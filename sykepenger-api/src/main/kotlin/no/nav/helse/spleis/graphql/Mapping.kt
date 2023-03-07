@@ -187,7 +187,7 @@ private fun mapUtbetaling(utbetaling: Utbetaling) = GraphQLUtbetaling(
         Utbetalingstatus.GodkjentUtenUtbetaling -> GraphQLUtbetalingstatus.GodkjentUtenUtbetaling
         Utbetalingstatus.IkkeGodkjent -> GraphQLUtbetalingstatus.IkkeGodkjent
         Utbetalingstatus.Overført -> GraphQLUtbetalingstatus.Overfort
-        Utbetalingstatus.Ubetalt -> GraphQLUtbetalingstatus.Ubetalt
+        Utbetalingstatus.IkkeUtbetalt -> GraphQLUtbetalingstatus.Ubetalt
         Utbetalingstatus.Utbetalt -> GraphQLUtbetalingstatus.Utbetalt
     },
     arbeidsgiverNettoBelop = utbetaling.arbeidsgiverNettoBeløp,

@@ -54,7 +54,7 @@ internal class KunEnArbeidsgiverMediatorTest : AbstractEndToEndMediatorTest() {
         sendSimulering(0, SimuleringMessage.Simuleringstatus.OK)
         sendUtbetalingsgodkjenning(0)
         sendUtbetaling()
-        assertUtbetalingTilstander(0, "NY", "IKKE_UTBETALT", "OVERFØRT", "UTBETALT")
+        assertUtbetalingTilstander(0, "NY", "IKKE_UTBETALT", "AVVENTER_ARBEIDSGIVERKVITTERING", "UTBETALT")
         assertTilstander(
             0,
             "AVVENTER_INFOTRYGDHISTORIKK",
@@ -169,8 +169,8 @@ internal class KunEnArbeidsgiverMediatorTest : AbstractEndToEndMediatorTest() {
         val fagsystemId = testRapid.inspektør.alleEtterspurteBehov(Utbetaling).last { it.path(Utbetaling.name).path("fagområde").asText() == "SPREF"}.path(Utbetaling.name).path("fagsystemId").asText()
         sendAnnullering(fagsystemId)
         sendUtbetaling()
-        assertUtbetalingTilstander(0, "NY", "IKKE_UTBETALT", "OVERFØRT", "UTBETALT")
-        assertUtbetalingTilstander(1, "NY", "IKKE_UTBETALT", "OVERFØRT", "ANNULLERT")
+        assertUtbetalingTilstander(0, "NY", "IKKE_UTBETALT", "AVVENTER_ARBEIDSGIVERKVITTERING", "UTBETALT")
+        assertUtbetalingTilstander(1, "NY", "IKKE_UTBETALT", "AVVENTER_ARBEIDSGIVERKVITTERING", "ANNULLERT")
         val annulleringsmelding = testRapid.inspektør.siste("utbetaling_annullert")
 
         assertEquals(UNG_PERSON_FNR_2018, annulleringsmelding.path("fødselsnummer").asText())
@@ -232,7 +232,7 @@ internal class KunEnArbeidsgiverMediatorTest : AbstractEndToEndMediatorTest() {
         sendSimulering(0, SimuleringMessage.Simuleringstatus.OK)
         sendUtbetalingsgodkjenning(0, true)
         assertUtbetalingTilstander(0, "NY", "IKKE_UTBETALT", "FORKASTET")
-        assertUtbetalingTilstander(1, "NY", "IKKE_UTBETALT", "OVERFØRT")
+        assertUtbetalingTilstander(1, "NY", "IKKE_UTBETALT", "AVVENTER_ARBEIDSGIVERKVITTERING")
         assertTilstander(
             0,
             "AVVENTER_INFOTRYGDHISTORIKK",
@@ -273,7 +273,7 @@ internal class KunEnArbeidsgiverMediatorTest : AbstractEndToEndMediatorTest() {
         sendUtbetalingsgodkjenning(0, true)
         assertUtbetalingTilstander(0, "NY", "IKKE_UTBETALT", "FORKASTET")
         assertUtbetalingTilstander(1, "NY", "IKKE_UTBETALT", "FORKASTET")
-        assertUtbetalingTilstander(2, "NY", "IKKE_UTBETALT", "OVERFØRT")
+        assertUtbetalingTilstander(2, "NY", "IKKE_UTBETALT", "AVVENTER_ARBEIDSGIVERKVITTERING")
         assertTilstander(
             0,
             "AVVENTER_INFOTRYGDHISTORIKK",
@@ -384,7 +384,7 @@ internal class KunEnArbeidsgiverMediatorTest : AbstractEndToEndMediatorTest() {
             "TIL_UTBETALING",
             "AVSLUTTET"
         )
-        assertUtbetalingTilstander(0, "NY", "IKKE_UTBETALT", "OVERFØRT", "UTBETALT")
+        assertUtbetalingTilstander(0, "NY", "IKKE_UTBETALT", "AVVENTER_ARBEIDSGIVERKVITTERING", "UTBETALT")
 
         assertEquals(1, testRapid.inspektør.meldinger("vedtak_fattet").size)
         assertEquals(vedtakFattetTidspunkt, testRapid.inspektør.siste("vedtak_fattet")["vedtakFattetTidspunkt"].asLocalDateTime())
@@ -495,8 +495,8 @@ internal class KunEnArbeidsgiverMediatorTest : AbstractEndToEndMediatorTest() {
         sendSimulering(0, SimuleringMessage.Simuleringstatus.OK, forventedeFagområder = setOf("SPREF", "SP"))
         sendUtbetalingsgodkjenning(0)
         sendUtbetaling()
-        assertUtbetalingTilstander(0, "NY", "IKKE_UTBETALT", "OVERFØRT", "UTBETALT")
-        assertEquals(2, testRapid.inspektør.alleEtterspurteBehov(Utbetaling).size)
+        assertUtbetalingTilstander(0, "NY", "IKKE_UTBETALT", "AVVENTER_KVITTERINGER", "AVVENTER_ARBEIDSGIVERKVITTERING", "UTBETALT")
+        assertEquals(3, testRapid.inspektør.alleEtterspurteBehov(Utbetaling).size)
         assertTilstander(
             0,
             "AVVENTER_INFOTRYGDHISTORIKK",

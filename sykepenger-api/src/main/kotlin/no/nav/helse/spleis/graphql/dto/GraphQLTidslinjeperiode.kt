@@ -142,11 +142,7 @@ enum class GraphQLUtbetalingstatus {
     GodkjentUtenUtbetaling,
     IkkeGodkjent,
     Overfort,
-    @Deprecated("skal slettes")
-    Sendt,
     Ubetalt,
-    @Deprecated("skal slettes")
-    UtbetalingFeilet,
     Utbetalt
 }
 

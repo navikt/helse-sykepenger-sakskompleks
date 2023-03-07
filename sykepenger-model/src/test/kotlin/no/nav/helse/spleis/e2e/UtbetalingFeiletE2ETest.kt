@@ -28,8 +28,7 @@ import no.nav.helse.person.TilstandType.TIL_UTBETALING
 import no.nav.helse.person.nullstillTilstandsendringer
 import no.nav.helse.utbetalingslinjer.Endringskode
 import no.nav.helse.utbetalingslinjer.Oppdragstatus
-import no.nav.helse.utbetalingslinjer.Utbetalingstatus.OVERFØRT
-import no.nav.helse.utbetalingslinjer.Utbetalingstatus.UTBETALT
+import no.nav.helse.utbetalingslinjer.Utbetalingstatus.*
 import no.nav.helse.økonomi.Prosentdel.Companion.prosent
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -49,7 +48,7 @@ internal class UtbetalingFeiletE2ETest : AbstractEndToEndTest() {
         håndterUtbetalingsgodkjenning(2.vedtaksperiode)
         håndterUtbetalt(Oppdragstatus.AVVIST)
 
-        håndterUtbetalingpåminnelse(2, OVERFØRT)
+        håndterUtbetalingpåminnelse(2, AVVENTER_ARBEIDSGIVERKVITTERING)
         håndterUtbetalt()
 
         val første = inspektør.utbetaling(0)
@@ -91,7 +90,7 @@ internal class UtbetalingFeiletE2ETest : AbstractEndToEndTest() {
         håndterUtbetalt(status = Oppdragstatus.AVVIST)
         nullstillTilstandsendringer()
 
-        håndterUtbetalingpåminnelse(0, OVERFØRT)
+        håndterUtbetalingpåminnelse(0, AVVENTER_ARBEIDSGIVERKVITTERING)
         håndterUtbetalt()
 
         assertEquals(1, inspektør.utbetalinger.size)
@@ -106,7 +105,7 @@ internal class UtbetalingFeiletE2ETest : AbstractEndToEndTest() {
         forlengTilGodkjentVedtak(1.februar, 28.februar)
         håndterUtbetalt(status = Oppdragstatus.AVVIST)
         nullstillTilstandsendringer()
-        håndterUtbetalingpåminnelse(1, OVERFØRT)
+        håndterUtbetalingpåminnelse(1, AVVENTER_ARBEIDSGIVERKVITTERING)
         håndterUtbetalt()
 
         assertEquals(2, inspektør.utbetalinger.size)
@@ -135,7 +134,7 @@ internal class UtbetalingFeiletE2ETest : AbstractEndToEndTest() {
         )
         nullstillTilstandsendringer()
 
-        håndterUtbetalingpåminnelse(0, OVERFØRT)
+        håndterUtbetalingpåminnelse(0, AVVENTER_PERSONKVITTERING)
         assertEquals(1, hendelselogg.behov().size)
         håndterUtbetalt(
             status = Oppdragstatus.AKSEPTERT,
@@ -160,18 +159,21 @@ internal class UtbetalingFeiletE2ETest : AbstractEndToEndTest() {
         håndterUtbetalt(
             status = Oppdragstatus.AVVIST,
             fagsystemId = inspektør.utbetaling(0).inspektør.arbeidsgiverOppdrag.inspektør.fagsystemId()
-        )
-        håndterUtbetalt(
-            status = Oppdragstatus.AKSEPTERT,
-            fagsystemId = inspektør.utbetaling(0).inspektør.personOppdrag.inspektør.fagsystemId()
+
         )
         nullstillTilstandsendringer()
 
-        håndterUtbetalingpåminnelse(0, OVERFØRT)
-        assertEquals(1, hendelselogg.behov().size)
+        assertEquals(AVVENTER_KVITTERINGER, inspektør.utbetaling(0).inspektør.tilstand)
+        håndterUtbetalingpåminnelse(0, AVVENTER_KVITTERINGER)
+        assertEquals(2, hendelselogg.behov().size)
         håndterUtbetalt(
             status = Oppdragstatus.AKSEPTERT,
             fagsystemId = inspektør.utbetaling(0).inspektør.arbeidsgiverOppdrag.inspektør.fagsystemId()
+        )
+        assertEquals(AVVENTER_PERSONKVITTERING, inspektør.utbetaling(0).inspektør.tilstand)
+        håndterUtbetalt(
+            status = Oppdragstatus.AKSEPTERT,
+            fagsystemId = inspektør.utbetaling(0).inspektør.personOppdrag.inspektør.fagsystemId()
         )
 
         assertEquals(1, inspektør.utbetalinger.size)

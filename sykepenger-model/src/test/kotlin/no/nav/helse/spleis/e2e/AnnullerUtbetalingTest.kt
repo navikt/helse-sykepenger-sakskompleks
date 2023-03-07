@@ -167,7 +167,7 @@ internal class AnnullerUtbetalingTest : AbstractEndToEndTest() {
         håndterAnnullerUtbetaling(fagsystemId = inspektør.fagsystemId(1.vedtaksperiode))
         håndterUtbetalt(status = Oppdragstatus.FEIL)
         assertFalse(hendelselogg.harFunksjonelleFeilEllerVerre())
-        assertEquals(Utbetalingstatus.OVERFØRT, inspektør.utbetaling(1).inspektør.tilstand)
+        assertEquals(Utbetalingstatus.AVVENTER_ARBEIDSGIVERKVITTERING, inspektør.utbetaling(1).inspektør.tilstand)
         assertForkastetPeriodeTilstander(1.vedtaksperiode, AVSLUTTET)
     }
 
@@ -178,7 +178,7 @@ internal class AnnullerUtbetalingTest : AbstractEndToEndTest() {
         håndterAnnullerUtbetaling(fagsystemId = inspektør.fagsystemId(1.vedtaksperiode))
         håndterUtbetalt(status = Oppdragstatus.AVVIST)
         assertFalse(person.personLogg.harFunksjonelleFeilEllerVerre())
-        assertEquals(Utbetalingstatus.OVERFØRT, inspektør.utbetaling(1).inspektør.tilstand)
+        assertEquals(Utbetalingstatus.AVVENTER_ARBEIDSGIVERKVITTERING, inspektør.utbetaling(1).inspektør.tilstand)
         assertForkastetPeriodeTilstander(1.vedtaksperiode, AVSLUTTET)
     }
 
@@ -205,7 +205,7 @@ internal class AnnullerUtbetalingTest : AbstractEndToEndTest() {
         håndterAnnullerUtbetaling(fagsystemId = inspektør.fagsystemId(1.vedtaksperiode))
         assertFalse(person.personLogg.harFunksjonelleFeilEllerVerre(), person.personLogg.toString())
         assertEquals(3, inspektør.utbetalinger.size)
-        assertEquals(Utbetalingstatus.OVERFØRT, inspektør.utbetaling(2).inspektør.tilstand)
+        assertEquals(Utbetalingstatus.AVVENTER_ARBEIDSGIVERKVITTERING, inspektør.utbetaling(2).inspektør.tilstand)
         assertEquals(Utbetalingtype.ANNULLERING, inspektør.utbetaling(2).inspektør.type)
         håndterUtbetalt(status = Oppdragstatus.AKSEPTERT)
         assertForkastetPeriodeTilstander(1.vedtaksperiode, AVSLUTTET)

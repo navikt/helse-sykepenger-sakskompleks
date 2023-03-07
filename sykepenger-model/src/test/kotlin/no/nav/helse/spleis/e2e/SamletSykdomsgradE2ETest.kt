@@ -72,7 +72,7 @@ internal class SamletSykdomsgradE2ETest: AbstractEndToEndTest() {
         assertTrue(utbetalingstidslinje[18.januar] is Utbetalingsdag.AvvistDag)
         assertTrue(utbetalingstidslinje[19.januar] is Utbetalingsdag.AvvistDag)
         assertEquals(3, utbetalingstidslinje.inspektør.avvistDagTeller)
-        assertEquals(Utbetalingstatus.OVERFØRT, inspektør.utbetalingtilstand(1))
+        assertEquals(Utbetalingstatus.AVVENTER_ARBEIDSGIVERKVITTERING, inspektør.utbetalingtilstand(1))
         assertTilstander(
             2.vedtaksperiode,
             START,

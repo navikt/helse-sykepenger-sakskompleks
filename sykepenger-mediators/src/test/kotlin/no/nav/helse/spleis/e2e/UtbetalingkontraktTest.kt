@@ -99,7 +99,7 @@ internal class UtbetalingkontraktTest : AbstractEndToEndMediatorTest() {
         val utbetalt = testRapid.inspektør.siste("utbetaling_utbetalt")
         assertUtbetalt(utbetalt)
         val utbetalingEndret = testRapid.inspektør.siste("utbetaling_endret")
-        assertUtbetalingEndret(utbetalingEndret, "OVERFØRT", "UTBETALT")
+        assertUtbetalingEndret(utbetalingEndret, "AVVENTER_ARBEIDSGIVERKVITTERING", "UTBETALT")
     }
 
     @Test
@@ -268,7 +268,7 @@ internal class UtbetalingkontraktTest : AbstractEndToEndMediatorTest() {
         val utbetalt = testRapid.inspektør.siste("utbetaling_annullert")
         assertAnnullert(utbetalt)
         val utbetalingEndret = testRapid.inspektør.siste("utbetaling_endret")
-        assertUtbetalingEndret(utbetalingEndret, "OVERFØRT", "ANNULLERT", true)
+        assertUtbetalingEndret(utbetalingEndret, "AVVENTER_ARBEIDSGIVERKVITTERING", "ANNULLERT", true)
     }
 
     @Test

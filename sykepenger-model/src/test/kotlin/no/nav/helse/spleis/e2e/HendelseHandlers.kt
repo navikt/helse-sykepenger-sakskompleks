@@ -62,6 +62,7 @@ import no.nav.helse.utbetalingslinjer.Fagområde
 import no.nav.helse.utbetalingslinjer.Oppdrag
 import no.nav.helse.utbetalingslinjer.Oppdragstatus
 import no.nav.helse.utbetalingslinjer.Utbetalingstatus
+import no.nav.helse.utbetalingslinjer.Utbetalingstatus.*
 import no.nav.helse.økonomi.Inntekt
 import no.nav.helse.økonomi.Inntekt.Companion.månedlig
 import no.nav.helse.økonomi.Prosentdel
@@ -771,7 +772,11 @@ private fun AbstractEndToEndTest.førsteUhåndterteUtbetalingsbehov(orgnummer: S
         .map { UUID.fromString(it.kontekst().getValue("utbetalingId")) }
 
     return inspektør(orgnummer).utbetalinger
-        .filter { it.inspektør.tilstand in setOf(Utbetalingstatus.OVERFØRT) }
+        .filter { it.inspektør.tilstand in setOf(
+            AVVENTER_KVITTERINGER,
+            AVVENTER_ARBEIDSGIVERKVITTERING,
+            AVVENTER_PERSONKVITTERING
+        ) }
         .also { require(it.size < 2) { "For mange utbetalinger i spill! Er sendt ut godkjenningsbehov for periodene ${it.map { utbetaling -> utbetaling.inspektør.periode }}" } }
         .firstOrNull { it.inspektør.utbetalingId in utbetalingsbehovUtbetalingIder }
         ?.let {

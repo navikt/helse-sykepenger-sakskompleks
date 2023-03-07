@@ -77,10 +77,10 @@ internal class AnnulleringOgUtbetalingTest : AbstractEndToEndTest() {
 
         assertEquals(13, observatør.utbetaltEndretEventer.size)
         assertUtbetalingtilstander(januarutbetaling.utbetalingId, NY, IKKE_UTBETALT, GODKJENT_UTEN_UTBETALING)
-        assertUtbetalingtilstander(marsutbetaling.utbetalingId, NY, IKKE_UTBETALT, OVERFØRT, UTBETALT)
+        assertUtbetalingtilstander(marsutbetaling.utbetalingId, NY, IKKE_UTBETALT, AVVENTER_ARBEIDSGIVERKVITTERING, UTBETALT)
         assertUtbetalingtilstander(annulleringAvJanuar.utbetalingId, NY, IKKE_UTBETALT, ANNULLERT)
-        assertUtbetalingtilstander(februarutbetaling.utbetalingId, NY, IKKE_UTBETALT, OVERFØRT, UTBETALT)
-        assertUtbetalingtilstander(revurderingAvMars.utbetalingId, NY, IKKE_UTBETALT, OVERFØRT, UTBETALT)
+        assertUtbetalingtilstander(februarutbetaling.utbetalingId, NY, IKKE_UTBETALT, AVVENTER_ARBEIDSGIVERKVITTERING, UTBETALT)
+        assertUtbetalingtilstander(revurderingAvMars.utbetalingId, NY, IKKE_UTBETALT, AVVENTER_ARBEIDSGIVERKVITTERING, UTBETALT)
 
         assertNotEquals(januarutbetaling.korrelasjonsId, marsutbetaling.korrelasjonsId)
         assertEquals(januarutbetaling.korrelasjonsId, annulleringAvJanuar.korrelasjonsId)
@@ -177,9 +177,9 @@ internal class AnnulleringOgUtbetalingTest : AbstractEndToEndTest() {
         val revurderingAvMars = inspektør.utbetaling(3).inspektør
 
         assertEquals(12, observatør.utbetaltEndretEventer.size)
-        assertUtbetalingtilstander(januarutbetaling.utbetalingId, NY, IKKE_UTBETALT, OVERFØRT, UTBETALT)
-        assertUtbetalingtilstander(marsutbetaling.utbetalingId, NY, IKKE_UTBETALT, OVERFØRT, UTBETALT)
-        assertUtbetalingtilstander(annulleringAvMars.utbetalingId, NY, IKKE_UTBETALT, OVERFØRT, ANNULLERT)
+        assertUtbetalingtilstander(januarutbetaling.utbetalingId, NY, IKKE_UTBETALT, AVVENTER_ARBEIDSGIVERKVITTERING, UTBETALT)
+        assertUtbetalingtilstander(marsutbetaling.utbetalingId, NY, IKKE_UTBETALT, AVVENTER_ARBEIDSGIVERKVITTERING, UTBETALT)
+        assertUtbetalingtilstander(annulleringAvMars.utbetalingId, NY, IKKE_UTBETALT, AVVENTER_ARBEIDSGIVERKVITTERING, ANNULLERT)
         assertUtbetalingtilstander(revurderingAvMars.utbetalingId, NY, IKKE_UTBETALT, GODKJENT, GODKJENT_UTEN_UTBETALING)
 
         assertEquals(marsutbetaling.korrelasjonsId, annulleringAvMars.korrelasjonsId)
@@ -236,12 +236,12 @@ internal class AnnulleringOgUtbetalingTest : AbstractEndToEndTest() {
         val revurderingAvMars = inspektør.utbetaling(5).inspektør
 
         assertEquals(19, observatør.utbetaltEndretEventer.size)
-        assertUtbetalingtilstander(januarutbetaling.utbetalingId, NY, IKKE_UTBETALT, OVERFØRT, UTBETALT)
-        assertUtbetalingtilstander(februarutbetaling.utbetalingId, NY, IKKE_UTBETALT, OVERFØRT, UTBETALT)
-        assertUtbetalingtilstander(marsutbetaling.utbetalingId, NY, IKKE_UTBETALT, OVERFØRT, UTBETALT)
-        assertUtbetalingtilstander(annulleringAvMars.utbetalingId, NY, IKKE_UTBETALT, OVERFØRT, ANNULLERT)
-        assertUtbetalingtilstander(revurderingAvFebruar.utbetalingId, NY, IKKE_UTBETALT, GODKJENT, OVERFØRT, UTBETALT)
-        assertUtbetalingtilstander(revurderingAvMars.utbetalingId, NY, IKKE_UTBETALT, OVERFØRT, UTBETALT)
+        assertUtbetalingtilstander(januarutbetaling.utbetalingId, NY, IKKE_UTBETALT, AVVENTER_ARBEIDSGIVERKVITTERING, UTBETALT)
+        assertUtbetalingtilstander(februarutbetaling.utbetalingId, NY, IKKE_UTBETALT, AVVENTER_ARBEIDSGIVERKVITTERING, UTBETALT)
+        assertUtbetalingtilstander(marsutbetaling.utbetalingId, NY, IKKE_UTBETALT, AVVENTER_ARBEIDSGIVERKVITTERING, UTBETALT)
+        assertUtbetalingtilstander(annulleringAvMars.utbetalingId, NY, IKKE_UTBETALT, AVVENTER_ARBEIDSGIVERKVITTERING, ANNULLERT)
+        assertUtbetalingtilstander(revurderingAvFebruar.utbetalingId, NY, IKKE_UTBETALT, GODKJENT, AVVENTER_ARBEIDSGIVERKVITTERING, UTBETALT)
+        assertUtbetalingtilstander(revurderingAvMars.utbetalingId, NY, IKKE_UTBETALT, AVVENTER_ARBEIDSGIVERKVITTERING, UTBETALT)
 
         assertEquals(januarutbetaling.korrelasjonsId, februarutbetaling.korrelasjonsId)
         assertNotEquals(februarutbetaling.korrelasjonsId, marsutbetaling.korrelasjonsId)

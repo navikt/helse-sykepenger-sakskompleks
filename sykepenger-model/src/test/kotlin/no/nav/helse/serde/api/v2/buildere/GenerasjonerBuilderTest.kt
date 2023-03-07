@@ -390,7 +390,7 @@ internal class GenerasjonerBuilderTest : AbstractEndToEndTest() {
         assertEquals(1, generasjoner.size)
         assertEquals(1, generasjoner[0].perioder.size)
         0.generasjon {
-            beregnetPeriode(0) er Utbetalingstatus.Ubetalt avType UTBETALING fra (1.januar til 31.januar) medAntallDager 31 forkastet false medTilstand TilGodkjenning
+            beregnetPeriode(0) er Utbetalingstatus.IkkeUtbetalt avType UTBETALING fra (1.januar til 31.januar) medAntallDager 31 forkastet false medTilstand TilGodkjenning
         }
     }
 
@@ -430,7 +430,7 @@ internal class GenerasjonerBuilderTest : AbstractEndToEndTest() {
         assertEquals(1, generasjoner[1].perioder.size)
 
         0.generasjon {
-            beregnetPeriode(0) er Utbetalingstatus.Ubetalt avType REVURDERING fra (1.januar til 31.januar) medAntallDager 31 forkastet false medTilstand ForberederGodkjenning
+            beregnetPeriode(0) er Utbetalingstatus.IkkeUtbetalt avType REVURDERING fra (1.januar til 31.januar) medAntallDager 31 forkastet false medTilstand ForberederGodkjenning
         }
 
         1.generasjon {
@@ -473,7 +473,7 @@ internal class GenerasjonerBuilderTest : AbstractEndToEndTest() {
         assertEquals(2, generasjoner[1].perioder.size)
 
         0.generasjon {
-            beregnetPeriode(0) er Utbetalingstatus.Ubetalt avType REVURDERING fra (1.februar til 28.februar) medAntallDager 28 forkastet false medTilstand ForberederGodkjenning
+            beregnetPeriode(0) er Utbetalingstatus.IkkeUtbetalt avType REVURDERING fra (1.februar til 28.februar) medAntallDager 28 forkastet false medTilstand ForberederGodkjenning
             beregnetPeriode(1) er Utbetalingstatus.Utbetalt avType UTBETALING fra (1.januar til 31.januar) medAntallDager 31 forkastet false medTilstand Utbetalt
         }
 
@@ -496,8 +496,8 @@ internal class GenerasjonerBuilderTest : AbstractEndToEndTest() {
         assertEquals(2, generasjoner[1].perioder.size)
 
         0.generasjon {
-            beregnetPeriode(0) er Utbetalingstatus.Ubetalt avType REVURDERING fra (1.februar til 28.februar) medAntallDager 28 forkastet false medTilstand ForberederGodkjenning
-            beregnetPeriode(1) er Utbetalingstatus.Ubetalt avType REVURDERING fra (1.januar til 31.januar) medAntallDager 31 forkastet false medTilstand VenterPåAnnenPeriode
+            beregnetPeriode(0) er Utbetalingstatus.IkkeUtbetalt avType REVURDERING fra (1.februar til 28.februar) medAntallDager 28 forkastet false medTilstand ForberederGodkjenning
+            beregnetPeriode(1) er Utbetalingstatus.IkkeUtbetalt avType REVURDERING fra (1.januar til 31.januar) medAntallDager 31 forkastet false medTilstand VenterPåAnnenPeriode
         }
 
         1.generasjon {
@@ -520,8 +520,8 @@ internal class GenerasjonerBuilderTest : AbstractEndToEndTest() {
         assertEquals(2, generasjoner[1].perioder.size)
 
         0.generasjon {
-            beregnetPeriode(0) er Utbetalingstatus.Ubetalt avType REVURDERING fra (1.februar til 28.februar) medAntallDager 28 forkastet false medTilstand TilGodkjenning
-            beregnetPeriode(1) er Utbetalingstatus.Ubetalt avType REVURDERING fra (1.januar til 31.januar) medAntallDager 31 forkastet false medTilstand TilGodkjenning
+            beregnetPeriode(0) er Utbetalingstatus.IkkeUtbetalt avType REVURDERING fra (1.februar til 28.februar) medAntallDager 28 forkastet false medTilstand TilGodkjenning
+            beregnetPeriode(1) er Utbetalingstatus.IkkeUtbetalt avType REVURDERING fra (1.januar til 31.januar) medAntallDager 31 forkastet false medTilstand TilGodkjenning
         }
 
         1.generasjon {
@@ -549,8 +549,8 @@ internal class GenerasjonerBuilderTest : AbstractEndToEndTest() {
         assertEquals(2, generasjoner[2].perioder.size)
 
         0.generasjon {
-            beregnetPeriode(0) er Utbetalingstatus.Ubetalt avType REVURDERING fra (1.februar til 28.februar) medAntallDager 28 forkastet false medTilstand ForberederGodkjenning
-            beregnetPeriode(1) er Utbetalingstatus.Ubetalt avType REVURDERING fra (1.januar til 31.januar) medAntallDager 31 forkastet false medTilstand VenterPåAnnenPeriode
+            beregnetPeriode(0) er Utbetalingstatus.IkkeUtbetalt avType REVURDERING fra (1.februar til 28.februar) medAntallDager 28 forkastet false medTilstand ForberederGodkjenning
+            beregnetPeriode(1) er Utbetalingstatus.IkkeUtbetalt avType REVURDERING fra (1.januar til 31.januar) medAntallDager 31 forkastet false medTilstand VenterPåAnnenPeriode
         }
 
         1.generasjon {
@@ -590,7 +590,7 @@ internal class GenerasjonerBuilderTest : AbstractEndToEndTest() {
         assertEquals(2, generasjoner[3].perioder.size)
 
         0.generasjon {
-            beregnetPeriode(0) er Utbetalingstatus.Ubetalt avType REVURDERING fra (1.februar til 28.februar) medAntallDager 28 forkastet false medTilstand ForberederGodkjenning
+            beregnetPeriode(0) er Utbetalingstatus.IkkeUtbetalt avType REVURDERING fra (1.februar til 28.februar) medAntallDager 28 forkastet false medTilstand ForberederGodkjenning
             beregnetPeriode(1) er Utbetalingstatus.Utbetalt avType REVURDERING fra (1.januar til 31.januar) medAntallDager 31 forkastet false medTilstand Utbetalt
         }
 
@@ -623,7 +623,7 @@ internal class GenerasjonerBuilderTest : AbstractEndToEndTest() {
         assertEquals(2, generasjoner[1].perioder.size)
 
         0.generasjon {
-            beregnetPeriode(0) er Utbetalingstatus.Ubetalt avType REVURDERING fra (2.februar til 28.februar) medAntallDager 27 forkastet false medTilstand ForberederGodkjenning
+            beregnetPeriode(0) er Utbetalingstatus.IkkeUtbetalt avType REVURDERING fra (2.februar til 28.februar) medAntallDager 27 forkastet false medTilstand ForberederGodkjenning
             beregnetPeriode(1) er Utbetalingstatus.Utbetalt avType UTBETALING fra (1.januar til 31.januar) medAntallDager 31 forkastet false medTilstand Utbetalt
         }
 
@@ -812,7 +812,7 @@ internal class GenerasjonerBuilderTest : AbstractEndToEndTest() {
         assertEquals(2, generasjoner[0].perioder.size)
 
         0.generasjon {
-            beregnetPeriode(0) er Utbetalingstatus.Ubetalt avType UTBETALING fra (16.januar til 15.februar) medAntallDager 31 forkastet false medTilstand ForberederGodkjenning
+            beregnetPeriode(0) er Utbetalingstatus.IkkeUtbetalt avType UTBETALING fra (16.januar til 15.februar) medAntallDager 31 forkastet false medTilstand ForberederGodkjenning
             uberegnetPeriode(1) fra (1.januar til 15.januar) medAntallDager 15 forkastet false medTilstand IngenUtbetaling
         }
     }
@@ -839,7 +839,7 @@ internal class GenerasjonerBuilderTest : AbstractEndToEndTest() {
         assertEquals(2, generasjoner[1].perioder.size)
 
         0.generasjon {
-            beregnetPeriode(0) er Utbetalingstatus.Ubetalt avType REVURDERING fra (16.januar til 15.februar) medAntallDager 31 forkastet false medTilstand ForberederGodkjenning
+            beregnetPeriode(0) er Utbetalingstatus.IkkeUtbetalt avType REVURDERING fra (16.januar til 15.februar) medAntallDager 31 forkastet false medTilstand ForberederGodkjenning
             uberegnetPeriode(1) fra (1.januar til 15.januar) medAntallDager 15 forkastet false medTilstand IngenUtbetaling
         }
 
@@ -859,7 +859,7 @@ internal class GenerasjonerBuilderTest : AbstractEndToEndTest() {
         0.generasjon {
             assertEquals(2, perioder.size)
             uberegnetPeriode(0) medTilstand VenterPåAnnenPeriode
-            beregnetPeriode(1) er Utbetalingstatus.Ubetalt avType UTBETALING fra (1.januar til 31.januar) medAntallDager 31 forkastet false medTilstand TilGodkjenning
+            beregnetPeriode(1) er Utbetalingstatus.IkkeUtbetalt avType UTBETALING fra (1.januar til 31.januar) medAntallDager 31 forkastet false medTilstand TilGodkjenning
         }
     }
 
@@ -873,7 +873,7 @@ internal class GenerasjonerBuilderTest : AbstractEndToEndTest() {
         0.generasjon {
             assertEquals(2, perioder.size)
             uberegnetPeriode(0) medTilstand ManglerInformasjon
-            beregnetPeriode(1) er Utbetalingstatus.Ubetalt avType UTBETALING fra (1.januar til 31.januar) medAntallDager 31 forkastet false medTilstand TilGodkjenning
+            beregnetPeriode(1) er Utbetalingstatus.IkkeUtbetalt avType UTBETALING fra (1.januar til 31.januar) medAntallDager 31 forkastet false medTilstand TilGodkjenning
         }
     }
 
@@ -944,7 +944,7 @@ internal class GenerasjonerBuilderTest : AbstractEndToEndTest() {
 
         0.generasjon {
             uberegnetPeriode(0) fra (1.februar til 28.februar) medAntallDager 28 forkastet false medTilstand VenterPåAnnenPeriode
-            beregnetPeriode(1) er Utbetalingstatus.Ubetalt avType REVURDERING fra (1.januar til 31.januar) medAntallDager 31 forkastet false medTilstand ForberederGodkjenning
+            beregnetPeriode(1) er Utbetalingstatus.IkkeUtbetalt avType REVURDERING fra (1.januar til 31.januar) medAntallDager 31 forkastet false medTilstand ForberederGodkjenning
         }
 
         1.generasjon {
@@ -1868,7 +1868,7 @@ internal class GenerasjonerBuilderTest : AbstractEndToEndTest() {
         0.generasjon {
             assertEquals(2, perioder.size)
             beregnetPeriode(0) er Utbetalingstatus.Utbetalt avType UTBETALING fra (1.mars til 31.mars) medTilstand UtbetaltVenterPåAnnenPeriode
-            beregnetPeriode(1) er Utbetalingstatus.Ubetalt avType UTBETALING fra (1.januar til 31.januar) medTilstand TilGodkjenning
+            beregnetPeriode(1) er Utbetalingstatus.IkkeUtbetalt avType UTBETALING fra (1.januar til 31.januar) medTilstand TilGodkjenning
         }
 
         håndterUtbetalingsgodkjenning(2.vedtaksperiode)
@@ -1880,7 +1880,7 @@ internal class GenerasjonerBuilderTest : AbstractEndToEndTest() {
 
         0.generasjon {
             assertEquals(2, perioder.size)
-            beregnetPeriode(0) er Utbetalingstatus.Ubetalt avType REVURDERING fra (1.mars til 31.mars) medTilstand TilGodkjenning
+            beregnetPeriode(0) er Utbetalingstatus.IkkeUtbetalt avType REVURDERING fra (1.mars til 31.mars) medTilstand TilGodkjenning
             beregnetPeriode(1) er Utbetalingstatus.Utbetalt avType UTBETALING fra (1.januar til 31.januar) medTilstand Utbetalt
         }
         1.generasjon {

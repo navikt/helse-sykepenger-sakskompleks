@@ -16,7 +16,6 @@ class AnnullerUtbetalingAdapter(private val original: AnnullerUtbetaling): Annul
     override fun vurdering(): Utbetaling.Vurdering = original.vurdering()
     override fun erRelevant(fagsystemId: String): Boolean = original.erRelevant(fagsystemId)
 }
-
 internal fun Simulering.utbetalingport() = SimuleringAdapter(this)
 class SimuleringAdapter(private val simulering: Simulering): SimuleringPort, IAktivitetslogg by simulering {
     override val simuleringResultat: SimuleringResultat? = simulering.simuleringResultat

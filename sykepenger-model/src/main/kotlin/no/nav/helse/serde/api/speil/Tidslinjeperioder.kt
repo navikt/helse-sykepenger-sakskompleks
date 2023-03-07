@@ -51,7 +51,7 @@ import no.nav.helse.serde.api.speil.builders.IVilkårsgrunnlag
 import no.nav.helse.serde.api.speil.builders.IVilkårsgrunnlagHistorikk
 import no.nav.helse.serde.api.speil.builders.PeriodeVarslerBuilder
 import no.nav.helse.Alder
-import kotlin.properties.Delegates
+import no.nav.helse.utbetalingslinjer.Utbetalingstatus.*
 
 internal class Generasjoner(perioder: Tidslinjeperioder) {
     private val generasjoner: List<Generasjon> = perioder.toGenerasjoner()
@@ -354,7 +354,7 @@ internal class IUtbetaling(
     val gjenståendeSykedager: Int?,
     val forbrukteSykedager: Int?,
     private val type: String,
-    private val tilstand: String,
+    tilstand: no.nav.helse.utbetalingslinjer.Utbetalingstatus,
     private val arbeidsgiverNettoBeløp: Int,
     private val personNettoBeløp: Int,
     private val arbeidsgiverFagsystemId: String,
@@ -362,11 +362,24 @@ internal class IUtbetaling(
     private val vurdering: Utbetaling.Vurdering?,
     private val oppdrag: Map<String, SpeilOppdrag>
 ) {
+    private val status = when (tilstand) {
+        IKKE_UTBETALT -> Utbetalingstatus.IkkeUtbetalt
+        IKKE_GODKJENT -> Utbetalingstatus.IkkeGodkjent
+        GODKJENT -> Utbetalingstatus.Godkjent
+        AVVENTER_ARBEIDSGIVERKVITTERING,
+        AVVENTER_PERSONKVITTERING,
+        AVVENTER_KVITTERINGER -> Utbetalingstatus.Overført
+        UTBETALT -> Utbetalingstatus.Utbetalt
+        GODKJENT_UTEN_UTBETALING -> Utbetalingstatus.GodkjentUtenUtbetaling
+        ANNULLERT -> Utbetalingstatus.Annullert
+        FORKASTET -> Utbetalingstatus.Forkastet
+        else -> error("Har ikke mappingregel for $tilstand")
+    }
     private var erTilGodkjenning = false
     fun erSammeSom(other: IUtbetaling) = id == other.id
     fun fagsystemId() = arbeidsgiverFagsystemId
     fun hørerSammen(other: IUtbetaling) = korrelasjonsId == other.korrelasjonsId
-    fun forkastet() = tilstand == "Forkastet"
+    fun forkastet() = status == Utbetalingstatus.Forkastet
 
     fun settTilGodkjenning(vedtaksperioder: List<IVedtaksperiode>) {
         erTilGodkjenning = vedtaksperioder.tilGodkjenning(this)
@@ -375,7 +388,7 @@ internal class IUtbetaling(
     fun toDTO(): Utbetaling {
         return Utbetaling(
             type = Utbetalingtype.valueOf(type),
-            status = Utbetalingstatus.valueOf(tilstand),
+            status = status,
             arbeidsgiverNettoBeløp = arbeidsgiverNettoBeløp,
             personNettoBeløp = personNettoBeløp,
             arbeidsgiverFagsystemId = arbeidsgiverFagsystemId,

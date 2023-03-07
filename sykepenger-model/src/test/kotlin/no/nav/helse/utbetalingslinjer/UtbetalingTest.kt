@@ -221,7 +221,7 @@ internal class UtbetalingTest {
             assertEquals(oppdragInspektør.fagsystemId(), kontekster.getValue("fagsystemId"))
         }
 
-        assertEquals(OVERFØRT, annullering1.inspektør.tilstand)
+        assertEquals(AVVENTER_ARBEIDSGIVERKVITTERING, annullering1.inspektør.tilstand)
         assertEquals(ANNULLERT, annullering2.inspektør.tilstand)
         assertEquals(GODKJENT, utbetalingen.inspektør.tilstand)
 
@@ -300,7 +300,7 @@ internal class UtbetalingTest {
             assertEquals(oppdragInspektør.fagsystemId(), kontekster.getValue("fagsystemId"))
         }
 
-        assertEquals(OVERFØRT, annullering1.inspektør.tilstand)
+        assertEquals(AVVENTER_ARBEIDSGIVERKVITTERING, annullering1.inspektør.tilstand)
         assertEquals(ANNULLERT, annullering2.inspektør.tilstand)
         assertEquals(GODKJENT, utbetalingen.inspektør.tilstand)
 
@@ -326,7 +326,7 @@ internal class UtbetalingTest {
 
         assertEquals(ANNULLERT, annullering1.inspektør.tilstand)
         assertEquals(ANNULLERT, annullering2.inspektør.tilstand)
-        assertEquals(OVERFØRT, utbetalingen.inspektør.tilstand)
+        assertEquals(AVVENTER_ARBEIDSGIVERKVITTERING, utbetalingen.inspektør.tilstand)
     }
 
     @Test
@@ -762,7 +762,6 @@ internal class UtbetalingTest {
         beregnUtbetalinger(tidslinje)
         val utbetaling = opprettGodkjentUtbetaling(tidslinje)
         assertFalse(Utbetaling.kanForkastes(listOf(utbetaling), listOf(utbetaling)))
-        assertFalse(Utbetaling.kanForkastes(listOf(utbetaling), listOf(utbetaling)))
         kvittèr(utbetaling, utbetaling.inspektør.arbeidsgiverOppdrag.inspektør.fagsystemId())
         assertFalse(Utbetaling.kanForkastes(listOf(utbetaling), listOf(utbetaling)))
     }
@@ -802,7 +801,7 @@ internal class UtbetalingTest {
         beregnUtbetalinger(tidslinje)
         val utbetaling = opprettGodkjentUtbetaling(tidslinje)
         kvittèr(utbetaling)
-        assertEquals(OVERFØRT, utbetaling.inspektør.tilstand)
+        assertEquals(Utbetalingstatus.AVVENTER_PERSONKVITTERING, utbetaling.inspektør.tilstand)
     }
 
     @Test
@@ -816,12 +815,12 @@ internal class UtbetalingTest {
     }
 
     @Test
-    fun `utbetalingen er feilet dersom én av oppdragene er avvist 1`() {
+    fun `venter på kvitteringer for begge`() {
         val tidslinje = tidslinjeOf(16.AP, 15.NAV(dekningsgrunnlag = 1000, refusjonsbeløp = 600))
         beregnUtbetalinger(tidslinje)
         val utbetaling = opprettGodkjentUtbetaling(tidslinje)
         kvittèr(utbetaling, utbetaling.inspektør.arbeidsgiverOppdrag.inspektør.fagsystemId(), AVVIST)
-        assertEquals(OVERFØRT, utbetaling.inspektør.tilstand)
+        assertEquals(Utbetalingstatus.AVVENTER_KVITTERINGER, utbetaling.inspektør.tilstand)
     }
 
     @Test
@@ -830,20 +829,22 @@ internal class UtbetalingTest {
         beregnUtbetalinger(tidslinje)
         val utbetaling = opprettGodkjentUtbetaling(tidslinje)
         kvittèr(utbetaling, utbetaling.inspektør.arbeidsgiverOppdrag.inspektør.fagsystemId(), AVVIST)
-        kvittèr(utbetaling, utbetaling.inspektør.personOppdrag.fagsystemId(), AKSEPTERT)
-        assertEquals(AVVIST, utbetaling.inspektør.arbeidsgiverOppdrag.inspektør.status())
+        kvittèr(utbetaling, utbetaling.inspektør.personOppdrag.inspektør.fagsystemId(), AKSEPTERT)
+        assertNull(utbetaling.inspektør.arbeidsgiverOppdrag.inspektør.status())
         assertEquals(AKSEPTERT, utbetaling.inspektør.personOppdrag.inspektør.status())
-        assertEquals(OVERFØRT, utbetaling.inspektør.tilstand)
+        assertEquals(Utbetalingstatus.AVVENTER_ARBEIDSGIVERKVITTERING, utbetaling.inspektør.tilstand)
     }
 
     @Test
-    fun `utbetalingen er feilet dersom én av oppdragene er avvist 2`() {
+    fun `utbetalingen venter på kvittering dersom én av oppdragene er avvist`() {
         val tidslinje = tidslinjeOf(16.AP, 15.NAV(dekningsgrunnlag = 1000, refusjonsbeløp = 600))
         beregnUtbetalinger(tidslinje)
         val utbetaling = opprettGodkjentUtbetaling(tidslinje)
         kvittèr(utbetaling, utbetaling.inspektør.arbeidsgiverOppdrag.inspektør.fagsystemId(), AKSEPTERT)
         kvittèr(utbetaling, utbetaling.inspektør.personOppdrag.fagsystemId(), AVVIST)
-        assertEquals(OVERFØRT, utbetaling.inspektør.tilstand)
+        assertEquals(Utbetalingstatus.AVVENTER_PERSONKVITTERING, utbetaling.inspektør.tilstand)
+        kvittèr(utbetaling, utbetaling.inspektør.personOppdrag.fagsystemId(), AKSEPTERT)
+        assertEquals(Utbetalingstatus.UTBETALT, utbetaling.inspektør.tilstand)
     }
 
     @Test
@@ -951,10 +952,13 @@ internal class UtbetalingTest {
         val utbetaling = opprettUbetaltUtbetaling(tidslinje)
         val hendelselogg = godkjenn(utbetaling)
         val utbetalingsbehov = hendelselogg.behov().filter { it.type == Behovtype.Utbetaling }
-        assertEquals(2, utbetalingsbehov.size) { "Forventer to utbetalingsbehov" }
-        val fagområder = utbetalingsbehov.map { it.detaljer().getValue("fagområde") as String }
-        assertTrue(Fagområde.Sykepenger.verdi in fagområder)
-        assertTrue(Fagområde.SykepengerRefusjon.verdi in fagområder)
+        assertEquals(2, utbetalingsbehov.size) { "Forventer ett utbetalingsbehov" }
+        val fagområde = utbetalingsbehov.map { it.detaljer().getValue("fagområde") as String }.toSet()
+        assertEquals(setOf(Fagområde.SykepengerRefusjon.verdi, Fagområde.Sykepenger.verdi), fagområde)
+        kvittèr(utbetaling)
+        assertEquals(Utbetalingstatus.AVVENTER_PERSONKVITTERING, utbetaling.inspektør.tilstand)
+        kvittèr(utbetaling, fagsystemId = utbetaling.inspektør.personOppdrag.inspektør.fagsystemId())
+        assertEquals(Utbetalingstatus.UTBETALT, utbetaling.inspektør.tilstand)
     }
 
     @Test
@@ -1043,7 +1047,7 @@ internal class UtbetalingTest {
     fun `utbetalingHendelse som treffer på brukeroppdraget`() {
         val utbetaling = opprettGodkjentUtbetaling()
         kvittèr(utbetaling, utbetaling.inspektør.personOppdrag.fagsystemId())
-        assertEquals(UTBETALT, utbetaling.inspektør.tilstand)
+        assertEquals(Utbetalingstatus.AVVENTER_ARBEIDSGIVERKVITTERING, utbetaling.inspektør.tilstand)
     }
 
     @Test

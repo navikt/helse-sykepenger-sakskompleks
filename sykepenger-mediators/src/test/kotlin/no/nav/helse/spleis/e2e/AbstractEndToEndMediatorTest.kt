@@ -1,5 +1,6 @@
 package no.nav.helse.spleis.e2e
 
+import com.fasterxml.jackson.databind.JsonNode
 import com.zaxxer.hikari.HikariConfig
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -419,15 +420,19 @@ internal abstract class AbstractEndToEndMediatorTest {
     }
 
     protected fun sendUtbetaling(utbetalingOK: Boolean = true) {
-        val etterspurteBehov = testRapid.inspektør.alleEtterspurteBehov(Utbetaling)
-        etterspurteBehov.forEach { behov ->
-            val (_, message) = meldingsfabrikk.lagUtbetaling(
-                fagsystemId = behov.path("fagsystemId").asText(),
-                utbetalingId = behov.path("utbetalingId").asText(),
-                utbetalingOK = utbetalingOK
-            )
-            testRapid.sendTestMessage(message)
-        }
+        val etterspurtBehov = testRapid.inspektør.etterspurteBehov(Utbetaling)
+        sendUtbetaling(utbetalingOK, etterspurtBehov)
+        val personbehov = testRapid.inspektør.etterspurteBehov(Utbetaling).takeUnless { etterspurtBehov === it } ?: return
+        sendUtbetaling(utbetalingOK, personbehov)
+    }
+
+    private fun sendUtbetaling(utfall: Boolean, behov: JsonNode) {
+        val (_, kvitteringmelding) = meldingsfabrikk.lagUtbetaling(
+            fagsystemId = behov.path("fagsystemId").asText(),
+            utbetalingId = behov.path("utbetalingId").asText(),
+            utbetalingOK = utfall
+        )
+        testRapid.sendTestMessage(kvitteringmelding)
     }
 
     protected fun sendAvstemming() {

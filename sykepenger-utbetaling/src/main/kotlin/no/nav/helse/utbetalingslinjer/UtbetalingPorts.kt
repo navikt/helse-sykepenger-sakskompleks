@@ -6,7 +6,7 @@ import java.util.UUID
 import no.nav.helse.hendelser.SimuleringResultat
 import no.nav.helse.person.aktivitetslogg.IAktivitetslogg
 
-interface UtbetalingHendelsePort: IAktivitetslogg {
+interface UtbetalingHendelsePort : IAktivitetslogg {
     val avstemmingsnøkkel: Long
     val overføringstidspunkt: LocalDateTime
     val status: Oppdragstatus

@@ -15,8 +15,6 @@ import no.nav.helse.person.aktivitetslogg.Varselkode.RV_OS_3
 import no.nav.helse.person.aktivitetslogg.Aktivitetskontekst
 import no.nav.helse.person.aktivitetslogg.IAktivitetslogg
 import no.nav.helse.person.aktivitetslogg.SpesifikkKontekst
-import no.nav.helse.utbetalingslinjer.Oppdragstatus.AVVIST
-import no.nav.helse.utbetalingslinjer.Oppdragstatus.FEIL
 import no.nav.helse.utbetalingslinjer.Utbetalingslinje.Companion.kjedeSammenLinjer
 import no.nav.helse.utbetalingslinjer.Utbetalingslinje.Companion.kobleTil
 import no.nav.helse.utbetalingslinjer.Utbetalingslinje.Companion.normaliserLinjer
@@ -50,14 +48,6 @@ class Oppdrag private constructor(
             return Utbetalingslinje.stønadsdager(oppdrag.toList().flatten())
         }
 
-        fun synkronisert(vararg oppdrag: Oppdrag): Boolean {
-            val endrede = oppdrag.filter { it.harUtbetalinger() }
-            return endrede.all { it.status == endrede.first().status }
-        }
-
-        fun ingenFeil(vararg oppdrag: Oppdrag) = oppdrag.none { it.status in listOf(AVVIST, FEIL) }
-        fun harFeil(vararg oppdrag: Oppdrag) = oppdrag.any { it.status in listOf(AVVIST, FEIL) }
-        fun kanIkkeForsøkesPåNy(vararg oppdrag: Oppdrag) = oppdrag.any { it.status == AVVIST }
         fun ferdigOppdrag(
             mottaker: String,
             from: Fagområde,
@@ -89,11 +79,6 @@ class Oppdrag private constructor(
         )
     }
 
-    private val overlapperiode get() = when {
-        sisteArbeidsgiverdag == null && isEmpty() -> null
-        sisteArbeidsgiverdag == null -> linjeperiode
-        else -> linjeperiode?.oppdaterFom(sisteArbeidsgiverdag)
-    }
     private val linjeperiode get() = firstOrNull()?.let { (it.datoStatusFom() ?: it.fom) til last().tom }
 
     constructor(
@@ -151,15 +136,6 @@ class Oppdrag private constructor(
     }
 
     fun fagsystemId() = fagsystemId
-
-    private operator fun contains(other: Oppdrag) = this.tilhører(other) || this.overlapperMed(other) || sammenhengendeUtbetalingsperiode(other)
-
-    fun tilhører(other: Oppdrag) = this.fagsystemId == other.fagsystemId && this.fagområde == other.fagområde
-    private fun overlapperMed(other: Oppdrag) =
-        this.overlapperiode?.let { other.overlapperiode?.overlapperMed(it) } ?: false
-
-    private fun sammenhengendeUtbetalingsperiode(other: Oppdrag) =
-        this.sisteArbeidsgiverdag != null && this.sisteArbeidsgiverdag == other.sisteArbeidsgiverdag
 
     fun overfør(
         aktivitetslogg: IAktivitetslogg,
@@ -378,11 +354,12 @@ class Oppdrag private constructor(
         "simuleringsResultat" to simuleringsResultat?.toMap()
     )
 
-    fun lagreOverføringsinformasjon(hendelse: UtbetalingHendelsePort) {
-        if (!hendelse.erRelevant(fagsystemId)) return
+    fun lagreOverføringsinformasjon(hendelse: UtbetalingHendelsePort): Boolean {
+        if (!hendelse.erRelevant(fagsystemId)) return false
         if (this.avstemmingsnøkkel == null) this.avstemmingsnøkkel = hendelse.avstemmingsnøkkel
         if (this.overføringstidspunkt == null) this.overføringstidspunkt = hendelse.overføringstidspunkt
         this.status = hendelse.status
+        return true
     }
     fun håndter(simulering: SimuleringPort) {
         if (!simulering.erSimulert(fagområde, fagsystemId)) return

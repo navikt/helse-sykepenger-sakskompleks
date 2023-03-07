@@ -1277,7 +1277,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
         håndterSimulering(1.vedtaksperiode)
         håndterUtbetalingsgodkjenning(1.vedtaksperiode)
         assertEquals(Utbetalingstatus.UTBETALT, inspektør.utbetalingtilstand(0))
-        assertEquals(Utbetalingstatus.OVERFØRT, inspektør.utbetalingtilstand(1))
+        assertEquals(Utbetalingstatus.AVVENTER_ARBEIDSGIVERKVITTERING, inspektør.utbetalingtilstand(1))
         assertEquals(inspektør.utbetaling(0).inspektør.arbeidsgiverOppdrag.fagsystemId(), inspektør.utbetaling(1).inspektør.arbeidsgiverOppdrag.fagsystemId())
         inspektør.utbetaling(1).inspektør.arbeidsgiverOppdrag.also { oppdrag ->
             assertEquals(2, oppdrag.size)
@@ -1315,7 +1315,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
         håndterUtbetalingsgodkjenning(2.vedtaksperiode)
         assertEquals(Utbetalingstatus.UTBETALT, inspektør.utbetalingtilstand(0))
         assertEquals(Utbetalingstatus.UTBETALT, inspektør.utbetalingtilstand(1))
-        assertEquals(Utbetalingstatus.OVERFØRT, inspektør.utbetalingtilstand(2))
+        assertEquals(Utbetalingstatus.AVVENTER_ARBEIDSGIVERKVITTERING, inspektør.utbetalingtilstand(2))
         assertEquals(inspektør.utbetaling(1).inspektør.arbeidsgiverOppdrag.fagsystemId(), inspektør.utbetaling(2).inspektør.arbeidsgiverOppdrag.fagsystemId())
         inspektør.utbetaling(2).inspektør.arbeidsgiverOppdrag.also { oppdrag ->
             assertEquals(1, oppdrag.size)
