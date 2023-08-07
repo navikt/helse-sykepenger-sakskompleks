@@ -4,7 +4,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 import no.nav.helse.hendelser.Periode
-import no.nav.helse.utbetalingstidslinje.Utbetalingstidslinje
+import no.nav.helse.utbetalingstidslinje.Utbetalingsdag
 
 interface UtbetalingObserver {
     fun utbetalingAnnullert(
@@ -32,7 +32,7 @@ interface UtbetalingObserver {
         epost: String,
         tidspunkt: LocalDateTime,
         automatiskBehandling: Boolean,
-        utbetalingstidslinje: Utbetalingstidslinje,
+        utbetalingstidslinje: Collection<Utbetalingsdag>,
         ident: String
     ) {
     }
@@ -51,7 +51,7 @@ interface UtbetalingObserver {
         arbeidsgiverOppdrag: Oppdrag,
         tidspunkt: LocalDateTime,
         automatiskBehandling: Boolean,
-        utbetalingstidslinje: Utbetalingstidslinje,
+        utbetalingstidslinje: Collection<Utbetalingsdag>,
         epost: String
     ) {
     }

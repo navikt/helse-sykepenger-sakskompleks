@@ -43,7 +43,7 @@ import no.nav.helse.utbetalingslinjer.Utbetaling
 import no.nav.helse.utbetalingslinjer.Utbetalingslinje
 import no.nav.helse.utbetalingslinjer.Utbetalingstatus
 import no.nav.helse.utbetalingslinjer.Utbetalingtype
-import no.nav.helse.utbetalingstidslinje.Utbetalingstidslinje
+import no.nav.helse.utbetalingstidslinje.Utbetalingsdag
 
 // Besøker hele arbeidsgiver-treet
 internal class GenerasjonerBuilder(
@@ -209,8 +209,8 @@ internal class GenerasjonerBuilder(
         )
     }
 
-    override fun preVisitUtbetalingstidslinje(tidslinje: Utbetalingstidslinje, gjeldendePeriode: Periode?) {
-        tilstand.besøkUtbetalingstidslinje(this, tidslinje)
+    override fun preVisitUtbetalingsdager(dager: Collection<Utbetalingsdag>) {
+        tilstand.besøkUtbetalingstidslinje(this, dager)
     }
 
     override fun preVisitOppdrag(
@@ -327,7 +327,7 @@ internal class GenerasjonerBuilder(
         fun besøkVilkårsgrunnlagelement(builder: GenerasjonerBuilder, vilkårsgrunnlagId: UUID, skjæringstidspunkt: LocalDate) {
             throw IllegalStateException("a-hoy! dette var ikke forventet gitt!")
         }
-        fun besøkUtbetalingstidslinje(builder: GenerasjonerBuilder, utbetalingstidslinje: Utbetalingstidslinje) {}
+        fun besøkUtbetalingstidslinje(builder: GenerasjonerBuilder, utbetalingstidslinje: Collection<Utbetalingsdag>) {}
         fun besøkSykdomstidslinje(builder: GenerasjonerBuilder, sykdomstidslinje: Sykdomstidslinje) {}
         fun forlatVedtaksperiode(builder: GenerasjonerBuilder) {
             throw IllegalStateException("a-hoy! dette var ikke forventet gitt!")
@@ -422,7 +422,7 @@ internal class GenerasjonerBuilder(
                 beregnetPeriodeBuilder?.medVurdering(godkjent, tidsstempel, automatisk, ident)
             }
 
-            override fun besøkUtbetalingstidslinje(builder: GenerasjonerBuilder, utbetalingstidslinje: Utbetalingstidslinje) {
+            override fun besøkUtbetalingstidslinje(builder: GenerasjonerBuilder, utbetalingstidslinje: Collection<Utbetalingsdag>) {
                 beregnetPeriodeBuilder?.medUtbetalingstidslinje(UtbetalingstidslinjeBuilder(utbetalingstidslinje).build())
             }
 

@@ -9,7 +9,7 @@ import no.nav.helse.utbetalingstidslinje.UtbetalingsdagVisitor
 import no.nav.helse.utbetalingstidslinje.UtbetalingstidslinjeVisitor
 import no.nav.helse.økonomi.Økonomi
 
-internal class UtbetalingsdagerBuilder(private val sykdomstidslinje: Sykdomstidslinje) : UtbetalingstidslinjeVisitor {
+internal class UtbetalingsdagerBuilder(private val sykdomstidslinje: Sykdomstidslinje) : UtbetalingstidslinjeVisitor, UtbetalingsdagVisitor {
 
     private val utbetalingsdager = mutableListOf<PersonObserver.Utbetalingsdag>()
 

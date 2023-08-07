@@ -144,7 +144,8 @@ internal class ØkonomiDagTest {
     fun `Beløp medNavDag som har blitt avvist`() {
         val a = tidslinjeOf(2.NAV(1200))
         val b = tidslinjeOf(2.NAV(1200))
-        val c = Utbetalingstidslinje.avvis(listOf(tidslinjeOf(2.NAV(1200))), listOf(1.januar til 31.januar), listOf(Begrunnelse.MinimumInntekt)).single()
+        val c = Utbetalingstidslinje.avvis(listOf(tidslinjeOf(2.NAV(1200))), listOf(1.januar til 31.januar), listOf(
+            Begrunnelse.MinimumInntekt)).single()
         val (a1, b1, c1) = listOf(a, b, c).betal()
         assertØkonomi(a, null, null)
         assertØkonomi(a1, 721.0, 0.0)

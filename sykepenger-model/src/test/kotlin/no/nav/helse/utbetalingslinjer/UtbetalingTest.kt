@@ -66,7 +66,7 @@ internal class UtbetalingTest {
             beregningId = UUID.randomUUID(),
             korrelerendeUtbetaling = null,
             periode = 1.februar til 15.februar,
-            utbetalingstidslinje = Utbetalingstidslinje(),
+            utbetalingstidslinje = emptyList(),
             arbeidsgiverOppdrag = Oppdrag("orgnr", Fagområde.SykepengerRefusjon),
             personOppdrag = Oppdrag("fnr", Fagområde.Sykepenger),
             type = Utbetalingtype.ANNULLERING,
@@ -78,7 +78,7 @@ internal class UtbetalingTest {
             beregningId = UUID.randomUUID(),
             korrelerendeUtbetaling = null,
             periode = 3.mars til 31.mars,
-            utbetalingstidslinje = Utbetalingstidslinje(),
+            utbetalingstidslinje = emptyList(),
             arbeidsgiverOppdrag = Oppdrag("orgnr", Fagområde.SykepengerRefusjon),
             personOppdrag = Oppdrag("fnr", Fagområde.Sykepenger),
             type = Utbetalingtype.ANNULLERING,
@@ -91,7 +91,7 @@ internal class UtbetalingTest {
             beregningId = UUID.randomUUID(),
             korrelerendeUtbetaling = null,
             periode = 1.januar til 31.mars,
-            utbetalingstidslinje = Utbetalingstidslinje(),
+            utbetalingstidslinje = emptyList(),
             arbeidsgiverOppdrag = Oppdrag("orgnr", Fagområde.SykepengerRefusjon),
             personOppdrag = Oppdrag("fnr", Fagområde.Sykepenger),
             type = Utbetalingtype.UTBETALING,
@@ -117,7 +117,7 @@ internal class UtbetalingTest {
             beregningId = UUID.randomUUID(),
             korrelerendeUtbetaling = null,
             periode = 1.februar til 15.februar,
-            utbetalingstidslinje = Utbetalingstidslinje(),
+            utbetalingstidslinje = emptyList(),
             arbeidsgiverOppdrag = Oppdrag("orgnr", Fagområde.SykepengerRefusjon),
             personOppdrag = Oppdrag("fnr", Fagområde.Sykepenger),
             type = Utbetalingtype.ANNULLERING,
@@ -129,7 +129,7 @@ internal class UtbetalingTest {
             beregningId = UUID.randomUUID(),
             korrelerendeUtbetaling = null,
             periode = 3.mars til 31.mars,
-            utbetalingstidslinje = Utbetalingstidslinje(),
+            utbetalingstidslinje = emptyList(),
             arbeidsgiverOppdrag = Oppdrag("orgnr", Fagområde.SykepengerRefusjon),
             personOppdrag = Oppdrag("fnr", Fagområde.Sykepenger),
             type = Utbetalingtype.ANNULLERING,
@@ -142,7 +142,7 @@ internal class UtbetalingTest {
             beregningId = UUID.randomUUID(),
             korrelerendeUtbetaling = null,
             periode = 1.januar til 31.mars,
-            utbetalingstidslinje = Utbetalingstidslinje(),
+            utbetalingstidslinje = emptyList(),
             arbeidsgiverOppdrag = Oppdrag("orgnr", Fagområde.SykepengerRefusjon),
             personOppdrag = Oppdrag("fnr", Fagområde.Sykepenger),
             type = Utbetalingtype.UTBETALING,
@@ -168,7 +168,7 @@ internal class UtbetalingTest {
             beregningId = UUID.randomUUID(),
             korrelerendeUtbetaling = null,
             periode = 1.februar til 15.februar,
-            utbetalingstidslinje = Utbetalingstidslinje(),
+            utbetalingstidslinje = emptyList(),
             arbeidsgiverOppdrag = Oppdrag("orgnr", Fagområde.SykepengerRefusjon, linjer = listOf(
                 Utbetalingslinje(1.februar, 15.februar, beløp = 500, aktuellDagsinntekt = 500, grad = 10, delytelseId = 1, endringskode = ENDR, datoStatusFom = 1.februar)
             )),
@@ -182,7 +182,7 @@ internal class UtbetalingTest {
             beregningId = UUID.randomUUID(),
             korrelerendeUtbetaling = null,
             periode = 3.mars til 31.mars,
-            utbetalingstidslinje = Utbetalingstidslinje(),
+            utbetalingstidslinje = emptyList(),
             arbeidsgiverOppdrag = Oppdrag("orgnr", Fagområde.SykepengerRefusjon),
             personOppdrag = Oppdrag("fnr", Fagområde.Sykepenger),
             type = Utbetalingtype.ANNULLERING,
@@ -195,7 +195,7 @@ internal class UtbetalingTest {
             beregningId = UUID.randomUUID(),
             korrelerendeUtbetaling = null,
             periode = 1.januar til 31.mars,
-            utbetalingstidslinje = Utbetalingstidslinje(),
+            utbetalingstidslinje = emptyList(),
             arbeidsgiverOppdrag = Oppdrag("orgnr", Fagområde.SykepengerRefusjon),
             personOppdrag = Oppdrag("fnr", Fagområde.Sykepenger),
             type = Utbetalingtype.UTBETALING,
@@ -245,7 +245,7 @@ internal class UtbetalingTest {
             beregningId = UUID.randomUUID(),
             korrelerendeUtbetaling = null,
             periode = 1.februar til 15.februar,
-            utbetalingstidslinje = Utbetalingstidslinje(),
+            utbetalingstidslinje = emptyList(),
             arbeidsgiverOppdrag = Oppdrag("orgnr", Fagområde.SykepengerRefusjon, linjer = listOf(
                 Utbetalingslinje(1.februar, 15.februar, beløp = 500, aktuellDagsinntekt = 500, grad = 10, delytelseId = 1, endringskode = ENDR, datoStatusFom = 1.februar)
             )),
@@ -259,7 +259,7 @@ internal class UtbetalingTest {
             beregningId = UUID.randomUUID(),
             korrelerendeUtbetaling = null,
             periode = 3.mars til 31.mars,
-            utbetalingstidslinje = Utbetalingstidslinje(),
+            utbetalingstidslinje = emptyList(),
             arbeidsgiverOppdrag = Oppdrag("orgnr", Fagområde.SykepengerRefusjon),
             personOppdrag = Oppdrag("fnr", Fagområde.Sykepenger),
             type = Utbetalingtype.ANNULLERING,
@@ -272,7 +272,7 @@ internal class UtbetalingTest {
             beregningId = UUID.randomUUID(),
             korrelerendeUtbetaling = null,
             periode = 1.januar til 31.mars,
-            utbetalingstidslinje = Utbetalingstidslinje(),
+            utbetalingstidslinje = emptyList(),
             arbeidsgiverOppdrag = Oppdrag("orgnr", Fagområde.SykepengerRefusjon, linjer = listOf(
                 Utbetalingslinje(1.januar, 31.januar, beløp = 500, aktuellDagsinntekt = 500, grad = 10, delytelseId = 1, endringskode = NY)
             )),
@@ -999,7 +999,8 @@ internal class UtbetalingTest {
         val tidslinje = tidslinjeOf(16.AP, 15.NAV(dekningsgrunnlag = 1000, refusjonsbeløp = 0)).betale()
         val utbetaling = opprettUbetaltUtbetaling(tidslinje)
         val simulering = opprettSimulering(
-            utbetaling.inspektør.personOppdrag.fagsystemId(), Fagområde.Sykepenger, utbetaling.inspektør.utbetalingId, SimuleringResultat(
+            utbetaling.inspektør.personOppdrag.fagsystemId(),
+            Fagområde.Sykepenger, utbetaling.inspektør.utbetalingId, SimuleringResultat(
                 totalbeløp = 1000,
                 perioder = emptyList()
             )
@@ -1014,7 +1015,8 @@ internal class UtbetalingTest {
         val tidslinje = tidslinjeOf(16.AP, 15.NAV(dekningsgrunnlag = 1000, refusjonsbeløp = 1000)).betale()
         val utbetaling = opprettUbetaltUtbetaling(tidslinje)
         val simulering = opprettSimulering(
-            utbetaling.inspektør.arbeidsgiverOppdrag.inspektør.fagsystemId(), Fagområde.SykepengerRefusjon, utbetaling.inspektør.utbetalingId, SimuleringResultat(
+            utbetaling.inspektør.arbeidsgiverOppdrag.inspektør.fagsystemId(),
+            Fagområde.SykepengerRefusjon, utbetaling.inspektør.utbetalingId, SimuleringResultat(
                 totalbeløp = 1000,
                 perioder = emptyList()
             )
@@ -1030,13 +1032,15 @@ internal class UtbetalingTest {
         val utbetaling = opprettUbetaltUtbetaling(tidslinje)
 
         val simuleringArbeidsgiver = opprettSimulering(
-            utbetaling.inspektør.arbeidsgiverOppdrag.inspektør.fagsystemId(), Fagområde.SykepengerRefusjon, utbetaling.inspektør.utbetalingId, SimuleringResultat(
+            utbetaling.inspektør.arbeidsgiverOppdrag.inspektør.fagsystemId(),
+            Fagområde.SykepengerRefusjon, utbetaling.inspektør.utbetalingId, SimuleringResultat(
                 totalbeløp = 500,
                 perioder = emptyList()
             )
         )
         val simuleringPerson = opprettSimulering(
-            utbetaling.inspektør.personOppdrag.fagsystemId(), Fagområde.Sykepenger, utbetaling.inspektør.utbetalingId, SimuleringResultat(
+            utbetaling.inspektør.personOppdrag.fagsystemId(),
+            Fagområde.Sykepenger, utbetaling.inspektør.utbetalingId, SimuleringResultat(
                 totalbeløp = 500,
                 perioder = emptyList()
             )

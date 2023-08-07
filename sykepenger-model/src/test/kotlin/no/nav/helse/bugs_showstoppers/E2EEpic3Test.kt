@@ -791,7 +791,7 @@ internal class E2EEpic3Test : AbstractEndToEndTest() {
                 assertEquals(11, tidslinjeInspektør.avvistDagTeller)
             }
 
-            it.vedtaksperioder(2.vedtaksperiode).inspektør.utbetalingstidslinje.inspektør.also { tidslinjeInspektør ->
+            it.utbetaling(1).inspektør.utbetalingstidslinje.inspektør.also { tidslinjeInspektør ->
                 assertEquals(32, tidslinjeInspektør.arbeidsgiverperiodeDagTeller)
                 assertEquals(8, tidslinjeInspektør.navHelgDagTeller)
                 assertEquals(11, tidslinjeInspektør.avvistDagTeller)
@@ -810,11 +810,7 @@ internal class E2EEpic3Test : AbstractEndToEndTest() {
                 Periode(1.januar, 16.januar)
             ), førsteFraværsdag = 1.januar, refusjon = Refusjon(INNTEKT, null, emptyList())
         )
-        håndterVilkårsgrunnlag(
-            1.vedtaksperiode,
-            INNTEKT,
-            arbeidsforhold = arbeidsforhold
-        )
+        håndterVilkårsgrunnlag(1.vedtaksperiode, INNTEKT, arbeidsforhold = arbeidsforhold)
         håndterYtelser()
         håndterUtbetalingsgodkjenning()
 
@@ -881,11 +877,10 @@ internal class E2EEpic3Test : AbstractEndToEndTest() {
                 assertEquals(11, tidslinjeInspektør.avvistDagTeller)
             }
 
-            it.vedtaksperioder(2.vedtaksperiode).inspektør.utbetalingstidslinje.inspektør.also { tidslinjeInspektør ->
+            it.utbetaling(1).inspektør.utbetalingstidslinje.inspektør.also { tidslinjeInspektør ->
                 assertEquals(32, tidslinjeInspektør.arbeidsgiverperiodeDagTeller)
                 assertEquals(8, tidslinjeInspektør.navHelgDagTeller)
                 assertEquals(22, tidslinjeInspektør.avvistDagTeller)
-
             }
         }
     }
@@ -982,12 +977,11 @@ internal class E2EEpic3Test : AbstractEndToEndTest() {
                 assertEquals(11, tidslinjeInspektør.navDagTeller)
             }
 
-            it.vedtaksperioder(2.vedtaksperiode).inspektør.utbetalingstidslinje.inspektør.also { tidslinjeInspektør ->
+            it.utbetaling(1).inspektør.utbetalingstidslinje.inspektør.also { tidslinjeInspektør ->
                 assertEquals(32, tidslinjeInspektør.arbeidsgiverperiodeDagTeller)
                 assertEquals(8, tidslinjeInspektør.navHelgDagTeller)
                 assertEquals(11, tidslinjeInspektør.navDagTeller)
                 assertEquals(11, tidslinjeInspektør.avvistDagTeller)
-
             }
         }
     }

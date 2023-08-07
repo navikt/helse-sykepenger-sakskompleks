@@ -4,6 +4,7 @@ import java.time.LocalDate
 import no.nav.helse.erHelg
 import no.nav.helse.hendelser.Periode
 import no.nav.helse.hendelser.somPeriode
+import no.nav.helse.utbetalingstidslinje.Utbetalingsdag
 import no.nav.helse.utbetalingstidslinje.Utbetalingsdag.Arbeidsdag
 import no.nav.helse.utbetalingstidslinje.Utbetalingsdag.ArbeidsgiverperiodeDag
 import no.nav.helse.utbetalingstidslinje.Utbetalingsdag.ArbeidsgiverperiodedagNav
@@ -14,15 +15,13 @@ import no.nav.helse.utbetalingstidslinje.Utbetalingsdag.NavDag
 import no.nav.helse.utbetalingstidslinje.Utbetalingsdag.NavHelgDag
 import no.nav.helse.utbetalingstidslinje.Utbetalingsdag.UkjentDag
 import no.nav.helse.utbetalingstidslinje.UtbetalingsdagVisitor
-import no.nav.helse.utbetalingstidslinje.Utbetalingstidslinje
-import no.nav.helse.utbetalingstidslinje.UtbetalingstidslinjeVisitor
 import no.nav.helse.økonomi.Økonomi
 
 class UtbetalingkladderBuilder(
-    tidslinje: Utbetalingstidslinje,
+    tidslinje: Collection<Utbetalingsdag>,
     private val mottakerRefusjon: String,
     private val mottakerBruker: String
-) : UtbetalingstidslinjeVisitor {
+) : UtbetalingsdagVisitor {
     private companion object {
         private const val MaksimaltAntallOppholdsdagerFørNyArbeidsgiverperiode = 15
     }
@@ -31,7 +30,7 @@ class UtbetalingkladderBuilder(
     private var arbeidsgiverdager: Periode? = null
 
     init {
-        tidslinje.accept(this)
+        tidslinje.forEach { it.accept(this) }
     }
 
     fun build() = ferdigstill()

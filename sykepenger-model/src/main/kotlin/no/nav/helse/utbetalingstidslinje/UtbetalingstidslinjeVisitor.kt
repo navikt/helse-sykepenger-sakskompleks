@@ -1,8 +1,6 @@
 package no.nav.helse.utbetalingstidslinje
 
-import java.time.LocalDate
 import no.nav.helse.hendelser.Periode
-import no.nav.helse.økonomi.Økonomi
 
 interface UtbetalingstidslinjeVisitor : UtbetalingsdagVisitor {
     /**

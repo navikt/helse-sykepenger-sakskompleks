@@ -30,7 +30,7 @@ import no.nav.helse.utbetalingslinjer.Oppdrag.Companion.trekkerTilbakePenger
 import no.nav.helse.utbetalingslinjer.Oppdrag.Companion.valider
 import no.nav.helse.utbetalingslinjer.Utbetalingkladd.Companion.finnKladd
 import no.nav.helse.utbetalingslinjer.Utbetalingtype.ANNULLERING
-import no.nav.helse.utbetalingstidslinje.Utbetalingstidslinje
+import no.nav.helse.utbetalingstidslinje.Utbetalingsdag
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -39,7 +39,7 @@ class Utbetaling private constructor(
     private val korrelasjonsId: UUID,
     private val beregningId: UUID,
     private val periode: Periode,
-    private val utbetalingstidslinje: Utbetalingstidslinje,
+    private val utbetalingstidslinje: Collection<Utbetalingsdag>,
     private val arbeidsgiverOppdrag: Oppdrag,
     private val personOppdrag: Oppdrag,
     private val tidsstempel: LocalDateTime,
@@ -59,7 +59,7 @@ class Utbetaling private constructor(
         beregningId: UUID,
         korrelerendeUtbetaling: Utbetaling?,
         periode: Periode,
-        utbetalingstidslinje: Utbetalingstidslinje,
+        utbetalingstidslinje: Collection<Utbetalingsdag>,
         arbeidsgiverOppdrag: Oppdrag,
         personOppdrag: Oppdrag,
         type: Utbetalingtype,
@@ -287,7 +287,7 @@ class Utbetaling private constructor(
             fødselsnummer: String,
             beregningId: UUID,
             organisasjonsnummer: String,
-            utbetalingstidslinje: Utbetalingstidslinje,
+            utbetalingstidslinje: Collection<Utbetalingsdag>,
             periode: Periode,
             aktivitetslogg: IAktivitetslogg,
             maksdato: LocalDate,
@@ -379,7 +379,7 @@ class Utbetaling private constructor(
             beregningId: UUID,
             annulleringer: List<Utbetaling>,
             opprinneligPeriode: Periode,
-            utbetalingstidslinje: Utbetalingstidslinje,
+            utbetalingstidslinje: Collection<Utbetalingsdag>,
             arbeidsgiverOppdrag: Oppdrag,
             personOppdrag: Oppdrag,
             tidsstempel: LocalDateTime,
@@ -454,7 +454,9 @@ class Utbetaling private constructor(
             avstemmingsnøkkel,
             annulleringer.map { it.id }.toSet()
         )
-        utbetalingstidslinje.accept(visitor)
+        visitor.preVisitUtbetalingsdager(utbetalingstidslinje)
+        utbetalingstidslinje.forEach { it.accept(visitor) }
+        visitor.postVisitUtbetalingsdager(utbetalingstidslinje)
         visitor.preVisitArbeidsgiverOppdrag(arbeidsgiverOppdrag)
         arbeidsgiverOppdrag.accept(visitor)
         visitor.postVisitArbeidsgiverOppdrag(arbeidsgiverOppdrag)

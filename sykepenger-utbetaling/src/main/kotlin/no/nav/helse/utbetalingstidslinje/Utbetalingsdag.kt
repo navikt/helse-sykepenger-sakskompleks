@@ -2,7 +2,8 @@ package no.nav.helse.utbetalingstidslinje
 
 import java.time.LocalDate
 import no.nav.helse.utbetalingslinjer.Beløpkilde
-import no.nav.helse.utbetalingstidslinje.Utbetalingstidslinje.Companion.periode
+import no.nav.helse.utbetalingstidslinje.Utbetalingsdag.UkjentDag
+import no.nav.helse.utbetalingstidslinje.InternUtbetalingstidslinje.Companion.tidslinjer
 import no.nav.helse.økonomi.betal
 import no.nav.helse.økonomi.Økonomi
 import no.nav.helse.økonomi.Økonomi.Companion.erUnderGrensen
@@ -102,7 +103,7 @@ sealed class Utbetalingsdag(
     }
 
     companion object {
-        fun dagerUnderGrensen(tidslinjer: List<Utbetalingstidslinje>): Set<LocalDate> {
+        fun dagerUnderGrensen(tidslinjer: Collection<Collection<Utbetalingsdag>>): Set<LocalDate> {
             return tidslinjer
                 .flatten()
                 .groupBy({ it.dato }) { it.økonomi }
@@ -110,14 +111,14 @@ sealed class Utbetalingsdag(
                 .keys
         }
 
-        fun betale(tidslinjer: List<Utbetalingstidslinje>): List<Utbetalingstidslinje> {
-            return periode(tidslinjer).fold(tidslinjer) { resultat, dato ->
+        fun betale(tidslinjer: Collection<Collection<Utbetalingsdag>>): Collection<Collection<Utbetalingsdag>> {
+            return periode(tidslinjer).fold(tidslinjer.tidslinjer) { resultat, dato ->
                 try {
-                    tidslinjer
+                    resultat
                         .map { it[dato].økonomi }
                         .betal()
                         .mapIndexed { index, økonomi ->
-                            Utbetalingstidslinje(resultat[index].map {
+                            InternUtbetalingstidslinje(resultat[index].map {
                                 if (it.dato == dato) it.kopierMed(økonomi) else it
                             })
                         }
@@ -127,16 +128,42 @@ sealed class Utbetalingsdag(
             }
         }
 
-        fun totalSykdomsgrad(tidslinjer: List<Utbetalingstidslinje>): List<Utbetalingstidslinje> {
-            return periode(tidslinjer).fold(tidslinjer) { tidslinjer1, dagen ->
+        fun totalSykdomsgrad(tidslinjer: Collection<Collection<Utbetalingsdag>>): Collection<Collection<Utbetalingsdag>> {
+            return periode(tidslinjer).fold(tidslinjer.tidslinjer) { tidslinjer1, dagen ->
                 // regner ut totalgrad for alle økonomi på samme dag
                 val dager = Økonomi.totalSykdomsgrad(tidslinjer1.map { it[dagen].økonomi })
                 // oppdaterer tidslinjen til hver ag med nytt økonomiobjekt
                 tidslinjer1.zip(dager) { tidslinjen, økonomi ->
-                    Utbetalingstidslinje(tidslinjen.map { if (it.dato == dagen) it.kopierMed(økonomi) else it })
+                    InternUtbetalingstidslinje(tidslinjen.map { if (it.dato == dagen) it.kopierMed(økonomi) else it })
                 }
             }
         }
+    }
+}
+
+private class InternUtbetalingstidslinje(private val dager: Collection<Utbetalingsdag>) : Collection<Utbetalingsdag> by dager {
+    private val periode = dager.firstOrNull()?.let { it.dato.rangeTo(dager.last().dato) }
+
+    operator fun contains(dato: LocalDate) = periode?.let { dato in it } ?: false
+
+    operator fun get(dato: LocalDate) =
+        if (dato !in this) UkjentDag(dato, Økonomi.ikkeBetalt())
+        else dager.first { it.dato == dato }
+
+
+    companion object {
+        val Collection<Utbetalingsdag>.tidslinje get() = InternUtbetalingstidslinje(this)
+        val Collection<Collection<Utbetalingsdag>>.tidslinjer get() = map { it.tidslinje }
+    }
+}
+
+private fun periode(tidslinjer: Collection<Collection<Utbetalingsdag>>): Iterable<LocalDate> {
+    val range = tidslinjer
+        .mapNotNull { dager -> dager.lastOrNull()?.let { dager.firstOrNull()?.dato?.rangeTo(it.dato) } }
+        .reduce { a, b, -> minOf(a.start, b.start).rangeTo(maxOf(a.endInclusive, b.endInclusive)) }
+
+    return object : Iterable<LocalDate> {
+        override fun iterator() = RangeIterator(range)
     }
 }
 
@@ -155,5 +182,17 @@ internal class BeløpkildeAdapter(økonomi: Økonomi): Beløpkilde, ØkonomiVisi
     override fun visitAvrundetØkonomi(grad: Int, arbeidsgiverRefusjonsbeløp: Int, dekningsgrunnlag: Int, totalGrad: Int, aktuellDagsinntekt: Int, arbeidsgiverbeløp: Int?, personbeløp: Int?, er6GBegrenset: Boolean?) {
         this.arbeidsgiverbeløp = arbeidsgiverbeløp
         this.personbeløp = personbeløp
+    }
+}
+
+private class RangeIterator(start: LocalDate, private val end: LocalDate): Iterator<LocalDate> {
+    private var currentDate = start
+    constructor(range: ClosedRange<LocalDate>) : this(range.start, range.endInclusive)
+    override fun hasNext() = end >= currentDate
+    override fun next(): LocalDate {
+        check(hasNext())
+        return currentDate.also {
+            currentDate = it.plusDays(1)
+        }
     }
 }

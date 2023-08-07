@@ -8,7 +8,7 @@ import no.nav.helse.nesteDag
 import no.nav.helse.person.aktivitetslogg.IAktivitetslogg
 import no.nav.helse.utbetalingslinjer.Oppdrag.Companion.periode
 import no.nav.helse.utbetalingslinjer.Utbetaling.Companion.aktive
-import no.nav.helse.utbetalingstidslinje.Utbetalingstidslinje
+import no.nav.helse.utbetalingstidslinje.Utbetalingsdag
 
 class Utbetalingkladd(
     private val periode: Periode,
@@ -20,7 +20,7 @@ class Utbetalingkladd(
         type: Utbetalingtype,
         korrelerendeUtbetaling: Utbetaling?,
         beregningId: UUID,
-        utbetalingstidslinje: Utbetalingstidslinje,
+        utbetalingstidslinje: Collection<Utbetalingsdag>,
         maksdato: LocalDate,
         forbrukteSykedager: Int,
         gjenståendeSykedager: Int,
@@ -30,7 +30,7 @@ class Utbetalingkladd(
             beregningId = beregningId,
             korrelerendeUtbetaling = korrelerendeUtbetaling,
             periode = periode,
-            utbetalingstidslinje = utbetalingstidslinje.kutt(periode.endInclusive),
+            utbetalingstidslinje = utbetalingstidslinje.filter { it.dato <= periode.endInclusive },
             arbeidsgiverOppdrag = arbeidsgiveroppdrag,
             personOppdrag = personoppdrag,
             type = type,

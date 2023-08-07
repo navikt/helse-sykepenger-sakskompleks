@@ -85,6 +85,7 @@ import no.nav.helse.utbetalingstidslinje.Arbeidsgiverperiode.Companion.Utbetalin
 import no.nav.helse.utbetalingstidslinje.Arbeidsgiverperiode.Companion.finn
 import no.nav.helse.utbetalingstidslinje.Feriepengeberegner
 import no.nav.helse.utbetalingstidslinje.Inntekter
+import no.nav.helse.utbetalingstidslinje.Utbetalingsdag
 import no.nav.helse.utbetalingstidslinje.Utbetalingstidslinje
 import no.nav.helse.utbetalingstidslinje.UtbetalingstidslinjeBuilder
 import no.nav.helse.utbetalingstidslinje.Utbetalingstidslinjeberegning
@@ -645,11 +646,11 @@ internal class Arbeidsgiver private constructor(
         epost: String,
         tidspunkt: LocalDateTime,
         automatiskBehandling: Boolean,
-        utbetalingstidslinje: Utbetalingstidslinje,
+        utbetalingstidslinje: Collection<Utbetalingsdag>,
         ident: String,
     ) {
         val builder = UtbetalingsdagerBuilder(sykdomshistorikk.sykdomstidslinje())
-        utbetalingstidslinje.accept(builder)
+        utbetalingstidslinje.forEach { it.accept(builder) }
         person.utbetalingUtbetalt(
             PersonObserver.UtbetalingUtbetaltEvent(
                 organisasjonsnummer = organisasjonsnummer,
@@ -688,11 +689,11 @@ internal class Arbeidsgiver private constructor(
         arbeidsgiverOppdrag: Oppdrag,
         tidspunkt: LocalDateTime,
         automatiskBehandling: Boolean,
-        utbetalingstidslinje: Utbetalingstidslinje,
+        utbetalingstidslinje: Collection<Utbetalingsdag>,
         epost: String,
     ) {
         val builder = UtbetalingsdagerBuilder(sykdomshistorikk.sykdomstidslinje())
-        utbetalingstidslinje.accept(builder)
+        utbetalingstidslinje.forEach { it.accept(builder) }
         person.utbetalingUtenUtbetaling(
             PersonObserver.UtbetalingUtbetaltEvent(
                 organisasjonsnummer = organisasjonsnummer,

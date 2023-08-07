@@ -187,10 +187,6 @@ internal class JsonBuilder : AbstractBuilder() {
             pushState(SykdomshistorikkState(sykdomshistorikkList))
         }
 
-        override fun preVisitTidslinjer(tidslinjer: MutableList<Utbetalingstidslinje>) {
-            arbeidsgiverMap["utbetalingstidslinjer"] = utbetalingstidslinjer
-        }
-
         override fun preVisitSykmeldingsperioder(sykmeldingsperioder: Sykmeldingsperioder) {
             val sykmeldingsperioderListe = mutableListOf<Map<String, Any>>()
             arbeidsgiverMap["sykmeldingsperioder"] = sykmeldingsperioderListe
@@ -282,7 +278,7 @@ internal class JsonBuilder : AbstractBuilder() {
     }
 
     private class UtbetalingstidslinjeberegningerState(private val beregninger: MutableList<Map<String, Any?>>) : BuilderState() {
-        private val utbetalingstidslinjeMap = mutableMapOf<String, Any>()
+        private val utbetalingstidslinjeMap = mutableMapOf<String, Any?>()
 
         override fun preVisitUtbetalingstidslinje(tidslinje: Utbetalingstidslinje, gjeldendePeriode: Periode?) {
             pushState(UtbetalingstidslinjeState(utbetalingstidslinjeMap))
@@ -1516,8 +1512,8 @@ internal class JsonBuilder : AbstractBuilder() {
         private val personOppdragMap = mutableMapOf<String, Any?>()
         private var vurderingMap: Map<String, Any?>? = null
 
-        override fun preVisitUtbetalingstidslinje(tidslinje: Utbetalingstidslinje, gjeldendePeriode: Periode?) {
-            pushState(UtbetalingstidslinjeState(utbetalingstidslinjeMap))
+        override fun preVisitUtbetalingsdager(dager: Collection<Utbetalingsdag>) {
+            pushState(UtbetalingstidslinjeState(utbetalingMap))
         }
 
         override fun preVisitArbeidsgiverOppdrag(oppdrag: Oppdrag) {
@@ -1631,7 +1627,7 @@ internal class JsonBuilder : AbstractBuilder() {
         }
 
         override fun preVisitUtbetalingstidslinje(tidslinje: Utbetalingstidslinje, gjeldendePeriode: Periode?) {
-            val utbetalingstidslinjeMap = mutableMapOf<String, Any>()
+            val utbetalingstidslinjeMap = mutableMapOf<String, Any?>()
             vedtaksperiodeMap["utbetalingstidslinje"] = utbetalingstidslinjeMap
             pushState(UtbetalingstidslinjeState(utbetalingstidslinjeMap))
         }
@@ -1762,7 +1758,7 @@ internal class JsonBuilder : AbstractBuilder() {
         }
     }
 
-    private class UtbetalingstidslinjeState(private val utbetalingstidslinjeMap: MutableMap<String, Any>) : BuilderState() {
+    private class UtbetalingstidslinjeState(private val utbetalingstidslinjeMap: MutableMap<String, Any?>) : BuilderState() {
         private val dager = DateRanges()
 
         private fun leggTilDag(dato: LocalDate, builder: UtbetalingsdagJsonBuilder) {
@@ -1807,6 +1803,11 @@ internal class JsonBuilder : AbstractBuilder() {
 
         override fun postVisitUtbetalingstidslinje() {
             utbetalingstidslinjeMap["dager"] = dager.toList()
+            popState()
+        }
+
+        override fun postVisitUtbetalingsdager(dager: Collection<Utbetalingsdag>) {
+            utbetalingstidslinjeMap["dager"] = this.dager.toList()
             popState()
         }
     }

@@ -9,7 +9,9 @@ import no.nav.helse.utbetalingslinjer.Oppdrag
 import no.nav.helse.utbetalingslinjer.Utbetaling
 import no.nav.helse.utbetalingslinjer.Utbetalingtype
 import no.nav.helse.utbetalingslinjer.Utbetalingstatus
+import no.nav.helse.utbetalingstidslinje.Utbetalingsdag
 import no.nav.helse.utbetalingstidslinje.Utbetalingstidslinje
+import no.nav.helse.økonomi.Økonomi
 import kotlin.properties.Delegates
 
 val Utbetaling.inspektør get() = UtbetalingInspektør(this)
@@ -27,8 +29,8 @@ class UtbetalingInspektør(utbetaling: Utbetaling) : UtbetalingVisitor {
         private set
     lateinit var personOppdrag: Oppdrag
         private set
-    lateinit var utbetalingstidslinje: Utbetalingstidslinje
-        private set
+    private val dager = mutableListOf<Utbetalingsdag>()
+    val utbetalingstidslinje: Utbetalingstidslinje get() = Utbetalingstidslinje(dager.toList())
     var nettobeløp by Delegates.notNull<Int>()
         private set
     private lateinit var status: Utbetalingstatus
@@ -85,8 +87,40 @@ class UtbetalingInspektør(utbetaling: Utbetaling) : UtbetalingVisitor {
         this.maksdato = maksdato
     }
 
-    override fun preVisitUtbetalingstidslinje(tidslinje: Utbetalingstidslinje, gjeldendePeriode: Periode?) {
-        this.utbetalingstidslinje = tidslinje
+    override fun visit(dag: Utbetalingsdag.ArbeidsgiverperiodeDag, dato: LocalDate, økonomi: Økonomi) {
+        dager.add(dag)
+    }
+
+    override fun visit(dag: Utbetalingsdag.ArbeidsgiverperiodedagNav, dato: LocalDate, økonomi: Økonomi) {
+        dager.add(dag)
+    }
+
+    override fun visit(dag: Utbetalingsdag.NavDag, dato: LocalDate, økonomi: Økonomi) {
+        dager.add(dag)
+    }
+
+    override fun visit(dag: Utbetalingsdag.NavHelgDag, dato: LocalDate, økonomi: Økonomi) {
+        dager.add(dag)
+    }
+
+    override fun visit(dag: Utbetalingsdag.Arbeidsdag, dato: LocalDate, økonomi: Økonomi) {
+        dager.add(dag)
+    }
+
+    override fun visit(dag: Utbetalingsdag.Fridag, dato: LocalDate, økonomi: Økonomi) {
+        dager.add(dag)
+    }
+
+    override fun visit(dag: Utbetalingsdag.AvvistDag, dato: LocalDate, økonomi: Økonomi) {
+        dager.add(dag)
+    }
+
+    override fun visit(dag: Utbetalingsdag.ForeldetDag, dato: LocalDate, økonomi: Økonomi) {
+        dager.add(dag)
+    }
+
+    override fun visit(dag: Utbetalingsdag.UkjentDag, dato: LocalDate, økonomi: Økonomi) {
+        dager.add(dag)
     }
 
     override fun preVisitArbeidsgiverOppdrag(oppdrag: Oppdrag) {

@@ -369,7 +369,7 @@ internal interface VedtaksperiodeUtbetalingVisitor : UtbetalingVisitor, Vilkårs
 }
 
 internal interface VedtaksperiodeVisitor : VedtaksperiodeUtbetalingVisitor,
-    UtbetalingsdagVisitor, InntektsmeldingInfoVisitor {
+    UtbetalingstidslinjeVisitor, InntektsmeldingInfoVisitor {
     fun preVisitVedtaksperiode(
         vedtaksperiode: Vedtaksperiode,
         id: UUID,

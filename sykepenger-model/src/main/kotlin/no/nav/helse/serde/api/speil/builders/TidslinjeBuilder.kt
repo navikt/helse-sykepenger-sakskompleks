@@ -23,9 +23,10 @@ import no.nav.helse.sykdomstidslinje.Dag
 import no.nav.helse.sykdomstidslinje.Sykdomshistorikk
 import no.nav.helse.sykdomstidslinje.Sykdomstidslinje
 import no.nav.helse.sykdomstidslinje.SykdomstidslinjeHendelse
-import no.nav.helse.utbetalingslinjer.UtbetalingVisitor
 import no.nav.helse.utbetalingstidslinje.Utbetalingsdag
+import no.nav.helse.utbetalingstidslinje.UtbetalingsdagVisitor
 import no.nav.helse.utbetalingstidslinje.Utbetalingstidslinje
+import no.nav.helse.utbetalingstidslinje.UtbetalingstidslinjeVisitor
 import no.nav.helse.økonomi.Økonomi
 
 // Besøker hele sykdomshistorikk-treet
@@ -189,11 +190,11 @@ internal class SykdomstidslinjeBuilder(tidslinje: Sykdomstidslinje): Sykdomstids
 }
 
 // Besøker hele utbetaling-treet
-internal class UtbetalingstidslinjeBuilder(utbetalingstidslinje: Utbetalingstidslinje): UtbetalingVisitor {
+internal class UtbetalingstidslinjeBuilder(utbetalingstidslinje: Collection<Utbetalingsdag>): UtbetalingsdagVisitor {
     private val utbetalingstidslinje: MutableList<Utbetalingstidslinjedag> = mutableListOf()
 
     init {
-        utbetalingstidslinje.accept(this)
+        utbetalingstidslinje.forEach { it.accept(this) }
     }
 
     internal fun build() = utbetalingstidslinje.toList()

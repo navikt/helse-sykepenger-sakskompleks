@@ -1069,14 +1069,6 @@ internal class DelegatedPersonVisitor(private val delegateeFun: () -> PersonVisi
         )
     }
 
-    override fun preVisitTidslinjer(tidslinjer: MutableList<Utbetalingstidslinje>) {
-        delegatee.preVisitTidslinjer(tidslinjer)
-    }
-
-    override fun postVisitTidslinjer(tidslinjer: MutableList<Utbetalingstidslinje>) {
-        delegatee.postVisitTidslinjer(tidslinjer)
-    }
-
     override fun preVisitArbeidsgiverOppdrag(oppdrag: Oppdrag) {
         delegatee.preVisitArbeidsgiverOppdrag(oppdrag)
     }
@@ -1126,6 +1118,14 @@ internal class DelegatedPersonVisitor(private val delegateeFun: () -> PersonVisi
 
     override fun postVisitVedtakserperiodeUtbetalinger(utbetalinger: List<Triple<VilkårsgrunnlagHistorikk.VilkårsgrunnlagElement?, Utbetaling, Sykdomstidslinje?>>) {
         delegatee.postVisitVedtakserperiodeUtbetalinger(utbetalinger)
+    }
+
+    override fun preVisitUtbetalingsdager(dager: Collection<Utbetalingsdag>) {
+        delegatee.preVisitUtbetalingsdager(dager)
+    }
+
+    override fun postVisitUtbetalingsdager(dager: Collection<Utbetalingsdag>) {
+        delegatee.postVisitUtbetalingsdager(dager)
     }
 
     override fun postVisitUtbetaling(

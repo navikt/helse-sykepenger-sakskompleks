@@ -2,8 +2,6 @@ package no.nav.helse.utbetalingslinjer
 
 import java.time.LocalDate
 import no.nav.helse.januar
-import no.nav.helse.utbetalingstidslinje.Utbetalingsdag
-import no.nav.helse.utbetalingstidslinje.Utbetalingstidslinje
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test

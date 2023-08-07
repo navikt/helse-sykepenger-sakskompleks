@@ -18,7 +18,7 @@ internal object Sykdomsgradfilter: UtbetalingstidslinjerFilter {
     ): List<Utbetalingstidslinje> {
         val tidslinjerForSubsumsjon = tidslinjer.subsumsjonsformat()
 
-        val oppdaterte = Utbetalingsdag.totalSykdomsgrad(tidslinjer)
+        val oppdaterte = Utbetalingsdag.totalSykdomsgrad(tidslinjer).map { Utbetalingstidslinje(it) }
 
         val dagerUnderGrensen = Utbetalingsdag.dagerUnderGrensen(oppdaterte)
 

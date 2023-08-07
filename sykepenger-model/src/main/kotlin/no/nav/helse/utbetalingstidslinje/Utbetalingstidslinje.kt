@@ -53,7 +53,7 @@ class Utbetalingstidslinje(utbetalingsdager: Collection<Utbetalingsdag>) : Colle
         ) = tidslinjer.flatMap { it.subset(periode) }.mapNotNull { it.erAvvistMed(begrunnelse) }
 
         fun betale(tidslinjer: List<Utbetalingstidslinje>): List<Utbetalingstidslinje> {
-            return Utbetalingsdag.betale(tidslinjer)
+            return Utbetalingsdag.betale(tidslinjer).map { Utbetalingstidslinje(it) }
         }
 
         fun ferdigUtbetalingstidslinje(utbetalingsdager: List<Utbetalingsdag>) = Utbetalingstidslinje(utbetalingsdager.toMutableList())
@@ -205,27 +205,3 @@ class Utbetalingstidslinje(utbetalingsdager: Collection<Utbetalingsdag>) : Colle
     }
 }
 
-sealed class Begrunnelse {
-
-    fun skalAvvises(utbetalingsdag: Utbetalingsdag) = utbetalingsdag is AvvistDag || utbetalingsdag is NavDag || utbetalingsdag is ArbeidsgiverperiodedagNav
-
-    object SykepengedagerOppbrukt : Begrunnelse()
-    object SykepengedagerOppbruktOver67 : Begrunnelse()
-    object MinimumInntekt : Begrunnelse()
-    object MinimumInntektOver67 : Begrunnelse()
-    object EgenmeldingUtenforArbeidsgiverperiode : Begrunnelse()
-    object AndreYtelserForeldrepenger: Begrunnelse()
-    object AndreYtelserAap: Begrunnelse()
-    object AndreYtelserOmsorgspenger: Begrunnelse()
-    object AndreYtelserPleiepenger: Begrunnelse()
-    object AndreYtelserSvangerskapspenger: Begrunnelse()
-    object AndreYtelserOpplaringspenger: Begrunnelse()
-    object AndreYtelserDagpenger: Begrunnelse()
-    object MinimumSykdomsgrad : Begrunnelse()
-    object EtterDødsdato : Begrunnelse()
-    object Over70 : Begrunnelse()
-    object ManglerOpptjening : Begrunnelse()
-    object ManglerMedlemskap : Begrunnelse()
-    object NyVilkårsprøvingNødvendig : Begrunnelse()
-
-}

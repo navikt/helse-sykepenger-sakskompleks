@@ -34,6 +34,7 @@ import no.nav.helse.utbetalingslinjer.Utbetaling
 import no.nav.helse.utbetalingslinjer.Utbetalingtype
 import no.nav.helse.utbetalingslinjer.Utbetalingslinje
 import no.nav.helse.utbetalingslinjer.Utbetalingstatus
+import no.nav.helse.utbetalingstidslinje.Utbetalingsdag
 import no.nav.helse.utbetalingstidslinje.Utbetalingstidslinje
 import no.nav.helse.utbetalingstidslinje.Utbetalingstidslinjeberegning
 import org.junit.jupiter.api.fail
@@ -87,7 +88,6 @@ internal class TestArbeidsgiverInspektør(
     private val vedtaksperioder = mutableMapOf<Int, Vedtaksperiode>()
     private var forkastetPeriode = false
     private var inVedtaksperiode = false
-    private var inUtbetaling = false
     private var inFeriepengeutbetaling = false
     private val forlengelserFraInfotrygd = mutableMapOf<Int, ForlengelseFraInfotrygd>()
     private val hendelseIder = mutableMapOf<Int, Set<Dokumentsporing>>()
@@ -185,8 +185,12 @@ internal class TestArbeidsgiverInspektør(
     }
 
     override fun preVisitUtbetalingstidslinje(tidslinje: Utbetalingstidslinje, gjeldendePeriode: Periode?) {
-        if (inVedtaksperiode && !inUtbetaling) utbetalingstidslinjer[vedtaksperiodeindeks] = tidslinje
-        else if (!inVedtaksperiode && inUtbetaling) utbetalingutbetalingstidslinjer.add(tidslinje)
+        if (inVedtaksperiode) utbetalingstidslinjer[vedtaksperiodeindeks] = tidslinje
+    }
+
+    override fun preVisitUtbetalingsdager(dager: Collection<Utbetalingsdag>) {
+        if (inVedtaksperiode) return
+        utbetalingutbetalingstidslinjer.add(Utbetalingstidslinje(dager))
     }
 
     override fun postVisitVedtaksperiode(
@@ -310,7 +314,6 @@ internal class TestArbeidsgiverInspektør(
         avstemmingsnøkkel: Long?,
         annulleringer: Set<UUID>
     ) {
-        inUtbetaling = true
         if (!inVedtaksperiode) {
             maksdatoer.add(maksdato)
             utbetalingIder.add(id)
@@ -322,30 +325,6 @@ internal class TestArbeidsgiverInspektør(
             vedtaksperiodeutbetalingider.getOrPut(vedtaksperiodeindeks) { mutableListOf() }.add(id)
             vedtaksperiodeutbetalingstyper.getOrPut(vedtaksperiodeindeks) { mutableListOf() }.add(type)
         }
-    }
-
-    override fun postVisitUtbetaling(
-        utbetaling: Utbetaling,
-        id: UUID,
-        korrelasjonsId: UUID,
-        type: Utbetalingtype,
-        tilstand: Utbetalingstatus,
-        periode: Periode,
-        tidsstempel: LocalDateTime,
-        oppdatert: LocalDateTime,
-        arbeidsgiverNettoBeløp: Int,
-        personNettoBeløp: Int,
-        maksdato: LocalDate,
-        forbrukteSykedager: Int?,
-        gjenståendeSykedager: Int?,
-        stønadsdager: Int,
-        beregningId: UUID,
-        overføringstidspunkt: LocalDateTime?,
-        avsluttet: LocalDateTime?,
-        avstemmingsnøkkel: Long?,
-        annulleringer: Set<UUID>
-    ) {
-        inUtbetaling = false
     }
 
     override fun preVisitFeriepengeutbetaling(

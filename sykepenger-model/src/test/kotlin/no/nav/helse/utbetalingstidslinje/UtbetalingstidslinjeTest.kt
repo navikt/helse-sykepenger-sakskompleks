@@ -50,7 +50,7 @@ internal class UtbetalingstidslinjeTest {
         val ag1 = tidslinjeOf(5.NAV(dekningsgrunnlag = 1000, grad = 50))
         val ag2 = tidslinjeOf(1.FRI(dekningsgrunnlag = 2000), 4.NAV(dekningsgrunnlag = 2000, grad = 100))
         val tidslinjer = listOf(ag1, ag2)
-        val result = Utbetalingsdag.totalSykdomsgrad(tidslinjer)
+        val result = Utbetalingsdag.totalSykdomsgrad(tidslinjer).map { Utbetalingstidslinje(it) }
 
         // totalgrad = 16.6666666666...
         1.januar.also { dato ->
@@ -77,7 +77,7 @@ internal class UtbetalingstidslinjeTest {
         val ag1 = tidslinjeOf(1.NAV(dekningsgrunnlag = 1000, grad = 50))
         val ag2 = tidslinjeOf()
         val tidslinjer = listOf(ag1, ag2)
-        val result = Utbetalingsdag.totalSykdomsgrad(tidslinjer)
+        val result = Utbetalingsdag.totalSykdomsgrad(tidslinjer).map { Utbetalingstidslinje(it) }
 
         1.januar.also { dato ->
             val expected = 50.prosent

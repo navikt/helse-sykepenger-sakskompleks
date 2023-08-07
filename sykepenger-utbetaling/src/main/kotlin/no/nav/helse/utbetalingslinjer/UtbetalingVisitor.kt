@@ -4,11 +4,10 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 import no.nav.helse.hendelser.Periode
+import no.nav.helse.utbetalingstidslinje.Utbetalingsdag
 import no.nav.helse.utbetalingstidslinje.UtbetalingsdagVisitor
-import no.nav.helse.utbetalingstidslinje.Utbetalingstidslinje
-import no.nav.helse.utbetalingstidslinje.UtbetalingstidslinjeVisitor
 
-interface UtbetalingVisitor : UtbetalingstidslinjeVisitor, OppdragVisitor, UtbetalingVurderingVisitor {
+interface UtbetalingVisitor : UtbetalingsdagVisitor, OppdragVisitor, UtbetalingVurderingVisitor {
     fun preVisitUtbetaling(
         utbetaling: Utbetaling,
         id: UUID,
@@ -32,8 +31,9 @@ interface UtbetalingVisitor : UtbetalingstidslinjeVisitor, OppdragVisitor, Utbet
     ) {
     }
 
-    fun preVisitTidslinjer(tidslinjer: MutableList<Utbetalingstidslinje>) {}
-    fun postVisitTidslinjer(tidslinjer: MutableList<Utbetalingstidslinje>) {}
+    fun preVisitUtbetalingsdager(dager: Collection<Utbetalingsdag>) {}
+    fun postVisitUtbetalingsdager(dager: Collection<Utbetalingsdag>) {}
+
     fun preVisitArbeidsgiverOppdrag(oppdrag: Oppdrag) {}
     fun postVisitArbeidsgiverOppdrag(oppdrag: Oppdrag) {}
     fun preVisitPersonOppdrag(oppdrag: Oppdrag) {}
