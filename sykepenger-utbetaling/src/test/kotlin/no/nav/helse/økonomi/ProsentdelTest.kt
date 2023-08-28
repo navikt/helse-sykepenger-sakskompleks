@@ -23,6 +23,16 @@ internal class ProsentdelTest {
         assertEquals(100.prosent, result)
     }
 
+    @Test
+    fun `total sykdomsgrad - flyttall 2`() {
+        val inntekter = listOf(
+            50.prosent to 1000.0,
+            0.prosent to 2000.0
+        )
+        val result = inntekter.average()
+        assertEquals(Prosentdel.ratio(1.0, 6.0), result)
+    }
+
     @Test fun equality() {
         assertEquals(ratio(1.0, 4.0), 25.0.prosent )
         assertNotEquals(ratio(1.0, 4.0), 75.0.prosent )
