@@ -437,7 +437,7 @@ interface SubsumsjonObserver {
     fun `§ 8-33 ledd 3`(grunnlagForFeriepenger: Int, opptjeningsår: Year, prosentsats: Double, alder: Int, feriepenger: Double) {}
 
     /**
-     * Vurdering av krav til minimum inntekt ved alder mellom 67 og 70 år
+     * Vurdering av krav til minimum inntekt ved alder mellom 67 og 70 år som inngangsvilkår ved skjæringstidspunkt
      *
      * Lovdata: [lenke](https://lovdata.no/lov/1997-02-28-19/%C2%A78-51)
      *
@@ -451,6 +451,25 @@ interface SubsumsjonObserver {
         oppfylt: Boolean,
         skjæringstidspunkt: LocalDate,
         alderPåSkjæringstidspunkt: Int,
+        beregningsgrunnlagÅrlig: Double,
+        minimumInntektÅrlig: Double
+    ) {}
+
+    /**
+     * Vurdering av krav til minimum inntekt ved alder mellom 67 og 70 år i løpende beregning
+     *
+     * Lovdata: [lenke](https://lovdata.no/lov/1997-02-28-19/%C2%A78-51)
+     *
+     * @param oppfylt dersom vedkommende har inntekt større enn eller lik to ganger grunnbeløpet. Det er en forutsetning at vedkommende er mellom 67 og 70 år
+     * @param periode aktuell periode som beregnes
+     * @param sekstisyvårsdagen dato sykmeldte fyller 67 år
+     * @param beregningsgrunnlagÅrlig total inntekt på tvers av alle relevante arbeidsgivere
+     * @param minimumInntektÅrlig minimum beløp [beregningsgrunnlagÅrlig] må være lik eller større enn for at vilkåret skal være [oppfylt]
+     */
+    fun `§ 8-51 ledd 2`(
+        oppfylt: Boolean,
+        periode: ClosedRange<LocalDate>,
+        sekstisyvårsdagen: LocalDate,
         beregningsgrunnlagÅrlig: Double,
         minimumInntektÅrlig: Double
     ) {}

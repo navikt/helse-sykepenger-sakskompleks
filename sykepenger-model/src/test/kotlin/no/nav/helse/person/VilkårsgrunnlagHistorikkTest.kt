@@ -473,7 +473,7 @@ internal class VilkårsgrunnlagHistorikkTest {
         vilkårsgrunnlagHistorikk.lagre(vilkårsgrunnlag1.grunnlagsdata())
         vilkårsgrunnlagHistorikk.lagre(vilkårsgrunnlag2.grunnlagsdata())
         val utbetalingstidslinjeMedNavDager = tidslinjeOf(16.AP, 10.NAV)
-        val resultat = vilkårsgrunnlagHistorikk.avvisInngangsvilkår(listOf(utbetalingstidslinjeMedNavDager)).single()
+        val resultat = vilkårsgrunnlagHistorikk.avvisInngangsvilkår(listOf(utbetalingstidslinjeMedNavDager), NullObserver).single()
         assertEquals(8, resultat.filterIsInstance<Utbetalingsdag.NavDag>().size)
     }
 
@@ -501,7 +501,7 @@ internal class VilkårsgrunnlagHistorikkTest {
         val grunnlagsdataInspektør = GrunnlagsdataInspektør(vilkårsgrunnlagHistorikk.vilkårsgrunnlagFor(1.januar)!!)
         assertFalse(grunnlagsdataInspektør.vurdertOk)
         val utbetalingstidslinjeMedNavDager = tidslinjeOf(16.AP, 10.NAV)
-        val resultat = vilkårsgrunnlagHistorikk.avvisInngangsvilkår(listOf(utbetalingstidslinjeMedNavDager)).single()
+        val resultat = vilkårsgrunnlagHistorikk.avvisInngangsvilkår(listOf(utbetalingstidslinjeMedNavDager), NullObserver).single()
         resultat.filterIsInstance<Utbetalingsdag.AvvistDag>().let { avvisteDager ->
             assertEquals(8, avvisteDager.size)
             avvisteDager.forEach {
@@ -537,7 +537,7 @@ internal class VilkårsgrunnlagHistorikkTest {
         val grunnlagsdataInspektør = GrunnlagsdataInspektør(vilkårsgrunnlagHistorikk.vilkårsgrunnlagFor(1.januar)!!)
         assertFalse(grunnlagsdataInspektør.vurdertOk)
         val utbetalingstidslinjeMedNavDager = tidslinjeOf(16.AP, 10.NAV)
-        val resultat = vilkårsgrunnlagHistorikk.avvisInngangsvilkår(listOf(utbetalingstidslinjeMedNavDager)).single()
+        val resultat = vilkårsgrunnlagHistorikk.avvisInngangsvilkår(listOf(utbetalingstidslinjeMedNavDager), NullObserver).single()
 
         resultat.filterIsInstance<Utbetalingsdag.AvvistDag>().let { avvisteDager ->
             assertEquals(8, avvisteDager.size)

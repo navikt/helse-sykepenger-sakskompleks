@@ -83,6 +83,25 @@ class Alder(private val fødselsdato: LocalDate, private val dødsdato: LocalDat
         fraOgMedFylte70(aktivitetslogg, periode, avvisteDager, jurist)
     }
 
+    internal fun etterlevelseAvvisteDagerOver67(
+        avvisningsperiode: Periode,
+        avvisteDager: List<LocalDate>,
+        beregningsgrunnlag: Double,
+        minimumInntektÅrlig: Double,
+        jurist: SubsumsjonObserver
+    ) {
+        if (avvisteDager.isEmpty()) return
+        jurist.`§ 8-51 ledd 2`(
+            oppfylt = beregningsgrunnlag >= minimumInntektÅrlig,
+            periode = avvisningsperiode,
+            sekstisyvårsdagen = redusertYtelseAlder,
+            beregningsgrunnlagÅrlig = beregningsgrunnlag,
+            minimumInntektÅrlig = minimumInntektÅrlig
+        )
+    }
+
+
+
     private fun førFylte70(periode: Periode, jurist: SubsumsjonObserver) {
         if (periode.start >= syttiårsdagen) return
         jurist.`§ 8-3 ledd 1 punktum 2`(

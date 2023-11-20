@@ -2360,13 +2360,59 @@ internal class SubsumsjonE2ETest : AbstractEndToEndTest() {
     }
 
     @Test
-    fun `§ 8-51 ledd 3 - 60 sykedager etter fylte 67 år - frisk på 60-årsdagen så total sykedager blir en dag mindre uten at maksdato endres`() {
+    fun `§ 8-51 ledd 2 - løpende avvisning dersom man fyller 67 underveis i sykefraværstilfellet`() {
         val personOver67år = "01025100065".somPersonidentifikator()
         createTestPerson(personOver67år, 1.februar(1951))
 
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar), fnr = personOver67år)
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent), fnr = personOver67år)
-        håndterInntektsmelding(listOf(1.januar til 16.januar), førsteFraværsdag = 1.januar, fnr = personOver67år,)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), beregnetInntekt = 187267.årlig, førsteFraværsdag = 1.januar, fnr = personOver67år)
+        håndterVilkårsgrunnlag(1.vedtaksperiode, fnr = personOver67år, inntekt = 187267.årlig)
+        håndterYtelser(1.vedtaksperiode, fnr = personOver67år)
+        håndterSimulering(1.vedtaksperiode, fnr = personOver67år)
+        håndterUtbetalingsgodkjenning(1.vedtaksperiode, fnr = personOver67år)
+        håndterUtbetalt(fnr = personOver67år)
+
+        SubsumsjonInspektør(jurist).assertOppfylt(
+            paragraf = PARAGRAF_8_3,
+            ledd = LEDD_2,
+            punktum = 1.punktum,
+            versjon = 16.desember(2011),
+            input = mapOf(
+                "skjæringstidspunkt" to 1.januar,
+                "grunnlagForSykepengegrunnlag" to 187267.0,
+                "minimumInntekt" to 46817.0
+            ),
+            output = emptyMap()
+        )
+        SubsumsjonInspektør(jurist).assertIkkeVurdert(PARAGRAF_8_51, ledd = LEDD_2)
+
+        håndterSykmelding(Sykmeldingsperiode(1.februar, 28.februar), fnr = personOver67år)
+        håndterSøknad(Sykdom(1.februar, 28.februar, 100.prosent), fnr = personOver67år)
+        håndterYtelser(2.vedtaksperiode, fnr = personOver67år)
+
+        SubsumsjonInspektør(jurist).assertIkkeOppfylt(
+            paragraf = PARAGRAF_8_51,
+            ledd = LEDD_2,
+            versjon = 16.desember(2011),
+            input = mapOf(
+                "periode" to (1.januar til 28.februar),
+                "sekstisyvårsdagen" to 1.februar,
+                "grunnlagForSykepengegrunnlag" to 187267.0,
+                "minimumInntekt" to 187268.0
+            ),
+            output = emptyMap()
+        )
+    }
+
+    @Test
+    fun `§ 8-51 ledd 3 - 60 sykedager etter fylte 67 år - frisk på 67-årsdagen så total sykedager blir en dag mindre uten at maksdato endres`() {
+        val personOver67år = "01025100065".somPersonidentifikator()
+        createTestPerson(personOver67år, 1.februar(1951))
+
+        håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar), fnr = personOver67år)
+        håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent), fnr = personOver67år)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), førsteFraværsdag = 1.januar, fnr = personOver67år)
         håndterVilkårsgrunnlag(1.vedtaksperiode, fnr = personOver67år)
         håndterYtelser(1.vedtaksperiode, fnr = personOver67år)
         håndterSimulering(1.vedtaksperiode, fnr = personOver67år)

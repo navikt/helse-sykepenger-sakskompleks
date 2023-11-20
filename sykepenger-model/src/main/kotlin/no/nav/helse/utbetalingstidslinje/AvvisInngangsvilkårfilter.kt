@@ -15,6 +15,6 @@ internal class AvvisInngangsvilkårfilter(
         aktivitetslogg: IAktivitetslogg,
         subsumsjonObserver: SubsumsjonObserver
     ): List<Utbetalingstidslinje> {
-        return vilkårsgrunnlagHistorikk.avvisInngangsvilkår(tidslinjer)
+        return vilkårsgrunnlagHistorikk.avvisInngangsvilkår(tidslinjer, subsumsjonObserver)
     }
 }

@@ -59,7 +59,6 @@ import no.nav.helse.person.inntekt.Refusjonsopplysning.Refusjonsopplysninger
 import no.nav.helse.person.inntekt.Sykepengegrunnlag.Begrensning.ER_6G_BEGRENSET
 import no.nav.helse.person.inntekt.Sykepengegrunnlag.Begrensning.ER_IKKE_6G_BEGRENSET
 import no.nav.helse.person.inntekt.Sykepengegrunnlag.Begrensning.VURDERT_I_INFOTRYGD
-import no.nav.helse.sykdomstidslinje.Sykdomstidslinje
 import no.nav.helse.utbetalingstidslinje.ArbeidsgiverRegler
 import no.nav.helse.utbetalingstidslinje.Begrunnelse
 import no.nav.helse.utbetalingstidslinje.Utbetalingstidslinje
@@ -158,7 +157,7 @@ internal class Sykepengegrunnlag private constructor(
         }
     }
 
-    internal fun avvis(tidslinjer: List<Utbetalingstidslinje>, skjæringstidspunktperiode: Periode): List<Utbetalingstidslinje> {
+    internal fun avvis(tidslinjer: List<Utbetalingstidslinje>, skjæringstidspunktperiode: Periode, subsumsjonObserver: SubsumsjonObserver): List<Utbetalingstidslinje> {
         val tidslinjeperiode = Utbetalingstidslinje.periode(tidslinjer) ?: return tidslinjer
         if (tidslinjeperiode.starterEtter(skjæringstidspunktperiode) || tidslinjeperiode.endInclusive < skjæringstidspunkt) return tidslinjer
 
@@ -169,6 +168,13 @@ internal class Sykepengegrunnlag private constructor(
         }
         if (avvisteDager.isEmpty()) return tidslinjer
         val (avvisteDagerOver67, avvisteDagerTil67) = avvisteDager.partition { alder.forhøyetInntektskrav(it) }
+        alder.etterlevelseAvvisteDagerOver67(
+            avvisningsperiode,
+            avvisteDagerOver67,
+            beregningsgrunnlag.reflection { årlig, _, _, _ -> årlig },
+            `2G`.minsteinntekt(skjæringstidspunkt).reflection { årlig, _, _, _ -> årlig },
+            subsumsjonObserver
+        )
 
         val dager = listOf(
             Begrunnelse.MinimumInntektOver67 to avvisteDagerOver67.grupperSammenhengendePerioder(),

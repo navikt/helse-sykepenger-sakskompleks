@@ -6,6 +6,7 @@ import java.util.UUID
 import no.nav.helse.Alder.Companion.alder
 import no.nav.helse.etterlevelse.MaskinellJurist
 import no.nav.helse.etterlevelse.SubsumsjonObserver
+import no.nav.helse.etterlevelse.SubsumsjonObserver.Companion.NullObserver
 import no.nav.helse.februar
 import no.nav.helse.hendelser.Grunnbeløpsregulering
 import no.nav.helse.hendelser.Medlemskapsvurdering
@@ -48,7 +49,7 @@ internal class VilkårsgrunnlagHistorikkInnslagTest {
     fun `finner ikke begrunnelser dersom vilkårsgrunnlag ikke er Grunnlagsdata`() {
         val tidslinjer = listOf(tidslinjeOf(1.NAV))
         innslag.add(1.januar, testgrunnlag)
-        val resultat = innslag.avvis(tidslinjer)
+        val resultat = innslag.avvis(tidslinjer, NullObserver)
         assertEquals(0, avvisteDager(resultat).size)
     }
 
@@ -57,7 +58,7 @@ internal class VilkårsgrunnlagHistorikkInnslagTest {
         val tidslinjer = listOf(tidslinjeOf(1.NAV))
         innslag.add(1.januar, testgrunnlag)
         innslag.add(1.januar, grunnlagsdata(1.januar, harOpptjening = false))
-        val resultat = innslag.avvis(tidslinjer)
+        val resultat = innslag.avvis(tidslinjer, NullObserver)
         val avvisteDager = avvisteDager(resultat)
         assertEquals(1, avvisteDager.size)
         assertNotNull(avvisteDager.first().erAvvistMed(Begrunnelse.ManglerOpptjening))
@@ -67,7 +68,7 @@ internal class VilkårsgrunnlagHistorikkInnslagTest {
     fun `avviser dager uten opptjening`() {
         val tidslinjer = listOf(tidslinjeOf(1.NAV))
         innslag.add(1.januar, grunnlagsdata(1.januar, harOpptjening = false))
-        val resultat = innslag.avvis(tidslinjer)
+        val resultat = innslag.avvis(tidslinjer, NullObserver)
         val avvisteDager = avvisteDager(resultat)
         assertEquals(1, avvisteDager.size)
         assertNotNull(avvisteDager.first().erAvvistMed(Begrunnelse.ManglerOpptjening))
@@ -77,7 +78,7 @@ internal class VilkårsgrunnlagHistorikkInnslagTest {
     fun `avviser ikke dager dersom vurdert ok`() {
         val tidslinjer = listOf(tidslinjeOf(1.NAV))
         innslag.add(1.januar, grunnlagsdata(1.januar, harOpptjening = true, harMinimumInntekt = true, erMedlem = true))
-        val resultat = innslag.avvis(tidslinjer)
+        val resultat = innslag.avvis(tidslinjer, NullObserver)
         assertEquals(0, avvisteDager(resultat).size)
     }
 
@@ -85,7 +86,7 @@ internal class VilkårsgrunnlagHistorikkInnslagTest {
     fun `avviser med flere begrunnelser`() {
         val tidslinjer = listOf(tidslinjeOf(1.NAV))
         innslag.add(1.januar, grunnlagsdata(1.januar, harOpptjening = false, harMinimumInntekt = false))
-        val resultat = innslag.avvis(tidslinjer)
+        val resultat = innslag.avvis(tidslinjer, NullObserver)
         val avvisteDager = avvisteDager(resultat)
         assertEquals(1, avvisteDager.size)
         avvisteDager.first().also {
@@ -99,7 +100,7 @@ internal class VilkårsgrunnlagHistorikkInnslagTest {
         val tidslinjer = listOf(tidslinjeOf(2.NAV, skjæringstidspunkter = listOf(1.januar, 2.januar)))
         innslag.add(1.januar, grunnlagsdata(1.januar, harOpptjening = false))
         innslag.add(2.januar, grunnlagsdata(2.januar, harMinimumInntekt = false))
-        val resultat = innslag.avvis(tidslinjer)
+        val resultat = innslag.avvis(tidslinjer, NullObserver)
         val avvisteDager = avvisteDager(resultat)
         assertEquals(2, avvisteDager.size)
         assertNotNull(avvisteDager.first().erAvvistMed(Begrunnelse.ManglerOpptjening))
@@ -111,7 +112,7 @@ internal class VilkårsgrunnlagHistorikkInnslagTest {
         val tidslinjer = listOf(tidslinjeOf(2.NAV, skjæringstidspunkter = listOf(1.januar, 2.januar)))
         innslag.add(1.januar, grunnlagsdata(1.januar))
         innslag.add(2.januar, grunnlagsdata(2.januar, harOpptjening = false, harMinimumInntekt = false, erMedlem = false))
-        val resultat = innslag.avvis(tidslinjer)
+        val resultat = innslag.avvis(tidslinjer, NullObserver)
         val avvisteDager = avvisteDager(resultat)
         assertEquals(1, avvisteDager.size)
         avvisteDager.first().also {
