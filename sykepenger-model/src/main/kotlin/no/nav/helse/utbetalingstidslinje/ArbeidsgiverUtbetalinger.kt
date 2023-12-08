@@ -22,7 +22,6 @@ internal class ArbeidsgiverUtbetalinger(
         maksimumSykepengedagerfilter,
         MaksimumUtbetalingFilter(),
     )
-    internal val maksimumSykepenger by lazy { maksimumSykepengedagerfilter.maksimumSykepenger() }
 
     internal fun beregn(
         beregningsperiode: Periode,
@@ -38,6 +37,6 @@ internal class ArbeidsgiverUtbetalinger(
                 arbeidsgiver to utbetalingstidslinje
             }.toMap()
         }
-        return maksimumSykepenger to tidslinjerPerArbeidsgiver
+        return maksimumSykepengedagerfilter.maksimumSykepenger(vedtaksperiode, subsumsjonObserver) to tidslinjerPerArbeidsgiver
     }
 }

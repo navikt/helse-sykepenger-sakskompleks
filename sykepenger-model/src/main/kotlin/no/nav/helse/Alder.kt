@@ -161,6 +161,7 @@ class Alder(private val fødselsdato: LocalDate, private val dødsdato: LocalDat
         }
 
         internal fun forbrukteDager() = forbrukteDager
+
         internal fun begrunnelse() = tilstand.begrunnAvvisning()
 
         internal fun gjenståendeDager(begrunnelse: Begrunnelse? = null): Int {

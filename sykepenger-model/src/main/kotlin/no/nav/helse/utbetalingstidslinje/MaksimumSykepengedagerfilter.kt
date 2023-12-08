@@ -23,7 +23,6 @@ internal class MaksimumSykepengedagerfilter(
         const val TILSTREKKELIG_OPPHOLD_I_SYKEDAGER = 26 * 7
     }
 
-    private lateinit var maksimumSykepenger: Alder.MaksimumSykepenger
     private lateinit var state: State
     private lateinit var teller: UtbetalingTeller
     private var opphold = 0
@@ -36,7 +35,14 @@ internal class MaksimumSykepengedagerfilter(
     private val tidslinjegrunnlagsubsumsjon by lazy { tidslinjegrunnlag.subsumsjonsformat() }
     private val beregnetTidslinjesubsumsjon by lazy { beregnetTidslinje.subsumsjonsformat() }
 
-    internal fun maksimumSykepenger() = maksimumSykepenger
+    private val maksdatoer = mutableMapOf<LocalDate, UtbetalingTeller>()
+
+    internal fun maksimumSykepenger(periode: Periode, subsumsjonObserver: SubsumsjonObserver): Alder.MaksimumSykepenger {
+        val telleren = maksdatoer.getValue(periode.endInclusive)
+        val maksimumSykepenger = telleren.maksimumSykepenger(periode.endInclusive)
+        maksimumSykepenger.sisteDag(karantenesporing(telleren, periode, subsumsjonObserver))
+        return maksimumSykepenger
+    }
 
     private fun avvisDag(dag: LocalDate, begrunnelse: Begrunnelse) {
         begrunnelserForAvvisteDager.getOrPut(begrunnelse) {
@@ -44,7 +50,7 @@ internal class MaksimumSykepengedagerfilter(
         }.add(dag)
     }
 
-    private fun karantenesporing(periode: Periode, subsumsjonObserver: SubsumsjonObserver) = object : Alder.MaksimumSykepenger.Begrunnelse {
+    private fun karantenesporing(teller: UtbetalingTeller, periode: Periode, subsumsjonObserver: SubsumsjonObserver) = object : Alder.MaksimumSykepenger.Begrunnelse {
         override fun `§ 8-12 ledd 1 punktum 1`(sisteDag: LocalDate, forbrukteDager: Int, gjenståendeDager: Int) {
             val sakensStartdato = teller.startdatoSykepengerettighet() ?: return
             subsumsjonObserver.`§ 8-12 ledd 1 punktum 1`(
@@ -80,20 +86,12 @@ internal class MaksimumSykepengedagerfilter(
         aktivitetslogg: IAktivitetslogg,
         subsumsjonObserver: SubsumsjonObserver
     ): List<Utbetalingstidslinje> {
-        val sisteDato = periode.endInclusive
         this.subsumsjonObserver = subsumsjonObserver
-        beregnetTidslinje = tidslinjer
-            .fold(Utbetalingstidslinje(), Utbetalingstidslinje::plus)
-            .plus(infotrygdtidslinje).kutt(sisteDato)
         tidslinjegrunnlag = tidslinjer + listOf(infotrygdtidslinje)
+        beregnetTidslinje = tidslinjegrunnlag.reduce(Utbetalingstidslinje::plus)
         teller = UtbetalingTeller(alder, arbeidsgiverRegler)
         state = State.Initiell
         beregnetTidslinje.accept(this)
-
-        val sisteDag = if (beregnetTidslinje.isNotEmpty()) beregnetTidslinje.periode().endInclusive else periode.endInclusive
-        maksimumSykepenger = teller.maksimumSykepenger(sisteDag).also {
-            it.sisteDag(karantenesporing(periode, subsumsjonObserver))
-        }
 
         val avvisteTidslinjer = begrunnelserForAvvisteDager.entries.fold(tidslinjer) { result, (begrunnelse, dager) ->
             Utbetalingstidslinje.avvis(result, dager.grupperSammenhengendePerioder(), listOf(begrunnelse))
@@ -120,6 +118,10 @@ internal class MaksimumSykepengedagerfilter(
         state.entering(this)
     }
 
+    override fun visit(dag: Utbetalingsdag.ForeldetDag, dato: LocalDate, økonomi: Økonomi) {
+        maksdatoer[dato] = teller.clone()
+    }
+
     override fun visit(
         dag: NavDag,
         dato: LocalDate,
@@ -127,6 +129,7 @@ internal class MaksimumSykepengedagerfilter(
     ) {
         if (alder.mistetSykepengerett(dato)) state(State.ForGammel)
         state.betalbarDag(this, dato)
+        maksdatoer[dato] = teller.clone()
     }
 
     override fun visit(
@@ -136,6 +139,7 @@ internal class MaksimumSykepengedagerfilter(
     ) {
         if (alder.mistetSykepengerett(dato)) state(State.ForGammel)
         state.sykdomshelg(this, dato)
+        maksdatoer[dato] = teller.clone()
     }
 
     override fun visit(
@@ -144,6 +148,7 @@ internal class MaksimumSykepengedagerfilter(
         økonomi: Økonomi
     ) {
         oppholdsdag(dato)
+        maksdatoer[dato] = teller.clone()
     }
 
     override fun visit(
@@ -152,10 +157,12 @@ internal class MaksimumSykepengedagerfilter(
         økonomi: Økonomi
     ) {
         oppholdsdag(dato)
+        maksdatoer[dato] = teller.clone()
     }
 
     override fun visit(dag: Utbetalingsdag.ArbeidsgiverperiodedagNav, dato: LocalDate, økonomi: Økonomi) {
         oppholdsdag(dato)
+        maksdatoer[dato] = teller.clone()
     }
 
     override fun visit(
@@ -164,6 +171,7 @@ internal class MaksimumSykepengedagerfilter(
         økonomi: Økonomi
     ) {
         fridag(dato)
+        maksdatoer[dato] = teller.clone()
     }
 
     override fun visit(
@@ -173,6 +181,7 @@ internal class MaksimumSykepengedagerfilter(
     ) {
         state.avvistDag(this, dato)
         oppholdsdag(dato)
+        maksdatoer[dato] = teller.clone()
     }
 
     override fun visit(
@@ -181,6 +190,7 @@ internal class MaksimumSykepengedagerfilter(
         økonomi: Økonomi
     ) {
         oppholdsdag(dato)
+        maksdatoer[dato] = teller.clone()
     }
 
     private fun oppholdsdag(dagen: LocalDate) {
@@ -339,7 +349,6 @@ internal class MaksimumSykepengedagerfilter(
             override fun sykdomshelg(avgrenser: MaksimumSykepengedagerfilter, dagen: LocalDate) {}
 
             override fun oppholdsdag(avgrenser: MaksimumSykepengedagerfilter, dagen: LocalDate) {
-                avgrenser.teller.resett()
                 avgrenser.state(Initiell)
             }
 

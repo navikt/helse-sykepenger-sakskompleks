@@ -20,7 +20,6 @@ internal class UtbetalingTeller(
     private val betalteDager = mutableSetOf<LocalDate>()
 
     internal fun startdatoSykepengerettighet() = startdatoSykepengerettighet.takeUnless { it == LocalDate.MIN }
-    internal fun sisteBetalteDag() = betalteDager.last()
 
     internal fun inkrementer(dato: LocalDate) {
         if (forbrukteDager == 0) {
@@ -56,7 +55,6 @@ internal class UtbetalingTeller(
         gammelPersonDager = 0
     }
 
-
     internal fun erDagerOver67ÅrForbrukte(): Boolean {
         val gjenståendeSykepengedagerOver67 = arbeidsgiverRegler.maksSykepengedagerOver67() - gammelPersonDager
         return gjenståendeSykepengedagerOver67 == 0
@@ -66,10 +64,6 @@ internal class UtbetalingTeller(
         return gjenståendeSykepengedager == 0 || erDagerOver67ÅrForbrukte()
     }
 
-    // hvor mange sykepengedager den sykmeldte har igjen, hensyntatt alder:
-    // en 70-åring har 0 dager igjen
-    // en person mellom 67-70 har opp til 60 dager igjen
-    // en person under 67 år har enten <248 - forbrukte dager> igjen -eller- 60, om vedkommende blir 67 år snart
     internal fun gjenståendeDager(dato: LocalDate): Int {
         val gjenståendeSykepengedager = arbeidsgiverRegler.maksSykepengedager() - forbrukteDager
         val gjenståendeSykepengedagerOver67 = arbeidsgiverRegler.maksSykepengedagerOver67() - gammelPersonDager
@@ -88,5 +82,15 @@ internal class UtbetalingTeller(
         }) ?: betalteDager.last()
 
         return alder.maksimumSykepenger(perspektiv, forbrukteDager, gjenståendeSykepengedager, gjenståendeSykepengedagerOver67)
+    }
+
+    fun clone(): UtbetalingTeller {
+        return UtbetalingTeller(alder, arbeidsgiverRegler).apply {
+            this.forbrukteDager = this@UtbetalingTeller.forbrukteDager
+            this.gammelPersonDager = this@UtbetalingTeller.gammelPersonDager
+            this.startdatoSykepengerettighet = this@UtbetalingTeller.startdatoSykepengerettighet
+            this.startdatoTreårsvindu = this@UtbetalingTeller.startdatoTreårsvindu
+            this.betalteDager.addAll(this@UtbetalingTeller.betalteDager)
+        }
     }
 }

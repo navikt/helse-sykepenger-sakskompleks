@@ -352,8 +352,8 @@ internal class ArbeidsgiverUtbetalingerTest {
             vilkårsgrunnlagHistorikk
         )
         val (maksimumSykepenger, tidslinjerPerArbeidsgiver) = utbetalinger.beregn(
-            Periode(1.januar, 31.desember(2019)),
-            Periode(1.januar, 31.desember(2019)),
+            arbeidsgiverTidslinje.periode(),
+            arbeidsgiverTidslinje.periode(),
             aktivitetslogg,
             SubsumsjonObserver.NullObserver
         )

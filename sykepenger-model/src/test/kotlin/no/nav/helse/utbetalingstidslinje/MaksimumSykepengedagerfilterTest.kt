@@ -63,15 +63,7 @@ internal class MaksimumSykepengedagerfilterTest {
         val a2 = tidslinjeOf(16.AP, 250.NAVDAGER, 182.ARB, 10.NAV)
         val avvisteDager = listOf(a1, a2).utbetalingsavgrenser(UNG_PERSON_FNR_2018, a1.periode())
         assertEquals(28.desember, maksimumSykepenger.sisteDag())
-        assertForventetFeil(
-            forklaring = "Om arbeidsgiver som _ikke_ beregner utbetalinger har dager som skal avvises etter arbeidsgiver som beregner utbetalinger, avvises dem ikke",
-            nå = {
-                 assertEquals(emptyList<LocalDate>(), avvisteDager)
-            },
-            ønsket = {
-                assertEquals(listOf(31.desember, 1.januar(2019)), avvisteDager)
-            }
-        )
+        assertEquals(listOf(31.desember, 1.januar(2019)), avvisteDager)
     }
 
     @Test
@@ -188,7 +180,7 @@ internal class MaksimumSykepengedagerfilterTest {
     @Test
     fun `ingen warning om avvist dag ikke er innenfor perioden`() {
         val tidslinje = tidslinjeOf(16.AP, 249.NAVDAGER)
-        assertEquals(emptyList<LocalDate>(), tidslinje.utbetalingsavgrenser(UNG_PERSON_FNR_2018, Periode(1.januar, 30.desember)))
+        assertEquals(listOf(31.desember), tidslinje.utbetalingsavgrenser(UNG_PERSON_FNR_2018, Periode(1.januar, 30.desember)))
         assertEquals(listOf(31.desember), tidslinje.utbetalingsavgrenser(UNG_PERSON_FNR_2018, Periode(1.januar, 31.desember)))
         assertTrue(aktivitetslogg.harAktiviteter())
         assertFalse(aktivitetslogg.harVarslerEllerVerre())
@@ -684,7 +676,7 @@ internal class MaksimumSykepengedagerfilterTest {
             Periode::plus)
         val maksimumSykepengedagerfilter = MaksimumSykepengedagerfilter(fødselsdato.alder, NormalArbeidstaker, personTidslinje)
         avvisteTidslinjer = maksimumSykepengedagerfilter.filter(this, filterperiode, aktivitetslogg, NullObserver)
-        maksimumSykepenger = maksimumSykepengedagerfilter.maksimumSykepenger()
+        maksimumSykepenger = maksimumSykepengedagerfilter.maksimumSykepenger(filterperiode, NullObserver)
         return avvisteTidslinjer.flatMap { it.inspektør.avvistedatoer }
     }
 }
