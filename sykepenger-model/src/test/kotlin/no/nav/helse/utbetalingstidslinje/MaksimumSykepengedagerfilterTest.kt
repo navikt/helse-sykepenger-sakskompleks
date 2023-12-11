@@ -250,18 +250,28 @@ internal class MaksimumSykepengedagerfilterTest {
     fun `utbetaling stopper når du blir 70 år`() {
         val tidslinje = tidslinjeOf(11.NAV)
         assertEquals(listOf(10.januar, 11.januar), tidslinje.utbetalingsavgrenser(PERSON_70_ÅR_10_JANUAR_2018))
+        assertEquals(9.januar, maksdato)
     }
 
     @Test
     fun `kan ikke bli syk på 70årsdagen`() {
         val tidslinje = tidslinjeOf(9.UTELATE, 2.NAVDAGER)
         assertEquals(listOf(10.januar, 11.januar), tidslinje.utbetalingsavgrenser(PERSON_70_ÅR_10_JANUAR_2018))
+        assertEquals(9.januar, maksdato)
     }
 
     @Test
     fun `kan ikke bli syk etter 70årsdagen`() {
         val tidslinje = tidslinjeOf(10.UTELATE, 2.NAVDAGER)
         assertEquals(listOf(11.januar, 12.januar), tidslinje.utbetalingsavgrenser(PERSON_70_ÅR_10_JANUAR_2018))
+        assertEquals(9.januar, maksdato)
+    }
+
+    @Test
+    fun `syk i helg etter blitt 70 år`() {
+        val tidslinje = tidslinjeOf(12.UTELATE, 3.NAV)
+        assertEquals(listOf(15.januar), tidslinje.utbetalingsavgrenser(PERSON_70_ÅR_10_JANUAR_2018))
+        assertEquals(9.januar, maksdato)
     }
 
     @Test

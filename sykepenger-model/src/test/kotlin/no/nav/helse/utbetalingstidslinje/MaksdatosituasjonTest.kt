@@ -33,7 +33,7 @@ internal class MaksdatosituasjonTest {
 
     @Test
     fun `siste dag med sykepenger 70 år`() {
-        assertSisteDagMedSykepenger(9.januar, 0, Hjemmelbegrunnelse.OVER_70, 10.januar, FYLLER_70_ÅR_10_JANUAR_2018, 0, 0).also { situasjon ->
+        assertSisteDagMedSykepenger(9.januar, 0, Hjemmelbegrunnelse.OVER_70, 10.januar, FYLLER_70_ÅR_10_JANUAR_2018, 0).also { situasjon ->
             val jurist = MaskinellJurist()
             situasjon.vurderMaksdatobestemmelse(
                 jurist,
@@ -46,7 +46,7 @@ internal class MaksdatosituasjonTest {
             inspektør.assertOppfylt(paragraf = Paragraf.PARAGRAF_8_3, ledd = Ledd.LEDD_1, versjon = 16.desember(2011), punktum = 2.punktum)
             inspektør.assertIkkeOppfylt(paragraf = Paragraf.PARAGRAF_8_3, ledd = Ledd.LEDD_1, versjon = 16.desember(2011), punktum = 2.punktum)
         }
-        assertSisteDagMedSykepenger(9.januar, 6, Hjemmelbegrunnelse.OVER_70, 1.januar, FYLLER_70_ÅR_10_JANUAR_2018, 0, 0).also { situasjon ->
+        assertSisteDagMedSykepenger(9.januar, 6, Hjemmelbegrunnelse.OVER_70, 1.januar, FYLLER_70_ÅR_10_JANUAR_2018, 0).also { situasjon ->
             val jurist = MaskinellJurist()
             situasjon.vurderMaksdatobestemmelse(jurist, 1.januar til 1.januar, emptyList(), emptyList(), emptySet())
 
@@ -57,70 +57,70 @@ internal class MaksdatosituasjonTest {
 
     @Test
     fun `siste dag med sykepenger 67 år`() {
-        assertSisteDagMedSykepenger(1.januar + 60.ukedager, 60, Hjemmelbegrunnelse.OVER_67, 1.januar, FYLLER_67_ÅR_1_JANUAR_2018, 0, 0)
-        assertSisteDagMedSykepenger(1.januar + 20.ukedager, 20, Hjemmelbegrunnelse.UNDER_67, 1.januar, FYLLER_67_ÅR_1_JANUAR_2018, 228, 1)
-        assertSisteDagMedSykepenger(1.januar + 60.ukedager, 81, Hjemmelbegrunnelse.OVER_67, 1.desember(2017), FYLLER_67_ÅR_1_JANUAR_2018, 48, 0)
-        assertSisteDagMedSykepenger(1.mars + 40.ukedager, 40, Hjemmelbegrunnelse.OVER_67, 1.mars, FYLLER_67_ÅR_1_JANUAR_2018, 20, 20)
+        assertSisteDagMedSykepenger(1.januar + 60.ukedager, 60, Hjemmelbegrunnelse.OVER_67, 1.januar, FYLLER_67_ÅR_1_JANUAR_2018, 0)
+        assertSisteDagMedSykepenger(1.januar + 20.ukedager, 20, Hjemmelbegrunnelse.UNDER_67, 1.januar, FYLLER_67_ÅR_1_JANUAR_2018, 228)
+        assertSisteDagMedSykepenger(1.januar + 60.ukedager, 81, Hjemmelbegrunnelse.OVER_67, 1.desember(2017), FYLLER_67_ÅR_1_JANUAR_2018, 48)
+        assertSisteDagMedSykepenger(1.mars + 40.ukedager, 40, Hjemmelbegrunnelse.OVER_67, 1.mars, FYLLER_67_ÅR_1_JANUAR_2018, 20)
     }
 
     @Test
     fun `siste dag med sykepenger under 67 år`() {
-        assertSisteDagMedSykepenger(1.januar + 248.ukedager, 248, Hjemmelbegrunnelse.UNDER_67, 1.januar, FYLLER_18_ÅR_2_NOVEMBER_2018, 0, 0)
-        assertSisteDagMedSykepenger(1.januar, 0, Hjemmelbegrunnelse.UNDER_67, 1.januar, FYLLER_18_ÅR_2_NOVEMBER_2018, 248, 0)
+        assertSisteDagMedSykepenger(1.januar + 248.ukedager, 248, Hjemmelbegrunnelse.UNDER_67, 1.januar, FYLLER_18_ÅR_2_NOVEMBER_2018, 0)
+        assertSisteDagMedSykepenger(1.januar, 0, Hjemmelbegrunnelse.UNDER_67, 1.januar, FYLLER_18_ÅR_2_NOVEMBER_2018, 248)
     }
 
     @Test
     fun `siste dag med sykepenger under 67 år faller på samme dag som over 67`() {
-        assertSisteDagMedSykepenger(1.januar + 60.ukedager, 60, Hjemmelbegrunnelse.UNDER_67, 1.januar, FYLLER_18_ÅR_2_NOVEMBER_2018, 188, 0)
+        assertSisteDagMedSykepenger(1.januar + 60.ukedager, 60, Hjemmelbegrunnelse.UNDER_67, 1.januar, FYLLER_18_ÅR_2_NOVEMBER_2018, 188)
     }
 
     @Test
     fun `siste dag med sykepenger over 67 år faller på samme dag som over 70`() {
-        assertSisteDagMedSykepenger(9.januar, 6, Hjemmelbegrunnelse.OVER_67, 1.januar, FYLLER_70_ÅR_10_JANUAR_2018, 54, 54)
+        assertSisteDagMedSykepenger(9.januar, 6, Hjemmelbegrunnelse.OVER_67, 1.januar, FYLLER_70_ÅR_10_JANUAR_2018, 54)
     }
 
     @Test
     fun `Person under 67 år får utbetalt 248 dager`() {
         grense(FYLLER_18_ÅR_2_NOVEMBER_2018, 247)
-        assertEquals(1, maksdatosituasjon.gjenståendeDager)
-        maksdatosituasjon = maksdatosituasjon.inkrementer(31.desember)
-        assertEquals(0, maksdatosituasjon.gjenståendeDager)
+        assertEquals(1, maksdatosituasjon.rettighetsvurdering.gjenståendeDager)
+        maksdatosituasjon = maksdatosituasjon.betalbarDag(31.desember)
+        assertEquals(0, maksdatosituasjon.rettighetsvurdering.gjenståendeDager)
     }
 
     @Test
     fun `Person som blir 67 år får utbetalt 60 dager etter 67 årsdagen`() {
         grense(FYLLER_67_ÅR_1_JANUAR_2018, 15 + 59, førsteForbrukteDag = 18.desember(2017))
-        assertEquals(1, maksdatosituasjon.gjenståendeDager)
-        maksdatosituasjon = maksdatosituasjon.inkrementer(31.desember)
-        assertEquals(0, maksdatosituasjon.gjenståendeDager)
+        assertEquals(1, maksdatosituasjon.rettighetsvurdering.gjenståendeDager)
+        maksdatosituasjon = maksdatosituasjon.betalbarDag(31.desember)
+        assertEquals(0, maksdatosituasjon.rettighetsvurdering.gjenståendeDager)
     }
 
     @Test
     fun `Person som blir 70 år har ikke utbetaling på 70 årsdagen`() {
         grense(FYLLER_70_ÅR_10_JANUAR_2018, 8)
-        assertEquals(1, maksdatosituasjon.gjenståendeDager)
-        maksdatosituasjon = maksdatosituasjon.inkrementer(12.januar)
-        assertEquals(0, maksdatosituasjon.gjenståendeDager)
+        assertEquals(1, maksdatosituasjon.rettighetsvurdering.gjenståendeDager)
+        maksdatosituasjon = maksdatosituasjon.betalbarDag(12.januar)
+        assertEquals(0, maksdatosituasjon.rettighetsvurdering.gjenståendeDager)
     }
 
     @Test
     fun `Person under 67`() {
         grense(FYLLER_18_ÅR_2_NOVEMBER_2018, 247)
-        assertEquals(1, maksdatosituasjon.gjenståendeDager)
-        maksdatosituasjon = maksdatosituasjon.dekrementer(2.januar)
-        maksdatosituasjon = maksdatosituasjon.inkrementer(30.desember)
-        assertEquals(1, maksdatosituasjon.gjenståendeDager)
-        maksdatosituasjon = maksdatosituasjon.inkrementer(31.desember)
-        assertEquals(0, maksdatosituasjon.gjenståendeDager)
+        assertEquals(1, maksdatosituasjon.rettighetsvurdering.gjenståendeDager)
+        maksdatosituasjon = maksdatosituasjon.oppholdsdag(1.januar(2021))!!
+        maksdatosituasjon = maksdatosituasjon.betalbarDag(2.januar(2021))
+        assertEquals(1, maksdatosituasjon.rettighetsvurdering.gjenståendeDager)
+        maksdatosituasjon = maksdatosituasjon.betalbarDag(3.januar(2021))
+        assertEquals(0, maksdatosituasjon.rettighetsvurdering.gjenståendeDager)
     }
 
     @Test
     fun `Reset decrement impact`() {
         grense(FYLLER_18_ÅR_2_NOVEMBER_2018, 247)
-        assertEquals(1, maksdatosituasjon.gjenståendeDager)
-        maksdatosituasjon = maksdatosituasjon.dekrementer(1.januar.minusDays(1))
-        maksdatosituasjon = maksdatosituasjon.inkrementer(31.desember)
-        assertEquals(0, maksdatosituasjon.gjenståendeDager)
+        assertEquals(1, maksdatosituasjon.rettighetsvurdering.gjenståendeDager)
+        maksdatosituasjon = maksdatosituasjon.oppholdsdag(1.januar.minusDays(1))!!
+        maksdatosituasjon = maksdatosituasjon.betalbarDag(31.desember)
+        assertEquals(0, maksdatosituasjon.rettighetsvurdering.gjenståendeDager)
     }
 
     @Test
@@ -141,31 +141,25 @@ internal class MaksdatosituasjonTest {
 
     private fun undersøke(expected: LocalDate, alder: Alder, dager: Int, sisteUtbetalingsdag: LocalDate) {
         grense(alder, dager, sisteUtbetalingsdag.minusDays(dager.toLong() - 1))
-        assertEquals(expected, maksdatosituasjon.maksdato)
+        assertEquals(expected, maksdatosituasjon.rettighetsvurdering.maksdato)
     }
 
     private fun grense(alder: Alder, dager: Int, førsteForbrukteDag: LocalDate = 1.januar) {
-        maksdatosituasjon = Maksdatosituasjon(NormalArbeidstaker, førsteForbrukteDag, alder, førsteForbrukteDag, førsteForbrukteDag.minusYears(3L), setOf(førsteForbrukteDag))
-        (1 until dager).forEach {
-            maksdatosituasjon = maksdatosituasjon.inkrementer(førsteForbrukteDag.plusDays(it.toLong()))
+        maksdatosituasjon = Maksdatosituasjon(NormalArbeidstaker, førsteForbrukteDag, alder, Maksdatovurdering.Nullvurdering)
+        (0 until dager).forEach {
+            maksdatosituasjon = maksdatosituasjon.betalbarDag(førsteForbrukteDag.plusDays(it.toLong()))
         }
     }
 
     private enum class Hjemmelbegrunnelse { UNDER_67, OVER_67, OVER_70 }
 
-    private fun assertSisteDagMedSykepenger(forventet: LocalDate, forventetDagerIgjen: Int, begrunnelse: Hjemmelbegrunnelse, sisteBetalteDag: LocalDate, alder: Alder, forbrukteDager: Int, forbrukteDagerOver67: Int): Maksdatosituasjon {
-        val situasjon = Maksdatosituasjon(
-            regler = NormalArbeidstaker,
-            dato = sisteBetalteDag,
-            alder = alder,
-            startdatoSykepengerettighet = LocalDate.EPOCH,
-            startdatoTreårsvindu = LocalDate.EPOCH,
-            betalteDager = if (forbrukteDager > 0) (sisteBetalteDag.minusDays(forbrukteDager.toLong() - 1) til sisteBetalteDag).toSet() else emptySet()
-        )
+    private fun assertSisteDagMedSykepenger(forventet: LocalDate, forventetDagerIgjen: Int, begrunnelse: Hjemmelbegrunnelse, sisteBetalteDag: LocalDate, alder: Alder, forbrukteDager: Int): Rettighetsvurdering {
+        grense(alder, forbrukteDager, if (forbrukteDager > 0) sisteBetalteDag.minusDays(forbrukteDager.toLong() - 1) else sisteBetalteDag)
         val hjemmebestemmelse = FangeHjemmebestemmelse()
-        assertEquals(forventet, situasjon.maksdato)
-        assertEquals(forventetDagerIgjen, situasjon.gjenståendeDager)
-        situasjon.vurderMaksdatobestemmelse(
+        val rettighetsvurdering = maksdatosituasjon.rettighetsvurdering
+        assertEquals(forventet, rettighetsvurdering.maksdato)
+        assertEquals(forventetDagerIgjen, rettighetsvurdering.gjenståendeDager)
+        rettighetsvurdering.vurderMaksdatobestemmelse(
             hjemmebestemmelse,
             LocalDate.EPOCH.somPeriode(),
             emptyList(),
@@ -173,7 +167,7 @@ internal class MaksdatosituasjonTest {
             emptySet()
         )
         assertEquals(begrunnelse, hjemmebestemmelse.hjemmel)
-        return situasjon
+        return rettighetsvurdering
     }
 
     private class FangeHjemmebestemmelse : SubsumsjonObserver {

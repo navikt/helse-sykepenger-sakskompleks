@@ -827,12 +827,67 @@ internal class SubsumsjonE2ETest : AbstractEndToEndTest() {
         håndterUtbetalingsgodkjenning(2.vedtaksperiode, true)
         håndterUtbetalt()
 
-        SubsumsjonInspektør(jurist).assertIkkeOppfylt(
+        val subsumsjonInspektør = SubsumsjonInspektør(jurist)
+        subsumsjonInspektør.assertPaaIndeks(
+            forventetAntall = 3,
+            index = 0,
+            utfall = VILKAR_IKKE_OPPFYLT,
+            lovverk = "folketrygdloven",
             paragraf = PARAGRAF_8_12,
             ledd = LEDD_2,
             versjon = 21.mai(2021),
             input = mapOf(
                 "dato" to 28.desember,
+                "tilstrekkeligOppholdISykedager" to 182,
+                "tidslinjegrunnlag" to listOf(
+                    listOf(
+                        mapOf("fom" to 1.januar, "tom" to 16.januar, "dagtype" to "AGPDAG", "grad" to 100),
+                        mapOf("fom" to 17.januar, "tom" to 31.desember, "dagtype" to "NAVDAG", "grad" to 100)
+                    )
+                ),
+                "beregnetTidslinje" to listOf(
+                    mapOf("fom" to 1.januar, "tom" to 16.januar, "dagtype" to "AGPDAG", "grad" to 100),
+                    mapOf("fom" to 17.januar, "tom" to 31.desember, "dagtype" to "NAVDAG", "grad" to 100)
+                )
+            ),
+            output = emptyMap(),
+            vedtaksperiodeId = 1.vedtaksperiode
+        )
+        subsumsjonInspektør.assertPaaIndeks(
+            forventetAntall = 3,
+            index = 1,
+            utfall = VILKAR_IKKE_OPPFYLT,
+            lovverk = "folketrygdloven",
+            paragraf = PARAGRAF_8_12,
+            ledd = LEDD_2,
+            versjon = 21.mai(2021),
+            input = mapOf(
+                "dato" to 29.desember,
+                "tilstrekkeligOppholdISykedager" to 182,
+                "tidslinjegrunnlag" to listOf(
+                    listOf(
+                        mapOf("fom" to 1.januar, "tom" to 16.januar, "dagtype" to "AGPDAG", "grad" to 100),
+                        mapOf("fom" to 17.januar, "tom" to 31.desember, "dagtype" to "NAVDAG", "grad" to 100)
+                    )
+                ),
+                "beregnetTidslinje" to listOf(
+                    mapOf("fom" to 1.januar, "tom" to 16.januar, "dagtype" to "AGPDAG", "grad" to 100),
+                    mapOf("fom" to 17.januar, "tom" to 31.desember, "dagtype" to "NAVDAG", "grad" to 100)
+                )
+            ),
+            output = emptyMap(),
+            vedtaksperiodeId = 1.vedtaksperiode
+        )
+        subsumsjonInspektør.assertPaaIndeks(
+            forventetAntall = 3,
+            index = 2,
+            utfall = VILKAR_IKKE_OPPFYLT,
+            lovverk = "folketrygdloven",
+            paragraf = PARAGRAF_8_12,
+            ledd = LEDD_2,
+            versjon = 21.mai(2021),
+            input = mapOf(
+                "dato" to 30.desember,
                 "tilstrekkeligOppholdISykedager" to 182,
                 "tidslinjegrunnlag" to listOf(
                     listOf(

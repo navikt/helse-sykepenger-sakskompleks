@@ -28,7 +28,7 @@ internal class ArbeidsgiverUtbetalinger(
         vedtaksperiode: Periode,
         aktivitetslogg: IAktivitetslogg,
         subsumsjonObserver: SubsumsjonObserver
-    ): Pair<Maksdatosituasjon, Map<Arbeidsgiver, Utbetalingstidslinje>> {
+    ): Pair<Rettighetsvurdering, Map<Arbeidsgiver, Utbetalingstidslinje>> {
         val arbeidsgivertidslinjer = arbeidsgivere(beregningsperiode, subsumsjonObserver, aktivitetslogg)
         val tidslinjerPerArbeidsgiver = filtere.fold(arbeidsgivertidslinjer) { tidslinjer, filter ->
             val input = tidslinjer.entries.map { (key, value) -> key to value }
