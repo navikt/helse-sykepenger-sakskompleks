@@ -88,11 +88,12 @@ internal class Maksdatosituasjon private constructor(
     }
 
     private fun inkrementer(dato: LocalDate): Maksdatosituasjon {
-        if (dato >= alder.syttiårsdagen) {
-            maksdatovurdering.avvistDag(dato, Begrunnelse.Over70, sisteVirkedagFørFylte70år)
-            return medTilstand(dato, State.ForGammel)
-        }
-        check(rettighetsvurdering.gjenståendeDager > 0) { "gjenstående dager må være større enn 0" }
+        if (dato >= alder.syttiårsdagen) return avvistOver70(dato)
+        return forbruktDag(dato)
+    }
+
+    private fun forbruktDag(dato: LocalDate): Maksdatosituasjon {
+        check(gjenståendeSykepengedagerOver67 > 0 && gjenståendeSykepengedagerUnder67 > 0) { "gjenstående dager må være større enn 0" }
         val nyTilstand = when {
             gjenståendeSykepengedagerUnder67 == 1 -> State.Karantene(Begrunnelse.SykepengedagerOppbrukt)
             gjenståendeSykepengedagerOver67 == 1 -> State.Karantene(Begrunnelse.SykepengedagerOppbruktOver67)
@@ -101,6 +102,17 @@ internal class Maksdatosituasjon private constructor(
         return Maksdatosituasjon(regler, dato, alder, startdatoSykepengerettighet!!, startdatoTreårsvindu, betalteDager + setOf(dato), maksdatovurdering, nyTilstand, 0).also {
             it.maksdatovurdering.forbruktDag(dato, it.rettighetsvurdering, TILSTREKKELIG_OPPHOLD_I_SYKEDAGER, oppholdsdager)
         }
+    }
+
+    private fun avvistOver70(dato: LocalDate): Maksdatosituasjon {
+        return medTilstand(dato, State.ForGammel).also {
+            it.maksdatovurdering.avvistDag(dato, Begrunnelse.Over70, it.sisteVirkedagFørFylte70år)
+        }
+    }
+
+    private fun avvistDag(dato: LocalDate, begrunnelse: Begrunnelse): Maksdatosituasjon {
+        maksdatovurdering.avvistDag(dato, begrunnelse, rettighetsvurdering.maksdato)
+        return this
     }
 
     private fun medTilstand(dato: LocalDate, nyTilstand: State, oppholdsdager: Int = this.oppholdsdager): Maksdatosituasjon {
@@ -175,16 +187,10 @@ internal class Maksdatosituasjon private constructor(
 
             override fun sykdomshelg(avgrenser: Maksdatosituasjon, dagen: LocalDate): Maksdatosituasjon? {
                 if (dagen < avgrenser.syttiårsdagen) return avgrenser
-                return avgrenser.medTilstand(dagen, ForGammel).also {
-                    it.maksdatovurdering.avvistDag(dagen, Begrunnelse.Over70, it.sisteVirkedagFørFylte70år)
-                }
+                return avgrenser.avvistOver70(dagen)
             }
 
-            override fun oppholdsdag(avgrenser: Maksdatosituasjon, dagen: LocalDate): Maksdatosituasjon {
-                return avgrenser.medTilstand(dagen, Opphold, 1).also {
-                    avgrenser.maksdatovurdering.oppholdsdag(dagen, it.rettighetsvurdering, TILSTREKKELIG_OPPHOLD_I_SYKEDAGER, 1)
-                }
-            }
+            override fun oppholdsdag(avgrenser: Maksdatosituasjon, dagen: LocalDate) = avgrenser.håndterOpphold(dagen, Opphold)
 
             override fun fridag(avgrenser: Maksdatosituasjon, dagen: LocalDate): Maksdatosituasjon {
                 return avgrenser.medTilstand(dagen, OppholdFri, 1)
@@ -212,37 +218,20 @@ internal class Maksdatosituasjon private constructor(
         }
 
         class Karantene(private val begrunnelse: Begrunnelse) : State {
+            /* betalbarDag skal ikke medføre ny rettighet */
             override fun betalbarDag(avgrenser: Maksdatosituasjon, dagen: LocalDate): Maksdatosituasjon {
-                /* betalbarDag skal ikke medføre ny rettighet */
-                return vurderTilstrekkeligOppholdNådd(avgrenser, dagen).also {
-                    it.tilstand.avvistDag(it, dagen)
-                }
+                avvistDag(avgrenser, dagen)
+                return håndterOppholdsdagUtenNyRettighet(avgrenser, dagen)
             }
-
-            override fun avvistDag(avgrenser: Maksdatosituasjon, dagen: LocalDate): Maksdatosituasjon {
-                avgrenser.maksdatovurdering.avvistDag(dagen, begrunnelse, avgrenser.rettighetsvurdering.maksdato)
-                return avgrenser
-            }
-
-            override fun sykdomshelg(avgrenser: Maksdatosituasjon, dagen: LocalDate): Maksdatosituasjon {
-                /* helg skal ikke medføre ny rettighet */
-                return vurderTilstrekkeligOppholdNådd(avgrenser, dagen).also {
-                    it.maksdatovurdering.oppholdsdag(dagen, it.rettighetsvurdering, TILSTREKKELIG_OPPHOLD_I_SYKEDAGER, it.oppholdsdager)
-                }
-            }
-
+            /* helg skal ikke medføre ny rettighet */
+            override fun sykdomshelg(avgrenser: Maksdatosituasjon, dagen: LocalDate) = håndterOppholdsdagUtenNyRettighet(avgrenser, dagen)
+            /* fridag skal ikke medføre ny rettighet */
+            override fun fridag(avgrenser: Maksdatosituasjon, dagen: LocalDate) = håndterOppholdsdagUtenNyRettighet(avgrenser, dagen)
+            override fun avvistDag(avgrenser: Maksdatosituasjon, dagen: LocalDate) = avgrenser.avvistDag(dagen, begrunnelse)
             override fun oppholdsdag(avgrenser: Maksdatosituasjon, dagen: LocalDate) = avgrenser.håndterOpphold(dagen, this)
-            override fun fridag(avgrenser: Maksdatosituasjon, dagen: LocalDate): Maksdatosituasjon {
-                return vurderTilstrekkeligOppholdNådd(avgrenser, dagen).also {
-                    it.maksdatovurdering.oppholdsdag(dagen, it.rettighetsvurdering, TILSTREKKELIG_OPPHOLD_I_SYKEDAGER, it.oppholdsdager)
-                }
-            }
 
-            private fun vurderTilstrekkeligOppholdNådd(avgrenser: Maksdatosituasjon, dagen: LocalDate): Maksdatosituasjon {
-                val oppholdsdager = avgrenser.oppholdsdager + 1
-                if (oppholdsdager > TILSTREKKELIG_OPPHOLD_I_SYKEDAGER) return avgrenser.medTilstand(dagen, KaranteneTilstrekkeligOppholdNådd, oppholdsdager)
-                return avgrenser.medTilstand(dagen, this, oppholdsdager)
-            }
+            private fun håndterOppholdsdagUtenNyRettighet(avgrenser: Maksdatosituasjon, dato: LocalDate) =
+                avgrenser.håndterOpphold(dato, this) ?: avgrenser.medTilstand(dato, KaranteneTilstrekkeligOppholdNådd)
         }
 
         object KaranteneTilstrekkeligOppholdNådd : State {
@@ -253,41 +242,28 @@ internal class Maksdatosituasjon private constructor(
             }
 
             override fun avvistDag(avgrenser: Maksdatosituasjon, dagen: LocalDate): Maksdatosituasjon {
-                avgrenser.maksdatovurdering.avvistDag(dagen, Begrunnelse.NyVilkårsprøvingNødvendig, avgrenser.rettighetsvurdering.maksdato)
-                return avgrenser
+                return avgrenser.avvistDag(dagen, Begrunnelse.NyVilkårsprøvingNødvendig)
             }
 
-            override fun sykdomshelg(avgrenser: Maksdatosituasjon, dagen: LocalDate): Maksdatosituasjon {
-                return avgrenser.medTilstand(dagen, KaranteneTilstrekkeligOppholdNådd, avgrenser.oppholdsdager).also {
-                    it.maksdatovurdering.oppholdsdag(dagen, it.rettighetsvurdering, TILSTREKKELIG_OPPHOLD_I_SYKEDAGER, it.oppholdsdager)
-                }
-            }
+            override fun sykdomshelg(avgrenser: Maksdatosituasjon, dagen: LocalDate) = håndterOppholdUtenNyRettighet(avgrenser, dagen)
 
             override fun oppholdsdag(avgrenser: Maksdatosituasjon, dagen: LocalDate): Maksdatosituasjon? {
                 avgrenser.maksdatovurdering.oppholdsdag(dagen, avgrenser.rettighetsvurdering, TILSTREKKELIG_OPPHOLD_I_SYKEDAGER, avgrenser.oppholdsdager)
                 return null
             }
 
-            override fun fridag(avgrenser: Maksdatosituasjon, dagen: LocalDate): Maksdatosituasjon {
-                return avgrenser.medTilstand(dagen, KaranteneTilstrekkeligOppholdNådd, avgrenser.oppholdsdager).also {
-                    it.maksdatovurdering.oppholdsdag(dagen, it.rettighetsvurdering, TILSTREKKELIG_OPPHOLD_I_SYKEDAGER, it.oppholdsdager)
+            override fun fridag(avgrenser: Maksdatosituasjon, dagen: LocalDate) = håndterOppholdUtenNyRettighet(avgrenser, dagen)
+
+            private fun håndterOppholdUtenNyRettighet(avgrenser: Maksdatosituasjon, dato: LocalDate) =
+                avgrenser.medTilstand(dato, this, avgrenser.oppholdsdager).also {
+                    it.maksdatovurdering.oppholdsdag(dato, it.rettighetsvurdering, TILSTREKKELIG_OPPHOLD_I_SYKEDAGER, it.oppholdsdager)
                 }
-            }
+
         }
 
         object ForGammel : State {
-            override fun betalbarDag(avgrenser: Maksdatosituasjon, dagen: LocalDate): Maksdatosituasjon {
-                return over70(avgrenser, dagen)
-            }
-
-            override fun sykdomshelg(avgrenser: Maksdatosituasjon, dagen: LocalDate): Maksdatosituasjon {
-                return over70(avgrenser, dagen)
-            }
-
-            private fun over70(avgrenser: Maksdatosituasjon, dagen: LocalDate): Maksdatosituasjon {
-                avgrenser.maksdatovurdering.avvistDag(dagen, Begrunnelse.Over70, avgrenser.sisteVirkedagFørFylte70år)
-                return avgrenser
-            }
+            override fun betalbarDag(avgrenser: Maksdatosituasjon, dagen: LocalDate) = avgrenser.avvistOver70(dagen)
+            override fun sykdomshelg(avgrenser: Maksdatosituasjon, dagen: LocalDate) = avgrenser.avvistOver70(dagen)
         }
     }
 
