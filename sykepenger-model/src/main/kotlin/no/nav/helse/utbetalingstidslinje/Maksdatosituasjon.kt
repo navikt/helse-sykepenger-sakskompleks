@@ -8,7 +8,6 @@ import no.nav.helse.Alder
 import no.nav.helse.plus
 import no.nav.helse.ukedager
 
-// todo: avviser ikke første sykdomshelg etter 70 år hvis det ikke har blitt avvist dager tidligere
 internal class Maksdatosituasjon private constructor(
     private val regler: ArbeidsgiverRegler,
     private val dato: LocalDate,
@@ -172,6 +171,13 @@ internal class Maksdatosituasjon private constructor(
         object Syk : State {
             override fun betalbarDag(avgrenser: Maksdatosituasjon, dagen: LocalDate): Maksdatosituasjon {
                 return avgrenser.inkrementer(dagen)
+            }
+
+            override fun sykdomshelg(avgrenser: Maksdatosituasjon, dagen: LocalDate): Maksdatosituasjon? {
+                if (dagen < avgrenser.syttiårsdagen) return avgrenser
+                return avgrenser.medTilstand(dagen, ForGammel).also {
+                    it.maksdatovurdering.avvistDag(dagen, Begrunnelse.Over70, it.sisteVirkedagFørFylte70år)
+                }
             }
 
             override fun oppholdsdag(avgrenser: Maksdatosituasjon, dagen: LocalDate): Maksdatosituasjon {
