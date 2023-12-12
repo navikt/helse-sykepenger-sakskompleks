@@ -102,56 +102,52 @@ internal class MaksimumSykepengedagerfilter(
     }
 
     private fun Maksdatosituasjon?.maksdatoFor(dato: LocalDate): Rettighetsvurdering {
-        return this?.maksdatoFor(dato) ?: Maksdatosituasjon(arbeidsgiverRegler, dato, alder, this@MaksimumSykepengedagerfilter).rettighetsvurdering
+        return this?.rettighetsvurdering ?: Maksdatosituasjon(arbeidsgiverRegler, dato, alder, this@MaksimumSykepengedagerfilter).rettighetsvurdering
     }
 
     override fun visit(dag: Utbetalingsdag.ForeldetDag, dato: LocalDate, økonomi: Økonomi) {
+        gjeldendeVurdering = gjeldendeVurdering?.foreldetDag(dato)
         maksdatoer[dato] = gjeldendeVurdering.maksdatoFor(dato)
     }
+
     override fun visit(dag: NavDag, dato: LocalDate, økonomi: Økonomi) {
         gjeldendeVurdering = (gjeldendeVurdering ?: Maksdatosituasjon(arbeidsgiverRegler, dato, alder, this)).betalbarDag(dato)
         maksdatoer[dato] = gjeldendeVurdering.maksdatoFor(dato)
     }
+
     override fun visit(dag: Utbetalingsdag.NavHelgDag, dato: LocalDate, økonomi: Økonomi) {
         gjeldendeVurdering = gjeldendeVurdering?.sykdomshelg(dato)
         maksdatoer[dato] = gjeldendeVurdering.maksdatoFor(dato)
     }
+
     override fun visit(dag: Utbetalingsdag.Arbeidsdag, dato: LocalDate, økonomi: Økonomi) {
-        oppholdsdag(dato)
+        gjeldendeVurdering = gjeldendeVurdering?.oppholdsdag(dato)
         maksdatoer[dato] = gjeldendeVurdering.maksdatoFor(dato)
     }
 
     override fun visit(dag: Utbetalingsdag.ArbeidsgiverperiodeDag, dato: LocalDate, økonomi: Økonomi) {
-        oppholdsdag(dato)
+        gjeldendeVurdering = gjeldendeVurdering?.oppholdsdag(dato)
         maksdatoer[dato] = gjeldendeVurdering.maksdatoFor(dato)
     }
 
     override fun visit(dag: Utbetalingsdag.ArbeidsgiverperiodedagNav, dato: LocalDate, økonomi: Økonomi) {
-        oppholdsdag(dato)
+        gjeldendeVurdering = gjeldendeVurdering?.oppholdsdag(dato)
         maksdatoer[dato] = gjeldendeVurdering.maksdatoFor(dato)
     }
 
     override fun visit(dag: Utbetalingsdag.Fridag, dato: LocalDate, økonomi: Økonomi) {
-        fridag(dato)
+        gjeldendeVurdering = gjeldendeVurdering?.fridag(dato)
         maksdatoer[dato] = gjeldendeVurdering.maksdatoFor(dato)
     }
 
     override fun visit(dag: Utbetalingsdag.AvvistDag, dato: LocalDate, økonomi: Økonomi) {
         gjeldendeVurdering = gjeldendeVurdering?.avvistDag(dato)
-        oppholdsdag(dato)
+        gjeldendeVurdering = gjeldendeVurdering?.oppholdsdag(dato)
         maksdatoer[dato] = gjeldendeVurdering.maksdatoFor(dato)
     }
 
     override fun visit(dag: UkjentDag, dato: LocalDate, økonomi: Økonomi) {
-        oppholdsdag(dato)
+        gjeldendeVurdering = gjeldendeVurdering?.oppholdsdag(dato)
         maksdatoer[dato] = gjeldendeVurdering.maksdatoFor(dato)
-    }
-
-    private fun oppholdsdag(dagen: LocalDate) {
-        gjeldendeVurdering = gjeldendeVurdering?.oppholdsdag(dagen)
-    }
-
-    private fun fridag(dagen: LocalDate) {
-        gjeldendeVurdering = gjeldendeVurdering?.fridag(dagen)
     }
 }

@@ -112,7 +112,7 @@ internal class Maksdatosituasjon private constructor(
 
     private fun avvistDag(dato: LocalDate, begrunnelse: Begrunnelse): Maksdatosituasjon {
         maksdatovurdering.avvistDag(dato, begrunnelse, rettighetsvurdering.maksdato)
-        return this
+        return medTilstand(dato, tilstand)
     }
 
     private fun medTilstand(dato: LocalDate, nyTilstand: State, oppholdsdager: Int = this.oppholdsdager): Maksdatosituasjon {
@@ -127,15 +127,12 @@ internal class Maksdatosituasjon private constructor(
         return Maksdatosituasjon(regler, dato, alder, startdatoSykepengerettighet!!, nyStartdatoTreårsvindu, nyBetalteDager, maksdatovurdering, this.tilstand)
     }
 
-    internal fun maksdatoFor(dato: LocalDate): Rettighetsvurdering {
-        return Maksdatosituasjon(regler, dato, alder, startdatoSykepengerettighet!!, startdatoTreårsvindu, betalteDager, maksdatovurdering).rettighetsvurdering
-    }
-
     fun betalbarDag(dagen: LocalDate) = tilstand.betalbarDag(this, dagen)
     fun oppholdsdag(dagen: LocalDate) = tilstand.oppholdsdag(this, dagen)
     fun sykdomshelg(dagen: LocalDate) = tilstand.sykdomshelg(this, dagen)
     fun fridag(dagen: LocalDate) = tilstand.fridag(this, dagen)
     fun avvistDag(dagen: LocalDate) = tilstand.avvistDag(this, dagen)
+    fun foreldetDag(dagen: LocalDate) = medTilstand(dagen, tilstand)
 
     private fun håndterOpphold(dagen: LocalDate, nyTilstand: State): Maksdatosituasjon? {
         val oppholdsdager = oppholdsdager + 1
@@ -153,9 +150,9 @@ internal class Maksdatosituasjon private constructor(
             throw NotImplementedError()
         }
         fun avvistDag(avgrenser: Maksdatosituasjon, dagen: LocalDate) = avgrenser
-        fun oppholdsdag(avgrenser: Maksdatosituasjon, dagen: LocalDate): Maksdatosituasjon? = avgrenser // return null indikerer tilbakestilling/nok opphold nådd
-        fun sykdomshelg(avgrenser: Maksdatosituasjon, dagen: LocalDate): Maksdatosituasjon? = avgrenser // return null indikerer tilbakestilling/nok opphold nådd
-        fun fridag(avgrenser: Maksdatosituasjon, dagen: LocalDate): Maksdatosituasjon? = avgrenser // return null indikerer tilbakestilling/nok opphold nådd
+        fun oppholdsdag(avgrenser: Maksdatosituasjon, dagen: LocalDate): Maksdatosituasjon? // return null indikerer tilbakestilling/nok opphold nådd
+        fun sykdomshelg(avgrenser: Maksdatosituasjon, dagen: LocalDate): Maksdatosituasjon?
+        fun fridag(avgrenser: Maksdatosituasjon, dagen: LocalDate): Maksdatosituasjon?
 
         object Initiell : State {
             override fun betalbarDag(avgrenser: Maksdatosituasjon, dagen: LocalDate): Maksdatosituasjon {
@@ -186,7 +183,7 @@ internal class Maksdatosituasjon private constructor(
             }
 
             override fun sykdomshelg(avgrenser: Maksdatosituasjon, dagen: LocalDate): Maksdatosituasjon? {
-                if (dagen < avgrenser.syttiårsdagen) return avgrenser
+                if (dagen < avgrenser.syttiårsdagen) return avgrenser.medTilstand(dagen, this)
                 return avgrenser.avvistOver70(dagen)
             }
 
@@ -212,6 +209,8 @@ internal class Maksdatosituasjon private constructor(
             override fun betalbarDag(avgrenser: Maksdatosituasjon, dagen: LocalDate): Maksdatosituasjon {
                 return avgrenser.inkrementer(dagen)
             }
+
+            override fun sykdomshelg(avgrenser: Maksdatosituasjon, dagen: LocalDate) = avgrenser.medTilstand(dagen, this)
 
             override fun fridag(avgrenser: Maksdatosituasjon, dagen: LocalDate) = avgrenser.håndterOpphold(dagen, OppholdFri)
             override fun oppholdsdag(avgrenser: Maksdatosituasjon, dagen: LocalDate) = avgrenser.håndterOpphold(dagen, Opphold)
@@ -263,6 +262,8 @@ internal class Maksdatosituasjon private constructor(
 
         object ForGammel : State {
             override fun betalbarDag(avgrenser: Maksdatosituasjon, dagen: LocalDate) = avgrenser.avvistOver70(dagen)
+            override fun oppholdsdag(avgrenser: Maksdatosituasjon, dagen: LocalDate) = avgrenser.medTilstand(dagen, this)
+            override fun fridag(avgrenser: Maksdatosituasjon, dagen: LocalDate) = avgrenser.medTilstand(dagen, this)
             override fun sykdomshelg(avgrenser: Maksdatosituasjon, dagen: LocalDate) = avgrenser.avvistOver70(dagen)
         }
     }
