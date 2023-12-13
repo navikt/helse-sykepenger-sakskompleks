@@ -1,112 +1,49 @@
 package no.nav.helse.utbetalingstidslinje
 
-import java.time.DayOfWeek.MONDAY
-import java.time.DayOfWeek.SATURDAY
-import java.time.DayOfWeek.SUNDAY
 import java.time.LocalDate
 import no.nav.helse.Alder
-import no.nav.helse.plus
-import no.nav.helse.ukedager
 
 internal class Maksdatosituasjon private constructor(
-    private val regler: ArbeidsgiverRegler,
-    private val dato: LocalDate,
-    private val alder: Alder,
-    startdatoSykepengerettighet: LocalDate,
-    private val startdatoTreårsvindu: LocalDate,
-    private val betalteDager: Set<LocalDate>,
+    internal val rettighetsvurdering: Rettighetsvurdering,
     private val maksdatovurdering: Maksdatovurdering,
     private val tilstand: State,
     private val oppholdsdager: Int = 0
 ) {
-    private constructor(
-        regler: ArbeidsgiverRegler,
-        dato: LocalDate,
-        alder: Alder,
-        startdatoSykepengerettighet: LocalDate,
-        startdatoTreårsvindu: LocalDate,
-        betalteDager: Set<LocalDate>,
-        maksdatovurdering: Maksdatovurdering
-    ) : this(regler, dato, alder, startdatoSykepengerettighet, startdatoTreårsvindu, betalteDager, maksdatovurdering, State.Initiell)
+    private constructor(rettighetsvurdering: Rettighetsvurdering, maksdatovurdering: Maksdatovurdering) : this(rettighetsvurdering, maksdatovurdering, State.Initiell)
 
     internal constructor(regler: ArbeidsgiverRegler, dato: LocalDate, alder: Alder, maksdatovurdering: Maksdatovurdering) :
-            this(regler, dato, alder, LocalDate.MIN, LocalDate.MIN, emptySet(), maksdatovurdering)
-
-    private val redusertYtelseAlder = alder.redusertYtelseAlder
-    private val syttiårsdagen = alder.syttiårsdagen
-    private val sisteVirkedagFørFylte70år = syttiårsdagen.forrigeVirkedagFør()
-
-    private val forbrukteDager = betalteDager.size
-    private val forbrukteDagerOver67 = betalteDager.count { it > redusertYtelseAlder }
-
-    private val gjenståendeSykepengedagerUnder67 = regler.maksSykepengedager() - forbrukteDager
-
-    private val gjenståendeSykepengedagerOver67 = regler.maksSykepengedagerOver67() - forbrukteDagerOver67
-    private val startdatoSykepengerettighet = startdatoSykepengerettighet.takeUnless { it == LocalDate.MIN }
-
-    private val harNåddMaks = minOf(gjenståendeSykepengedagerOver67, gjenståendeSykepengedagerUnder67) == 0
-    private val forrigeMaksdato = if (harNåddMaks) betalteDager.last() else null
-    private val forrigeVirkedag = forrigeMaksdato ?: dato.sisteVirkedagInklusiv()
-
-    private val maksdatoOrdinærRett = forrigeVirkedag + gjenståendeSykepengedagerUnder67.ukedager
-    private val maksdatoBegrensetRett = maxOf(forrigeVirkedag, redusertYtelseAlder) + gjenståendeSykepengedagerOver67.ukedager
-
-    internal val rettighetsvurdering: Rettighetsvurdering
-
-    init {
-        // maksdato er den dagen som først inntreffer blant ordinær kvote, 67-års-kvoten og 70-årsdagen,
-        // med mindre man allerede har brukt opp alt tidligere
-        when {
-            maksdatoOrdinærRett <= maksdatoBegrensetRett -> {
-                rettighetsvurdering = Rettighetsvurdering(
-                    maksdato = maksdatoOrdinærRett,
-                    forbrukteDager = forbrukteDager,
-                    gjenståendeDager = gjenståendeSykepengedagerUnder67,
-                    syttiårsdagen = syttiårsdagen,
-                    bestemmelse = Rettighetsvurdering.Maksdatobestemmelse.OrdinærRett(startdatoSykepengerettighet)
-                )
-            }
-            maksdatoBegrensetRett <= sisteVirkedagFørFylte70år -> {
-                rettighetsvurdering = Rettighetsvurdering(
-                    maksdato = maksdatoBegrensetRett,
-                    forbrukteDager = forbrukteDager,
-                    gjenståendeDager = ukedager(forrigeVirkedag, maksdatoBegrensetRett),
-                    syttiårsdagen = syttiårsdagen,
-                    bestemmelse = Rettighetsvurdering.Maksdatobestemmelse.BegrensetRett(startdatoSykepengerettighet)
-                )
-            }
-            else -> {
-                rettighetsvurdering = Rettighetsvurdering(
-                    maksdato = sisteVirkedagFørFylte70år,
-                    forbrukteDager = forbrukteDager,
-                    gjenståendeDager = ukedager(forrigeVirkedag, sisteVirkedagFørFylte70år),
-                    syttiårsdagen = syttiårsdagen,
-                    bestemmelse = Rettighetsvurdering.Maksdatobestemmelse.Over70()
-                )
-            }
-        }
-    }
+            this(Rettighetsvurdering.maksdatoFor(regler, alder, dato, emptySet(), LocalDate.MIN, LocalDate.MIN), maksdatovurdering)
 
     private fun inkrementer(dato: LocalDate): Maksdatosituasjon {
-        if (dato >= alder.syttiårsdagen) return avvistOver70(dato)
-        return forbruktDag(dato)
+        //check(rettighetsvurdering.harGjenståendeDager()) { "gjenstående dager må være større enn 0" }
+        val nyVurdering = rettighetsvurdering.medForbruktDag(dato)
+        return forbruktDag(nyVurdering, dato)
     }
 
-    private fun forbruktDag(dato: LocalDate): Maksdatosituasjon {
-        check(gjenståendeSykepengedagerOver67 > 0 && gjenståendeSykepengedagerUnder67 > 0) { "gjenstående dager må være større enn 0" }
+    // tilgir forbrukte dager som følge av at treårsvinduet forskyves
+    private fun forskyvOgForbruk(dato: LocalDate): Maksdatosituasjon {
+        val nyVurdering = rettighetsvurdering.forskyvTreårsvindu(dato, dato.minusYears(HISTORISK_PERIODE_I_ÅR))
+        return forbruktDag(nyVurdering, dato)
+    }
+
+    private fun forbruktDag(nyVurdering: Rettighetsvurdering, dato: LocalDate): Maksdatosituasjon {
         val nyTilstand = when {
-            gjenståendeSykepengedagerUnder67 == 1 -> State.Karantene(Begrunnelse.SykepengedagerOppbrukt)
-            gjenståendeSykepengedagerOver67 == 1 -> State.Karantene(Begrunnelse.SykepengedagerOppbruktOver67)
+            nyVurdering.forGammel() -> State.ForGammel
+            nyVurdering.bruktOppOrdinærKvote() -> State.Karantene(Begrunnelse.SykepengedagerOppbrukt)
+            nyVurdering.bruktOppBegrensetKvote() -> State.Karantene(Begrunnelse.SykepengedagerOppbruktOver67)
             else -> State.Syk
         }
-        return Maksdatosituasjon(regler, dato, alder, startdatoSykepengerettighet!!, startdatoTreårsvindu, betalteDager + setOf(dato), maksdatovurdering, nyTilstand, 0).also {
-            it.maksdatovurdering.forbruktDag(dato, it.rettighetsvurdering, TILSTREKKELIG_OPPHOLD_I_SYKEDAGER, oppholdsdager)
+        return Maksdatosituasjon(nyVurdering, maksdatovurdering, nyTilstand, 0).also {
+            if (nyTilstand == State.ForGammel)
+                it.maksdatovurdering.avvistDag(dato, Begrunnelse.Over70, it.rettighetsvurdering.maksdato)
+            else
+                it.maksdatovurdering.forbruktDag(dato, it.rettighetsvurdering, TILSTREKKELIG_OPPHOLD_I_SYKEDAGER, oppholdsdager)
         }
     }
 
     private fun avvistOver70(dato: LocalDate): Maksdatosituasjon {
         return medTilstand(dato, State.ForGammel).also {
-            it.maksdatovurdering.avvistDag(dato, Begrunnelse.Over70, it.sisteVirkedagFørFylte70år)
+            it.maksdatovurdering.avvistDag(dato, Begrunnelse.Over70, it.rettighetsvurdering.maksdato)
         }
     }
 
@@ -116,15 +53,7 @@ internal class Maksdatosituasjon private constructor(
     }
 
     private fun medTilstand(dato: LocalDate, nyTilstand: State, oppholdsdager: Int = this.oppholdsdager): Maksdatosituasjon {
-        return Maksdatosituasjon(regler, dato, alder, startdatoSykepengerettighet!!, startdatoTreårsvindu, betalteDager, maksdatovurdering, nyTilstand, oppholdsdager)
-    }
-
-    // tilgir forbrukte dager som følge av at treårsvinduet forskyves
-    private fun dekrementer(dagen: LocalDate): Maksdatosituasjon {
-        val nyStartdatoTreårsvindu = dagen.minusYears(HISTORISK_PERIODE_I_ÅR)
-        val nyBetalteDager = betalteDager.filter { it >= nyStartdatoTreårsvindu }.toSet()
-        //println("Tilgir ${betalteDager.size - nyBetalteDager.size} dager som følge av at treårsvindu flyttes fra $startdatoTreårsvindu til $nyStartdatoTreårsvindu")
-        return Maksdatosituasjon(regler, dato, alder, startdatoSykepengerettighet!!, nyStartdatoTreårsvindu, nyBetalteDager, maksdatovurdering, this.tilstand)
+        return Maksdatosituasjon(rettighetsvurdering.forskyvMaksdato(dato), maksdatovurdering, nyTilstand, oppholdsdager)
     }
 
     fun betalbarDag(dagen: LocalDate) = tilstand.betalbarDag(this, dagen)
@@ -156,8 +85,7 @@ internal class Maksdatosituasjon private constructor(
 
         object Initiell : State {
             override fun betalbarDag(avgrenser: Maksdatosituasjon, dagen: LocalDate): Maksdatosituasjon {
-                return Maksdatosituasjon(avgrenser.regler, dagen, avgrenser.alder, dagen, dagen.minusYears(HISTORISK_PERIODE_I_ÅR), emptySet(), avgrenser.maksdatovurdering)
-                    .inkrementer(dagen)
+                return Maksdatosituasjon(avgrenser.rettighetsvurdering.resett(dagen, dagen.minusYears(HISTORISK_PERIODE_I_ÅR)), avgrenser.maksdatovurdering).inkrementer(dagen)
             }
 
             override fun avvistDag(avgrenser: Maksdatosituasjon, dagen: LocalDate): Maksdatosituasjon {
@@ -183,7 +111,7 @@ internal class Maksdatosituasjon private constructor(
             }
 
             override fun sykdomshelg(avgrenser: Maksdatosituasjon, dagen: LocalDate): Maksdatosituasjon? {
-                if (dagen < avgrenser.syttiårsdagen) return avgrenser.medTilstand(dagen, this)
+                if (dagen < avgrenser.rettighetsvurdering.syttiårsdagen) return avgrenser.medTilstand(dagen, this)
                 return avgrenser.avvistOver70(dagen)
             }
 
@@ -196,7 +124,7 @@ internal class Maksdatosituasjon private constructor(
 
         object Opphold : State {
             override fun betalbarDag(avgrenser: Maksdatosituasjon, dagen: LocalDate): Maksdatosituasjon {
-                return avgrenser.dekrementer(dagen).inkrementer(dagen)
+                return avgrenser.forskyvOgForbruk(dagen).inkrementer(dagen)
             }
 
             override fun fridag(avgrenser: Maksdatosituasjon, dagen: LocalDate) = oppholdsdag(avgrenser, dagen)
@@ -271,17 +199,6 @@ internal class Maksdatosituasjon private constructor(
     private companion object {
         const val TILSTREKKELIG_OPPHOLD_I_SYKEDAGER = 26 * 7
         private const val HISTORISK_PERIODE_I_ÅR: Long = 3
-
-        fun LocalDate.forrigeVirkedagFør() = minusDays(when (dayOfWeek) {
-            SUNDAY -> 2
-            MONDAY -> 3
-            else -> 1
-        })
-        fun LocalDate.sisteVirkedagInklusiv() = when (dayOfWeek) {
-            SATURDAY -> minusDays(1)
-            SUNDAY -> minusDays(2)
-            else -> this
-        }
     }
 }
 

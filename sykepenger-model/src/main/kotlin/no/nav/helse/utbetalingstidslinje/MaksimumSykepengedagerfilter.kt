@@ -102,7 +102,7 @@ internal class MaksimumSykepengedagerfilter(
     }
 
     private fun Maksdatosituasjon?.maksdatoFor(dato: LocalDate): Rettighetsvurdering {
-        return this?.rettighetsvurdering ?: Maksdatosituasjon(arbeidsgiverRegler, dato, alder, this@MaksimumSykepengedagerfilter).rettighetsvurdering
+        return this?.rettighetsvurdering ?: Rettighetsvurdering.maksdatoFor(arbeidsgiverRegler, alder, dato, emptySet(), LocalDate.MIN, LocalDate.MIN)
     }
 
     override fun visit(dag: Utbetalingsdag.ForeldetDag, dato: LocalDate, økonomi: Økonomi) {
