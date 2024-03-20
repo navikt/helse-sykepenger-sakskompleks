@@ -228,7 +228,7 @@ internal class ArbeidsgiverperiodeBuilder(
         }
 
         override fun andreYtelser(builder: ArbeidsgiverperiodeBuilder, dato: LocalDate, begrunnelse: Begrunnelse) {
-            feriedag(builder, dato)
+            builder.mediator.avvistDag(dato, begrunnelse, Økonomi.ikkeBetalt())
         }
 
         override fun feriedagSomSyk(builder: ArbeidsgiverperiodeBuilder, dato: LocalDate, kilde: Hendelseskilde) {

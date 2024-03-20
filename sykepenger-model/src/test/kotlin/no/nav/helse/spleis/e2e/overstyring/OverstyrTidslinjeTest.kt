@@ -20,6 +20,7 @@ import no.nav.helse.juni
 import no.nav.helse.mars
 import no.nav.helse.person.PersonObserver
 import no.nav.helse.person.PersonObserver.Utbetalingsdag.Dagtype.ArbeidsgiverperiodeDag
+import no.nav.helse.person.PersonObserver.Utbetalingsdag.Dagtype.AvvistDag
 import no.nav.helse.person.PersonObserver.Utbetalingsdag.Dagtype.Fridag
 import no.nav.helse.person.PersonObserver.Utbetalingsdag.Dagtype.NavDag
 import no.nav.helse.person.PersonObserver.Utbetalingsdag.Dagtype.NavHelgDag
@@ -64,6 +65,7 @@ import no.nav.helse.spleis.e2e.tilGodkjenning
 import no.nav.helse.sykdomstidslinje.Dag
 import no.nav.helse.sykdomstidslinje.Melding
 import no.nav.helse.utbetalingslinjer.Utbetalingstatus
+import no.nav.helse.utbetalingstidslinje.Utbetalingsdag
 import no.nav.helse.økonomi.Inntekt.Companion.månedlig
 import no.nav.helse.økonomi.Prosentdel.Companion.prosent
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -514,7 +516,7 @@ internal class OverstyrTidslinjeTest : AbstractEndToEndTest() {
         assertEquals(forventetUtbetaling, observatør.utbetalingMedUtbetalingEventer.first().dager)
 
         val forventetRevurdering =
-            (1.januar til 10.januar).associateWith { Fridag } +
+            (1.januar til 10.januar).associateWith { AvvistDag } +
             (11.januar til 26.januar).associateWith { ArbeidsgiverperiodeDag } +
             (27.januar til 28.januar).associateWith { NavHelgDag } +
             (29.januar til 31.januar).associateWith { NavDag }
