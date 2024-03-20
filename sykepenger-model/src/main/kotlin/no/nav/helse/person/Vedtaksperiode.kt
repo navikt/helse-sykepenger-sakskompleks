@@ -1116,7 +1116,7 @@ internal class Vedtaksperiode private constructor(
         ytelser.oppdaterHistorikk(
             periode,
             arbeidsgiver.finnVedtaksperiodeRettEtter(this)?.periode
-        ) { oppdaterHistorikk(ytelser) }
+        ) { oppdaterHistorikk(ytelser, validering = {}) }
         val maksimumSykepenger = beregnUtbetalinger(aktivitetslogg, arbeidsgiverUtbetalinger) ?: return false
         ytelser.valider(periode, skjæringstidspunkt, maksimumSykepenger.maksdato, erForlengelse())
         return !aktivitetslogg.harFunksjonelleFeilEllerVerre()
