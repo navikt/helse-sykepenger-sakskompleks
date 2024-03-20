@@ -15,6 +15,7 @@ import no.nav.helse.hendelser.Søknad
 import no.nav.helse.hendelser.Søknad.Søknadsperiode.Sykdom
 import no.nav.helse.hendelser.Vilkårsgrunnlag
 import no.nav.helse.hendelser.til
+import no.nav.helse.inspectors.inspektør
 import no.nav.helse.januar
 import no.nav.helse.mai
 import no.nav.helse.mars
@@ -344,5 +345,16 @@ internal class YtelserE2ETest : AbstractEndToEndTest() {
                 assertIngenInfo("Mangler nødvendig inntekt for vilkårsprøving og kan derfor ikke gjenoppta revurdering.")
             }
         )
+    }
+
+    @Test
+    fun `Fullstendig overlapp med foreldrepenger`() {
+        håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent))
+        håndterInntektsmelding(listOf(1.januar til 16.januar))
+        håndterVilkårsgrunnlag(1.vedtaksperiode)
+        håndterYtelser(1.vedtaksperiode, foreldrepenger = listOf(1.januar til 31.januar))
+        assertEquals("YYYYYYY YYYYYYY YYYYYYY YYYYYYY YYY", inspektør.sykdomstidslinje.toShortString())
+        val utbetalingstidslinje = inspektør.utbetalingstidslinjer(1.vedtaksperiode)
+        assertEquals(31, utbetalingstidslinje.inspektør.avvistDagTeller)
     }
 }

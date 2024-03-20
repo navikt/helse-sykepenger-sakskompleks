@@ -3,8 +3,11 @@ package no.nav.helse.hendelser
 
 import java.time.LocalDate
 import java.util.UUID
+import no.nav.helse.person.Dokumentsporing
 import no.nav.helse.person.aktivitetslogg.Aktivitetslogg
 import no.nav.helse.person.aktivitetslogg.Varselkode
+import no.nav.helse.sykdomstidslinje.Sykdomshistorikk
+import no.nav.helse.sykdomstidslinje.SykdomshistorikkHendelse
 
 class Ytelser(
     meldingsreferanseId: UUID,
@@ -21,7 +24,7 @@ class Ytelser(
     private val arbeidsavklaringspenger: Arbeidsavklaringspenger,
     private val dagpenger: Dagpenger,
     aktivitetslogg: Aktivitetslogg
-) : ArbeidstakerHendelse(meldingsreferanseId, fødselsnummer, aktørId, organisasjonsnummer, aktivitetslogg) {
+) : ArbeidstakerHendelse(meldingsreferanseId, fødselsnummer, aktørId, organisasjonsnummer, aktivitetslogg), SykdomshistorikkHendelse {
 
     companion object {
         internal val Periode.familieYtelserPeriode get() = oppdaterFom(start.minusWeeks(4))
@@ -43,5 +46,27 @@ class Ytelser(
         if (institusjonsopphold.overlapper(this, periodeForOverlappsjekk)) funksjonellFeil(Varselkode.`Overlapper med institusjonsopphold`)
 
         return !harFunksjonelleFeilEllerVerre()
+    }
+
+    override fun dokumentsporing(): Dokumentsporing {
+        return Dokumentsporing.overstyrTidslinje(meldingsreferanseId()) // TODO
+    }
+
+    override fun oppdaterFom(other: Periode): Periode {
+        return other
+    }
+
+    override fun element(): Sykdomshistorikk.Element {
+        val kilde = SykdomshistorikkHendelse.Hendelseskilde("Ytelser", meldingsreferanseId(), registrert())
+        return foreldrepenger.sykdomshistorikkElement(meldingsreferanseId(), kilde)
+    }
+
+    internal fun oppdaterHistorikk(periode: Periode, periodeRettEtter: Periode?, oppdaterHistorikk: () -> Unit) {
+        if (!skalOppdatereHistorikk(periode, periodeRettEtter)) return
+        oppdaterHistorikk()
+    }
+
+    private fun skalOppdatereHistorikk(periode: Periode, periodeRettEtter: Periode?): Boolean {
+        return foreldrepenger.skalOppdatereHistorikk(periode, periodeRettEtter)
     }
 }

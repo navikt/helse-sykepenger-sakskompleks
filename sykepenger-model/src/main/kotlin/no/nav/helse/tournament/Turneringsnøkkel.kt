@@ -33,6 +33,7 @@ internal enum class Turneringsnøkkel {
     Arbeidsdag_SB,
     SykedagNav_IM,
     UkjentDag,
+    AndreYtelser,
     UbestemtDag;
 
     companion object {
@@ -58,6 +59,7 @@ internal enum class Turneringsnøkkel {
             dag is ProblemDag -> UbestemtDag
             dag is Sykedag && dag.kommerFra(Søknad::class) -> Sykedag_SØ
             dag is SykHelgedag && dag.kommerFra(Søknad::class) -> SykHelgedag_SØ
+            dag is Dag.AndreYtelser -> AndreYtelser
             dag is Dag.UkjentDag -> UkjentDag
             else -> throw IllegalArgumentException("Ingen turneringsnøkkel definert for ${dag::class.simpleName}")
         }
