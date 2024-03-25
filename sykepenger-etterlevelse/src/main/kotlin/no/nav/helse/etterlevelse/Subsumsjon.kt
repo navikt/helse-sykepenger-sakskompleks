@@ -30,15 +30,7 @@ abstract class Subsumsjon {
 
     protected abstract fun acceptSpesifikk(visitor: SubsumsjonVisitor)
 
-    fun sammenstill(subsumsjoner: List<Subsumsjon>): Boolean {
-        if (!skalSammenstille()) return true
-        val medSammeDatagrunnlag = subsumsjoner.firstOrNull { it == this } ?: return false
-        medSammeDatagrunnlag.sammenstillMed(this)
-        return true
-    }
-
-    protected open fun sammenstillMed(ny: Subsumsjon) {}
-    protected open fun skalSammenstille() = true
+    abstract fun sammenstill(subsumsjoner: List<Subsumsjon>): Boolean
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -87,6 +79,8 @@ class EnkelSubsumsjon(
     private val output: Map<String, Any>,
     override val kontekster: Map<String, KontekstType>
 ) : Subsumsjon() {
+    override fun sammenstill(subsumsjoner: List<Subsumsjon>) = false
+
     override fun output() = output
     override fun acceptSpesifikk(visitor: SubsumsjonVisitor) {}
 }
@@ -138,8 +132,16 @@ class GrupperbarSubsumsjon private constructor(
         return originalOutput == other.originalOutput
     }
 
-    override fun sammenstillMed(ny: Subsumsjon) {
-        check(ny is GrupperbarSubsumsjon)
+    override fun sammenstill(subsumsjoner: List<Subsumsjon>): Boolean {
+        val medSammeDatagrunnlag = subsumsjoner
+            .asSequence()
+            .filterIsInstance<GrupperbarSubsumsjon>()
+            .firstOrNull { it == this } ?: return false
+        medSammeDatagrunnlag.sammenstillMed(this)
+        return true
+    }
+
+    private fun sammenstillMed(ny: GrupperbarSubsumsjon) {
         this.perioder = this.perioder.plusElement(ny.perioder.single()).merge()
     }
 }
@@ -158,8 +160,7 @@ class BetingetSubsumsjon(
     override val kontekster: Map<String, KontekstType>
 ) : Subsumsjon() {
     override fun output() = output
-
-    override fun skalSammenstille() = funnetRelevant
+    override fun sammenstill(subsumsjoner: List<Subsumsjon>) = !funnetRelevant
 
     override fun acceptSpesifikk(visitor: SubsumsjonVisitor) {
         visitor.visitBetingetSubsumsjon(funnetRelevant)

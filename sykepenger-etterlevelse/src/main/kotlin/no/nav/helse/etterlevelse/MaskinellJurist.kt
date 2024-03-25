@@ -239,8 +239,8 @@ class MaskinellJurist private constructor(
 
     override fun `§ 8-12 ledd 1 punktum 1`(
         periode: ClosedRange<LocalDate>,
-        tidslinjegrunnlag: List<List<Tidslinjedag>>,
-        beregnetTidslinje: List<Tidslinjedag>,
+        tidslinjegrunnlag: List<List<Tidslinjedag.Tidslinjeperiode>>,
+        beregnetTidslinje: List<Tidslinjedag.Tidslinjeperiode>,
         gjenståendeSykedager: Int,
         forbrukteSykedager: Int,
         maksdato: LocalDate,
@@ -266,8 +266,8 @@ class MaskinellJurist private constructor(
                         "tom" to periode.endInclusive,
                         "utfallFom" to utfallFom,
                         "utfallTom" to utfallTom,
-                        "tidslinjegrunnlag" to tidslinjegrunnlag.map { it.dager(periode) },
-                        "beregnetTidslinje" to beregnetTidslinje.dager(periode)
+                        "tidslinjegrunnlag" to tidslinjegrunnlag.map { it.dager() },
+                        "beregnetTidslinje" to beregnetTidslinje.dager()
                     ),
                     output = mapOf(
                         "gjenståendeSykedager" to gjenståendeSykedager,
@@ -288,8 +288,8 @@ class MaskinellJurist private constructor(
         gjenståendeSykepengedager: Int,
         beregnetAntallOppholdsdager: Int,
         tilstrekkeligOppholdISykedager: Int,
-        tidslinjegrunnlag: List<List<Tidslinjedag>>,
-        beregnetTidslinje: List<Tidslinjedag>
+        tidslinjegrunnlag: List<List<Tidslinjedag.Tidslinjeperiode>>,
+        beregnetTidslinje: List<Tidslinjedag.Tidslinjeperiode>
     ) {
         leggTil(
             BetingetSubsumsjon(
@@ -313,7 +313,7 @@ class MaskinellJurist private constructor(
         )
     }
 
-    override fun `§ 8-13 ledd 1`(periode: ClosedRange<LocalDate>, avvisteDager: SortedSet<LocalDate>, tidslinjer: List<List<Tidslinjedag>>) {
+    override fun `§ 8-13 ledd 1`(periode: ClosedRange<LocalDate>, avvisteDager: SortedSet<LocalDate>, tidslinjer: List<List<Tidslinjedag.Tidslinjeperiode>>) {
         fun logg(utfall: Utfall, dager: Iterable<LocalDate>) {
             dager.forEach { dagen ->
                 leggTil(
@@ -325,7 +325,7 @@ class MaskinellJurist private constructor(
                         ledd = LEDD_1,
                         versjon = FOLKETRYGDLOVENS_OPPRINNELSESDATO,
                         input = mapOf(
-                            "tidslinjegrunnlag" to tidslinjer.map { it.dager(periode) }
+                            "tidslinjegrunnlag" to tidslinjer.map { it.dager() }
                         ),
                         output = emptyMap(),
                         kontekster = kontekster()
@@ -341,11 +341,11 @@ class MaskinellJurist private constructor(
 
     override fun `§ 8-13 ledd 2`(
         periode: ClosedRange<LocalDate>,
-        tidslinjer: List<List<Tidslinjedag>>,
+        tidslinjer: List<List<Tidslinjedag.Tidslinjeperiode>>,
         grense: Double,
         dagerUnderGrensen: List<ClosedRange<LocalDate>>
     ) {
-        val tidslinjegrunnlag = tidslinjer.map { it.dager(periode) }
+        val tidslinjegrunnlag = tidslinjer.map { it.dager() }
         val dagerUnderGrensenMap = dagerUnderGrensen.map {
             mapOf(
                 "fom" to it.start,
@@ -776,8 +776,8 @@ class MaskinellJurist private constructor(
 
     override fun `§ 8-51 ledd 3`(
         periode: ClosedRange<LocalDate>,
-        tidslinjegrunnlag: List<List<Tidslinjedag>>,
-        beregnetTidslinje: List<Tidslinjedag>,
+        tidslinjegrunnlag: List<List<Tidslinjedag.Tidslinjeperiode>>,
+        beregnetTidslinje: List<Tidslinjedag.Tidslinjeperiode>,
         gjenståendeSykedager: Int,
         forbrukteSykedager: Int,
         maksdato: LocalDate,

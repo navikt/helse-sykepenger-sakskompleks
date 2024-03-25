@@ -1,12 +1,11 @@
 package no.nav.helse.etterlevelse
 
 import java.time.LocalDate
+import no.nav.helse.etterlevelse.Tidslinjedag.Companion.tidslinjeperiodedager
 import no.nav.helse.utbetalingstidslinje.Utbetalingsdag
-import no.nav.helse.utbetalingstidslinje.UtbetalingsdagVisitor
 import no.nav.helse.utbetalingstidslinje.Utbetalingstidslinje
 import no.nav.helse.utbetalingstidslinje.UtbetalingstidslinjeVisitor
 import no.nav.helse.økonomi.Økonomi
-import kotlin.math.roundToInt
 
 internal class UtbetalingstidslinjeBuilder(utbetalingstidslinje: Utbetalingstidslinje) : UtbetalingstidslinjeVisitor {
     private val navdager = mutableListOf<Tidslinjedag>()
@@ -15,7 +14,7 @@ internal class UtbetalingstidslinjeBuilder(utbetalingstidslinje: Utbetalingstids
         utbetalingstidslinje.accept(this)
     }
 
-    fun dager() = navdager.toList()
+    fun dager() = navdager.tidslinjeperiodedager()
 
     override fun visit(dag: Utbetalingsdag.NavDag, dato: LocalDate, økonomi: Økonomi) {
         visit(dato, "NAVDAG", økonomi)
@@ -44,8 +43,8 @@ internal class UtbetalingstidslinjeBuilder(utbetalingstidslinje: Utbetalingstids
     }
 
     companion object {
-        internal fun Utbetalingstidslinje.subsumsjonsformat(): List<Tidslinjedag> = UtbetalingstidslinjeBuilder(this).dager()
-        internal fun List<Utbetalingstidslinje>.subsumsjonsformat(): List<List<Tidslinjedag>> = map { it.subsumsjonsformat() }
+        internal fun Utbetalingstidslinje.subsumsjonsformat(): List<Tidslinjedag.Tidslinjeperiode> = UtbetalingstidslinjeBuilder(this).dager()
+        internal fun List<Utbetalingstidslinje>.subsumsjonsformat(): List<List<Tidslinjedag.Tidslinjeperiode>> = map { it.subsumsjonsformat() }
             .filter { it.isNotEmpty() }
     }
 }

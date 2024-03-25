@@ -14,9 +14,13 @@ class Tidslinjedag(
     fun erAvvistDag() = dagtype == "AVVISTDAG"
 
     companion object {
-        fun List<Tidslinjedag>.dager(periode: ClosedRange<LocalDate>? = null): List<Map<String, Any?>> {
+        fun List<Tidslinjedag>.dager(periode: ClosedRange<LocalDate> = LocalDate.MIN..LocalDate.MAX): List<Map<String, Any?>> {
+            return this.tidslinjeperiodedager(periode).dager()
+        }
+        fun List<Tidslinjedag>.tidslinjeperiodedager(periode: ClosedRange<LocalDate> = LocalDate.MIN..LocalDate.MAX): List<Tidslinjeperiode> {
             return this
-                .filter { it.dato >= (periode?.start ?: LocalDate.MIN) && it.dato <= (periode?.endInclusive ?: LocalDate.MAX) }
+                .asSequence()
+                .filter { it.dato >= periode.start && it.dato <= periode.endInclusive }
                 .sortedBy { it.dato }
                 .fold(mutableListOf<Tidslinjeperiode>()) { acc, nesteDag ->
                     if (acc.isNotEmpty() && nesteDag.hørerTil(acc.last())) {
@@ -25,9 +29,9 @@ class Tidslinjedag(
                         acc.add(Tidslinjeperiode(nesteDag.dato, nesteDag.dato, nesteDag.dagtype, nesteDag.grad))
                     }
                     acc
-                }.dager()
+                }
         }
-        private fun List<Tidslinjeperiode>.dager() = map {
+        fun List<Tidslinjeperiode>.dager() = map {
             mapOf(
                 "fom" to it.fom,
                 "tom" to it.tom,
@@ -37,7 +41,7 @@ class Tidslinjedag(
         }
     }
 
-    private class Tidslinjeperiode(
+    class Tidslinjeperiode(
         val fom: LocalDate,
         var tom: LocalDate,
         val dagtype: String,
@@ -47,7 +51,7 @@ class Tidslinjedag(
             this.tom = dato
         }
 
-        fun hørerTil(dato: LocalDate, dagtype: String, grad: Int?) = tom.plusDays(1) == dato && this.dagtype == dagtype && this.grad == grad
+        fun hørerTil(dato: LocalDate, dagtype: String, grad: Int?) = this.dagtype == dagtype && this.grad == grad && tom.plusDays(1) == dato
     }
 
 }

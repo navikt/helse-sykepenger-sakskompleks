@@ -124,8 +124,8 @@ interface SubsumsjonObserver {
      */
     fun `§ 8-12 ledd 1 punktum 1`(
         periode: ClosedRange<LocalDate>,
-        tidslinjegrunnlag: List<List<Tidslinjedag>>,
-        beregnetTidslinje: List<Tidslinjedag>,
+        tidslinjegrunnlag: List<List<Tidslinjedag.Tidslinjeperiode>>,
+        beregnetTidslinje: List<Tidslinjedag.Tidslinjeperiode>,
         gjenståendeSykedager: Int,
         forbrukteSykedager: Int,
         maksdato: LocalDate,
@@ -149,8 +149,8 @@ interface SubsumsjonObserver {
         gjenståendeSykepengedager: Int,
         beregnetAntallOppholdsdager: Int,
         tilstrekkeligOppholdISykedager: Int,
-        tidslinjegrunnlag: List<List<Tidslinjedag>>,
-        beregnetTidslinje: List<Tidslinjedag>
+        tidslinjegrunnlag: List<List<Tidslinjedag.Tidslinjeperiode>>,
+        beregnetTidslinje: List<Tidslinjedag.Tidslinjeperiode>
     ) {}
 
     /**
@@ -162,7 +162,7 @@ interface SubsumsjonObserver {
      * @param avvisteDager dager som vilkåret ikke er oppfylt for, hvis noen
      * @param tidslinjer alle tidslinjer på tvers av arbeidsgivere
      */
-    fun `§ 8-13 ledd 1`(periode: ClosedRange<LocalDate>, avvisteDager: SortedSet<LocalDate>, tidslinjer: List<List<Tidslinjedag>>) {}
+    fun `§ 8-13 ledd 1`(periode: ClosedRange<LocalDate>, avvisteDager: SortedSet<LocalDate>, tidslinjer: List<List<Tidslinjedag.Tidslinjeperiode>>) {}
 
     /**
      * Vurdering av sykepengenes størrelse
@@ -174,7 +174,7 @@ interface SubsumsjonObserver {
      * @param grense grense brukt til å vurdere [dagerUnderGrensen]
      * @param dagerUnderGrensen dager som befinner seg under tilstrekkelig uføregrad, gitt av [grense]
      */
-    fun `§ 8-13 ledd 2`(periode: ClosedRange<LocalDate>, tidslinjer: List<List<Tidslinjedag>>, grense: Double, dagerUnderGrensen: List<ClosedRange<LocalDate>>) {}
+    fun `§ 8-13 ledd 2`(periode: ClosedRange<LocalDate>, tidslinjer: List<List<Tidslinjedag.Tidslinjeperiode>>, grense: Double, dagerUnderGrensen: List<ClosedRange<LocalDate>>) {}
 
     /**
      * Retten til sykepenger etter dette kapitlet faller bort når arbeidsforholdet midlertidig avbrytes i mer enn 14 dager
@@ -455,8 +455,8 @@ interface SubsumsjonObserver {
      */
     fun `§ 8-51 ledd 3`(
         periode: ClosedRange<LocalDate>,
-        tidslinjegrunnlag: List<List<Tidslinjedag>>,
-        beregnetTidslinje: List<Tidslinjedag>,
+        tidslinjegrunnlag: List<List<Tidslinjedag.Tidslinjeperiode>>,
+        beregnetTidslinje: List<Tidslinjedag.Tidslinjeperiode>,
         gjenståendeSykedager: Int,
         forbrukteSykedager: Int,
         maksdato: LocalDate,

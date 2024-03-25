@@ -10,11 +10,11 @@ import no.nav.helse.etterlevelse.Paragraf
 import no.nav.helse.etterlevelse.Punktum.Companion.punktum
 import no.nav.helse.etterlevelse.SubsumsjonObserver
 import no.nav.helse.etterlevelse.Tidslinjedag
+import no.nav.helse.februar
 import no.nav.helse.hendelser.somPeriode
 import no.nav.helse.hendelser.til
 import no.nav.helse.inspectors.SubsumsjonInspektør
 import no.nav.helse.januar
-import no.nav.helse.februar
 import no.nav.helse.mai
 import no.nav.helse.mars
 import no.nav.helse.november
@@ -180,8 +180,8 @@ internal class MaksdatosituasjonTest {
         lateinit var hjemmel: Hjemmelbegrunnelse
         override fun `§ 8-12 ledd 1 punktum 1`(
             periode: ClosedRange<LocalDate>,
-            tidslinjegrunnlag: List<List<Tidslinjedag>>,
-            beregnetTidslinje: List<Tidslinjedag>,
+            tidslinjegrunnlag: List<List<Tidslinjedag.Tidslinjeperiode>>,
+            beregnetTidslinje: List<Tidslinjedag.Tidslinjeperiode>,
             gjenståendeSykedager: Int,
             forbrukteSykedager: Int,
             maksdato: LocalDate,
@@ -191,8 +191,8 @@ internal class MaksdatosituasjonTest {
         }
         override fun `§ 8-51 ledd 3`(
             periode: ClosedRange<LocalDate>,
-            tidslinjegrunnlag: List<List<Tidslinjedag>>,
-            beregnetTidslinje: List<Tidslinjedag>,
+            tidslinjegrunnlag: List<List<Tidslinjedag.Tidslinjeperiode>>,
+            beregnetTidslinje: List<Tidslinjedag.Tidslinjeperiode>,
             gjenståendeSykedager: Int,
             forbrukteSykedager: Int,
             maksdato: LocalDate,

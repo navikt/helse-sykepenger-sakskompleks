@@ -73,8 +73,8 @@ internal class Maksdatosituasjon(
     internal fun vurderMaksdatobestemmelse(
         subsumsjonObserver: SubsumsjonObserver,
         periode: Periode,
-        tidslinjegrunnlagsubsumsjon: List<List<Tidslinjedag>>,
-        beregnetTidslinjesubsumsjon: List<Tidslinjedag>,
+        tidslinjegrunnlagsubsumsjon: List<List<Tidslinjedag.Tidslinjeperiode>>,
+        beregnetTidslinjesubsumsjon: List<Tidslinjedag.Tidslinjeperiode>,
         avvisteDager: Set<LocalDate>
     ) {
         hjemmelsbegrunnelse.sporHjemmel(
@@ -87,7 +87,7 @@ internal class Maksdatosituasjon(
         )
     }
 
-    fun vurderHarTilstrekkeligOpphold(subsumsjonObserver: SubsumsjonObserver, opphold: Int, tilstrekkeligOpphold: Int, tidslinjegrunnlagsubsumsjon: List<List<Tidslinjedag>>, beregnetTidslinjesubsumsjon: List<Tidslinjedag>): Boolean {
+    fun vurderHarTilstrekkeligOpphold(subsumsjonObserver: SubsumsjonObserver, opphold: Int, tilstrekkeligOpphold: Int, tidslinjegrunnlagsubsumsjon: List<List<Tidslinjedag.Tidslinjeperiode>>, beregnetTidslinjesubsumsjon: List<Tidslinjedag.Tidslinjeperiode>): Boolean {
         val harTilstrekkeligOpphold = opphold >= tilstrekkeligOpphold
         subsumsjonObserver.`§ 8-12 ledd 2`(
             oppfylt = harTilstrekkeligOpphold,
@@ -131,8 +131,8 @@ internal class Maksdatosituasjon(
         fun sporHjemmel(
             subsumsjonObserver: SubsumsjonObserver,
             periode: Periode,
-            tidslinjegrunnlagsubsumsjon: List<List<Tidslinjedag>>,
-            beregnetTidslinjesubsumsjon: List<Tidslinjedag>,
+            tidslinjegrunnlagsubsumsjon: List<List<Tidslinjedag.Tidslinjeperiode>>,
+            beregnetTidslinjesubsumsjon: List<Tidslinjedag.Tidslinjeperiode>,
             avvisteDager: Set<LocalDate>,
             maksdatosituasjon: Maksdatosituasjon
         )
