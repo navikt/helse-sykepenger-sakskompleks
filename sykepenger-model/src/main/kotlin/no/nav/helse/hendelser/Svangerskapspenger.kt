@@ -13,8 +13,8 @@ class Svangerskapspenger(
             return false
         }
         val overlappsperiode = if (erForlengelse) sykdomsperiode else sykdomsperiode.familieYtelserPeriode
-        return svangerskapsytelse.any {
-            ytelse -> ytelse.overlapperMed(overlappsperiode) }
+        return svangerskapsytelse.any { ytelse -> ytelse.overlapperMed(overlappsperiode) }.also { overlapper ->
+            if (!overlapper) aktivitetslogg.info("Bruker har svangerskapsytelser, men det slår ikke ut på overlappssjekken")
+        }
     }
-
 }

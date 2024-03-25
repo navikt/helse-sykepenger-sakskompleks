@@ -15,7 +15,8 @@ class Institusjonsopphold(
             aktivitetslogg.info("Bruker har ingen institusjonsoppholdsperioder")
             return false
         }
-        return perioder.map(Institusjonsoppholdsperiode::tilPeriode)
-            .any { opphold -> opphold.overlapperMed(sykdomsperiode) }
+        return perioder.map(Institusjonsoppholdsperiode::tilPeriode).any { opphold -> opphold.overlapperMed(sykdomsperiode) }.also { overlapper ->
+            if (!overlapper) aktivitetslogg.info("Bruker har institusjonsoppholdsperioder, men det slår ikke ut på overlappssjekken")
+        }
     }
 }
