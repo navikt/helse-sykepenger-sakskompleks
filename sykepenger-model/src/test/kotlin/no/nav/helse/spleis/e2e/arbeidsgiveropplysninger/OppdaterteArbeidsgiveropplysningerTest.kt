@@ -1,6 +1,8 @@
 package no.nav.helse.spleis.e2e.arbeidsgiveropplysninger
 
 import java.time.LocalDate
+import no.nav.helse.Toggle
+import no.nav.helse.april
 import no.nav.helse.assertForventetFeil
 import no.nav.helse.dsl.lagStandardSykepengegrunnlag
 import no.nav.helse.februar
@@ -10,14 +12,20 @@ import no.nav.helse.hendelser.Vilkårsgrunnlag
 import no.nav.helse.hendelser.Vilkårsgrunnlag.Arbeidsforhold.Arbeidsforholdtype
 import no.nav.helse.hendelser.til
 import no.nav.helse.januar
+import no.nav.helse.juni
+import no.nav.helse.mai
 import no.nav.helse.mars
+import no.nav.helse.november
 import no.nav.helse.person.PersonObserver
 import no.nav.helse.person.TilstandType
 import no.nav.helse.person.inntekt.Refusjonsopplysning
 import no.nav.helse.spleis.e2e.AbstractEndToEndTest
+import no.nav.helse.spleis.e2e.OverstyrtArbeidsgiveropplysning
 import no.nav.helse.spleis.e2e.assertTilstander
 import no.nav.helse.spleis.e2e.håndterInntektsmelding
+import no.nav.helse.spleis.e2e.håndterOverstyrArbeidsgiveropplysninger
 import no.nav.helse.spleis.e2e.håndterSimulering
+import no.nav.helse.spleis.e2e.håndterSkjønnsmessigFastsettelse
 import no.nav.helse.spleis.e2e.håndterSykmelding
 import no.nav.helse.spleis.e2e.håndterSøknad
 import no.nav.helse.spleis.e2e.håndterUtbetalingsgodkjenning
@@ -26,6 +34,7 @@ import no.nav.helse.spleis.e2e.håndterVilkårsgrunnlag
 import no.nav.helse.spleis.e2e.håndterYtelser
 import no.nav.helse.spleis.e2e.nyPeriode
 import no.nav.helse.spleis.e2e.nyttVedtak
+import no.nav.helse.økonomi.Inntekt.Companion.månedlig
 import no.nav.helse.økonomi.Prosentdel.Companion.prosent
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -259,6 +268,81 @@ internal class OppdaterteArbeidsgiveropplysningerTest: AbstractEndToEndTest() {
                 )
                 assertEquals(expectedForespørsel, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.last())
             }
+        )
+    }
+
+    @Test
+    fun `sender oppdatert forespørsel om arbeidsgiveropplysninger når forrige periode som ikke er auu får et nytt vilkårsgrunnlag`()  = Toggle.OppdaterteForespørsler.enable {
+        nyttVedtak(1.november(2017), 30.november(2017))  // skal ikke oppdatere tidligere perioder
+        nyPeriode(1.januar til 31.januar)                   // periode som får et vilkårsgrunnlag som skal være med i oppdatert forespørsel
+        nyPeriode(18.februar til 22.februar)                // en kort periode vi ikke skal bry oss om
+        nyPeriode(1.mars til 31.mars)                       // perioden som skal sende ut oppdatert forespørsel
+        nyPeriode(1.april til 5.april)                      // forlengelse i AvventerInntektsmelding som ikke skal sende ny forespørsel
+        nyPeriode(1.mai til 31.mai)                         // skal ikke sende oppdatert forespørsel for senere skjæringstidspunkt enn førstkommende
+        nyPeriode(1.juni til 5.juni)                        // skal ikke sende forespørsel for forlengelser
+
+        assertEquals(4, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.size)
+
+        val im = håndterInntektsmelding(listOf(1.januar til 16.januar), beregnetInntekt = INNTEKT)
+        håndterVilkårsgrunnlag(2.vedtaksperiode)
+
+        assertEquals(5, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.size)
+        val oppdatertForespørsel = observatør.trengerArbeidsgiveropplysningerVedtaksperioder.last()
+
+        assertEquals(4.vedtaksperiode.id(ORGNUMMER), oppdatertForespørsel.vedtaksperiodeId)
+        assertEquals(
+            PersonObserver.Inntekt(forslag = PersonObserver.Inntektsdata(1.januar, PersonObserver.Inntektsopplysningstype.INNTEKTSMELDING, 31000.0)),
+            oppdatertForespørsel.forespurteOpplysninger.first { it is PersonObserver.Inntekt }
+        )
+
+        assertEquals(
+            PersonObserver.Refusjon(forslag = listOf(Refusjonsopplysning(im, 1.januar, null, INNTEKT))),
+            oppdatertForespørsel.forespurteOpplysninger.first { it is PersonObserver.Refusjon }
+        )
+    }
+
+    @Test
+    fun `Sender ikke med skjønnsmessig inntekt ved oppdatert forespørsel`() {
+        nyttVedtak(1.januar, 31.januar)
+        nyPeriode(1.mars til 31.mars)
+        assertEquals(2, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.size)
+
+        håndterSkjønnsmessigFastsettelse(1.januar, listOf(OverstyrtArbeidsgiveropplysning(ORGNUMMER, INNTEKT/2)))
+        assertEquals(3, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.size)
+        val forespørsel = observatør.trengerArbeidsgiveropplysningerVedtaksperioder.last()
+        assertEquals(
+            PersonObserver.Inntekt(forslag = PersonObserver.Inntektsdata(1.januar, PersonObserver.Inntektsopplysningstype.INNTEKTSMELDING, 31000.0)),
+            forespørsel.forespurteOpplysninger.first { it is PersonObserver.Inntekt }
+        )
+    }
+
+    @Test
+    fun `Sender oppdatert forespørsel ved nytt vilkårsgrunnlag pga saksbehandleroverstyrt inntekt`() {
+        nyttVedtak(1.januar, 31.januar)
+        nyPeriode(1.mars til 31.mars)
+        assertEquals(2, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.size)
+
+        håndterOverstyrArbeidsgiveropplysninger(1.januar, listOf(OverstyrtArbeidsgiveropplysning(ORGNUMMER, 32000.månedlig)))
+
+        assertEquals(3, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.size)
+        val forespørsel = observatør.trengerArbeidsgiveropplysningerVedtaksperioder.last()
+        assertEquals(
+            PersonObserver.Inntekt(forslag = PersonObserver.Inntektsdata(1.januar, PersonObserver.Inntektsopplysningstype.SAKSBEHANDLER, 32000.0)),
+            forespørsel.forespurteOpplysninger.first { it is PersonObserver.Inntekt }
+        )
+    }
+
+    @Test
+    fun `Sender oppdatert forespørsel ved nytt vilkårsgrunnlag pga korrigerende inntektsmelding`() {
+        nyttVedtak(1.januar, 31.januar)
+        nyPeriode(1.mars til 31.mars)
+
+        håndterInntektsmelding(listOf(1.januar til 16.januar), beregnetInntekt = 32000.månedlig)
+
+        val forespørsel = observatør.trengerArbeidsgiveropplysningerVedtaksperioder.last()
+        assertEquals(
+            PersonObserver.Inntekt(forslag = PersonObserver.Inntektsdata(1.januar, PersonObserver.Inntektsopplysningstype.INNTEKTSMELDING, 32000.0)),
+            forespørsel.forespurteOpplysninger.first { it is PersonObserver.Inntekt }
         )
     }
 }

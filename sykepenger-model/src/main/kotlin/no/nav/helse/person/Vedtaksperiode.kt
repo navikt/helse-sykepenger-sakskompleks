@@ -4,6 +4,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
 import java.util.UUID
+import no.nav.helse.Toggle
 import no.nav.helse.dto.VedtaksperiodetilstandDto
 import no.nav.helse.dto.deserialisering.VedtaksperiodeInnDto
 import no.nav.helse.dto.serialisering.VedtaksperiodeUtDto
@@ -693,6 +694,9 @@ internal class Vedtaksperiode private constructor(
         person.lagreVilkårsgrunnlag(grunnlagsdata)
         vilkårsgrunnlag.info("Vilkårsgrunnlag vurdert")
         if (vilkårsgrunnlag.harFunksjonelleFeilEllerVerre()) return forkast(vilkårsgrunnlag)
+        if (Toggle.OppdaterteForespørsler.enabled) {
+            sendOppdatertForespørselOmArbeidsgiveropplysninger(vilkårsgrunnlag)
+        }
         tilstand(vilkårsgrunnlag, nesteTilstand)
     }
 
@@ -777,6 +781,10 @@ internal class Vedtaksperiode private constructor(
         )
     }
 
+    private fun sendOppdatertForespørselOmArbeidsgiveropplysninger(hendelse: IAktivitetslogg) {
+        arbeidsgiver.finnNesteVedtaksperiodeSomTrengerInntektsmelding(this)?.trengerArbeidsgiveropplysninger(hendelse)
+    }
+
     private fun vedtaksperioderIArbeidsgiverperiodeTilOgMedDenne(arbeidsgiverperiode: Arbeidsgiverperiode?): List<Vedtaksperiode> {
         if (arbeidsgiverperiode == null) return listOf(this)
         return arbeidsgiver.vedtaksperioderKnyttetTilArbeidsgiverperiode(arbeidsgiverperiode)
@@ -792,11 +800,17 @@ internal class Vedtaksperiode private constructor(
         )
     }
 
+    private fun forrigeSkjæringstidspunktMedVilkårsgrunnlagFor(arbeidsgiver: Arbeidsgiver, skjæringstidspunkt: LocalDate) = person.skjæringstidspunkter()
+        .filter { it < skjæringstidspunkt }
+        .filter { arbeidsgiver
+            .vedtaksperioderKnyttetTilSkjæringstidspunkt(it)
+            .any { vedtaksperiode -> vedtaksperiode.tilstand != AvsluttetUtenUtbetaling }
+        }
+        .maxOrNull()
+
     private fun forespurtInntekt(fastsattInntekt: Inntekt?): PersonObserver.Inntekt? {
         if (fastsattInntekt != null) return null
-        val inntektForrigeSkjæringstidspunkt = person.skjæringstidspunkter()
-            .filter { it != skjæringstidspunkt }
-            .maxOrNull()
+        val inntektForrigeSkjæringstidspunkt = forrigeSkjæringstidspunktMedVilkårsgrunnlagFor(arbeidsgiver, skjæringstidspunkt)
             ?.let { person.vilkårsgrunnlagFor(it)?.inntektsdata(it, organisasjonsnummer) }
 
         return PersonObserver.Inntekt(forslag = inntektForrigeSkjæringstidspunkt)
@@ -814,9 +828,7 @@ internal class Vedtaksperiode private constructor(
             return PersonObserver.Refusjon(forslag = refusjonsopplysninger)
 
         } else {
-            val forrigeSkjæringstidspunkt = person.skjæringstidspunkter()
-                .filter { it != skjæringstidspunkt }
-                .maxOrNull()
+            val forrigeSkjæringstidspunkt = forrigeSkjæringstidspunktMedVilkårsgrunnlagFor(arbeidsgiver, skjæringstidspunkt)
 
             val refusjonsopplysninger = forrigeSkjæringstidspunkt?.let { person
                 .vilkårsgrunnlagFor(forrigeSkjæringstidspunkt)
@@ -2448,6 +2460,17 @@ internal class Vedtaksperiode private constructor(
         }.filter {
             it.forventerInntekt()
         }
+
+        internal fun List<Vedtaksperiode>.finnNesteVedtaksperiodeSomTrengerInntektsmelding(vedtaksperiode: Vedtaksperiode): Vedtaksperiode? {
+            val nesteVedtaksperiode = filter { it.skjæringstidspunkt > vedtaksperiode.skjæringstidspunkt }
+                .sorted()
+                .firstOrNull { it.tilstand != AvsluttetUtenUtbetaling }
+
+            if (nesteVedtaksperiode?.tilstand != AvventerInntektsmelding) return null
+            return nesteVedtaksperiode
+        }
+
+        internal fun List<Vedtaksperiode>.finnVedtaksperioderKnyttetTilSkjæringstidspunkt(skjæringstidspunktet: LocalDate) = filter { it.skjæringstidspunkt == skjæringstidspunktet }
 
         internal fun Iterable<Vedtaksperiode>.checkBareEnPeriodeTilGodkjenningSamtidig(periodeSomSkalGjenopptas: Vedtaksperiode) {
             check(this.filterNot { it == periodeSomSkalGjenopptas }.none(HAR_AVVENTENDE_GODKJENNING)) {
