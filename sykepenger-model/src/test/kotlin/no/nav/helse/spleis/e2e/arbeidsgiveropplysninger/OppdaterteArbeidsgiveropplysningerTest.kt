@@ -21,6 +21,7 @@ import no.nav.helse.person.TilstandType
 import no.nav.helse.person.inntekt.Refusjonsopplysning
 import no.nav.helse.spleis.e2e.AbstractEndToEndTest
 import no.nav.helse.spleis.e2e.OverstyrtArbeidsgiveropplysning
+import no.nav.helse.spleis.e2e.assertTilstand
 import no.nav.helse.spleis.e2e.assertTilstander
 import no.nav.helse.spleis.e2e.håndterInntektsmelding
 import no.nav.helse.spleis.e2e.håndterOverstyrArbeidsgiveropplysninger
@@ -333,7 +334,7 @@ internal class OppdaterteArbeidsgiveropplysningerTest: AbstractEndToEndTest() {
     }
 
     @Test
-    fun `Sender oppdatert forespørsel ved nytt vilkårsgrunnlag pga korrigerende inntektsmelding`() {
+    fun `Sender oppdatert forespørsel ved nytt vilkårsgrunnlag pga korrigerende inntektsmelding -- revurdering`() {
         nyttVedtak(1.januar, 31.januar)
         nyPeriode(1.mars til 31.mars)
 
@@ -344,5 +345,39 @@ internal class OppdaterteArbeidsgiveropplysningerTest: AbstractEndToEndTest() {
             PersonObserver.Inntekt(forslag = PersonObserver.Inntektsdata(1.januar, PersonObserver.Inntektsopplysningstype.INNTEKTSMELDING, 32000.0)),
             forespørsel.forespurteOpplysninger.first { it is PersonObserver.Inntekt }
         )
+    }
+
+    @Test
+    fun `Sender oppdatert forespørsel ved nytt vilkårsgrunnlag pga korrigerende inntektsmelding  -- overstyring`() {
+        nyPeriode(1.januar til 31.januar)
+        nyPeriode(1.mars til 31.mars)
+
+        håndterInntektsmelding(listOf(1.januar til 16.januar), beregnetInntekt = 32000.månedlig)
+        håndterVilkårsgrunnlag(1.vedtaksperiode)
+        håndterYtelser(1.vedtaksperiode)
+        håndterSimulering(1.vedtaksperiode)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), beregnetInntekt = 33000.månedlig)
+
+        val forespørsel = observatør.trengerArbeidsgiveropplysningerVedtaksperioder.last()
+        assertEquals(
+            PersonObserver.Inntekt(forslag = PersonObserver.Inntektsdata(1.januar, PersonObserver.Inntektsopplysningstype.INNTEKTSMELDING, 33000.0)),
+            forespørsel.forespurteOpplysninger.first { it is PersonObserver.Inntekt }
+        )
+    }
+
+    @Test
+    fun `sender ikke oppdatert forespørsel for en periode som har mottatt inntektsmelding`() {
+        nyPeriode(1.januar til 31.januar)
+        nyPeriode(1.mars til 31.mars)
+        håndterInntektsmelding(listOf(1.mars til 31.mars))
+
+        assertTilstand(2.vedtaksperiode, TilstandType.AVVENTER_BLOKKERENDE_PERIODE)
+        assertEquals(2, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.size)
+
+        håndterInntektsmelding(listOf(1.januar til 31.januar))
+        håndterVilkårsgrunnlag(1.vedtaksperiode)
+
+        assertTilstand(2.vedtaksperiode, TilstandType.AVVENTER_BLOKKERENDE_PERIODE)
+        assertEquals(2, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.size)
     }
 }
