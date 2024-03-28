@@ -1,0 +1,51 @@
+{
+  "skjemaVersjon": 293,
+  "arbeidsgivere": [
+    {
+      "vedtaksperioder": [
+        {
+          "tilstand": "AVSLUTTET_UTEN_UTBETALING",
+          "oppdatert": "2020-08-03T14:53:17.213",
+          "generasjoner": [
+            {
+              "tilstand": "AVSLUTTET_UTEN_VEDTAK"
+            },
+            {
+              "tilstand": "AVSLUTTET_UTEN_VEDTAK",
+              "avsluttet": "2020-08-03T14:53:17.213"
+            }
+          ]
+        },
+        {
+          "tilstand": "AVSLUTTET_UTEN_UTBETALING",
+          "oppdatert": "2021-08-03T14:53:17.213",
+          "generasjoner": [
+            {
+              "tilstand": "AVSLUTTET_UTEN_VEDTAK",
+              "avsluttet": "2021-08-03T14:53:17.213"
+            }
+          ]
+        },
+        {
+          "tilstand": "AVSLUTTET_UTEN_UTBETALING",
+          "generasjoner": [
+            {
+              "tilstand": "AVSLUTTET_UTEN_VEDTAK"
+            }
+          ]
+        },
+        {
+          "tilstand": "AVVENTER_INNTEKTSMELDING",
+          "generasjoner": [
+            {
+              "tilstand": "AVSLUTTET_UTEN_VEDTAK"
+            },
+            {
+              "tilstand": "UBEREGNET_OMGJØRING"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
