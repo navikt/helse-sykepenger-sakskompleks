@@ -3,11 +3,13 @@ package no.nav.helse.spleis.e2e.behandlinger
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
+import no.nav.helse.assertForventetFeil
 import no.nav.helse.august
 import no.nav.helse.dsl.AbstractDslTest
 import no.nav.helse.dsl.TestPerson.Companion.INNTEKT
 import no.nav.helse.dsl.forlengVedtak
 import no.nav.helse.dsl.lagStandardSykepengegrunnlag
+import no.nav.helse.dsl.nyPeriode
 import no.nav.helse.dsl.nyttVedtak
 import no.nav.helse.dsl.tilGodkjenning
 import no.nav.helse.februar
@@ -22,6 +24,13 @@ import no.nav.helse.hendelser.Vilkårsgrunnlag.Arbeidsforhold
 import no.nav.helse.hendelser.Vilkårsgrunnlag.Arbeidsforhold.Arbeidsforholdtype.ORDINÆRT
 import no.nav.helse.hendelser.til
 import no.nav.helse.inspectors.VedtaksperiodeInspektør.Behandling.Behandlingkilde
+import no.nav.helse.inspectors.VedtaksperiodeInspektør.Behandling.Behandlingtilstand.ANNULLERT_PERIODE
+import no.nav.helse.inspectors.VedtaksperiodeInspektør.Behandling.Behandlingtilstand.AVSLUTTET_UTEN_VEDTAK
+import no.nav.helse.inspectors.VedtaksperiodeInspektør.Behandling.Behandlingtilstand.REVURDERT_VEDTAK_AVVIST
+import no.nav.helse.inspectors.VedtaksperiodeInspektør.Behandling.Behandlingtilstand.UBEREGNET_OMGJØRING
+import no.nav.helse.inspectors.VedtaksperiodeInspektør.Behandling.Behandlingtilstand.UBEREGNET_REVURDERING
+import no.nav.helse.inspectors.VedtaksperiodeInspektør.Behandling.Behandlingtilstand.VEDTAK_FATTET
+import no.nav.helse.inspectors.VedtaksperiodeInspektør.Behandling.Behandlingtilstand.VEDTAK_IVERKSATT
 import no.nav.helse.inspectors.inspektør
 import no.nav.helse.januar
 import no.nav.helse.juli
@@ -35,13 +44,6 @@ import no.nav.helse.person.TilstandType.AVVENTER_GODKJENNING_REVURDERING
 import no.nav.helse.person.TilstandType.START
 import no.nav.helse.person.aktivitetslogg.Varselkode
 import no.nav.helse.person.infotrygdhistorikk.ArbeidsgiverUtbetalingsperiode
-import no.nav.helse.inspectors.VedtaksperiodeInspektør.Behandling.Behandlingtilstand.AVSLUTTET_UTEN_VEDTAK
-import no.nav.helse.inspectors.VedtaksperiodeInspektør.Behandling.Behandlingtilstand.REVURDERT_VEDTAK_AVVIST
-import no.nav.helse.inspectors.VedtaksperiodeInspektør.Behandling.Behandlingtilstand.TIL_INFOTRYGD
-import no.nav.helse.inspectors.VedtaksperiodeInspektør.Behandling.Behandlingtilstand.UBEREGNET_REVURDERING
-import no.nav.helse.inspectors.VedtaksperiodeInspektør.Behandling.Behandlingtilstand.VEDTAK_FATTET
-import no.nav.helse.inspectors.VedtaksperiodeInspektør.Behandling.Behandlingtilstand.VEDTAK_IVERKSATT
-import no.nav.helse.inspectors.VedtaksperiodeInspektør.Behandling.Behandlingtilstand.ANNULLERT_PERIODE
 import no.nav.helse.spleis.e2e.AktivitetsloggFilter.Companion.filter
 import no.nav.helse.testhelpers.assertNotNull
 import no.nav.helse.utbetalingslinjer.Utbetalingstatus
@@ -547,6 +549,48 @@ internal class BehandlingerE2ETest : AbstractDslTest() {
                 assertEquals(AVSLUTTET_UTEN_VEDTAK, behandlinger[1].tilstand)
             }
             assertSisteTilstand(1.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING)
+        }
+    }
+
+    @Test
+    fun `korrigert søknad på kort periode`() {
+        a1 {
+            nyPeriode(1.januar til 5.januar)
+            nyPeriode(6.januar til 8.januar)
+            nyPeriode(9.januar til 15.januar)
+            nyttVedtak(16.januar, 25.januar, arbeidsgiverperiode = listOf(1.januar til 16.januar))
+            håndterSøknad(Sykdom(6.januar, 8.januar, 100.prosent, 10.prosent))
+
+            inspektør(1.vedtaksperiode).behandlinger.also { behandlinger ->
+                assertEquals(2, behandlinger.size)
+                assertEquals(AVSLUTTET_UTEN_VEDTAK, behandlinger[0].tilstand)
+                assertEquals(AVSLUTTET_UTEN_VEDTAK, behandlinger[1].tilstand)
+            }
+            inspektør(2.vedtaksperiode).behandlinger.also { behandlinger ->
+                assertEquals(3, behandlinger.size)
+                assertEquals(AVSLUTTET_UTEN_VEDTAK, behandlinger[0].tilstand)
+                assertEquals(AVSLUTTET_UTEN_VEDTAK, behandlinger[1].tilstand)
+                assertEquals(AVSLUTTET_UTEN_VEDTAK, behandlinger[2].tilstand)
+            }
+            inspektør(3.vedtaksperiode).behandlinger.also { behandlinger ->
+                assertEquals(3, behandlinger.size)
+                assertEquals(AVSLUTTET_UTEN_VEDTAK, behandlinger[0].tilstand)
+                assertEquals(AVSLUTTET_UTEN_VEDTAK, behandlinger[1].tilstand)
+                assertForventetFeil(
+                    forklaring = "behandligen skal være lukket",
+                    nå = {
+                        assertEquals(UBEREGNET_OMGJØRING, behandlinger[2].tilstand)
+                    },
+                    ønsket = {
+                        assertEquals(AVSLUTTET_UTEN_VEDTAK, behandlinger[2].tilstand)
+                    }
+                )
+            }
+            inspektør(4.vedtaksperiode).behandlinger.also { behandlinger ->
+                assertEquals(2, behandlinger.size)
+                assertEquals(VEDTAK_IVERKSATT, behandlinger[0].tilstand)
+                assertEquals(UBEREGNET_REVURDERING, behandlinger[1].tilstand)
+            }
         }
     }
 }
