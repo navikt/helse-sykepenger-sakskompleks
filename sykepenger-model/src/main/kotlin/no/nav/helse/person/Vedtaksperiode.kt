@@ -599,7 +599,6 @@ internal class Vedtaksperiode private constructor(
 
         lagreTidsnæreopplysninger(hendelse)
         val periodeEtter = rettEtterFørEndring ?: arbeidsgiver.finnVedtaksperiodeRettEtter(this)
-        periodeEtter?.behandlinger?.sikreNyBehandling(arbeidsgiver, hendelse)
         periodeEtter?.lagreTidsnæreopplysninger(hendelse)
     }
 
@@ -614,6 +613,7 @@ internal class Vedtaksperiode private constructor(
         behandlinger.lagreTidsnæreInntekter(
             arbeidsgiver,
             skjæringstidspunkt,
+            hendelse,
             aktivitetsloggkopi(hendelse),
             oppholdsperiodeMellom
         )

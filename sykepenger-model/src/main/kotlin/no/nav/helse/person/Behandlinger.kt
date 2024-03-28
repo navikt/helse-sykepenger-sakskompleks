@@ -3,13 +3,13 @@ package no.nav.helse.person
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
-import no.nav.helse.dto.BehandlingtilstandDto
 import no.nav.helse.dto.BehandlingkildeDto
-import no.nav.helse.dto.deserialisering.BehandlingendringInnDto
+import no.nav.helse.dto.BehandlingtilstandDto
 import no.nav.helse.dto.deserialisering.BehandlingInnDto
+import no.nav.helse.dto.deserialisering.BehandlingendringInnDto
 import no.nav.helse.dto.deserialisering.BehandlingerInnDto
-import no.nav.helse.dto.serialisering.BehandlingendringUtDto
 import no.nav.helse.dto.serialisering.BehandlingUtDto
+import no.nav.helse.dto.serialisering.BehandlingendringUtDto
 import no.nav.helse.dto.serialisering.BehandlingerUtDto
 import no.nav.helse.etterlevelse.MaskinellJurist
 import no.nav.helse.etterlevelse.SubsumsjonObserver.Companion.NullObserver
@@ -22,15 +22,15 @@ import no.nav.helse.hendelser.utbetaling.AnnullerUtbetaling
 import no.nav.helse.hendelser.utbetaling.UtbetalingHendelse
 import no.nav.helse.hendelser.utbetaling.Utbetalingsavgjørelse
 import no.nav.helse.hendelser.utbetaling.avvist
-import no.nav.helse.person.Dokumentsporing.Companion.ider
-import no.nav.helse.person.Dokumentsporing.Companion.sisteInntektsmeldingId
-import no.nav.helse.person.Dokumentsporing.Companion.søknadIder
-import no.nav.helse.person.Dokumentsporing.Companion.tilSubsumsjonsformat
 import no.nav.helse.person.Behandlinger.Behandling.Companion.dokumentsporing
 import no.nav.helse.person.Behandlinger.Behandling.Companion.erUtbetaltPåForskjelligeUtbetalinger
 import no.nav.helse.person.Behandlinger.Behandling.Companion.jurist
 import no.nav.helse.person.Behandlinger.Behandling.Companion.lagreTidsnæreInntekter
 import no.nav.helse.person.Behandlinger.Behandling.Endring.Companion.dokumentsporing
+import no.nav.helse.person.Dokumentsporing.Companion.ider
+import no.nav.helse.person.Dokumentsporing.Companion.sisteInntektsmeldingId
+import no.nav.helse.person.Dokumentsporing.Companion.søknadIder
+import no.nav.helse.person.Dokumentsporing.Companion.tilSubsumsjonsformat
 import no.nav.helse.person.VilkårsgrunnlagHistorikk.VilkårsgrunnlagElement
 import no.nav.helse.person.aktivitetslogg.Aktivitet
 import no.nav.helse.person.aktivitetslogg.GodkjenningsbehovBuilder
@@ -98,10 +98,11 @@ internal class Behandlinger private constructor(behandlinger: List<Behandling>) 
     internal fun lagreTidsnæreInntekter(
         arbeidsgiver: Arbeidsgiver,
         skjæringstidspunkt: LocalDate,
-        hendelse: IAktivitetslogg,
+        hendelse: Hendelse,
+        aktivitetslogg: IAktivitetslogg,
         oppholdsperiodeMellom: Periode?
     ) {
-        behandlinger.lagreTidsnæreInntekter(arbeidsgiver, skjæringstidspunkt, hendelse, oppholdsperiodeMellom)
+        behandlinger.lagreTidsnæreInntekter(this, arbeidsgiver, skjæringstidspunkt, hendelse, aktivitetslogg, oppholdsperiodeMellom)
     }
 
     internal fun gjelderIkkeFor(hendelse: Utbetalingsavgjørelse) = siste?.gjelderFor(hendelse) != true
@@ -498,15 +499,6 @@ internal class Behandlinger private constructor(behandlinger: List<Behandling>) 
             tilstand.entering(this, hendelse)
         }
 
-        fun lagreTidsnæreInntekter(
-            nyttSkjæringstidspunkt: LocalDate,
-            arbeidsgiver: Arbeidsgiver,
-            hendelse: IAktivitetslogg,
-            oppholdsperiodeMellom: Periode?
-        ) {
-            endringer.lastOrNull { it.utbetaling != null }?.lagreTidsnæreInntekter(nyttSkjæringstidspunkt, arbeidsgiver, hendelse, oppholdsperiodeMellom)
-        }
-
         fun forkastUtbetaling(hendelse: IAktivitetslogg) {
             tilstand.utenUtbetaling(this, hendelse)
         }
@@ -804,8 +796,10 @@ enum class Periodetilstand {
             fun List<Behandling>.jurist(jurist: MaskinellJurist, vedtaksperiodeId: UUID) =
                 jurist.medVedtaksperiode(vedtaksperiodeId, dokumentsporing.tilSubsumsjonsformat(), sykmeldingsperiode)
 
-            fun List<Behandling>.lagreTidsnæreInntekter(arbeidsgiver: Arbeidsgiver, skjæringstidspunkt: LocalDate, hendelse: IAktivitetslogg, oppholdsperiodeMellom: Periode?) {
-                lastOrNull { it.endringer.any { it.utbetaling != null } }?.lagreTidsnæreInntekter(skjæringstidspunkt, arbeidsgiver, hendelse, oppholdsperiodeMellom)
+            fun List<Behandling>.lagreTidsnæreInntekter(behandlinger: Behandlinger, arbeidsgiver: Arbeidsgiver, skjæringstidspunkt: LocalDate, hendelse: Hendelse, aktivitetslogg: IAktivitetslogg, oppholdsperiodeMellom: Periode?) {
+                val sisteEndringMedUtbetaling = asReversed().firstNotNullOfOrNull { it.endringer.lastOrNull { it.utbetaling != null } } ?: return
+                behandlinger.sikreNyBehandling(arbeidsgiver, hendelse)
+                return sisteEndringMedUtbetaling.lagreTidsnæreInntekter(skjæringstidspunkt, arbeidsgiver, aktivitetslogg, oppholdsperiodeMellom)
             }
 
             // hvorvidt man delte samme utbetaling før

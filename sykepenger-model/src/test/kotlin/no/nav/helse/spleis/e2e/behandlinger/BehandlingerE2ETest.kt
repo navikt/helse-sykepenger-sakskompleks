@@ -3,7 +3,6 @@ package no.nav.helse.spleis.e2e.behandlinger
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
-import no.nav.helse.assertForventetFeil
 import no.nav.helse.august
 import no.nav.helse.dsl.AbstractDslTest
 import no.nav.helse.dsl.TestPerson.Companion.INNTEKT
@@ -27,7 +26,6 @@ import no.nav.helse.inspectors.VedtaksperiodeInspektør.Behandling.Behandlingkil
 import no.nav.helse.inspectors.VedtaksperiodeInspektør.Behandling.Behandlingtilstand.ANNULLERT_PERIODE
 import no.nav.helse.inspectors.VedtaksperiodeInspektør.Behandling.Behandlingtilstand.AVSLUTTET_UTEN_VEDTAK
 import no.nav.helse.inspectors.VedtaksperiodeInspektør.Behandling.Behandlingtilstand.REVURDERT_VEDTAK_AVVIST
-import no.nav.helse.inspectors.VedtaksperiodeInspektør.Behandling.Behandlingtilstand.UBEREGNET_OMGJØRING
 import no.nav.helse.inspectors.VedtaksperiodeInspektør.Behandling.Behandlingtilstand.UBEREGNET_REVURDERING
 import no.nav.helse.inspectors.VedtaksperiodeInspektør.Behandling.Behandlingtilstand.VEDTAK_FATTET
 import no.nav.helse.inspectors.VedtaksperiodeInspektør.Behandling.Behandlingtilstand.VEDTAK_IVERKSATT
@@ -573,18 +571,9 @@ internal class BehandlingerE2ETest : AbstractDslTest() {
                 assertEquals(AVSLUTTET_UTEN_VEDTAK, behandlinger[2].tilstand)
             }
             inspektør(3.vedtaksperiode).behandlinger.also { behandlinger ->
-                assertEquals(3, behandlinger.size)
+                assertEquals(2, behandlinger.size)
                 assertEquals(AVSLUTTET_UTEN_VEDTAK, behandlinger[0].tilstand)
                 assertEquals(AVSLUTTET_UTEN_VEDTAK, behandlinger[1].tilstand)
-                assertForventetFeil(
-                    forklaring = "behandligen skal være lukket",
-                    nå = {
-                        assertEquals(UBEREGNET_OMGJØRING, behandlinger[2].tilstand)
-                    },
-                    ønsket = {
-                        assertEquals(AVSLUTTET_UTEN_VEDTAK, behandlinger[2].tilstand)
-                    }
-                )
             }
             inspektør(4.vedtaksperiode).behandlinger.also { behandlinger ->
                 assertEquals(2, behandlinger.size)
