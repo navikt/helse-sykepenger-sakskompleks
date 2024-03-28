@@ -2,33 +2,24 @@ package no.nav.helse.serde
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import java.time.LocalDate
-import no.nav.helse.dto.serialisering.ArbeidsgiverInntektsopplysningUtDto
 import no.nav.helse.dto.ArbeidsgiverInntektsopplysningForSammenligningsgrunnlagDto
 import no.nav.helse.dto.AvsenderDto
 import no.nav.helse.dto.BegrunnelseDto
+import no.nav.helse.dto.BehandlingkildeDto
+import no.nav.helse.dto.BehandlingtilstandDto
 import no.nav.helse.dto.DokumentsporingDto
 import no.nav.helse.dto.DokumenttypeDto
 import no.nav.helse.dto.EndringIRefusjonDto
 import no.nav.helse.dto.EndringskodeDto
 import no.nav.helse.dto.FagområdeDto
-import no.nav.helse.dto.BehandlingtilstandDto
-import no.nav.helse.dto.BehandlingkildeDto
 import no.nav.helse.dto.HendelseskildeDto
-import no.nav.helse.dto.serialisering.InfotrygdArbeidsgiverutbetalingsperiodeUtDto
 import no.nav.helse.dto.InfotrygdFerieperiodeDto
-import no.nav.helse.dto.serialisering.InfotrygdInntektsopplysningUtDto
-import no.nav.helse.dto.serialisering.InfotrygdPersonutbetalingsperiodeUtDto
-import no.nav.helse.dto.serialisering.InfotrygdhistorikkelementUtDto
-import no.nav.helse.dto.serialisering.InntektsopplysningUtDto
 import no.nav.helse.dto.InntekttypeDto
 import no.nav.helse.dto.KlassekodeDto
 import no.nav.helse.dto.MedlemskapsvurderingDto
 import no.nav.helse.dto.OppdragstatusDto
-import no.nav.helse.dto.serialisering.OpptjeningUtDto
-import no.nav.helse.dto.serialisering.RefusjonUtDto
-import no.nav.helse.dto.serialisering.RefusjonsopplysningUtDto
-import no.nav.helse.dto.serialisering.SammenligningsgrunnlagUtDto
 import no.nav.helse.dto.SatstypeDto
+import no.nav.helse.dto.SimuleringResultatDto
 import no.nav.helse.dto.SkatteopplysningDto
 import no.nav.helse.dto.SykdomshistorikkElementDto
 import no.nav.helse.dto.SykdomstidslinjeDagDto
@@ -36,25 +27,34 @@ import no.nav.helse.dto.SykdomstidslinjeDto
 import no.nav.helse.dto.SykmeldingsperioderDto
 import no.nav.helse.dto.UtbetalingTilstandDto
 import no.nav.helse.dto.UtbetalingVurderingDto
-import no.nav.helse.dto.serialisering.UtbetalingsdagUtDto
-import no.nav.helse.dto.serialisering.UtbetalingstidslinjeUtDto
 import no.nav.helse.dto.UtbetalingtypeDto
 import no.nav.helse.dto.UtbetaltDagDto
 import no.nav.helse.dto.VedtaksperiodetilstandDto
+import no.nav.helse.dto.serialisering.ArbeidsgiverInntektsopplysningUtDto
 import no.nav.helse.dto.serialisering.ArbeidsgiverUtDto
+import no.nav.helse.dto.serialisering.BehandlingUtDto
+import no.nav.helse.dto.serialisering.BehandlingendringUtDto
 import no.nav.helse.dto.serialisering.FeriepengeUtDto
 import no.nav.helse.dto.serialisering.ForkastetVedtaksperiodeUtDto
-import no.nav.helse.dto.serialisering.BehandlingendringUtDto
-import no.nav.helse.dto.serialisering.BehandlingUtDto
+import no.nav.helse.dto.serialisering.InfotrygdArbeidsgiverutbetalingsperiodeUtDto
+import no.nav.helse.dto.serialisering.InfotrygdInntektsopplysningUtDto
+import no.nav.helse.dto.serialisering.InfotrygdPersonutbetalingsperiodeUtDto
+import no.nav.helse.dto.serialisering.InfotrygdhistorikkelementUtDto
+import no.nav.helse.dto.serialisering.InntektsopplysningUtDto
 import no.nav.helse.dto.serialisering.OppdragUtDto
+import no.nav.helse.dto.serialisering.OpptjeningUtDto
 import no.nav.helse.dto.serialisering.PersonUtDto
+import no.nav.helse.dto.serialisering.RefusjonUtDto
+import no.nav.helse.dto.serialisering.RefusjonsopplysningUtDto
+import no.nav.helse.dto.serialisering.SammenligningsgrunnlagUtDto
 import no.nav.helse.dto.serialisering.SykepengegrunnlagUtDto
 import no.nav.helse.dto.serialisering.UtbetalingUtDto
+import no.nav.helse.dto.serialisering.UtbetalingsdagUtDto
 import no.nav.helse.dto.serialisering.UtbetalingslinjeUtDto
+import no.nav.helse.dto.serialisering.UtbetalingstidslinjeUtDto
 import no.nav.helse.dto.serialisering.VedtaksperiodeUtDto
 import no.nav.helse.dto.serialisering.VilkårsgrunnlagInnslagUtDto
 import no.nav.helse.dto.serialisering.VilkårsgrunnlagUtDto
-import no.nav.helse.dto.SimuleringResultatDto
 import no.nav.helse.serde.PersonData.ArbeidsgiverData.SykdomstidslinjeData.DagData
 import no.nav.helse.serde.PersonData.ArbeidsgiverData.VedtaksperiodeData.TilstandTypeData
 import no.nav.helse.serde.PersonData.UtbetalingstidslinjeData.UtbetalingsdagData
@@ -330,7 +330,7 @@ private fun VedtaksperiodeUtDto.tilPersonData() = PersonData.ArbeidsgiverData.Ve
         VedtaksperiodetilstandDto.TIL_INFOTRYGD -> TilstandTypeData.TIL_INFOTRYGD
         VedtaksperiodetilstandDto.TIL_UTBETALING -> TilstandTypeData.TIL_UTBETALING
     },
-    generasjoner = behandlinger.behandlinger.map { it.tilPersonData() },
+    behandlinger = behandlinger.behandlinger.map { it.tilPersonData() },
     opprettet = opprettet,
     oppdatert = oppdatert
 )

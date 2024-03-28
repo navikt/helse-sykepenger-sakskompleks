@@ -1,0 +1,26 @@
+{
+  "arbeidsgivere": [
+    {
+      "vedtaksperioder": [
+        {
+          "generasjoner": [
+            {
+              "tilstand": "AVSLUTTET_UTEN_VEDTAK"
+            }
+          ]
+        }
+      ],
+      "forkastede": [
+        {
+          "vedtaksperiode": {
+            "generasjoner": [
+              {
+                "tilstand": "AVSLUTTET_UTEN_VEDTAK"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

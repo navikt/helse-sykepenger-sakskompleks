@@ -1,0 +1,27 @@
+{
+  "skjemaVersjon": 294,
+  "arbeidsgivere": [
+    {
+      "vedtaksperioder": [
+        {
+          "behandlinger": [
+            {
+              "tilstand": "AVSLUTTET_UTEN_VEDTAK"
+            }
+          ]
+        }
+      ],
+      "forkastede": [
+        {
+          "vedtaksperiode": {
+            "behandlinger": [
+              {
+                "tilstand": "AVSLUTTET_UTEN_VEDTAK"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

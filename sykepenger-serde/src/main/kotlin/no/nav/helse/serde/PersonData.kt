@@ -12,14 +12,14 @@ import no.nav.helse.dto.ArbeidsgiverInntektsopplysningForSammenligningsgrunnlagD
 import no.nav.helse.dto.ArbeidsgiverOpptjeningsgrunnlagDto
 import no.nav.helse.dto.AvsenderDto
 import no.nav.helse.dto.BegrunnelseDto
+import no.nav.helse.dto.BehandlingkildeDto
+import no.nav.helse.dto.BehandlingtilstandDto
 import no.nav.helse.dto.DokumentsporingDto
 import no.nav.helse.dto.DokumenttypeDto
 import no.nav.helse.dto.EndringIRefusjonDto
 import no.nav.helse.dto.EndringskodeDto
 import no.nav.helse.dto.FagområdeDto
 import no.nav.helse.dto.FeriepengeberegnerDto
-import no.nav.helse.dto.BehandlingtilstandDto
-import no.nav.helse.dto.BehandlingkildeDto
 import no.nav.helse.dto.HendelseskildeDto
 import no.nav.helse.dto.InfotrygdFerieperiodeDto
 import no.nav.helse.dto.InntektbeløpDto
@@ -44,11 +44,11 @@ import no.nav.helse.dto.UtbetaltDagDto
 import no.nav.helse.dto.VedtaksperiodetilstandDto
 import no.nav.helse.dto.deserialisering.ArbeidsgiverInnDto
 import no.nav.helse.dto.deserialisering.ArbeidsgiverInntektsopplysningInnDto
+import no.nav.helse.dto.deserialisering.BehandlingInnDto
+import no.nav.helse.dto.deserialisering.BehandlingendringInnDto
+import no.nav.helse.dto.deserialisering.BehandlingerInnDto
 import no.nav.helse.dto.deserialisering.FeriepengeInnDto
 import no.nav.helse.dto.deserialisering.ForkastetVedtaksperiodeInnDto
-import no.nav.helse.dto.deserialisering.BehandlingendringInnDto
-import no.nav.helse.dto.deserialisering.BehandlingInnDto
-import no.nav.helse.dto.deserialisering.BehandlingerInnDto
 import no.nav.helse.dto.deserialisering.InfotrygdArbeidsgiverutbetalingsperiodeInnDto
 import no.nav.helse.dto.deserialisering.InfotrygdInntektsopplysningInnDto
 import no.nav.helse.dto.deserialisering.InfotrygdPersonutbetalingsperiodeInnDto
@@ -683,7 +683,7 @@ data class PersonData(
         data class VedtaksperiodeData(
             val id: UUID,
             val tilstand: TilstandTypeData,
-            val generasjoner: List<BehandlingData>,
+            val behandlinger: List<BehandlingData>,
             val opprettet: LocalDateTime,
             val oppdatert: LocalDateTime
         ) {
@@ -730,7 +730,7 @@ data class PersonData(
                     TilstandTypeData.AVVENTER_SIMULERING_REVURDERING -> VedtaksperiodetilstandDto.AVVENTER_SIMULERING_REVURDERING
                     TilstandTypeData.AVVENTER_GODKJENNING_REVURDERING -> VedtaksperiodetilstandDto.AVVENTER_GODKJENNING_REVURDERING
                 },
-                behandlinger = BehandlingerInnDto(this.generasjoner.map { it.tilDto() }),
+                behandlinger = BehandlingerInnDto(this.behandlinger.map { it.tilDto() }),
                 opprettet = opprettet,
                 oppdatert = oppdatert
             )
