@@ -375,6 +375,7 @@ internal data class SpannerPersonDto(
                 START,
                 AVVENTER_INFOTRYGDHISTORIKK,
                 AVVENTER_INNTEKTSMELDING,
+                AVVENTER_INNTEKTSMELDING_REPLAY,
                 AVVENTER_BLOKKERENDE_PERIODE,
                 AVVENTER_VILKÅRSPRØVING,
                 AVVENTER_REVURDERING,
@@ -924,6 +925,7 @@ private fun VedtaksperiodeUtDto.tilPersonData() = SpannerPersonDto.ArbeidsgiverD
         VedtaksperiodetilstandDto.AVVENTER_HISTORIKK_REVURDERING -> SpannerPersonDto.ArbeidsgiverData.VedtaksperiodeData.TilstandType.AVVENTER_HISTORIKK_REVURDERING
         VedtaksperiodetilstandDto.AVVENTER_INFOTRYGDHISTORIKK -> SpannerPersonDto.ArbeidsgiverData.VedtaksperiodeData.TilstandType.AVVENTER_INFOTRYGDHISTORIKK
         VedtaksperiodetilstandDto.AVVENTER_INNTEKTSMELDING -> SpannerPersonDto.ArbeidsgiverData.VedtaksperiodeData.TilstandType.AVVENTER_INNTEKTSMELDING
+        VedtaksperiodetilstandDto.AVVENTER_INNTEKTSMELDING_REPLAY -> SpannerPersonDto.ArbeidsgiverData.VedtaksperiodeData.TilstandType.AVVENTER_INNTEKTSMELDING_REPLAY
         VedtaksperiodetilstandDto.AVVENTER_REVURDERING -> SpannerPersonDto.ArbeidsgiverData.VedtaksperiodeData.TilstandType.AVVENTER_REVURDERING
         VedtaksperiodetilstandDto.AVVENTER_SIMULERING -> SpannerPersonDto.ArbeidsgiverData.VedtaksperiodeData.TilstandType.AVVENTER_SIMULERING
         VedtaksperiodetilstandDto.AVVENTER_SIMULERING_REVURDERING -> SpannerPersonDto.ArbeidsgiverData.VedtaksperiodeData.TilstandType.AVVENTER_SIMULERING_REVURDERING

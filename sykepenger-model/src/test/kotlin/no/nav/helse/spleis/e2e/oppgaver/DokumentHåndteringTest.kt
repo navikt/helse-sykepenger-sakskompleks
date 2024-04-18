@@ -458,7 +458,7 @@ internal class DokumentHåndteringTest : AbstractEndToEndTest() {
         håndterSykmelding(Sykmeldingsperiode(3.januar, 26.januar))
         håndterSøknad(Sykdom(3.januar, 26.januar, 100.prosent))
         val im = håndterInntektsmelding(listOf(Periode(3.januar, 18.januar)), 27.januar)
-        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING)
+        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_INNTEKTSMELDING)
         assertFalse(im in observatør.inntektsmeldingHåndtert.map(Pair<UUID,*>::first))
         assertTrue(im in observatør.inntektsmeldingIkkeHåndtert)
     }
@@ -468,7 +468,7 @@ internal class DokumentHåndteringTest : AbstractEndToEndTest() {
         håndterSykmelding(Sykmeldingsperiode(3.januar, 26.januar))
         håndterInntektsmelding(listOf(Periode(3.januar, 18.januar)), 27.januar)
         håndterSøknad(Sykdom(3.januar, 26.januar, 100.prosent))
-        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING)
+        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_INNTEKTSMELDING)
     }
 
     @Test

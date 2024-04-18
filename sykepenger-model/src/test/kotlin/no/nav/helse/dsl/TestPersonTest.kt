@@ -13,6 +13,7 @@ import no.nav.helse.person.TilstandType.AVVENTER_GODKJENNING
 import no.nav.helse.person.TilstandType.AVVENTER_HISTORIKK
 import no.nav.helse.person.TilstandType.AVVENTER_INFOTRYGDHISTORIKK
 import no.nav.helse.person.TilstandType.AVVENTER_INNTEKTSMELDING
+import no.nav.helse.person.TilstandType.AVVENTER_INNTEKTSMELDING_REPLAY
 import no.nav.helse.person.TilstandType.AVVENTER_SIMULERING
 import no.nav.helse.person.TilstandType.AVVENTER_VILKÅRSPRØVING
 import no.nav.helse.person.TilstandType.START
@@ -56,6 +57,7 @@ internal class TestPersonTest : AbstractDslTest() {
             1.vedtaksperiode,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
@@ -90,6 +92,7 @@ internal class TestPersonTest : AbstractDslTest() {
                 1.vedtaksperiode,
                 START,
                 AVVENTER_INFOTRYGDHISTORIKK,
+                AVVENTER_INNTEKTSMELDING_REPLAY,
                 AVVENTER_INNTEKTSMELDING,
                 AVVENTER_BLOKKERENDE_PERIODE,
                AVVENTER_VILKÅRSPRØVING,
@@ -118,20 +121,16 @@ internal class TestPersonTest : AbstractDslTest() {
                 1.vedtaksperiode,
                 START,
                 AVVENTER_INFOTRYGDHISTORIKK,
+                AVVENTER_INNTEKTSMELDING_REPLAY,
                 AVVENTER_INNTEKTSMELDING,
                 AVVENTER_BLOKKERENDE_PERIODE
             )
         }
         a2 {
             håndterInntektsmelding(listOf(Periode(3.januar, 18.januar)), INNTEKT)
-            assertTilstander(
-                1.vedtaksperiode,
-                START,
-                AVVENTER_INNTEKTSMELDING,
-                AVVENTER_BLOKKERENDE_PERIODE
-            )
+            assertTilstander(1.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_INNTEKTSMELDING, AVVENTER_BLOKKERENDE_PERIODE)
         }
-        a1.assertTilstander(1.vedtaksperiode(a1), START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_VILKÅRSPRØVING)
+        a1.assertTilstander(1.vedtaksperiode(a1), START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_INNTEKTSMELDING, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_VILKÅRSPRØVING)
     }
 
     @Test
@@ -161,6 +160,7 @@ internal class TestPersonTest : AbstractDslTest() {
             1.vedtaksperiode,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,

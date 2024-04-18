@@ -28,6 +28,7 @@ import no.nav.helse.person.TilstandType.AVVENTER_HISTORIKK
 import no.nav.helse.person.TilstandType.AVVENTER_HISTORIKK_REVURDERING
 import no.nav.helse.person.TilstandType.AVVENTER_INFOTRYGDHISTORIKK
 import no.nav.helse.person.TilstandType.AVVENTER_INNTEKTSMELDING
+import no.nav.helse.person.TilstandType.AVVENTER_INNTEKTSMELDING_REPLAY
 import no.nav.helse.person.TilstandType.AVVENTER_REVURDERING
 import no.nav.helse.person.TilstandType.AVVENTER_VILKÅRSPRØVING
 import no.nav.helse.person.TilstandType.START
@@ -310,7 +311,7 @@ internal class TrengerArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
         forlengVedtak(1.februar, 28.februar, orgnummer = a2)
         nyPeriode(1.mars til 31.mars, a1)
 
-        assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, orgnummer = a1)
+        assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_INNTEKTSMELDING, orgnummer = a1)
 
         assertEquals(4, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.size)
         assertEquals(2, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.count { it.vedtaksperiodeId == 1.vedtaksperiode.id(a1) })
@@ -371,7 +372,7 @@ internal class TrengerArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
         forlengVedtak(1.februar, 28.februar, orgnummer = a2)
         nyPeriode(1.mars til 31.mars, a1)
 
-        assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, orgnummer = a1)
+        assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_INNTEKTSMELDING, orgnummer = a1)
 
         assertEquals(4, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.size)
         assertEquals(2, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.count { it.vedtaksperiodeId == 1.vedtaksperiode.id(a1) })
@@ -427,7 +428,7 @@ internal class TrengerArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
         )
         forlengVedtak(1.februar, 28.februar, orgnummer = a1)
         nyPeriode(1.mars til 31.mars, a2)
-        assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, orgnummer = a2)
+        assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_INNTEKTSMELDING, orgnummer = a2)
 
         assertEquals(4, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.size)
         assertEquals(2, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.count { it.vedtaksperiodeId == 1.vedtaksperiode.id(a1) })
@@ -518,7 +519,7 @@ internal class TrengerArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
         håndterUtbetalt(orgnummer = a1)
 
         håndterSøknad(Sykdom(1.februar, 28.februar, 100.prosent), orgnummer = a2)
-        assertTilstander(1.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, orgnummer = a2)
+        assertTilstander(1.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_INNTEKTSMELDING, orgnummer = a2)
 
         val arbeidsgiveropplysningerEvents = observatør.trengerArbeidsgiveropplysningerVedtaksperioder
         assertEquals(2, arbeidsgiveropplysningerEvents.size)
@@ -559,10 +560,10 @@ internal class TrengerArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
         assertForventetFeil(
             forklaring = "perioden i mars (2.vedtaksperiode for a2) har en ny arbeidsgiverperiode og skal vente på opplysninger fra AG",
             nå = {
-                assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_HISTORIKK, orgnummer = a2)
+                assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_HISTORIKK, orgnummer = a2)
             },
             ønsket = {
-                assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, orgnummer = a2)
+                assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_INNTEKTSMELDING, orgnummer = a2)
 
                 val arbeidsgiveropplysningerEvents = observatør.trengerArbeidsgiveropplysningerVedtaksperioder
                 assertEquals(3, arbeidsgiveropplysningerEvents.size)
@@ -601,10 +602,10 @@ internal class TrengerArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
         assertForventetFeil(
             forklaring = "perioden i mars (2.vedtaksperiode for a2) har en ny arbeidsgiverperiode og skal vente på opplysninger fra AG",
             nå = {
-                assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_HISTORIKK, orgnummer = a2)
+                assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_HISTORIKK, orgnummer = a2)
             },
             ønsket = {
-                assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, orgnummer = a2)
+                assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_INNTEKTSMELDING, orgnummer = a2)
 
                 val trengerArbeidsgiveropplysningerEvents = observatør.trengerArbeidsgiveropplysningerVedtaksperioder
                 assertEquals(3, trengerArbeidsgiveropplysningerEvents.size)
@@ -632,7 +633,7 @@ internal class TrengerArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
     fun `Skal ikke be om arbeidsgiveropplysninger for perioder innenfor arbeidsgiverperioden`() {
         nyPeriode(1.januar til 10.januar)
         assertTrue(observatør.trengerArbeidsgiveropplysningerVedtaksperioder.isEmpty())
-        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING, AVSLUTTET_UTEN_UTBETALING)
+        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING_REPLAY, AVSLUTTET_UTEN_UTBETALING)
     }
 
     @Test
@@ -856,6 +857,9 @@ internal class TrengerArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
         nyPeriode(1.januar til 2.januar)
         nyPeriode(3.januar til 6.januar)
 
+        // todo: denne feiler fordi Auuene går inn til AvIM ved håndtering av dager,
+        // men da er ikke inntekt på plass ennå og de ber om TOFA.
+        // dette ble tidligere "løst" ved å vente med å be om opplysninger til håndtering av ReplayUtførtFerdig
         håndterInntektsmelding(emptyList(), begrunnelseForReduksjonEllerIkkeUtbetalt = "ManglerOpptjening",)
         assertEquals(0, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.size)
         assertEquals(0, observatør.trengerIkkeArbeidsgiveropplysningerVedtaksperioder.size)

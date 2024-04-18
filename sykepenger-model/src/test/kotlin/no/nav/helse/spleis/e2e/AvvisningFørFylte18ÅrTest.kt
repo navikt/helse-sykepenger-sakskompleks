@@ -6,6 +6,7 @@ import no.nav.helse.november
 import no.nav.helse.oktober
 import no.nav.helse.person.TilstandType.AVVENTER_INFOTRYGDHISTORIKK
 import no.nav.helse.person.TilstandType.AVVENTER_INNTEKTSMELDING
+import no.nav.helse.person.TilstandType.AVVENTER_INNTEKTSMELDING_REPLAY
 import no.nav.helse.person.TilstandType.START
 import no.nav.helse.person.TilstandType.TIL_INFOTRYGD
 import no.nav.helse.somPersonidentifikator
@@ -38,6 +39,6 @@ internal class AvvisningFørFylte18ÅrTest : AbstractEndToEndTest() {
         håndterSykmelding(Sykmeldingsperiode(1.oktober, 31.oktober), mottatt = 2.november.atStartOfDay(), fnr = FYLLER_18_ÅR_2_NOVEMBER)
         håndterSøknad(Sykdom(1.oktober, 31.oktober, 100.prosent), sendtTilNAVEllerArbeidsgiver = 2.november, fnr = FYLLER_18_ÅR_2_NOVEMBER)
         assertFalse(hendelselogg.harFunksjonelleFeilEllerVerre())
-        assertTilstander(0, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING)
+        assertTilstander(0, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_INNTEKTSMELDING)
     }
 }

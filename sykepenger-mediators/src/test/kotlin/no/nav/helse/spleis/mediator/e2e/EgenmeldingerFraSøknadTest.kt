@@ -18,6 +18,7 @@ internal class EgenmeldingerFraSøknadTest : AbstractEndToEndMediatorTest() {
         assertTilstander(
             0,
             "AVVENTER_INFOTRYGDHISTORIKK",
+            "AVVENTER_INNTEKTSMELDING_REPLAY",
             "AVVENTER_INNTEKTSMELDING"
         )
     }

@@ -26,8 +26,8 @@ import no.nav.helse.person.TilstandType.AVVENTER_GODKJENNING
 import no.nav.helse.person.TilstandType.AVVENTER_GODKJENNING_REVURDERING
 import no.nav.helse.person.TilstandType.AVVENTER_HISTORIKK
 import no.nav.helse.person.TilstandType.AVVENTER_HISTORIKK_REVURDERING
-import no.nav.helse.person.TilstandType.AVVENTER_INFOTRYGDHISTORIKK
 import no.nav.helse.person.TilstandType.AVVENTER_INNTEKTSMELDING
+import no.nav.helse.person.TilstandType.AVVENTER_INNTEKTSMELDING_REPLAY
 import no.nav.helse.person.TilstandType.AVVENTER_REVURDERING
 import no.nav.helse.person.TilstandType.AVVENTER_SIMULERING
 import no.nav.helse.person.TilstandType.AVVENTER_SIMULERING_REVURDERING
@@ -440,7 +440,7 @@ internal class RevurderingOutOfOrderGapTest : AbstractEndToEndTest() {
         nullstillTilstandsendringer()
         nyPeriode(1.januar til 15.januar)
         assertTilstander(1.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING, AVVENTER_INNTEKTSMELDING)
-        assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, AVSLUTTET_UTEN_UTBETALING)
+        assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVSLUTTET_UTEN_UTBETALING)
     }
 
     @Test
@@ -449,7 +449,7 @@ internal class RevurderingOutOfOrderGapTest : AbstractEndToEndTest() {
         forlengVedtak(1.juni, 30.juni)
         nullstillTilstandsendringer()
         nyPeriode(1.januar til 15.januar)
-        assertTilstander(3.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, AVSLUTTET_UTEN_UTBETALING)
+        assertTilstander(3.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVSLUTTET_UTEN_UTBETALING)
         assertTilstander(1.vedtaksperiode, AVSLUTTET, AVVENTER_REVURDERING, AVVENTER_HISTORIKK_REVURDERING)
         assertTilstander(2.vedtaksperiode, AVSLUTTET, AVVENTER_REVURDERING)
     }
@@ -459,7 +459,7 @@ internal class RevurderingOutOfOrderGapTest : AbstractEndToEndTest() {
         nyeVedtak(1.mai, 31.mai, a1, a2)
         nullstillTilstandsendringer()
         nyPeriode(1.januar til 15.januar, a1)
-        assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, AVSLUTTET_UTEN_UTBETALING, orgnummer = a1)
+        assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVSLUTTET_UTEN_UTBETALING, orgnummer = a1)
         assertTilstander(1.vedtaksperiode, AVSLUTTET, AVVENTER_REVURDERING, AVVENTER_HISTORIKK_REVURDERING, orgnummer = a1)
         assertTilstander(1.vedtaksperiode, AVSLUTTET, AVVENTER_REVURDERING, orgnummer = a2)
     }
@@ -715,7 +715,7 @@ internal class RevurderingOutOfOrderGapTest : AbstractEndToEndTest() {
 
         assertTilstander(1.vedtaksperiode, AVSLUTTET, AVVENTER_REVURDERING)
         assertTilstander(2.vedtaksperiode, TIL_UTBETALING, AVVENTER_REVURDERING)
-        assertTilstander(3.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, AVVENTER_BLOKKERENDE_PERIODE)
+        assertTilstander(3.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_INNTEKTSMELDING, AVVENTER_BLOKKERENDE_PERIODE)
 
         nullstillTilstandsendringer()
         håndterUtbetalt()
@@ -747,7 +747,7 @@ internal class RevurderingOutOfOrderGapTest : AbstractEndToEndTest() {
         håndterUtbetalt()
 
         assertTilstander(1.vedtaksperiode, TIL_UTBETALING, AVVENTER_REVURDERING)
-        assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_VILKÅRSPRØVING)
+        assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_INNTEKTSMELDING, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_VILKÅRSPRØVING)
         assertNotNull(observatør.avsluttetMedVedtakEvent[1.vedtaksperiode.id(ORGNUMMER)])
 
         nullstillTilstandsendringer()
@@ -1017,6 +1017,9 @@ internal class RevurderingOutOfOrderGapTest : AbstractEndToEndTest() {
         nyttVedtak(1.mars, 31.mars)
         assertSisteTilstand(marsId, AVSLUTTET)
 
+        // det er pga. gjenopptaBehandling (som følge av at AvventerRevurdering bestiller det)
+        // at februar-perioden ikke blir paddet med arbeidsdager, fordi AvIm håndterer gjenopptaBehandling.
+        // Det høres litt ut som vi burde unngått å gå inn der i utgangspunktet!
         nyPeriode(1.februar til 28.februar)
         håndterInntektsmelding(listOf(1.februar til 16.februar),)
         val februarId = 2.vedtaksperiode
@@ -1049,6 +1052,7 @@ internal class RevurderingOutOfOrderGapTest : AbstractEndToEndTest() {
     @Test
     fun `out-of-order søknad medfører revurdering`() {
         nyttVedtak(1.februar, 28.februar)
+        // fikses pga gjenopptaBehandling i AvIM
         nyPeriode(1.januar til 31.januar)
 
         val februarId = 1.vedtaksperiode

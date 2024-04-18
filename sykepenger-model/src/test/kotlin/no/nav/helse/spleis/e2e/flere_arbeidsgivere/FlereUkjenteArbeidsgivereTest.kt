@@ -22,8 +22,7 @@ import no.nav.helse.person.TilstandType.AVVENTER_GODKJENNING
 import no.nav.helse.person.TilstandType.AVVENTER_GODKJENNING_REVURDERING
 import no.nav.helse.person.TilstandType.AVVENTER_HISTORIKK
 import no.nav.helse.person.TilstandType.AVVENTER_HISTORIKK_REVURDERING
-import no.nav.helse.person.TilstandType.AVVENTER_INFOTRYGDHISTORIKK
-import no.nav.helse.person.TilstandType.AVVENTER_INNTEKTSMELDING
+import no.nav.helse.person.TilstandType.AVVENTER_INNTEKTSMELDING_REPLAY
 import no.nav.helse.person.TilstandType.AVVENTER_REVURDERING
 import no.nav.helse.person.TilstandType.AVVENTER_SIMULERING
 import no.nav.helse.person.TilstandType.AVVENTER_SIMULERING_REVURDERING
@@ -246,7 +245,7 @@ internal class FlereUkjenteArbeidsgivereTest : AbstractEndToEndTest() {
         assertTilstander(2.vedtaksperiode, AVVENTER_REVURDERING, orgnummer = a1)
         assertTilstander(3.vedtaksperiode, AVVENTER_REVURDERING, orgnummer = a1)
         assertTilstander(1.vedtaksperiode, AVVENTER_REVURDERING, orgnummer = a2)
-        assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, AVVENTER_BLOKKERENDE_PERIODE, orgnummer = a2)
+        assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_BLOKKERENDE_PERIODE, orgnummer = a2)
     }
 
     @Test
@@ -308,7 +307,7 @@ internal class FlereUkjenteArbeidsgivereTest : AbstractEndToEndTest() {
             AVVENTER_SIMULERING,
             AVVENTER_GODKJENNING, orgnummer = a1
         )
-        assertTilstander(1.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, AVVENTER_BLOKKERENDE_PERIODE, orgnummer = a2)
+        assertTilstander(1.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_BLOKKERENDE_PERIODE, orgnummer = a2)
     }
 
     @Test
@@ -362,7 +361,7 @@ internal class FlereUkjenteArbeidsgivereTest : AbstractEndToEndTest() {
             AVSLUTTET,
             orgnummer = a1
         )
-        assertTilstander(1.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_HISTORIKK, orgnummer = a2)
+        assertTilstander(1.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_HISTORIKK, orgnummer = a2)
     }
 
     @Test
@@ -423,7 +422,7 @@ internal class FlereUkjenteArbeidsgivereTest : AbstractEndToEndTest() {
             AVSLUTTET,
             orgnummer = a1
         )
-        assertTilstander(1.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_HISTORIKK, orgnummer = a2)
+        assertTilstander(1.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_HISTORIKK, orgnummer = a2)
     }
 
     @Test

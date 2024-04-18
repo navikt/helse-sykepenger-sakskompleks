@@ -17,6 +17,7 @@ import no.nav.helse.mars
 import no.nav.helse.november
 import no.nav.helse.person.PersonObserver
 import no.nav.helse.person.TilstandType
+import no.nav.helse.person.TilstandType.*
 import no.nav.helse.person.inntekt.Refusjonsopplysning
 import no.nav.helse.spleis.e2e.AbstractEndToEndTest
 import no.nav.helse.spleis.e2e.OverstyrtArbeidsgiveropplysning
@@ -62,11 +63,7 @@ internal class OppdaterteArbeidsgiveropplysningerTest: AbstractEndToEndTest() {
             )
         )
 
-        assertTilstander(1.vedtaksperiode,
-            TilstandType.START,
-            TilstandType.AVVENTER_INFOTRYGDHISTORIKK,
-            TilstandType.AVVENTER_INNTEKTSMELDING
-        )
+        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_INNTEKTSMELDING)
         assertEquals(2, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.size)
         val actualForespørsel = observatør.trengerArbeidsgiveropplysningerVedtaksperioder.last()
         assertEquals(expectedForespørsel, actualForespørsel)
@@ -94,11 +91,7 @@ internal class OppdaterteArbeidsgiveropplysningerTest: AbstractEndToEndTest() {
             )
         )
 
-        assertTilstander(1.vedtaksperiode,
-            TilstandType.START,
-            TilstandType.AVVENTER_INFOTRYGDHISTORIKK,
-            TilstandType.AVVENTER_INNTEKTSMELDING
-        )
+        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_INNTEKTSMELDING)
         assertEquals(2, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.size)
         val actualForespørsel = observatør.trengerArbeidsgiveropplysningerVedtaksperioder.last()
         assertEquals(expectedForespørsel, actualForespørsel)
@@ -370,13 +363,13 @@ internal class OppdaterteArbeidsgiveropplysningerTest: AbstractEndToEndTest() {
         nyPeriode(1.mars til 31.mars)
         håndterInntektsmelding(listOf(1.mars til 31.mars))
 
-        assertTilstand(2.vedtaksperiode, TilstandType.AVVENTER_BLOKKERENDE_PERIODE)
+        assertTilstand(2.vedtaksperiode, AVVENTER_BLOKKERENDE_PERIODE)
         assertEquals(2, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.size)
 
         håndterInntektsmelding(listOf(1.januar til 31.januar))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
 
-        assertTilstand(2.vedtaksperiode, TilstandType.AVVENTER_BLOKKERENDE_PERIODE)
+        assertTilstand(2.vedtaksperiode, AVVENTER_BLOKKERENDE_PERIODE)
         assertEquals(2, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.size)
     }
 }

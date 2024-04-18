@@ -23,6 +23,7 @@ import no.nav.helse.person.TilstandType.AVVENTER_GODKJENNING
 import no.nav.helse.person.TilstandType.AVVENTER_HISTORIKK
 import no.nav.helse.person.TilstandType.AVVENTER_INFOTRYGDHISTORIKK
 import no.nav.helse.person.TilstandType.AVVENTER_INNTEKTSMELDING
+import no.nav.helse.person.TilstandType.AVVENTER_INNTEKTSMELDING_REPLAY
 import no.nav.helse.person.TilstandType.AVVENTER_SIMULERING
 import no.nav.helse.person.TilstandType.AVVENTER_VILKÅRSPRØVING
 import no.nav.helse.person.TilstandType.START
@@ -73,6 +74,7 @@ internal class KunEnArbeidsgiverTest : AbstractDslTest() {
             1.vedtaksperiode,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
@@ -115,7 +117,7 @@ internal class KunEnArbeidsgiverTest : AbstractDslTest() {
             1.vedtaksperiode,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
-            AVVENTER_INNTEKTSMELDING,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVSLUTTET_UTEN_UTBETALING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVSLUTTET_UTEN_UTBETALING
@@ -123,7 +125,7 @@ internal class KunEnArbeidsgiverTest : AbstractDslTest() {
         assertTilstander(
             2.vedtaksperiode,
             START,
-            AVVENTER_INNTEKTSMELDING,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVSLUTTET_UTEN_UTBETALING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVSLUTTET_UTEN_UTBETALING
@@ -131,6 +133,7 @@ internal class KunEnArbeidsgiverTest : AbstractDslTest() {
         assertTilstander(
             3.vedtaksperiode,
             START,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
@@ -165,7 +168,7 @@ internal class KunEnArbeidsgiverTest : AbstractDslTest() {
             1.vedtaksperiode,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
-            AVVENTER_INNTEKTSMELDING,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVSLUTTET_UTEN_UTBETALING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVSLUTTET_UTEN_UTBETALING
@@ -173,7 +176,7 @@ internal class KunEnArbeidsgiverTest : AbstractDslTest() {
         assertTilstander(
             2.vedtaksperiode,
             START,
-            AVVENTER_INNTEKTSMELDING,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVSLUTTET_UTEN_UTBETALING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVSLUTTET_UTEN_UTBETALING
@@ -181,6 +184,7 @@ internal class KunEnArbeidsgiverTest : AbstractDslTest() {
         assertTilstander(
             3.vedtaksperiode,
             START,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
@@ -211,6 +215,7 @@ internal class KunEnArbeidsgiverTest : AbstractDslTest() {
             1.vedtaksperiode,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
@@ -255,6 +260,7 @@ internal class KunEnArbeidsgiverTest : AbstractDslTest() {
             1.vedtaksperiode,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
@@ -402,6 +408,7 @@ internal class KunEnArbeidsgiverTest : AbstractDslTest() {
             1.vedtaksperiode,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
@@ -414,6 +421,7 @@ internal class KunEnArbeidsgiverTest : AbstractDslTest() {
         assertTilstander(
             2.vedtaksperiode,
             START,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
@@ -458,6 +466,7 @@ internal class KunEnArbeidsgiverTest : AbstractDslTest() {
             1.vedtaksperiode,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
@@ -470,6 +479,7 @@ internal class KunEnArbeidsgiverTest : AbstractDslTest() {
         assertTilstander(
             2.vedtaksperiode,
             START,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
@@ -497,11 +507,11 @@ internal class KunEnArbeidsgiverTest : AbstractDslTest() {
         assertIngenFunksjonelleFeil()
         assertActivities()
         assertNotNull(inspektør.sisteMaksdato(2.vedtaksperiode))
-        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING, AVSLUTTET_UTEN_UTBETALING, AVVENTER_BLOKKERENDE_PERIODE, AVSLUTTET_UTEN_UTBETALING)
+        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING_REPLAY, AVSLUTTET_UTEN_UTBETALING, AVVENTER_BLOKKERENDE_PERIODE, AVSLUTTET_UTEN_UTBETALING)
         assertTilstander(
             2.vedtaksperiode,
             START,
-            AVVENTER_INNTEKTSMELDING,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
             AVVENTER_HISTORIKK,
@@ -542,6 +552,7 @@ internal class KunEnArbeidsgiverTest : AbstractDslTest() {
             1.vedtaksperiode,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
@@ -582,6 +593,7 @@ internal class KunEnArbeidsgiverTest : AbstractDslTest() {
             1.vedtaksperiode,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
@@ -614,6 +626,7 @@ internal class KunEnArbeidsgiverTest : AbstractDslTest() {
             1.vedtaksperiode,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
@@ -652,7 +665,7 @@ internal class KunEnArbeidsgiverTest : AbstractDslTest() {
     fun `Person uten skjæringstidspunkt feiler ikke i validering av Utbetalingshistorikk`() {
         håndterSykmelding(Sykmeldingsperiode(23.oktober(2020), 18.november(2020)))
         håndterSøknad(Sykdom(23.oktober(2020), 18.november(2020), 100.prosent), Ferie(23.oktober(2020), 18.november(2020)))
-        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING, AVSLUTTET_UTEN_UTBETALING)
+        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING_REPLAY, AVSLUTTET_UTEN_UTBETALING)
     }
 
     @Test

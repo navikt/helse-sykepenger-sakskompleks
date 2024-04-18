@@ -36,7 +36,7 @@ internal class KunEnArbeidsgiverMediatorTest : AbstractEndToEndMediatorTest() {
         assertTilstander(
             0,
             "AVVENTER_INFOTRYGDHISTORIKK",
-            "AVVENTER_INNTEKTSMELDING",
+            "AVVENTER_INNTEKTSMELDING_REPLAY",
             "AVSLUTTET_UTEN_UTBETALING"
         )
     }
@@ -57,6 +57,7 @@ internal class KunEnArbeidsgiverMediatorTest : AbstractEndToEndMediatorTest() {
         assertTilstander(
             0,
             "AVVENTER_INFOTRYGDHISTORIKK",
+            "AVVENTER_INNTEKTSMELDING_REPLAY",
             "AVVENTER_INNTEKTSMELDING",
             "AVVENTER_BLOKKERENDE_PERIODE",
             "AVVENTER_VILKÅRSPRØVING",
@@ -79,7 +80,7 @@ internal class KunEnArbeidsgiverMediatorTest : AbstractEndToEndMediatorTest() {
         assertTilstander(
             0,
             "AVVENTER_INFOTRYGDHISTORIKK",
-            "AVVENTER_INNTEKTSMELDING",
+            "AVVENTER_INNTEKTSMELDING_REPLAY",
             "AVSLUTTET_UTEN_UTBETALING",
             "AVVENTER_BLOKKERENDE_PERIODE",
             "AVSLUTTET_UTEN_UTBETALING"
@@ -97,7 +98,7 @@ internal class KunEnArbeidsgiverMediatorTest : AbstractEndToEndMediatorTest() {
         assertTilstander(
             0,
             "AVVENTER_INFOTRYGDHISTORIKK",
-            "AVVENTER_INNTEKTSMELDING",
+            "AVVENTER_INNTEKTSMELDING_REPLAY",
             "AVSLUTTET_UTEN_UTBETALING",
             "AVVENTER_BLOKKERENDE_PERIODE",
             "AVSLUTTET_UTEN_UTBETALING"
@@ -119,6 +120,7 @@ internal class KunEnArbeidsgiverMediatorTest : AbstractEndToEndMediatorTest() {
         assertTilstander(
             0,
             "AVVENTER_INFOTRYGDHISTORIKK",
+            "AVVENTER_INNTEKTSMELDING_REPLAY",
             "AVVENTER_INNTEKTSMELDING",
             "AVVENTER_BLOKKERENDE_PERIODE",
             "AVVENTER_VILKÅRSPRØVING",
@@ -148,6 +150,7 @@ internal class KunEnArbeidsgiverMediatorTest : AbstractEndToEndMediatorTest() {
         assertTilstander(
             0,
             "AVVENTER_INFOTRYGDHISTORIKK",
+            "AVVENTER_INNTEKTSMELDING_REPLAY",
             "AVVENTER_INNTEKTSMELDING",
             "AVVENTER_BLOKKERENDE_PERIODE",
             "AVVENTER_VILKÅRSPRØVING",
@@ -180,6 +183,7 @@ internal class KunEnArbeidsgiverMediatorTest : AbstractEndToEndMediatorTest() {
         assertTilstander(
             0,
             "AVVENTER_INFOTRYGDHISTORIKK",
+            "AVVENTER_INNTEKTSMELDING_REPLAY",
             "AVVENTER_INNTEKTSMELDING",
             "AVVENTER_BLOKKERENDE_PERIODE",
             "AVVENTER_VILKÅRSPRØVING",
@@ -208,6 +212,7 @@ internal class KunEnArbeidsgiverMediatorTest : AbstractEndToEndMediatorTest() {
         assertTilstander(
             0,
             "AVVENTER_INFOTRYGDHISTORIKK",
+            "AVVENTER_INNTEKTSMELDING_REPLAY",
             "AVVENTER_INNTEKTSMELDING",
             "AVVENTER_BLOKKERENDE_PERIODE",
             "AVVENTER_VILKÅRSPRØVING",
@@ -238,6 +243,7 @@ internal class KunEnArbeidsgiverMediatorTest : AbstractEndToEndMediatorTest() {
         assertTilstander(
             0,
             "AVVENTER_INFOTRYGDHISTORIKK",
+            "AVVENTER_INNTEKTSMELDING_REPLAY",
             "AVVENTER_INNTEKTSMELDING",
             "AVVENTER_BLOKKERENDE_PERIODE",
             "AVVENTER_VILKÅRSPRØVING",
@@ -296,6 +302,7 @@ internal class KunEnArbeidsgiverMediatorTest : AbstractEndToEndMediatorTest() {
         assertTilstander(
             0,
             "AVVENTER_INFOTRYGDHISTORIKK",
+            "AVVENTER_INNTEKTSMELDING_REPLAY",
             "AVVENTER_INNTEKTSMELDING",
             "AVVENTER_BLOKKERENDE_PERIODE",
             "AVVENTER_VILKÅRSPRØVING",
@@ -335,6 +342,7 @@ internal class KunEnArbeidsgiverMediatorTest : AbstractEndToEndMediatorTest() {
         assertForkastedeTilstander(
             0,
             "AVVENTER_INFOTRYGDHISTORIKK",
+            "AVVENTER_INNTEKTSMELDING_REPLAY",
             "AVVENTER_INNTEKTSMELDING",
             "TIL_INFOTRYGD"
         )
@@ -353,6 +361,7 @@ internal class KunEnArbeidsgiverMediatorTest : AbstractEndToEndMediatorTest() {
         assertTilstander(
             0,
             "AVVENTER_INFOTRYGDHISTORIKK",
+            "AVVENTER_INNTEKTSMELDING_REPLAY",
             "AVVENTER_INNTEKTSMELDING",
             "AVVENTER_BLOKKERENDE_PERIODE",
             "AVVENTER_VILKÅRSPRØVING",
@@ -372,7 +381,7 @@ internal class KunEnArbeidsgiverMediatorTest : AbstractEndToEndMediatorTest() {
         assertTilstander(
             0,
             "AVVENTER_INFOTRYGDHISTORIKK",
-            "AVVENTER_INNTEKTSMELDING",
+            "AVVENTER_INNTEKTSMELDING_REPLAY",
             "AVVENTER_BLOKKERENDE_PERIODE",
             "AVVENTER_VILKÅRSPRØVING",
             "AVVENTER_HISTORIKK")
@@ -467,6 +476,7 @@ internal class KunEnArbeidsgiverMediatorTest : AbstractEndToEndMediatorTest() {
         assertTilstander(
             0,
             "AVVENTER_INFOTRYGDHISTORIKK",
+            "AVVENTER_INNTEKTSMELDING_REPLAY",
             "AVVENTER_INNTEKTSMELDING",
             "AVVENTER_BLOKKERENDE_PERIODE",
             "AVVENTER_VILKÅRSPRØVING",

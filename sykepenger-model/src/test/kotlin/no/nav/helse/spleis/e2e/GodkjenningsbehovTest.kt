@@ -187,6 +187,7 @@ internal class GodkjenningsbehovTest : AbstractEndToEndTest() {
     @Test
     fun `kan avvise en out of order rett i forkant av en utbetalt periode`() {
         nyttVedtak(1.februar, 28.februar)
+        // fikses via gjenopptaBehandling
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent))
         assertSisteTilstand(1.vedtaksperiode, AVVENTER_REVURDERING)
         assertSisteTilstand(2.vedtaksperiode, AVVENTER_VILKÅRSPRØVING)

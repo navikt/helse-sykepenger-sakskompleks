@@ -38,6 +38,6 @@ internal class AndreInntektskilderTest : AbstractEndToEndMediatorTest() {
             ikkeJobbetIDetSisteFraAnnetArbeidsforhold = true,
         )
 
-        assertTilstander(0, "AVVENTER_INFOTRYGDHISTORIKK", "AVVENTER_INNTEKTSMELDING")
+        assertTilstander(0, "AVVENTER_INFOTRYGDHISTORIKK", "AVVENTER_INNTEKTSMELDING_REPLAY", "AVVENTER_INNTEKTSMELDING")
     }
 }

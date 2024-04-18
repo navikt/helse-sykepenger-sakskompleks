@@ -5,6 +5,7 @@ import java.time.LocalDateTime
 import java.util.UUID
 import no.nav.helse.etterlevelse.SubsumsjonObserver.Companion.NullObserver
 import no.nav.helse.hendelser.Inntektsmelding
+import no.nav.helse.hendelser.InntektsmeldingReplayUtført
 import no.nav.helse.hendelser.Periode
 import no.nav.helse.hendelser.Sykmeldingsperiode
 import no.nav.helse.hendelser.Søknad.Søknadsperiode
@@ -69,6 +70,7 @@ internal class InntektsmeldingHendelseTest : AbstractPersonTest() {
         ), besvart = LocalDateTime.now()))
         person.håndter(sykmelding(Sykmeldingsperiode(6.januar, 20.januar)))
         person.håndter(søknad(Sykdom(6.januar, 20.januar, 100.prosent)))
+        person.håndter(InntektsmeldingReplayUtført(UUID.randomUUID(), UNG_PERSON_FNR_2018.toString(), AKTØRID, ORGNUMMER, 1.vedtaksperiode.id(ORGNUMMER)))
         person.håndter(inntektsmelding)
         assertEquals(TilstandType.AVVENTER_VILKÅRSPRØVING, inspektør.sisteTilstand(1.vedtaksperiode))
     }

@@ -13,6 +13,7 @@ import no.nav.helse.person.TilstandType.AVVENTER_BLOKKERENDE_PERIODE
 import no.nav.helse.person.TilstandType.AVVENTER_GODKJENNING
 import no.nav.helse.person.TilstandType.AVVENTER_INFOTRYGDHISTORIKK
 import no.nav.helse.person.TilstandType.AVVENTER_INNTEKTSMELDING
+import no.nav.helse.person.TilstandType.AVVENTER_INNTEKTSMELDING_REPLAY
 import no.nav.helse.person.TilstandType.AVVENTER_VILKÅRSPRØVING
 import no.nav.helse.person.TilstandType.START
 import no.nav.helse.økonomi.Prosentdel.Companion.prosent
@@ -27,7 +28,7 @@ internal class BerOmInntektsmeldingTest : AbstractEndToEndTest() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 15.januar))
         håndterSøknad(Sykdom(1.januar, 15.januar, 100.prosent))
         assertIngenFunksjonelleFeil()
-        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING, AVSLUTTET_UTEN_UTBETALING)
+        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING_REPLAY, AVSLUTTET_UTEN_UTBETALING)
         assertEquals(0, observatør.manglendeInntektsmeldingVedtaksperioder.size)
     }
 
@@ -44,7 +45,7 @@ internal class BerOmInntektsmeldingTest : AbstractEndToEndTest() {
         val søknadId = håndterSøknad(Sykdom(1.mars, 15.mars, 100.prosent), orgnummer = a2)
 
         assertSisteTilstand(1.vedtaksperiode, AVVENTER_GODKJENNING, orgnummer = a1)
-        assertTilstander(1.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, AVSLUTTET_UTEN_UTBETALING, orgnummer = a2)
+        assertTilstander(1.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVSLUTTET_UTEN_UTBETALING, orgnummer = a2)
         assertEquals(1, observatør.manglendeInntektsmeldingVedtaksperioder.size)
         assertTrue(observatør.manglendeInntektsmeldingVedtaksperioder.none { event ->
             søknadId in event.søknadIder
@@ -61,6 +62,7 @@ internal class BerOmInntektsmeldingTest : AbstractEndToEndTest() {
             1.vedtaksperiode,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
         )
         assertEquals(1, observatør.manglendeInntektsmeldingVedtaksperioder.size)
@@ -86,8 +88,8 @@ internal class BerOmInntektsmeldingTest : AbstractEndToEndTest() {
         håndterSøknad(Sykdom(1.februar, 28.februar, 100.prosent))
 
         assertIngenFunksjonelleFeil()
-        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING)
-        assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING)
+        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_INNTEKTSMELDING)
+        assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_INNTEKTSMELDING)
         assertEquals(1, observatør.manglendeInntektsmeldingVedtaksperioder.size)
         assertEquals(
             PersonObserver.ManglendeInntektsmeldingEvent(
@@ -113,6 +115,7 @@ internal class BerOmInntektsmeldingTest : AbstractEndToEndTest() {
             1.vedtaksperiode,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING
@@ -132,6 +135,7 @@ internal class BerOmInntektsmeldingTest : AbstractEndToEndTest() {
         assertTilstander(
             2.vedtaksperiode,
             START,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
         )

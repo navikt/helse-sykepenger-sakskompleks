@@ -12,7 +12,6 @@ import no.nav.helse.hendelser.ArbeidsgiverInntekt
 import no.nav.helse.hendelser.Dagtype.Feriedag
 import no.nav.helse.hendelser.Dagtype.Permisjonsdag
 import no.nav.helse.hendelser.InntektForSykepengegrunnlag
-import no.nav.helse.hendelser.Inntektsmelding
 import no.nav.helse.hendelser.Inntektsmelding.Refusjon
 import no.nav.helse.hendelser.ManuellOverskrivingDag
 import no.nav.helse.hendelser.Periode
@@ -41,6 +40,7 @@ import no.nav.helse.person.TilstandType.AVVENTER_HISTORIKK
 import no.nav.helse.person.TilstandType.AVVENTER_HISTORIKK_REVURDERING
 import no.nav.helse.person.TilstandType.AVVENTER_INFOTRYGDHISTORIKK
 import no.nav.helse.person.TilstandType.AVVENTER_INNTEKTSMELDING
+import no.nav.helse.person.TilstandType.AVVENTER_INNTEKTSMELDING_REPLAY
 import no.nav.helse.person.TilstandType.AVVENTER_REVURDERING
 import no.nav.helse.person.TilstandType.AVVENTER_SIMULERING
 import no.nav.helse.person.TilstandType.AVVENTER_SIMULERING_REVURDERING
@@ -202,8 +202,8 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
         håndterSøknad(Sykdom(16.februar, 27.februar, 100.prosent))
 
         håndterInntektsmelding(listOf(1.februar til 16.februar), førsteFraværsdag = 1.januar)
-        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING, AVSLUTTET_UTEN_UTBETALING, AVVENTER_BLOKKERENDE_PERIODE, AVSLUTTET_UTEN_UTBETALING)
-        assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_VILKÅRSPRØVING)
+        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING_REPLAY, AVSLUTTET_UTEN_UTBETALING, AVVENTER_BLOKKERENDE_PERIODE, AVSLUTTET_UTEN_UTBETALING)
+        assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_INNTEKTSMELDING, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_VILKÅRSPRØVING)
     }
 
     @Test
@@ -253,11 +253,11 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
         val inntektsmelding2 = UUID.randomUUID()
 
         nyPeriode(20.mars.somPeriode())
-        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING, AVSLUTTET_UTEN_UTBETALING)
+        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING_REPLAY, AVSLUTTET_UTEN_UTBETALING)
 
         // Inntektsmelding treffer ikke (litt kødden siden den bare er 12 dager..)
         håndterInntektsmelding(listOf(5.mars til 16.mars), id = inntektsmelding1)
-        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING, AVSLUTTET_UTEN_UTBETALING)
+        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING_REPLAY, AVSLUTTET_UTEN_UTBETALING)
         assertHarIkkeHendelseIder(1.vedtaksperiode, inntektsmelding1)
 
         // Arbeidsgiver bare kødda, dette er riktig inntektsmelding
@@ -273,7 +273,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
                 1.vedtaksperiode,
                 START,
                 AVVENTER_INFOTRYGDHISTORIKK,
-                AVVENTER_INNTEKTSMELDING,
+                AVVENTER_INNTEKTSMELDING_REPLAY,
                 AVSLUTTET_UTEN_UTBETALING,
                 AVVENTER_INNTEKTSMELDING,
                 AVVENTER_BLOKKERENDE_PERIODE,
@@ -292,7 +292,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
         }
 
         assertEquals(listOf(1.mars til 6.mars, 10.mars til 19.mars), inspektør.arbeidsgiverperioder(1.vedtaksperiode))
-        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING, AVSLUTTET_UTEN_UTBETALING, AVVENTER_INNTEKTSMELDING, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_VILKÅRSPRØVING)
+        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING_REPLAY, AVSLUTTET_UTEN_UTBETALING, AVVENTER_INNTEKTSMELDING, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_VILKÅRSPRØVING)
     }
 
     @Test
@@ -516,8 +516,8 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
         håndterSøknad(Sykdom(9.januar, 19.januar, 100.prosent))
         håndterInntektsmelding(listOf(9.januar til 19.januar, 23.januar til 27.januar), førsteFraværsdag = 23.januar)
 
-        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING, AVSLUTTET_UTEN_UTBETALING)
-        assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING)
+        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING_REPLAY, AVSLUTTET_UTEN_UTBETALING)
+        assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_INNTEKTSMELDING)
 
         assertEquals(listOf(1.januar til 6.januar, 9.januar til 18.januar), inspektør.arbeidsgiverperioder(1.vedtaksperiode))
         assertEquals(listOf(1.januar til 6.januar, 9.januar til 18.januar), inspektør.arbeidsgiverperioder(2.vedtaksperiode))
@@ -546,7 +546,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
         håndterVilkårsgrunnlag(2.vedtaksperiode)
         håndterYtelser(2.vedtaksperiode)
 
-        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING, AVSLUTTET_UTEN_UTBETALING)
+        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING_REPLAY, AVSLUTTET_UTEN_UTBETALING)
         assertForventetFeil(
             forklaring = "Inntektsmelding forteller _implisitt_ at 1.jan-6.jan er arbeidsdager. Dagene henger igjen som sykedager i modellen." +
                     "De spredte sykedagene er innenfor 16 dager fra hverandre, slik at de teller med i samme arbeidsgiverperiodetelling." +
@@ -556,6 +556,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
                 assertTilstander(
                     2.vedtaksperiode,
                     START,
+                    AVVENTER_INNTEKTSMELDING_REPLAY,
                     AVVENTER_INNTEKTSMELDING,
                     AVVENTER_BLOKKERENDE_PERIODE,
                     AVVENTER_VILKÅRSPRØVING,
@@ -645,6 +646,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
             1.vedtaksperiode,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
@@ -702,6 +704,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
             1.vedtaksperiode,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
@@ -713,11 +716,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
             AVVENTER_REVURDERING,
             AVVENTER_HISTORIKK_REVURDERING
         )
-        assertTilstander(
-            2.vedtaksperiode,
-            START,
-            AVVENTER_INNTEKTSMELDING
-        )
+        assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_INNTEKTSMELDING)
     }
 
     @Test
@@ -766,6 +765,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
         assertTilstander(
             3.vedtaksperiode,
             START,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVSLUTTET_UTEN_UTBETALING
         )
@@ -774,6 +774,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
         assertTilstander(
             4.vedtaksperiode,
             START,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
@@ -826,6 +827,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
         assertTilstander(
             3.vedtaksperiode,
             START,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVSLUTTET_UTEN_UTBETALING
         )
@@ -834,6 +836,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
         assertTilstander(
             4.vedtaksperiode,
             START,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
@@ -869,6 +872,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
         assertTilstander(
             3.vedtaksperiode,
             START,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
@@ -894,6 +898,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
             1.vedtaksperiode,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
@@ -907,13 +912,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
         håndterInntektsmelding(listOf(Periode(1.mars, 16.mars)), 1.mars)
         håndterSykmelding(Sykmeldingsperiode(1.mars, 31.mars))
         håndterSøknad(Sykdom(1.mars, 31.mars, 100.prosent))
-        assertTilstander(
-            2.vedtaksperiode,
-            START,
-            AVVENTER_INNTEKTSMELDING,
-            AVVENTER_BLOKKERENDE_PERIODE,
-            AVVENTER_VILKÅRSPRØVING
-        )
+        assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_VILKÅRSPRØVING)
         assertIngenVarsler()
     }
 
@@ -927,21 +926,8 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
         håndterSøknad(Sykdom(1.januar, 20.januar, 100.prosent))
         håndterSykmelding(Sykmeldingsperiode(21.januar, 31.januar))
         håndterSøknad(Sykdom(21.januar, 31.januar, 100.prosent))
-        assertTilstander(
-            1.vedtaksperiode,
-            START,
-            AVVENTER_INFOTRYGDHISTORIKK,
-            AVVENTER_INNTEKTSMELDING,
-            AVSLUTTET_UTEN_UTBETALING
-        )
-
-        assertTilstander(
-            2.vedtaksperiode,
-            START,
-            AVVENTER_INNTEKTSMELDING,
-            AVVENTER_BLOKKERENDE_PERIODE,
-            AVVENTER_VILKÅRSPRØVING
-        )
+        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING_REPLAY, AVSLUTTET_UTEN_UTBETALING)
+        assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_VILKÅRSPRØVING)
     }
 
     @Test
@@ -955,21 +941,8 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
         håndterSøknad(Sykdom(1.januar, 20.januar, 100.prosent))
         håndterSøknad(Sykdom(21.januar, 31.januar, 100.prosent))
 
-        assertTilstander(
-            1.vedtaksperiode,
-            START,
-            AVVENTER_INFOTRYGDHISTORIKK,
-            AVVENTER_INNTEKTSMELDING,
-            AVSLUTTET_UTEN_UTBETALING
-        )
-
-        assertTilstander(
-            2.vedtaksperiode,
-            START,
-            AVVENTER_INNTEKTSMELDING,
-            AVVENTER_BLOKKERENDE_PERIODE,
-            AVVENTER_VILKÅRSPRØVING
-        )
+        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING_REPLAY, AVSLUTTET_UTEN_UTBETALING)
+        assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_VILKÅRSPRØVING)
     }
 
     @Test
@@ -1039,9 +1012,9 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
             harOpphørAvNaturalytelser = true
         )
 
-        assertForkastetPeriodeTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING, AVSLUTTET_UTEN_UTBETALING, TIL_INFOTRYGD)
-        assertForkastetPeriodeTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, AVSLUTTET_UTEN_UTBETALING, TIL_INFOTRYGD)
-        assertForkastetPeriodeTilstander(3.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, TIL_INFOTRYGD)
+        assertForkastetPeriodeTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING_REPLAY, AVSLUTTET_UTEN_UTBETALING, TIL_INFOTRYGD)
+        assertForkastetPeriodeTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVSLUTTET_UTEN_UTBETALING, TIL_INFOTRYGD)
+        assertForkastetPeriodeTilstander(3.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_INNTEKTSMELDING, TIL_INFOTRYGD)
     }
 
     @Test
@@ -1057,9 +1030,9 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
             harOpphørAvNaturalytelser = true
         )
 
-        assertForkastetPeriodeTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING, AVSLUTTET_UTEN_UTBETALING, TIL_INFOTRYGD)
-        assertForkastetPeriodeTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, TIL_INFOTRYGD)
-        assertForkastetPeriodeTilstander(3.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, TIL_INFOTRYGD)
+        assertForkastetPeriodeTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING_REPLAY, AVSLUTTET_UTEN_UTBETALING, TIL_INFOTRYGD)
+        assertForkastetPeriodeTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_INNTEKTSMELDING, TIL_INFOTRYGD)
+        assertForkastetPeriodeTilstander(3.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_INNTEKTSMELDING, TIL_INFOTRYGD)
     }
 
     @Test
@@ -1256,13 +1229,14 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
         håndterSykmelding(Sykmeldingsperiode(10.desember, 14.desember))
         håndterSøknad(Sykdom(10.desember, 14.desember, 100.prosent))
 
-        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING, AVSLUTTET_UTEN_UTBETALING)
+        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING_REPLAY, AVSLUTTET_UTEN_UTBETALING)
         assertTilstander(
             2.vedtaksperiode,
             START,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
         )
-        assertTilstander(3.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, AVSLUTTET_UTEN_UTBETALING)
+        assertTilstander(3.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVSLUTTET_UTEN_UTBETALING)
     }
 
     @Test
@@ -1277,7 +1251,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
             1.vedtaksperiode,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
-            AVVENTER_INNTEKTSMELDING,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVSLUTTET_UTEN_UTBETALING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVSLUTTET_UTEN_UTBETALING
@@ -1285,6 +1259,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
         assertTilstander(
             2.vedtaksperiode,
             START,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING
@@ -1326,7 +1301,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
 
         assertTilstander(1.vedtaksperiode, AVVENTER_SIMULERING, AVVENTER_BLOKKERENDE_PERIODE, orgnummer = a1)
         assertTilstander(1.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING, orgnummer = a2)
-        assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, orgnummer = a2)
+        assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_INNTEKTSMELDING, orgnummer = a2)
         assertForventetFeil(
             forklaring = "Fordi vi allerede har vilkårsprøvd skjæringstidspunktet mener vi at vi har " +
                     "'nødvendig inntekt for vilkårsprøving' for alle arbeidsgiverne, slik at periode 1 hos ag1 går derfor videre til utbetaling." +
@@ -1359,9 +1334,9 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
             ),
             12.januar,
         )
-        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING, AVSLUTTET_UTEN_UTBETALING, AVVENTER_BLOKKERENDE_PERIODE, AVSLUTTET_UTEN_UTBETALING)
-        assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, AVSLUTTET_UTEN_UTBETALING, AVVENTER_BLOKKERENDE_PERIODE, AVSLUTTET_UTEN_UTBETALING)
-        assertTilstander(3.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_VILKÅRSPRØVING)
+        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING_REPLAY, AVSLUTTET_UTEN_UTBETALING, AVVENTER_BLOKKERENDE_PERIODE, AVSLUTTET_UTEN_UTBETALING)
+        assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVSLUTTET_UTEN_UTBETALING, AVVENTER_BLOKKERENDE_PERIODE, AVSLUTTET_UTEN_UTBETALING)
+        assertTilstander(3.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_INNTEKTSMELDING, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_VILKÅRSPRØVING)
     }
 
     @Test
@@ -1384,6 +1359,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
             1.vedtaksperiode,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
@@ -1419,6 +1395,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
             1.vedtaksperiode,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
@@ -1443,7 +1420,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
     fun `Opphør av naturalytelser kaster periode til infotrygd`() {
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent))
         håndterInntektsmelding(listOf(1.januar til 16.januar), 1.januar, harOpphørAvNaturalytelser = true)
-        assertForkastetPeriodeTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING, TIL_INFOTRYGD)
+        assertForkastetPeriodeTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_INNTEKTSMELDING, TIL_INFOTRYGD)
     }
 
     @Test
@@ -1466,6 +1443,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
         assertTilstander(
             2.vedtaksperiode,
             START,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
@@ -1534,11 +1512,12 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
             1.vedtaksperiode,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             TIL_INFOTRYGD
         )
-        assertForkastetPeriodeTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, AVSLUTTET_UTEN_UTBETALING, TIL_INFOTRYGD)
-        assertForkastetPeriodeTilstander(3.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, TIL_INFOTRYGD)
+        assertForkastetPeriodeTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVSLUTTET_UTEN_UTBETALING, TIL_INFOTRYGD)
+        assertForkastetPeriodeTilstander(3.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_INNTEKTSMELDING, TIL_INFOTRYGD)
     }
 
     @Test
@@ -1559,10 +1538,10 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
         håndterSykmelding(Sykmeldingsperiode(20.november(2017), 13.desember(2017)))
         håndterSøknad(Sykdom(20.november(2017), 13.desember(2017), 100.prosent))
 
-        assertForkastetPeriodeTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING, TIL_INFOTRYGD)
-        assertForkastetPeriodeTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, AVSLUTTET_UTEN_UTBETALING, TIL_INFOTRYGD)
-        assertForkastetPeriodeTilstander(3.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, AVSLUTTET_UTEN_UTBETALING, AVVENTER_BLOKKERENDE_PERIODE, TIL_INFOTRYGD)
-        assertForkastetPeriodeTilstander(4.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, AVVENTER_BLOKKERENDE_PERIODE, TIL_INFOTRYGD)
+        assertForkastetPeriodeTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_INNTEKTSMELDING, TIL_INFOTRYGD)
+        assertForkastetPeriodeTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVSLUTTET_UTEN_UTBETALING, TIL_INFOTRYGD)
+        assertForkastetPeriodeTilstander(3.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVSLUTTET_UTEN_UTBETALING, AVVENTER_BLOKKERENDE_PERIODE, TIL_INFOTRYGD)
+        assertForkastetPeriodeTilstander(4.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_BLOKKERENDE_PERIODE, TIL_INFOTRYGD)
     }
 
     @Test
@@ -1570,7 +1549,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
         håndterSøknad(Sykdom(3.januar, 26.januar, 100.prosent))
         håndterInntektsmelding(listOf(Periode(3.januar, 18.januar)), 4.januar)
         assertIngenVarsel(RV_IM_2, 1.vedtaksperiode.filter())
-        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_VILKÅRSPRØVING)
+        assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING_REPLAY, AVVENTER_INNTEKTSMELDING, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_VILKÅRSPRØVING)
     }
 
     @Test
@@ -1588,6 +1567,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
             1.vedtaksperiode,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING
@@ -1595,6 +1575,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
         assertTilstander(
             2.vedtaksperiode,
             START,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE
         )
@@ -1639,13 +1620,13 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
             1.vedtaksperiode,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
-            AVVENTER_INNTEKTSMELDING,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVSLUTTET_UTEN_UTBETALING
         )
         assertTilstander(
             2.vedtaksperiode,
             START,
-            AVVENTER_INNTEKTSMELDING,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
             AVVENTER_HISTORIKK,
@@ -1672,7 +1653,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
             1.vedtaksperiode,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
-            AVVENTER_INNTEKTSMELDING,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVSLUTTET_UTEN_UTBETALING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVSLUTTET_UTEN_UTBETALING
@@ -1680,6 +1661,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
         assertTilstander(
             2.vedtaksperiode,
             START,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING
@@ -1718,6 +1700,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
             1.vedtaksperiode,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
@@ -1781,6 +1764,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
             1.vedtaksperiode,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
@@ -1797,6 +1781,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
         assertTilstander(
             2.vedtaksperiode,
             START,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,

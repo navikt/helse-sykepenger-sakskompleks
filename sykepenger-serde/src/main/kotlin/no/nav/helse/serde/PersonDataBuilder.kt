@@ -319,6 +319,7 @@ private fun VedtaksperiodeUtDto.tilPersonData() = PersonData.ArbeidsgiverData.Ve
         VedtaksperiodetilstandDto.AVVENTER_HISTORIKK -> TilstandTypeData.AVVENTER_HISTORIKK
         VedtaksperiodetilstandDto.AVVENTER_HISTORIKK_REVURDERING -> TilstandTypeData.AVVENTER_HISTORIKK_REVURDERING
         VedtaksperiodetilstandDto.AVVENTER_INFOTRYGDHISTORIKK -> TilstandTypeData.AVVENTER_INFOTRYGDHISTORIKK
+        VedtaksperiodetilstandDto.AVVENTER_INNTEKTSMELDING_REPLAY -> TilstandTypeData.AVVENTER_INNTEKTSMELDING_REPLAY
         VedtaksperiodetilstandDto.AVVENTER_INNTEKTSMELDING -> TilstandTypeData.AVVENTER_INNTEKTSMELDING
         VedtaksperiodetilstandDto.AVVENTER_REVURDERING -> TilstandTypeData.AVVENTER_REVURDERING
         VedtaksperiodetilstandDto.AVVENTER_SIMULERING -> TilstandTypeData.AVVENTER_SIMULERING

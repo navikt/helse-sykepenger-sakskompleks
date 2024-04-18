@@ -12,6 +12,7 @@ import no.nav.helse.hendelser.Dagpenger
 import no.nav.helse.hendelser.Foreldrepenger
 import no.nav.helse.hendelser.InntektForSykepengegrunnlag
 import no.nav.helse.hendelser.Inntektsmelding
+import no.nav.helse.hendelser.InntektsmeldingReplayUtført
 import no.nav.helse.hendelser.Institusjonsopphold
 import no.nav.helse.hendelser.Medlemskapsvurdering
 import no.nav.helse.hendelser.Omsorgspenger
@@ -57,6 +58,7 @@ internal class PåminnelserOgTimeoutTest : AbstractPersonTest() {
         person.håndter(sykmelding())
         person.håndter(søknad())
         person.håndter(utbetalingshistorikk())
+        person.håndter(InntektsmeldingReplayUtført(UUID.randomUUID(), UNG_PERSON_FNR_2018.toString(), AKTØRID, ORGNUMMER, 1.vedtaksperiode.id(ORGNUMMER)))
         person.håndter(inntektsmelding())
         val antallBehovFør = hendelse.behov().size
         person.håndter(påminnelse(AVVENTER_VILKÅRSPRØVING, 1.vedtaksperiode))
@@ -71,6 +73,7 @@ internal class PåminnelserOgTimeoutTest : AbstractPersonTest() {
         person.håndter(sykmelding())
         person.håndter(søknad())
         person.håndter(utbetalingshistorikk())
+        person.håndter(InntektsmeldingReplayUtført(UUID.randomUUID(), UNG_PERSON_FNR_2018.toString(), AKTØRID, ORGNUMMER, 1.vedtaksperiode.id(ORGNUMMER)))
         person.håndter(inntektsmelding())
         person.håndter(vilkårsgrunnlag())
         assertEquals(7, hendelse.behov().size)
@@ -91,6 +94,7 @@ internal class PåminnelserOgTimeoutTest : AbstractPersonTest() {
         person.håndter(sykmelding())
         person.håndter(søknad())
         person.håndter(utbetalingshistorikk())
+        person.håndter(InntektsmeldingReplayUtført(UUID.randomUUID(), UNG_PERSON_FNR_2018.toString(), AKTØRID, ORGNUMMER, 1.vedtaksperiode.id(ORGNUMMER)))
         person.håndter(inntektsmelding())
         person.håndter(vilkårsgrunnlag())
         assertEquals(7, hendelse.behov().size)
@@ -111,6 +115,7 @@ internal class PåminnelserOgTimeoutTest : AbstractPersonTest() {
         person.håndter(sykmelding())
         person.håndter(søknad())
         person.håndter(utbetalingshistorikk())
+        person.håndter(InntektsmeldingReplayUtført(UUID.randomUUID(), UNG_PERSON_FNR_2018.toString(), AKTØRID, ORGNUMMER, 1.vedtaksperiode.id(ORGNUMMER)))
         person.håndter(inntektsmelding())
         person.håndter(vilkårsgrunnlag())
         person.håndter(ytelser())
@@ -127,6 +132,7 @@ internal class PåminnelserOgTimeoutTest : AbstractPersonTest() {
         person.håndter(sykmelding())
         person.håndter(søknad())
         person.håndter(utbetalingshistorikk())
+        person.håndter(InntektsmeldingReplayUtført(UUID.randomUUID(), UNG_PERSON_FNR_2018.toString(), AKTØRID, ORGNUMMER, 1.vedtaksperiode.id(ORGNUMMER)))
         person.håndter(inntektsmelding())
         person.håndter(vilkårsgrunnlag())
         person.håndter(ytelser())
@@ -145,6 +151,7 @@ internal class PåminnelserOgTimeoutTest : AbstractPersonTest() {
         person.håndter(sykmelding())
         person.håndter(søknad())
         person.håndter(utbetalingshistorikk())
+        person.håndter(InntektsmeldingReplayUtført(UUID.randomUUID(), UNG_PERSON_FNR_2018.toString(), AKTØRID, ORGNUMMER, 1.vedtaksperiode.id(ORGNUMMER)))
         person.håndter(inntektsmelding())
         person.håndter(vilkårsgrunnlag())
         person.håndter(ytelser())
@@ -161,6 +168,7 @@ internal class PåminnelserOgTimeoutTest : AbstractPersonTest() {
         person.håndter(sykmelding())
         person.håndter(søknad())
         person.håndter(utbetalingshistorikk())
+        person.håndter(InntektsmeldingReplayUtført(UUID.randomUUID(), UNG_PERSON_FNR_2018.toString(), AKTØRID, ORGNUMMER, 1.vedtaksperiode.id(ORGNUMMER)))
         person.håndter(inntektsmelding())
         person.håndter(vilkårsgrunnlag())
         person.håndter(påminnelse(AVVENTER_VILKÅRSPRØVING, 1.vedtaksperiode))

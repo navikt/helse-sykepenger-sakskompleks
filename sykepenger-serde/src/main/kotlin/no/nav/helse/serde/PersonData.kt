@@ -699,6 +699,7 @@ data class PersonData(
                 REVURDERING_FEILET,
                 START,
                 AVVENTER_INFOTRYGDHISTORIKK,
+                AVVENTER_INNTEKTSMELDING_REPLAY,
                 AVVENTER_INNTEKTSMELDING,
                 AVVENTER_BLOKKERENDE_PERIODE,
                 AVVENTER_VILKÅRSPRØVING,
@@ -722,6 +723,7 @@ data class PersonData(
                     TilstandTypeData.REVURDERING_FEILET -> VedtaksperiodetilstandDto.REVURDERING_FEILET
                     TilstandTypeData.START -> VedtaksperiodetilstandDto.START
                     TilstandTypeData.AVVENTER_INFOTRYGDHISTORIKK -> VedtaksperiodetilstandDto.AVVENTER_INFOTRYGDHISTORIKK
+                    TilstandTypeData.AVVENTER_INNTEKTSMELDING_REPLAY -> VedtaksperiodetilstandDto.AVVENTER_INNTEKTSMELDING_REPLAY
                     TilstandTypeData.AVVENTER_INNTEKTSMELDING -> VedtaksperiodetilstandDto.AVVENTER_INNTEKTSMELDING
                     TilstandTypeData.AVVENTER_BLOKKERENDE_PERIODE -> VedtaksperiodetilstandDto.AVVENTER_BLOKKERENDE_PERIODE
                     TilstandTypeData.AVVENTER_VILKÅRSPRØVING -> VedtaksperiodetilstandDto.AVVENTER_VILKÅRSPRØVING

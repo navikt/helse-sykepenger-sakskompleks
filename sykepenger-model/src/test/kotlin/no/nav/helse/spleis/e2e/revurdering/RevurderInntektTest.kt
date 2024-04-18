@@ -23,6 +23,7 @@ import no.nav.helse.person.TilstandType.AVVENTER_HISTORIKK
 import no.nav.helse.person.TilstandType.AVVENTER_HISTORIKK_REVURDERING
 import no.nav.helse.person.TilstandType.AVVENTER_INFOTRYGDHISTORIKK
 import no.nav.helse.person.TilstandType.AVVENTER_INNTEKTSMELDING
+import no.nav.helse.person.TilstandType.AVVENTER_INNTEKTSMELDING_REPLAY
 import no.nav.helse.person.TilstandType.AVVENTER_REVURDERING
 import no.nav.helse.person.TilstandType.AVVENTER_SIMULERING
 import no.nav.helse.person.TilstandType.AVVENTER_SIMULERING_REVURDERING
@@ -91,6 +92,7 @@ internal class RevurderInntektTest : AbstractEndToEndTest() {
             1.vedtaksperiode,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
@@ -180,6 +182,7 @@ internal class RevurderInntektTest : AbstractEndToEndTest() {
             1.vedtaksperiode,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
@@ -195,6 +198,7 @@ internal class RevurderInntektTest : AbstractEndToEndTest() {
         assertTilstander(
             1,
             START,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
@@ -238,6 +242,7 @@ internal class RevurderInntektTest : AbstractEndToEndTest() {
             1.vedtaksperiode,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
@@ -261,6 +266,7 @@ internal class RevurderInntektTest : AbstractEndToEndTest() {
         assertTilstander(
             2.vedtaksperiode,
             START,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
@@ -287,6 +293,7 @@ internal class RevurderInntektTest : AbstractEndToEndTest() {
             0,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
@@ -482,7 +489,7 @@ internal class RevurderInntektTest : AbstractEndToEndTest() {
             1.vedtaksperiode,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
-            AVVENTER_INNTEKTSMELDING,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVSLUTTET_UTEN_UTBETALING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVSLUTTET_UTEN_UTBETALING,
@@ -492,6 +499,7 @@ internal class RevurderInntektTest : AbstractEndToEndTest() {
         assertTilstander(
             2.vedtaksperiode,
             START,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
@@ -535,7 +543,7 @@ internal class RevurderInntektTest : AbstractEndToEndTest() {
             1.vedtaksperiode,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
-            AVVENTER_INNTEKTSMELDING,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVSLUTTET_UTEN_UTBETALING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVSLUTTET_UTEN_UTBETALING,
@@ -545,7 +553,7 @@ internal class RevurderInntektTest : AbstractEndToEndTest() {
         assertTilstander(
             2.vedtaksperiode,
             START,
-            AVVENTER_INNTEKTSMELDING,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,
             AVVENTER_HISTORIKK,
@@ -632,6 +640,7 @@ internal class RevurderInntektTest : AbstractEndToEndTest() {
             1.vedtaksperiode,
             START,
             AVVENTER_INFOTRYGDHISTORIKK,
+            AVVENTER_INNTEKTSMELDING_REPLAY,
             AVVENTER_INNTEKTSMELDING,
             AVVENTER_BLOKKERENDE_PERIODE,
             AVVENTER_VILKÅRSPRØVING,

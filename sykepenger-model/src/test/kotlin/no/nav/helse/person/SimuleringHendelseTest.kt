@@ -12,6 +12,7 @@ import no.nav.helse.hendelser.Foreldrepenger
 import no.nav.helse.hendelser.GradertPeriode
 import no.nav.helse.hendelser.InntektForSykepengegrunnlag
 import no.nav.helse.hendelser.Inntektsmelding
+import no.nav.helse.hendelser.InntektsmeldingReplayUtført
 import no.nav.helse.hendelser.Institusjonsopphold
 import no.nav.helse.hendelser.Medlemskapsvurdering
 import no.nav.helse.hendelser.Omsorgspenger
@@ -113,6 +114,7 @@ internal class SimuleringHendelseTest : AbstractPersonTest() {
             ), besvart = LocalDateTime.now()))
         person.håndter(sykmelding())
         person.håndter(søknad())
+        person.håndter(InntektsmeldingReplayUtført(UUID.randomUUID(), UNG_PERSON_FNR_2018.toString(), AKTØRID, ORGNUMMER, 1.vedtaksperiode.id(ORGNUMMER)))
         person.håndter(inntektsmelding(refusjon))
         person.håndter(vilkårsgrunnlag())
         person.håndter(ytelser())

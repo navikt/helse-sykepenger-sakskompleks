@@ -50,6 +50,7 @@ import no.nav.helse.person.TilstandType.AVVENTER_HISTORIKK
 import no.nav.helse.person.TilstandType.AVVENTER_HISTORIKK_REVURDERING
 import no.nav.helse.person.TilstandType.AVVENTER_INFOTRYGDHISTORIKK
 import no.nav.helse.person.TilstandType.AVVENTER_INNTEKTSMELDING
+import no.nav.helse.person.TilstandType.AVVENTER_INNTEKTSMELDING_REPLAY
 import no.nav.helse.person.TilstandType.AVVENTER_REVURDERING
 import no.nav.helse.person.TilstandType.AVVENTER_SIMULERING
 import no.nav.helse.person.TilstandType.AVVENTER_SIMULERING_REVURDERING
@@ -1297,7 +1298,7 @@ internal class Vedtaksperiode private constructor(
                     !infotrygdhistorikk.harHistorikk() -> AvventerInfotrygdHistorikk
                     periodeRettFørHarFåttInntektsmelding(vedtaksperiode) -> AvventerBlokkerendePeriode
                     periodeRettEtterHarFåttInntektsmelding(vedtaksperiode, søknad) -> AvventerBlokkerendePeriode
-                    else -> AvventerInntektsmelding
+                    else -> AvventerInntektsmeldingReplay
                 }
             }
 
@@ -1357,7 +1358,7 @@ internal class Vedtaksperiode private constructor(
                         info("Oppdaget at perioden startet i infotrygd")
                         vedtaksperiode.tilstand(hendelse, AvventerBlokkerendePeriode)
                     } else {
-                        vedtaksperiode.tilstand(hendelse, AvventerInntektsmelding)
+                        vedtaksperiode.tilstand(hendelse, AvventerInntektsmeldingReplay)
                     }
                 }
             }
@@ -1551,6 +1552,62 @@ internal class Vedtaksperiode private constructor(
         }
     }
 
+    internal data object AvventerInntektsmeldingReplay : Vedtaksperiodetilstand {
+        override val type: TilstandType = AVVENTER_INNTEKTSMELDING_REPLAY
+
+        override fun entering(vedtaksperiode: Vedtaksperiode, hendelse: IAktivitetslogg) {
+            vedtaksperiode.trengerInntektsmeldingReplay()
+        }
+
+        override fun leaving(vedtaksperiode: Vedtaksperiode, hendelse: IAktivitetslogg) {
+            vedtaksperiode.person.trengerIkkeInntektsmeldingReplay(vedtaksperiode.id)
+        }
+
+        override fun igangsettOverstyring(vedtaksperiode: Vedtaksperiode, revurdering: Revurderingseventyr) {}
+
+        override fun venteårsak(vedtaksperiode: Vedtaksperiode, arbeidsgivere: List<Arbeidsgiver>) =
+            INNTEKTSMELDING.utenBegrunnelse
+
+        override fun venter(vedtaksperiode: Vedtaksperiode, arbeidsgivere: List<Arbeidsgiver>, nestemann: Vedtaksperiode): VedtaksperiodeVenter? {
+            return vedtaksperiode.vedtaksperiodeVenter(nestemann, arbeidsgivere)
+        }
+
+        override fun håndter(
+            vedtaksperiode: Vedtaksperiode,
+            søknad: Søknad,
+            arbeidsgivere: List<Arbeidsgiver>,
+            infotrygdhistorikk: Infotrygdhistorikk
+        ) = error("Forventer ikke søknad mens vi replayer IM")
+
+        override fun skalHåndtereDager(vedtaksperiode: Vedtaksperiode, dager: DagerFraInntektsmelding): Boolean {
+            return vedtaksperiode.skalHåndtereDagerAvventerInntektsmelding(dager)
+        }
+
+        override fun håndter(vedtaksperiode: Vedtaksperiode, dager: DagerFraInntektsmelding) {
+            vedtaksperiode.håndterDager(dager)
+            if (dager.harFunksjonelleFeilEllerVerre()) return vedtaksperiode.forkast(dager)
+            if (vedtaksperiode .sykdomstidslinje.egenmeldingerFraSøknad().isNotEmpty()) {
+                dager.info("Det er egenmeldingsdager fra søknaden på sykdomstidlinjen, selv etter at inntektsmeldingen har oppdatert historikken. Undersøk hvorfor inntektsmeldingen ikke har overskrevet disse. Da er kanskje denne aktørId-en til hjelp: ${vedtaksperiode.aktørId}.")
+            }
+        }
+
+        override fun håndtertInntektPåSkjæringstidspunktet(vedtaksperiode: Vedtaksperiode, hendelse: Inntektsmelding) {
+            vedtaksperiode.inntektsmeldingHåndtert(hendelse)
+        }
+
+        override fun håndter(vedtaksperiode: Vedtaksperiode, inntektsmeldingReplayUtført: InntektsmeldingReplayUtført) {
+            vurderGåVidere(vedtaksperiode, inntektsmeldingReplayUtført)
+        }
+
+        private fun vurderGåVidere(vedtaksperiode: Vedtaksperiode, hendelse: IAktivitetslogg) {
+            vedtaksperiode.tilstand(hendelse, when {
+                !vedtaksperiode.forventerInntekt() -> AvsluttetUtenUtbetaling
+                !vedtaksperiode.harTilstrekkeligInformasjonTilUtbetaling(hendelse) -> AvventerInntektsmelding
+                else -> AvventerBlokkerendePeriode
+            })
+        }
+    }
+
     internal data object AvventerInntektsmelding : Vedtaksperiodetilstand {
         override val type: TilstandType = AVVENTER_INNTEKTSMELDING
         override fun makstid(
@@ -1561,8 +1618,13 @@ internal class Vedtaksperiode private constructor(
             tilstandsendringstidspunkt.plusDays(180)
 
         override fun entering(vedtaksperiode: Vedtaksperiode, hendelse: IAktivitetslogg) {
-            vedtaksperiode.trengerInntektsmeldingReplay()
             vedtaksperiode.trengerInntektsmelding()
+            if (vedtaksperiode.trengerArbeidsgiveropplysninger(hendelse)) {
+                // ved out-of-order gir vi beskjed om at vi ikke trenger arbeidsgiveropplysninger for den seneste perioden lenger
+                vedtaksperiode.arbeidsgiver.finnVedtaksperiodeRettEtter(vedtaksperiode)?.also {
+                    it.trengerIkkeArbeidsgiveropplysninger()
+                }
+            }
         }
 
         override fun håndter(vedtaksperiode: Vedtaksperiode, hendelse: OverstyrTidslinje) {
@@ -1584,7 +1646,6 @@ internal class Vedtaksperiode private constructor(
                 "hæ?! vedtaksperiodens behandling er ikke uberegnet!"
             }
             vedtaksperiode.trengerIkkeInntektsmelding()
-            vedtaksperiode.person.trengerIkkeInntektsmeldingReplay(vedtaksperiode.id)
         }
 
         override fun skalHåndtereDager(vedtaksperiode: Vedtaksperiode, dager: DagerFraInntektsmelding): Boolean {
@@ -1640,16 +1701,6 @@ internal class Vedtaksperiode private constructor(
 
         override fun gjenopptaBehandling(vedtaksperiode: Vedtaksperiode, arbeidsgivere: Iterable<Arbeidsgiver>, hendelse: Hendelse) {
             vurderOmKanGåVidere(vedtaksperiode, hendelse)
-        }
-
-        override fun håndter(vedtaksperiode: Vedtaksperiode, inntektsmeldingReplayUtført: InntektsmeldingReplayUtført) {
-            if (vedtaksperiode.trengerArbeidsgiveropplysninger(inntektsmeldingReplayUtført)) {
-                // ved out-of-order gir vi beskjed om at vi ikke trenger arbeidsgiveropplysninger for den seneste perioden lenger
-                vedtaksperiode.arbeidsgiver.finnVedtaksperiodeRettEtter(vedtaksperiode)?.also {
-                    it.trengerIkkeArbeidsgiveropplysninger()
-                }
-            }
-            vurderOmKanGåVidere(vedtaksperiode, inntektsmeldingReplayUtført)
         }
 
         override fun inntektsmeldingFerdigbehandlet(vedtaksperiode: Vedtaksperiode, hendelse: Hendelse) {
@@ -2630,6 +2681,7 @@ internal class Vedtaksperiode private constructor(
                     VedtaksperiodetilstandDto.AVVENTER_HISTORIKK -> AvventerHistorikk
                     VedtaksperiodetilstandDto.AVVENTER_HISTORIKK_REVURDERING -> AvventerHistorikkRevurdering
                     VedtaksperiodetilstandDto.AVVENTER_INFOTRYGDHISTORIKK -> AvventerInfotrygdHistorikk
+                    VedtaksperiodetilstandDto.AVVENTER_INNTEKTSMELDING_REPLAY -> AvventerInntektsmeldingReplay
                     VedtaksperiodetilstandDto.AVVENTER_INNTEKTSMELDING -> AvventerInntektsmelding
                     VedtaksperiodetilstandDto.AVVENTER_REVURDERING -> AvventerRevurdering
                     VedtaksperiodetilstandDto.AVVENTER_SIMULERING -> AvventerSimulering
@@ -2680,6 +2732,7 @@ internal class Vedtaksperiode private constructor(
             AvventerHistorikk -> VedtaksperiodetilstandDto.AVVENTER_HISTORIKK
             AvventerHistorikkRevurdering -> VedtaksperiodetilstandDto.AVVENTER_HISTORIKK_REVURDERING
             AvventerInfotrygdHistorikk -> VedtaksperiodetilstandDto.AVVENTER_INFOTRYGDHISTORIKK
+            AvventerInntektsmeldingReplay -> VedtaksperiodetilstandDto.AVVENTER_INNTEKTSMELDING_REPLAY
             AvventerInntektsmelding -> VedtaksperiodetilstandDto.AVVENTER_INNTEKTSMELDING
             AvventerRevurdering -> VedtaksperiodetilstandDto.AVVENTER_REVURDERING
             AvventerSimulering -> VedtaksperiodetilstandDto.AVVENTER_SIMULERING

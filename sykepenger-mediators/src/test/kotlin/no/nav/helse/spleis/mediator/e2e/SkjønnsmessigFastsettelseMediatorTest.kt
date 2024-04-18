@@ -15,6 +15,7 @@ internal class SkjønnsmessigFastsettelseMediatorTest : AbstractEndToEndMediator
         assertTilstander(
             0,
             "AVVENTER_INFOTRYGDHISTORIKK",
+            "AVVENTER_INNTEKTSMELDING_REPLAY",
             "AVVENTER_INNTEKTSMELDING",
             "AVVENTER_BLOKKERENDE_PERIODE",
             "AVVENTER_VILKÅRSPRØVING",
@@ -36,6 +37,7 @@ internal class SkjønnsmessigFastsettelseMediatorTest : AbstractEndToEndMediator
         assertTilstander(
             0,
             "AVVENTER_INFOTRYGDHISTORIKK",
+            "AVVENTER_INNTEKTSMELDING_REPLAY",
             "AVVENTER_INNTEKTSMELDING",
             "AVVENTER_BLOKKERENDE_PERIODE",
             "AVVENTER_VILKÅRSPRØVING",

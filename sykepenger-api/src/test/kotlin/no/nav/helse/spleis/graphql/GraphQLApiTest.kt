@@ -834,6 +834,7 @@ internal class GraphQLApiTest : AbstractObservableTest() {
             person.håndter(sykmelding())
             person.håndter(utbetalinghistorikk())
             person.håndter(søknad())
+            person.håndter(inntektsmeldingReplayUtført())
             person.håndter(inntektsmelding())
             person.håndter(ytelser())
             person.håndter(vilkårsgrunnlag())

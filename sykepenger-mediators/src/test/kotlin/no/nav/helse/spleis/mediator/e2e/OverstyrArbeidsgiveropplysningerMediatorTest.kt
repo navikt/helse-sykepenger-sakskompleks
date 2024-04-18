@@ -40,6 +40,7 @@ internal class OverstyrArbeidsgiveropplysningerMediatorTest : AbstractEndToEndMe
         assertTilstander(
             0,
             "AVVENTER_INFOTRYGDHISTORIKK",
+            "AVVENTER_INNTEKTSMELDING_REPLAY",
             "AVVENTER_INNTEKTSMELDING",
             "AVVENTER_BLOKKERENDE_PERIODE",
             "AVVENTER_VILKÅRSPRØVING",
