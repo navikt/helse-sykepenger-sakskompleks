@@ -125,8 +125,6 @@ internal class Venteårsak private constructor(
     internal companion object {
         internal infix fun Hva.fordi(hvorfor: Hvorfor) = Venteårsak(this, hvorfor)
         internal val Hva.utenBegrunnelse get() = Venteårsak(this, null)
-        internal val Venteårsak?.venterPåInntektsmelding get() = this != null && hva == Hva.INNTEKTSMELDING
-        internal val Venteårsak?.venterPåSøknad get() = this != null && hva == Hva.SØKNAD
     }
 }
 

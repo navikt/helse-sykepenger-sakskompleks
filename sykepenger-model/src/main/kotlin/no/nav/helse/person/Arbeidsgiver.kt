@@ -43,6 +43,7 @@ import no.nav.helse.person.Vedtaksperiode.Companion.aktiveSkjæringstidspunkter
 import no.nav.helse.person.Vedtaksperiode.Companion.beregnSkjæringstidspunkter
 import no.nav.helse.person.Vedtaksperiode.Companion.checkBareEnPeriodeTilGodkjenningSamtidig
 import no.nav.helse.person.Vedtaksperiode.Companion.finnNesteVedtaksperiodeSomTrengerInntektsmelding
+import no.nav.helse.person.Vedtaksperiode.Companion.førstePeriode
 import no.nav.helse.person.Vedtaksperiode.Companion.iderMedUtbetaling
 import no.nav.helse.person.Vedtaksperiode.Companion.nestePeriodeSomSkalGjenopptas
 import no.nav.helse.person.Vedtaksperiode.Companion.nåværendeVedtaksperiode
@@ -230,6 +231,10 @@ internal class Arbeidsgiver private constructor(
         internal fun Iterable<Arbeidsgiver>.trengerInntektsmelding(hendelse: IAktivitetslogg, periode: Vedtaksperiode) = this
             .nåværendeVedtaksperioder(TRENGER_INNTEKTSMELDING(periode, hendelse))
             .isNotEmpty()
+
+        internal fun Iterable<Arbeidsgiver>.førstePeriodeSomTrengerInntektsmelding(hendelse: IAktivitetslogg, periode: Vedtaksperiode) = this
+            .nåværendeVedtaksperioder(TRENGER_INNTEKTSMELDING(periode, hendelse))
+            .førstePeriode()
 
         internal fun Iterable<Arbeidsgiver>.avventerSøknad(periode: Periode) = this
             .any { it.sykmeldingsperioder.avventerSøknad(periode) }
