@@ -42,7 +42,7 @@ internal class OmsorgspengerE2ETest : AbstractEndToEndTest() {
     fun `Periode for person der det ikke foreligger pleiepengeromsorgse blir behandlet og sendt til godkjenning`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent))
-        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)),)
+        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode, omsorgspenger = emptyList())
         håndterSimulering(1.vedtaksperiode)
@@ -56,7 +56,7 @@ internal class OmsorgspengerE2ETest : AbstractEndToEndTest() {
     fun `Periode som overlapper med pleiepengeromsorgse får varsel`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent))
-        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)),)
+        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode, omsorgspenger = listOf(GradertPeriode(1.januar til 31.januar, 100)))
         assertVarsel(Varselkode.RV_AY_7, 1.vedtaksperiode.filter())
@@ -67,7 +67,7 @@ internal class OmsorgspengerE2ETest : AbstractEndToEndTest() {
     fun `Periode som overlapper med omsorgspengerytelse i starten av perioden får varsel`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent))
-        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)),)
+        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode, omsorgspenger = listOf(GradertPeriode(1.desember(2017) til 1.januar, 100)))
         assertVarsel(Varselkode.RV_AY_7, 1.vedtaksperiode.filter())
@@ -78,7 +78,7 @@ internal class OmsorgspengerE2ETest : AbstractEndToEndTest() {
     fun `Periode som overlapper med omsorgspengerytelse i slutten av perioden får varsel`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent))
-        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)),)
+        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode, omsorgspenger = listOf(GradertPeriode(31.januar til 14.februar, 100)))
         assertVarsel(Varselkode.RV_AY_7)
@@ -89,7 +89,7 @@ internal class OmsorgspengerE2ETest : AbstractEndToEndTest() {
     fun `Omsorgspenger starter mindre enn 4 uker før sykefraværstilfellet`() {
         håndterSykmelding(Sykmeldingsperiode(3.mars, 19.mars))
         håndterSøknad(Sykdom(3.mars, 19.mars, 100.prosent))
-        håndterInntektsmelding(listOf(3.mars til 18.mars),)
+        håndterInntektsmelding(listOf(3.mars til 18.mars))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode, omsorgspenger = listOf(GradertPeriode(3.februar til 20.februar, 100)))
         assertVarsel(Varselkode.RV_AY_7)

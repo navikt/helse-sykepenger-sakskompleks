@@ -68,7 +68,7 @@ internal class SpeilBuilderTest : AbstractE2ETest() {
     @Test
     fun `nav skal ikke utbetale agp for kort periode likevel - perioden går så til AUU`() {
         håndterSøknad(1.januar til 16.januar)
-        håndterInntektsmelding(1.januar, begrunnelseForReduksjonEllerIkkeUtbetalt = "ja",)
+        håndterInntektsmelding(1.januar, begrunnelseForReduksjonEllerIkkeUtbetalt = "ja")
         håndterVilkårsgrunnlag()
         håndterYtelserTilGodkjenning()
         val idOverstyring = UUID.randomUUID()
@@ -93,7 +93,7 @@ internal class SpeilBuilderTest : AbstractE2ETest() {
     @Test
     fun `Viser inntektsgrunnlag for arbeidsforhold som startet innen 3 måneder før skjæringstidspunktet, selvom vi ikke har inntekt`() {
         håndterSøknad(Sykdom(1.januar, 15.mars, 100.prosent), orgnummer = a1)
-        håndterInntektsmelding(1.januar, orgnummer = a1,)
+        håndterInntektsmelding(1.januar, orgnummer = a1)
         håndterVilkårsgrunnlag(
             inntekter = listOf(a1 to 31000.månedlig),
             arbeidsforhold = listOf(a1 to EPOCH, a2 to 25.november(2017))
@@ -129,7 +129,7 @@ internal class SpeilBuilderTest : AbstractE2ETest() {
 
     @Test
     fun `annullert periode skal ikke ha vilkårsgrunnlagsId`() {
-        val utbetaling = nyttVedtak(1.januar, 31.januar)
+        val utbetaling = nyttVedtak(1.januar til 31.januar)
         håndterAnnullerUtbetaling(utbetaling)
         val personDto = speilApi()
         val generasjoner = personDto.arbeidsgivere.first().generasjoner
@@ -140,7 +140,7 @@ internal class SpeilBuilderTest : AbstractE2ETest() {
 
     @Test
     fun `beregnet periode peker på et vilkårsgrunnlag`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         val personDto = speilApi()
         val speilVilkårsgrunnlagId = (personDto.arbeidsgivere.first().generasjoner.first().perioder.first() as BeregnetPeriode).vilkårsgrunnlagId
         val vilkårsgrunnlag = personDto.vilkårsgrunnlag[speilVilkårsgrunnlagId]
@@ -149,7 +149,7 @@ internal class SpeilBuilderTest : AbstractE2ETest() {
 
     @Test
     fun `refusjon ligger på vilkårsgrunnlaget`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         val personDto = speilApi()
         val speilVilkårsgrunnlagId = (personDto.arbeidsgivere.first().generasjoner.first().perioder.first() as BeregnetPeriode).vilkårsgrunnlagId
         val vilkårsgrunnlag = personDto.vilkårsgrunnlag[speilVilkårsgrunnlagId] as? SpleisVilkårsgrunnlag
@@ -213,7 +213,7 @@ internal class SpeilBuilderTest : AbstractE2ETest() {
 
     @Test
     fun `korrigert inntektsmelding i Avsluttet, velger opprinnelig refusjon for eldste generasjon`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         håndterInntektsmelding(
             listOf(1.januar til 16.januar),
             refusjon = Inntektsmelding.Refusjon(20000.månedlig, null),
@@ -240,7 +240,7 @@ internal class SpeilBuilderTest : AbstractE2ETest() {
 
     @Test
     fun `Endring til ingen refusjon i forlengelsen`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         håndterSøknad(Sykdom(1.februar, 28.februar, 100.prosent))
         håndterYtelserTilGodkjenning()
         håndterInntektsmeldingUtenRefusjon(
@@ -282,7 +282,7 @@ internal class SpeilBuilderTest : AbstractE2ETest() {
         val inntektSkatt = 31000.0 * 2
         val inntektSkjønnsfastsatt = 31000 * 1.5
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent))
-        håndterInntektsmelding(1.januar, beregnetInntekt = inntektIm.månedlig,)
+        håndterInntektsmelding(1.januar, beregnetInntekt = inntektIm.månedlig)
         håndterVilkårsgrunnlag(arbeidsgivere = listOf(a1 to inntektSkatt.månedlig))
         håndterYtelserTilGodkjenning()
         håndterSkjønnsmessigFastsettelse(

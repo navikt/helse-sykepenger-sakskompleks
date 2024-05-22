@@ -1,6 +1,7 @@
 package no.nav.helse.spleis.e2e
 
 import no.nav.helse.dsl.AbstractDslTest
+import no.nav.helse.hendelser.til
 import no.nav.helse.inspectors.inspektør
 import no.nav.helse.januar
 import no.nav.helse.person.TilstandType.AVSLUTTET
@@ -14,7 +15,7 @@ internal class GrunnbeløpsreguleringTest: AbstractDslTest() {
     @Test
     fun `Grunnbeløpsregulering med allerede riktig G-beløp`() {
         a1 {
-            nyttVedtak(1.januar, 31.januar)
+            nyttVedtak(1.januar til 31.januar)
             assertEquals(1, inspektør.vilkårsgrunnlagHistorikkInnslag().size)
             assertEquals(561804.årlig, inspektør.vilkårsgrunnlag(1.vedtaksperiode)!!.inspektør.sykepengegrunnlag.inspektør.`6G`)
             nullstillTilstandsendringer()

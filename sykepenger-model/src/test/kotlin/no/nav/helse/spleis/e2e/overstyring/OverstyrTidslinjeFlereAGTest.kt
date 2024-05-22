@@ -41,7 +41,7 @@ internal class OverstyrTidslinjeFlereAGTest : AbstractEndToEndTest() {
 
     @Test
     fun `overstyre en eldre periode hos en arbeidsgiver`() {
-        nyttVedtak(1.januar, 31.januar, orgnummer = a1)
+        nyttVedtak(1.januar til 31.januar, orgnummer = a1)
         tilGodkjenning(1.oktober, 30.oktober, a2)
         håndterOverstyrTidslinje((29.januar til 29.januar).map { manuellFeriedag(it) }, orgnummer = a1)
         assertSisteTilstand(1.vedtaksperiode, AVVENTER_HISTORIKK_REVURDERING, a1)
@@ -50,7 +50,7 @@ internal class OverstyrTidslinjeFlereAGTest : AbstractEndToEndTest() {
 
     @Test
     fun `overstyre og utbetalte en eldre periode hos en arbeidsgiver`() {
-        nyttVedtak(1.januar, 31.januar, orgnummer = a1)
+        nyttVedtak(1.januar til 31.januar, orgnummer = a1)
 
         tilGodkjenning(1.oktober, 30.oktober, a2)
 

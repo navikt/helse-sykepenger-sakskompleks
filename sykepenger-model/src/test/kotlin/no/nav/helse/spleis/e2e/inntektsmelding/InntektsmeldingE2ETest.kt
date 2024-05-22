@@ -133,7 +133,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `korrigerer arbeidsgiverperiode etter utbetalt`() {
-        nyttVedtak(1.januar, 25.januar)
+        nyttVedtak(1.januar til 25.januar)
         forlengVedtak(26.januar, 28.februar)
         håndterInntektsmelding(listOf(26.januar til 10.februar))
         assertEquals("AAAAARR AAAAARR AAAAARR AAAASHH SSSSSHH SSSSSHH SSSSSHH SSSSSHH SSS", inspektør.sykdomstidslinje.toShortString())
@@ -152,7 +152,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `når arbeidsgiver feilaktig tror det er ny arbeidsgiverperiode må alle periodene få varsel`() {
-        nyttVedtak(1.januar, 18.januar)
+        nyttVedtak(1.januar til 18.januar)
         håndterSøknad(Sykdom(25.januar, 31.januar, 100.prosent))
         håndterSøknad(Sykdom(1.februar, 28.februar, 100.prosent))
         assertSisteTilstand(1.vedtaksperiode, AVSLUTTET)
@@ -217,7 +217,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `Forkaster søknaden på direkten med etterfølgende svar fra portal`() {
-        nyttVedtak(1.januar(2016), 31.januar(2016), orgnummer = a1)
+        nyttVedtak(1.januar(2016) til 31.januar(2016), orgnummer = a1)
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent), andreInntektskilder = true, orgnummer = a2)
         assertSisteForkastetPeriodeTilstand(a2, 1.vedtaksperiode, TIL_INFOTRYGD)
         håndterInntektsmeldingPortal(listOf(1.januar til 16.januar), inntektsdato = 1.januar, vedtaksperiodeId = inspektør(a2).vedtaksperioder(1.vedtaksperiode).inspektør.id, orgnummer = a2)
@@ -226,7 +226,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `Håndterer ikke inntektsmelding fra portal`() {
-        nyttVedtak(1.januar(2016), 31.januar(2016), orgnummer = a1)
+        nyttVedtak(1.januar(2016) til 31.januar(2016), orgnummer = a1)
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent), orgnummer = a2)
         håndterInntektsmeldingPortal(listOf(1.januar til 16.januar), inntektsdato = 1.januar, harOpphørAvNaturalytelser = true, vedtaksperiodeId = inspektør(a2).vedtaksperioder(1.vedtaksperiode).inspektør.id, orgnummer = a2)
         assertSisteForkastetPeriodeTilstand(a2, 1.vedtaksperiode, TIL_INFOTRYGD)
@@ -375,7 +375,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `inntektsmelding i det blå`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         forlengVedtak(1.februar, 28.februar)
 
         håndterInntektsmelding(listOf(1.oktober til 16.oktober), orgnummer = a2)
@@ -392,9 +392,9 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `Arbeidsgiver opplyser om feilaktig ny arbeidsgiverperiode som dekker hele perioden som skal utbetales`() {
-        nyttVedtak(1.januar, 20.januar, arbeidsgiverperiode = listOf(1.januar til 16.januar))
+        nyttVedtak(1.januar til 20.januar, arbeidsgiverperiode = listOf(1.januar til 16.januar))
         assertEquals(1.januar til 16.januar, inspektør.arbeidsgiverperiode(1.vedtaksperiode))
-        nyttVedtak(25.januar, 25.januar, arbeidsgiverperiode = listOf(25.januar til 9.februar))
+        nyttVedtak(25.januar til 25.januar, arbeidsgiverperiode = listOf(25.januar til 9.februar))
         assertEquals(1.januar til 16.januar, inspektør.arbeidsgiverperiode(2.vedtaksperiode))
     }
 
@@ -801,7 +801,11 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
     @Test
     fun `korrigerer agp langt tilbake i tid`() {
         nyPeriode(5.januar til 16.januar)
-        nyttVedtak(17.januar, 31.januar, arbeidsgiverperiode = listOf(5.januar til 20.januar), førsteFraværsdag = 5.januar)
+        nyttVedtak(
+            17.januar til 31.januar,
+            førsteFraværsdag = 5.januar,
+            arbeidsgiverperiode = listOf(5.januar til 20.januar)
+        )
         forlengVedtak(1.februar, 28.februar)
         forlengVedtak(1.mars, 31.mars)
         nyPeriode(10.april til 30.april)
@@ -1104,7 +1108,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
     @Test
     fun `Unngår aggresiv håndtering av arbeidsdager før opplyst AGP ved pågående revurdering`() {
         nyPeriode(1.januar til 16.januar)
-        nyttVedtak(17.januar, 31.januar, arbeidsgiverperiode = listOf(1.januar til 16.januar))
+        nyttVedtak(17.januar til 31.januar, arbeidsgiverperiode = listOf(1.januar til 16.januar))
 
         forlengVedtak(1.februar, 28.februar)
         forlengVedtak(1.mars, 31.mars)
@@ -1124,7 +1128,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
     @Test
     fun `Unngår aggressiv håndtering av arbeidsdager før opplyst AGP ved senere utbetalt periode på annen arbeidsgiver`() {
         nyPeriode(1.februar til 16.februar, a1)
-        nyttVedtak(1.april, 30.april, orgnummer = a2)
+        nyttVedtak(1.april til 30.april, orgnummer = a2)
         nullstillTilstandsendringer()
 
         håndterInntektsmelding(listOf(16.januar til 31.januar), orgnummer = a1)
@@ -1158,7 +1162,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
     @Test
     fun `Håndterer ikke inntektsmelding to ganger ved replay - hvor vi har en tidligere periode og gap`() {
         // Ved en tidligere periode resettes trimming av inntektsmelding og vi ender med å håndtere samme inntektsmelding flere ganger i en vedtaksperiode
-        nyttVedtak(1.januar(2017), 31.januar(2017))
+        nyttVedtak(1.januar(2017) til 31.januar(2017))
 
         håndterInntektsmelding(listOf(10.januar til 25.januar), førsteFraværsdag = 10.januar)
         håndterSykmelding(Sykmeldingsperiode(10.januar, 31.januar))
@@ -1618,7 +1622,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `Inntektsmelding opplyser om endret arbeidsgiverperiode`() {
-        nyttVedtak(2.januar, 31.januar)
+        nyttVedtak(2.januar til 31.januar)
         nyPeriode(12.februar til 28.februar)
 
         assertEquals(2.januar, inspektør.skjæringstidspunkt(1.vedtaksperiode))
@@ -1826,7 +1830,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `inntektsmelding oppgir ny arbeidsgiverperiode i en sammenhengende periode`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         håndterSykmelding(Sykmeldingsperiode(1.februar, 28.februar))
         håndterSøknad(Sykdom(1.februar, 28.februar, 100.prosent), Ferie(1.februar, 28.februar))
         håndterYtelser(2.vedtaksperiode)
@@ -2099,7 +2103,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `inntektsmelding korrigerer periode til godkjenning revurdering`() {
-        nyttVedtak(1.januar, 31.januar, beregnetInntekt = INNTEKT)
+        nyttVedtak(1.januar til 31.januar, beregnetInntekt = INNTEKT)
         håndterOverstyrTidslinje(listOf(ManuellOverskrivingDag(31.januar, Feriedag)))
         håndterYtelser(1.vedtaksperiode)
         håndterSimulering(1.vedtaksperiode)
@@ -2145,7 +2149,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `Spleis bruker feilaktig en ugyldig egenmeldingsdag i gap-beregning`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         nyPeriode(20.februar til 20.mars)
         håndterInntektsmelding(listOf(8.februar til 8.februar, 20.februar til 6.mars))
         håndterVilkårsgrunnlag(2.vedtaksperiode)

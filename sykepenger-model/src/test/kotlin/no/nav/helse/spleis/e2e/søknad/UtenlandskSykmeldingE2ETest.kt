@@ -2,6 +2,7 @@ package no.nav.helse.spleis.e2e.søknad
 
 import no.nav.helse.hendelser.Sykmeldingsperiode
 import no.nav.helse.hendelser.Søknad.Søknadsperiode.Sykdom
+import no.nav.helse.hendelser.til
 import no.nav.helse.januar
 import no.nav.helse.person.TilstandType.AVSLUTTET
 import no.nav.helse.person.TilstandType.START
@@ -41,7 +42,7 @@ internal class UtenlandskSykmeldingE2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `Overlapper med utbetalt - søknad med flagg utenlandskSykmelding ignoreres og kastes ut`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent), utenlandskSykmelding = true)
         assertSisteTilstand(1.vedtaksperiode, AVSLUTTET)

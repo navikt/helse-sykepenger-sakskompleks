@@ -338,8 +338,8 @@ internal abstract class AbstractE2ETest {
             håndterUtbetalt()
         }
     }
-    protected fun nyttVedtak(fom: LocalDate, tom: LocalDate, orgnummer: String = a1): Utbetalingbehov {
-        tilGodkjenning(fom, tom, orgnummer)
+    protected fun nyttVedtak(periode: Periode, orgnummer: String = a1): Utbetalingbehov {
+        tilGodkjenning(periode.start, periode.endInclusive, orgnummer)
         håndterUtbetalingsgodkjenning()
         return håndterUtbetalt()
     }

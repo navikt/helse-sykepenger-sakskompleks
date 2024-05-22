@@ -18,7 +18,7 @@ internal class VedtaksperiodeAnnullertEventTest : AbstractEndToEndTest() {
 
     @Test
     fun `vi sender vedtaksperiode annullert-hendelse når saksbehandler annullerer en vedtaksperiode`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         håndterAnnullerUtbetaling()
 
         assertTrue(observatør.vedtaksperiodeAnnullertEventer.isNotEmpty())
@@ -26,9 +26,9 @@ internal class VedtaksperiodeAnnullertEventTest : AbstractEndToEndTest() {
 
     @Test
     fun `vi sender vedtaksperiode annullert-hendelser når saksbehandler annullerer en vedtaksperiode i et lengre sykdomsforløp`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         forlengVedtak(1.februar, 28.februar)
-        nyttVedtak(5.mars, 31.mars)
+        nyttVedtak(5.mars til 31.mars)
         håndterAnnullerUtbetaling()
 
         assertEquals(3, observatør.vedtaksperiodeAnnullertEventer.size)
@@ -48,7 +48,7 @@ internal class VedtaksperiodeAnnullertEventTest : AbstractEndToEndTest() {
 
     @Test
     fun `vi sender ikke ut vedtaksperiode annullert-hendelse for vedtaksperioder som ikke er utbetalt`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         forlengVedtak(1.februar, 28.februar)
         tilGodkjenning(5.mars, 31.mars, ORGNUMMER)
         håndterAnnullerUtbetaling()
@@ -66,9 +66,9 @@ internal class VedtaksperiodeAnnullertEventTest : AbstractEndToEndTest() {
 
     @Test
     fun `også langt gap`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         forlengVedtak(1.februar, 28.februar)
-        nyttVedtak(1.april, 30.april)
+        nyttVedtak(1.april til 30.april)
         håndterAnnullerUtbetaling()
 
         assertEquals(1, observatør.vedtaksperiodeAnnullertEventer.size)
@@ -80,7 +80,7 @@ internal class VedtaksperiodeAnnullertEventTest : AbstractEndToEndTest() {
 
     @Test
     fun `arbeid ikke gjenopptatt`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
 
         håndterSøknad(Søknad.Søknadsperiode.Sykdom(1.mars, 31.mars, 100.prosent))
         håndterInntektsmelding(
@@ -110,9 +110,9 @@ internal class VedtaksperiodeAnnullertEventTest : AbstractEndToEndTest() {
 
     @Test
     fun `revurdering uten endring som siden annulleres skal sende melding om annullert`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
 
-        håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        håndterInntektsmelding(listOf(1.januar til 16.januar))
         håndterYtelser(1.vedtaksperiode)
         håndterUtbetalingsgodkjenning(1.vedtaksperiode)
 
@@ -124,8 +124,8 @@ internal class VedtaksperiodeAnnullertEventTest : AbstractEndToEndTest() {
 
     @Test
     fun `Pågående revurdering uten endring som siden annulleres skal sende melding om annullert`() {
-        nyttVedtak(1.januar, 31.januar)
-        håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        nyttVedtak(1.januar til 31.januar)
+        håndterInntektsmelding(listOf(1.januar til 16.januar))
         håndterAnnullerUtbetaling()
 
         assertEquals(1, observatør.vedtaksperiodeAnnullertEventer.size)

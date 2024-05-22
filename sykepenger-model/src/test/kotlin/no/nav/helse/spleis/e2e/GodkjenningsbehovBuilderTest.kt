@@ -75,7 +75,7 @@ internal class GodkjenningsbehovBuilderTest : AbstractEndToEndTest() {
 
     @Test
     fun `ingen ny arbeidsgiverperiode og sykepengegrunnlag under 2g`() {
-        nyttVedtak(1.januar, 31.januar, orgnummer = a1)
+        nyttVedtak(1.januar til 31.januar, orgnummer = a1)
         tilGodkjenning(10.februar, 20.februar, a1, beregnetInntekt = 10000.månedlig)
         assertGodkjenningsbehov(
             skjæringstidspunkt = 10.februar,
@@ -98,7 +98,7 @@ internal class GodkjenningsbehovBuilderTest : AbstractEndToEndTest() {
 
     @Test
     fun `Sender med tag IngenNyArbeidsgiverperiode når det ikke er ny AGP pga AIG-dager`() {
-        nyttVedtak(1.juni, 30.juni)
+        nyttVedtak(1.juni til 30.juni)
         håndterSøknad(Søknad.Søknadsperiode.Sykdom(1.august, 31.august, 100.prosent))
         håndterInntektsmelding(
             listOf(1.juni til 16.juni),
@@ -218,7 +218,7 @@ internal class GodkjenningsbehovBuilderTest : AbstractEndToEndTest() {
 
     @Test
     fun `ingen utbetaling`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         håndterSøknad(Søknad.Søknadsperiode.Sykdom(1.februar, 28.februar, 100.prosent), Søknad.Søknadsperiode.Ferie(1.februar, 28.februar))
         håndterYtelser(2.vedtaksperiode)
         assertGodkjenningsbehov(
@@ -238,7 +238,7 @@ internal class GodkjenningsbehovBuilderTest : AbstractEndToEndTest() {
 
     @Test
     fun `trekker tilbake penger fra arbeidsgiver og flytter til bruker`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         håndterInntektsmelding(
             listOf(1.januar til 16.januar),
             refusjon = Inntektsmelding.Refusjon(beløp = INGEN, opphørsdato = null),
@@ -250,7 +250,7 @@ internal class GodkjenningsbehovBuilderTest : AbstractEndToEndTest() {
 
     @Test
     fun `trekker tilbake penger fra person og flytter til arbeidsgiver`() {
-        nyttVedtak(1.januar, 31.januar, refusjon = Inntektsmelding.Refusjon(INGEN, null))
+        nyttVedtak(1.januar til 31.januar, refusjon = Inntektsmelding.Refusjon(INGEN, null))
         håndterInntektsmelding(
             listOf(1.januar til 16.januar),
             refusjon = Inntektsmelding.Refusjon(beløp = INNTEKT, opphørsdato = null),
@@ -330,7 +330,7 @@ internal class GodkjenningsbehovBuilderTest : AbstractEndToEndTest() {
 
     @Test
     fun `Periode uten navdager og avslagsdager får Avslag-tag`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         håndterSykmelding(Sykmeldingsperiode(1.februar, 28.februar))
         håndterSøknad(Søknad.Søknadsperiode.Sykdom(1.februar, 28.februar, 100.prosent), Søknad.Søknadsperiode.Ferie(1.februar, 28.februar))
         håndterYtelser(2.vedtaksperiode)
@@ -373,13 +373,13 @@ internal class GodkjenningsbehovBuilderTest : AbstractEndToEndTest() {
         )
     }
 
-    private fun assertTags(tags: Set<String>, vedtaksperiodeId: UUID = 1.vedtaksperiode.id(a1),) {
+    private fun assertTags(tags: Set<String>, vedtaksperiodeId: UUID = 1.vedtaksperiode.id(a1)) {
         val actualtags = hentFelt<Set<String>>(vedtaksperiodeId = vedtaksperiodeId, feltNavn = "tags") ?: emptySet()
         assertTrue(actualtags.containsAll(tags))
         val utkastTilVedtak = observatør.utkastTilVedtakEventer.last()
         assertEquals(actualtags, utkastTilVedtak.tags)
     }
-    private fun assertIngenTag(tag: String, vedtaksperiodeId: UUID = 1.vedtaksperiode.id(a1),) {
+    private fun assertIngenTag(tag: String, vedtaksperiodeId: UUID = 1.vedtaksperiode.id(a1)) {
         val actualtags = hentFelt<Set<String>>(vedtaksperiodeId = vedtaksperiodeId, feltNavn = "tags") ?: emptySet()
         assertFalse(actualtags.contains(tag))
         val utkastTilVedtak = observatør.utkastTilVedtakEventer.last()

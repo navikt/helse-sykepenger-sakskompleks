@@ -2,7 +2,6 @@ package no.nav.helse.spleis.e2e
 
 import no.nav.helse.dsl.AbstractDslTest
 import no.nav.helse.dsl.nyPeriode
-import no.nav.helse.dsl.nyttVedtak
 import no.nav.helse.februar
 import no.nav.helse.hendelser.Dagtype.Feriedag
 import no.nav.helse.hendelser.ManuellOverskrivingDag
@@ -13,7 +12,6 @@ import no.nav.helse.juli
 import no.nav.helse.mai
 import no.nav.helse.mars
 import no.nav.helse.person.TilstandType.AVSLUTTET
-import no.nav.helse.person.TilstandType.AVSLUTTET_UTEN_UTBETALING
 import no.nav.helse.person.TilstandType.AVVENTER_BLOKKERENDE_PERIODE
 import no.nav.helse.person.TilstandType.AVVENTER_GODKJENNING_REVURDERING
 import no.nav.helse.person.TilstandType.AVVENTER_INNTEKTSMELDING
@@ -28,7 +26,7 @@ internal class AnmodningOmForkastingTest: AbstractDslTest() {
     @Test
     fun `anmodning avslås av en avsluttet vedtaksperiode`(){
         a1 {
-            nyttVedtak(1.januar, 31.januar)
+            nyttVedtak(1.januar til 31.januar)
             håndterAnmodningOmForkasting(1.vedtaksperiode)
             assertInfo("Avslår anmodning om forkasting i AVSLUTTET (kan ikke forkastes)", 1.vedtaksperiode.filter())
         }
@@ -90,7 +88,7 @@ internal class AnmodningOmForkastingTest: AbstractDslTest() {
     @Test
     fun `Forkaster senere periode påvirker ikke pågående revurdering på tidligere periode med samme skjæringstidspunkt`() {
         a1 {
-            nyttVedtak(1.januar, 31.januar)
+            nyttVedtak(1.januar til 31.januar)
             håndterSøknad(Sykdom(1.februar, 28.februar, 100.prosent))
             håndterYtelser(2.vedtaksperiode)
             håndterSimulering(2.vedtaksperiode)

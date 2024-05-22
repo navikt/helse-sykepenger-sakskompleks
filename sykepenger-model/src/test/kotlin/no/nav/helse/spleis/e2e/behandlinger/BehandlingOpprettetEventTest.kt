@@ -56,7 +56,7 @@ internal class BehandlingOpprettetEventTest : AbstractDslTest() {
     @Test
     fun revurdering() {
         a1 {
-            nyttVedtak(1.januar, 31.januar, 100.prosent)
+            nyttVedtak(1.januar til 31.januar, 100.prosent)
             håndterSøknad(Sykdom(1.januar, 31.januar, 80.prosent))
             val behandlingOpprettetEventer = observatør.behandlingOpprettetEventer
             assertEquals(2, behandlingOpprettetEventer.size)
@@ -84,7 +84,7 @@ internal class BehandlingOpprettetEventTest : AbstractDslTest() {
     @Test
     fun annullering() {
         a1 {
-            nyttVedtak(1.januar, 31.januar)
+            nyttVedtak(1.januar til 31.januar)
             forlengVedtak(1.februar, 28.februar)
             håndterAnnullering(inspektør.utbetaling(0).inspektør.utbetalingId)
             val behandlingOpprettetEventer = observatør.behandlingOpprettetEventer

@@ -68,7 +68,7 @@ internal class OverstyrArbeidsgiverperiodeTest : AbstractDslTest() {
     @Test
     fun `endre arbeidsgiverperiode til å starte tidligere med tidligere urelatert utbetaling`() {
         a1 {
-            nyttVedtak(1.januar, 31.januar)
+            nyttVedtak(1.januar til 31.januar)
 
             håndterSøknad(Sykdom(1.april, 14.april, 100.prosent))
             håndterSøknad(Sykdom(15.april, 30.april, 100.prosent))

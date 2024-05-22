@@ -43,7 +43,7 @@ internal class PleiepengerE2ETest : AbstractEndToEndTest() {
     fun `Periode for person der det ikke foreligger pleiepengerytelse blir behandlet og sendt til godkjenning`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar(2020), 31.januar(2020)))
         håndterSøknad(Sykdom(1.januar(2020), 31.januar(2020), 100.prosent))
-        håndterInntektsmelding(listOf(Periode(1.januar(2020), 16.januar(2020))),)
+        håndterInntektsmelding(listOf(Periode(1.januar(2020), 16.januar(2020))))
         håndterVilkårsgrunnlag(1.vedtaksperiode, INNTEKT)
         håndterYtelser(1.vedtaksperiode, pleiepenger = emptyList())
         håndterSimulering(1.vedtaksperiode)
@@ -69,7 +69,7 @@ internal class PleiepengerE2ETest : AbstractEndToEndTest() {
     fun `Periode som overlapper med pleiepengerytelse får varsel`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent))
-        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)),)
+        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode, pleiepenger = listOf(GradertPeriode(1.januar til 31.januar, 100)))
         assertVarsel(Varselkode.RV_AY_6)
@@ -80,7 +80,7 @@ internal class PleiepengerE2ETest : AbstractEndToEndTest() {
     fun `Periode som overlapper med pleiepengerytelse i starten av perioden får varsel`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent))
-        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)),)
+        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode, pleiepenger = listOf(GradertPeriode(1.desember(2017) til 1.januar, 100)))
         assertVarsel(Varselkode.RV_AY_6, 1.vedtaksperiode.filter())
@@ -91,7 +91,7 @@ internal class PleiepengerE2ETest : AbstractEndToEndTest() {
     fun `Periode som overlapper med pleiepengerytelse i slutten av perioden får varsel`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent))
-        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)),)
+        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode, pleiepenger = listOf(GradertPeriode(31.januar til 14.februar, 100)))
         assertVarsel(Varselkode.RV_AY_6, 1.vedtaksperiode.filter())
@@ -102,7 +102,7 @@ internal class PleiepengerE2ETest : AbstractEndToEndTest() {
     fun `Pleiepenger starter mindre enn 4 uker før sykefraværstilfellet`() {
         håndterSykmelding(Sykmeldingsperiode(3.mars, 19.mars))
         håndterSøknad(Sykdom(3.mars, 19.mars, 100.prosent))
-        håndterInntektsmelding(listOf(3.mars til 18.mars),)
+        håndterInntektsmelding(listOf(3.mars til 18.mars))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode, pleiepenger = listOf(GradertPeriode(3.februar til 20.februar, 100)))
         assertVarsel(Varselkode.RV_AY_6)
@@ -114,7 +114,7 @@ internal class PleiepengerE2ETest : AbstractEndToEndTest() {
     fun `Pleiepenger starter mer enn 4 uker før sykefraværstilfellet`() {
         håndterSykmelding(Sykmeldingsperiode(3.mars, 19.mars))
         håndterSøknad(Sykdom(3.mars, 19.mars, 100.prosent))
-        håndterInntektsmelding(listOf(3.mars til 18.mars),)
+        håndterInntektsmelding(listOf(3.mars til 18.mars))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode, pleiepenger = listOf(GradertPeriode(3.januar til 20.januar, 100)))
         assertIngenFunksjonelleFeil()

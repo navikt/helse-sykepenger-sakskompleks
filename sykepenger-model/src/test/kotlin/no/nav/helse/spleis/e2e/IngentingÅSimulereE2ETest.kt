@@ -4,6 +4,7 @@ import no.nav.helse.hendelser.Periode
 import no.nav.helse.hendelser.Sykmeldingsperiode
 import no.nav.helse.hendelser.Søknad.Søknadsperiode.Ferie
 import no.nav.helse.hendelser.Søknad.Søknadsperiode.Sykdom
+import no.nav.helse.hendelser.til
 import no.nav.helse.januar
 import no.nav.helse.person.TilstandType.AVSLUTTET
 import no.nav.helse.person.TilstandType.AVSLUTTET_UTEN_UTBETALING
@@ -24,7 +25,7 @@ internal class IngentingÅSimulereE2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `forlenger et vedtak med bare helg`() {
-        nyttVedtak(1.januar, 19.januar)
+        nyttVedtak(1.januar til 19.januar)
         håndterSykmelding(Sykmeldingsperiode(20.januar, 21.januar))
         håndterSøknad(Sykdom(20.januar, 21.januar, 100.prosent))
         håndterYtelser(2.vedtaksperiode)
@@ -35,7 +36,7 @@ internal class IngentingÅSimulereE2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `førstegangsbehandling på eksisterende utbetaling med bare helg`() {
-        nyttVedtak(1.januar, 18.januar)
+        nyttVedtak(1.januar til 18.januar)
         håndterSykmelding(Sykmeldingsperiode(20.januar, 21.januar))
         håndterSøknad(Sykdom(20.januar, 21.januar, 100.prosent))
         assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, AVSLUTTET_UTEN_UTBETALING)
@@ -44,7 +45,7 @@ internal class IngentingÅSimulereE2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `forlenger et vedtak med bare helg og litt ferie`() {
-        nyttVedtak(1.januar, 19.januar)
+        nyttVedtak(1.januar til 19.januar)
         håndterSykmelding(Sykmeldingsperiode(20.januar, 23.januar))
         håndterSøknad(Sykdom(20.januar, 23.januar, 100.prosent), Ferie(22.januar, 23.januar))
         håndterYtelser(2.vedtaksperiode)
@@ -64,7 +65,7 @@ internal class IngentingÅSimulereE2ETest : AbstractEndToEndTest() {
     fun `tomt simuleringsresultat`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 21.januar))
         håndterSøknad(Sykdom(1.januar, 21.januar, 100.prosent))
-        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)),)
+        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode)
         håndterSimulering(1.vedtaksperiode, simuleringsresultat = null)

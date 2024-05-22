@@ -17,9 +17,9 @@ internal class AnnullereTidligereUtbetalingE2ETest : AbstractDslTest() {
     @Test
     fun `annullere tidligere utbetaling på samme arbeidsgiver`() {
         a1 {
-            nyttVedtak(1.januar, 31.januar)
+            nyttVedtak(1.januar til 31.januar)
             val utbetalingId = inspektør.utbetalinger.single().inspektør.utbetalingId
-            nyttVedtak(1.mars, 31.mars)
+            nyttVedtak(1.mars til 31.mars)
             håndterAnnullering(utbetalingId)
             håndterUtbetalt()
             assertSisteTilstand(1.vedtaksperiode, TilstandType.TIL_INFOTRYGD)
@@ -30,7 +30,7 @@ internal class AnnullereTidligereUtbetalingE2ETest : AbstractDslTest() {
     @Test
     fun `annullere tidligere utbetaling på annen arbeidsgiver`() {
         a1 {
-            nyttVedtak(1.januar, 31.januar)
+            nyttVedtak(1.januar til 31.januar)
         }
         val utbetalingId = inspektør.utbetalinger.single().inspektør.utbetalingId
         a2 {

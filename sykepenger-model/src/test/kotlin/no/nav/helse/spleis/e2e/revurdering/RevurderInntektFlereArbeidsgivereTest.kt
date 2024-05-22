@@ -4,7 +4,6 @@ import java.time.LocalDate
 import no.nav.helse.dsl.AbstractDslTest
 import no.nav.helse.dsl.TestPerson
 import no.nav.helse.dsl.TestPerson.Companion.INNTEKT
-import no.nav.helse.dsl.nyttVedtak
 import no.nav.helse.hendelser.InntektForSykepengegrunnlag
 import no.nav.helse.hendelser.Inntektsmelding.Refusjon
 import no.nav.helse.hendelser.Sykmeldingsperiode
@@ -514,7 +513,7 @@ internal class RevurderInntektFlereArbeidsgivereTest: AbstractDslTest() {
     @Test
     fun `kun den arbeidsgiveren som har fått overstyrt inntekt som faktisk lagrer inntekten`() {
         a2 {
-            nyttVedtak(1.januar(2017), 31.januar(2017), 100.prosent) // gammelt vedtak
+            nyttVedtak(1.januar(2017) til 31.januar(2017), 100.prosent) // gammelt vedtak
         }
         a1 {
             håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))

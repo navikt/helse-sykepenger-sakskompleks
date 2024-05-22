@@ -15,7 +15,6 @@ import no.nav.helse.person.PersonObserver.Inntektsopplysningstype.SAKSBEHANDLER
 import no.nav.helse.økonomi.Inntekt.Companion.månedlig
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 internal class ArbeidsopplysningerKorrigertTest : AbstractEndToEndTest() {
@@ -47,14 +46,14 @@ internal class ArbeidsopplysningerKorrigertTest : AbstractEndToEndTest() {
     @Test
     fun `Sender ut spisset event ved korrigerende inntektsmelding som endrer agp`() {
         nyPeriode(1.januar til 31.januar)
-        val korrigertInntektsmeldingId = håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        val korrigertInntektsmeldingId = håndterInntektsmelding(listOf(1.januar til 16.januar))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode)
         håndterSimulering(1.vedtaksperiode)
         håndterUtbetalingsgodkjenning(1.vedtaksperiode)
         håndterUtbetalt()
 
-        val korrigerendeInntektsmeldingId = håndterInntektsmelding(listOf(2.januar til 17.januar),)
+        val korrigerendeInntektsmeldingId = håndterInntektsmelding(listOf(2.januar til 17.januar))
 
         val expected = ArbeidsgiveropplysningerKorrigertEvent(
             korrigertInntektsmeldingId = korrigertInntektsmeldingId,
@@ -68,7 +67,7 @@ internal class ArbeidsopplysningerKorrigertTest : AbstractEndToEndTest() {
     @Test
     fun `Sender ut spisset event ved saksbehandleroverstyring som endrer inntekt og refusjon`() {
         nyPeriode(1.januar til 31.januar)
-        val korrigertInntektsmeldingId = håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        val korrigertInntektsmeldingId = håndterInntektsmelding(listOf(1.januar til 16.januar))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode)
         håndterSimulering(1.vedtaksperiode)
@@ -102,8 +101,8 @@ internal class ArbeidsopplysningerKorrigertTest : AbstractEndToEndTest() {
         val tom = 31.januar
         nyPeriode(fom til tom, orgnummer = a1)
         nyPeriode(fom til tom, orgnummer = a2)
-        val korrigertInntektsmeldingIdA1 = håndterInntektsmelding(listOf(fom til fom.plusDays(15)), orgnummer = a1,)
-        val korrigertInntektsmeldingIdA2 = håndterInntektsmelding(listOf(fom til fom.plusDays(15)), orgnummer = a2,)
+        val korrigertInntektsmeldingIdA1 = håndterInntektsmelding(listOf(fom til fom.plusDays(15)), orgnummer = a1)
+        val korrigertInntektsmeldingIdA2 = håndterInntektsmelding(listOf(fom til fom.plusDays(15)), orgnummer = a2)
         håndterVilkårsgrunnlag(
             1.vedtaksperiode,
             orgnummer = a1,
@@ -162,8 +161,8 @@ internal class ArbeidsopplysningerKorrigertTest : AbstractEndToEndTest() {
         val tom = 31.januar
         nyPeriode(fom til tom, orgnummer = a1)
         nyPeriode(fom til tom, orgnummer = a2)
-        val korrigertInntektsmeldingIdA1 = håndterInntektsmelding(listOf(fom til fom.plusDays(15)), orgnummer = a1,)
-        håndterInntektsmelding(listOf(fom til fom.plusDays(15)), orgnummer = a2,)
+        val korrigertInntektsmeldingIdA1 = håndterInntektsmelding(listOf(fom til fom.plusDays(15)), orgnummer = a1)
+        håndterInntektsmelding(listOf(fom til fom.plusDays(15)), orgnummer = a2)
         håndterVilkårsgrunnlag(
             1.vedtaksperiode,
             orgnummer = a1,
@@ -206,7 +205,7 @@ internal class ArbeidsopplysningerKorrigertTest : AbstractEndToEndTest() {
     @Test
     fun `Sender ut spisset event ved saksbehandleroverstyring som endrer agp`() {
         nyPeriode(1.januar til 31.januar)
-        val korrigertInntektsmeldingId = håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        val korrigertInntektsmeldingId = håndterInntektsmelding(listOf(1.januar til 16.januar))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode)
         håndterSimulering(1.vedtaksperiode)
@@ -233,7 +232,7 @@ internal class ArbeidsopplysningerKorrigertTest : AbstractEndToEndTest() {
 
     @Test
     fun `Sender ikke ut spisset event ved tidslinjeoverstyring som ikke fører til en endring av agp`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         håndterOverstyrTidslinje(
             listOf(
                 ManuellOverskrivingDag(
@@ -278,7 +277,7 @@ internal class ArbeidsopplysningerKorrigertTest : AbstractEndToEndTest() {
 
     @Test
     fun `Sender ikke ut spisset event ved korrigerende inntektsmelding som korrigerer noe annet enn en inntektsmelding`() {
-        nyttVedtak(1.januar,  31.januar)
+        nyttVedtak(1.januar til 31.januar)
         håndterOverstyrArbeidsgiveropplysninger(
             1.januar,
             arbeidsgiveropplysninger = listOf(
@@ -292,7 +291,7 @@ internal class ArbeidsopplysningerKorrigertTest : AbstractEndToEndTest() {
             )
         )
         assertEquals(1, observatør.arbeidsgiveropplysningerKorrigert.size)
-        håndterInntektsmelding(listOf(1.januar til 16.januar), beregnetInntekt = 41000.månedlig,)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), beregnetInntekt = 41000.månedlig)
         assertEquals(1, observatør.arbeidsgiveropplysningerKorrigert.size)
     }
 }

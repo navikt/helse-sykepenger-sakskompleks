@@ -20,7 +20,6 @@ import no.nav.helse.person.TilstandType.AVVENTER_GODKJENNING
 import no.nav.helse.person.TilstandType.AVVENTER_GODKJENNING_REVURDERING
 import no.nav.helse.person.TilstandType.AVVENTER_HISTORIKK
 import no.nav.helse.person.TilstandType.AVVENTER_HISTORIKK_REVURDERING
-import no.nav.helse.person.TilstandType.AVVENTER_INFOTRYGDHISTORIKK
 import no.nav.helse.person.TilstandType.AVVENTER_INNTEKTSMELDING
 import no.nav.helse.person.TilstandType.AVVENTER_REVURDERING
 import no.nav.helse.person.TilstandType.AVVENTER_SIMULERING
@@ -63,7 +62,7 @@ internal class RevurderTidslinjeFlereArbeidsgivereTest : AbstractEndToEndTest() 
 
         håndterSykmelding(Sykmeldingsperiode(17.januar, 25.januar), orgnummer = a2)
         håndterSøknad(Sykdom(17.januar, 25.januar, 100.prosent), orgnummer = a2)
-        håndterInntektsmelding(listOf(1.januar til 16.januar), beregnetInntekt = 20000.månedlig, orgnummer = a2,)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), beregnetInntekt = 20000.månedlig, orgnummer = a2)
         håndterVilkårsgrunnlag(
             vedtaksperiodeIdInnhenter = 2.vedtaksperiode,
             orgnummer = a2,
@@ -85,7 +84,7 @@ internal class RevurderTidslinjeFlereArbeidsgivereTest : AbstractEndToEndTest() 
         håndterYtelser(2.vedtaksperiode, orgnummer = a2)
         håndterSimulering(2.vedtaksperiode, orgnummer = a2)
 
-        håndterInntektsmelding(listOf(2.januar til 17.januar), beregnetInntekt = 20000.månedlig, orgnummer = a1,)
+        håndterInntektsmelding(listOf(2.januar til 17.januar), beregnetInntekt = 20000.månedlig, orgnummer = a1)
 
         assertIngenFunksjonelleFeil()
 

@@ -1,19 +1,22 @@
 package no.nav.helse.spleis.e2e.behandlinger
 
 import no.nav.helse.dsl.AbstractDslTest
-import no.nav.helse.dsl.nyttVedtak
 import no.nav.helse.dsl.tilGodkjenning
 import no.nav.helse.hendelser.Dagtype
 import no.nav.helse.hendelser.ManuellOverskrivingDag
 import no.nav.helse.hendelser.Søknad.Søknadsperiode.Sykdom
 import no.nav.helse.hendelser.til
+import no.nav.helse.inspectors.VedtaksperiodeInspektør.Behandling.Behandlingtilstand.AVSLUTTET_UTEN_VEDTAK
+import no.nav.helse.inspectors.VedtaksperiodeInspektør.Behandling.Behandlingtilstand.REVURDERT_VEDTAK_AVVIST
+import no.nav.helse.inspectors.VedtaksperiodeInspektør.Behandling.Behandlingtilstand.TIL_INFOTRYGD
+import no.nav.helse.inspectors.VedtaksperiodeInspektør.Behandling.Behandlingtilstand.VEDTAK_FATTET
+import no.nav.helse.inspectors.VedtaksperiodeInspektør.Behandling.Behandlingtilstand.VEDTAK_IVERKSATT
 import no.nav.helse.januar
 import no.nav.helse.mai
 import no.nav.helse.onsdag
 import no.nav.helse.person.AbstractPersonTest.Companion.UNG_PERSON_FNR_2018
 import no.nav.helse.person.PersonObserver
 import no.nav.helse.person.TilstandType
-import no.nav.helse.inspectors.VedtaksperiodeInspektør.Behandling.Behandlingtilstand.*
 import no.nav.helse.søndag
 import no.nav.helse.økonomi.Prosentdel.Companion.prosent
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -57,7 +60,7 @@ internal class BehandlingLukketEventTest : AbstractDslTest() {
     @Test
     fun `behandling lukkes når revurdert vedtak avvises`() {
         a1 {
-            nyttVedtak(1.januar, 31.januar)
+            nyttVedtak(1.januar til 31.januar)
             håndterOverstyrTidslinje(listOf(ManuellOverskrivingDag(31.januar, Dagtype.Feriedag)))
             håndterYtelser(1.vedtaksperiode)
             håndterSimulering(1.vedtaksperiode)
@@ -118,7 +121,7 @@ internal class BehandlingLukketEventTest : AbstractDslTest() {
     @Test
     fun `behandling lukkes når revurdering fattes`() {
         a1 {
-            nyttVedtak(1.januar, onsdag den 31.januar)
+            nyttVedtak(1.januar til onsdag(31.januar))
             håndterOverstyrTidslinje(listOf(ManuellOverskrivingDag(onsdag den 31.januar, Dagtype.Feriedag)))
             håndterYtelser(1.vedtaksperiode)
             håndterSimulering(1.vedtaksperiode)
@@ -143,8 +146,8 @@ internal class BehandlingLukketEventTest : AbstractDslTest() {
     @Test
     fun `behandling lukkes når revurdering avvises`() {
         a1 {
-            nyttVedtak(1.januar, onsdag den 31.januar)
-            håndterOverstyrTidslinje(listOf(ManuellOverskrivingDag(onsdag den 31.januar, Dagtype.Feriedag)))
+            nyttVedtak(1.januar til onsdag(31.januar))
+            håndterOverstyrTidslinje(listOf(ManuellOverskrivingDag(onsdag(31.januar), Dagtype.Feriedag)))
             håndterYtelser(1.vedtaksperiode)
             håndterSimulering(1.vedtaksperiode)
             håndterUtbetalingsgodkjenning(1.vedtaksperiode, godkjent = false)
@@ -168,8 +171,8 @@ internal class BehandlingLukketEventTest : AbstractDslTest() {
     @Test
     fun `behandling lukkes når revurdering uten utbetaling fattes`() {
         a1 {
-            nyttVedtak(1.januar, søndag den 28.januar)
-            håndterOverstyrTidslinje(listOf(ManuellOverskrivingDag(søndag den 28.januar, Dagtype.Feriedag)))
+            nyttVedtak(1.januar til søndag(28.januar))
+            håndterOverstyrTidslinje(listOf(ManuellOverskrivingDag(søndag(28.januar), Dagtype.Feriedag)))
             håndterYtelser(1.vedtaksperiode)
             håndterUtbetalingsgodkjenning(1.vedtaksperiode, godkjent = true)
 
@@ -192,7 +195,7 @@ internal class BehandlingLukketEventTest : AbstractDslTest() {
     @Test
     fun `behandling lukkes når revurdering gjør om til auu - med tidligere utbetaling`() {
         a1 {
-            nyttVedtak(1.januar, 31.januar)
+            nyttVedtak(1.januar til 31.januar)
             håndterOverstyrTidslinje((17.januar til 31.januar).map { ManuellOverskrivingDag(it, Dagtype.Feriedag) })
             håndterYtelser(1.vedtaksperiode)
             håndterSimulering(1.vedtaksperiode)

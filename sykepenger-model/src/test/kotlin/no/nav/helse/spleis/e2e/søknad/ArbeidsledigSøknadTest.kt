@@ -7,7 +7,6 @@ import no.nav.helse.hendelser.Søknad.Søknadsperiode.Sykdom
 import no.nav.helse.hendelser.Søknad.Søknadstype.Companion.Arbeidsledig
 import no.nav.helse.hendelser.til
 import no.nav.helse.januar
-import no.nav.helse.person.TilstandType
 import no.nav.helse.person.TilstandType.AVVENTER_BLOKKERENDE_PERIODE
 import no.nav.helse.person.TilstandType.AVVENTER_HISTORIKK
 import no.nav.helse.person.TilstandType.START
@@ -25,7 +24,7 @@ internal class ArbeidsledigSøknadTest: AbstractDslTest() {
     @Test
     fun `støtter arbeidsledigsøknad som forlengelse av tidligere vilkårsprøvd skjæringstidspunkt`() {
         a1 {
-            nyttVedtak(1.januar, 31.januar)
+            nyttVedtak(1.januar til 31.januar)
             håndterSøknad(Sykdom(1.februar, 28.februar, 100.prosent), søknadstype = Arbeidsledig)
             assertSisteTilstand(2.vedtaksperiode, AVVENTER_HISTORIKK)
             assertVarsel(`Arbeidsledigsøknad er lagt til grunn`, 2.vedtaksperiode.filter())
@@ -34,7 +33,7 @@ internal class ArbeidsledigSøknadTest: AbstractDslTest() {
     @Test
     fun `trenger ikke varsel ved forlengelse hvis det ikke er refusjon`() {
         a1 {
-            nyttVedtak(1.januar, 31.januar, refusjon = Inntektsmelding.Refusjon(Inntekt.INGEN, null, emptyList()))
+            nyttVedtak(1.januar til 31.januar, refusjon = Inntektsmelding.Refusjon(Inntekt.INGEN, null, emptyList()))
             håndterSøknad(Sykdom(1.februar, 28.februar, 100.prosent), søknadstype = Arbeidsledig)
             assertSisteTilstand(2.vedtaksperiode, AVVENTER_HISTORIKK)
             assertIngenVarsel(`Arbeidsledigsøknad er lagt til grunn`, 2.vedtaksperiode.filter())

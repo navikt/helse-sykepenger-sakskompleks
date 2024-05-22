@@ -954,7 +954,7 @@ internal class E2EEpic3Test : AbstractEndToEndTest() {
 
     @Test
     fun `'arbeidGjenopptatt' i løpet av arbeidsgiverperioden i arbeidsgiversøknad medfører ikke NavDager og påvirker derfor ikke telling av 26 uker opphold`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
 
         håndterSykmelding(Sykmeldingsperiode(1.mars, 21.mars))
         håndterSøknad(
@@ -975,7 +975,7 @@ internal class E2EEpic3Test : AbstractEndToEndTest() {
         val maksdatoFør26UkerOpphold = LocalDate.of(2018, 12, 28)
         assertEquals(maksdatoFør26UkerOpphold, inspektør.maksdatoVedSisteVedtak())
 
-        nyttVedtak(1.august, 21.august)
+        nyttVedtak(1.august til 21.august)
 
         val maksdatoEtter26UkerOpphold = LocalDate.of(2019, 7, 30)
         assertEquals(maksdatoEtter26UkerOpphold, inspektør.maksdatoVedSisteVedtak())
@@ -985,7 +985,7 @@ internal class E2EEpic3Test : AbstractEndToEndTest() {
 
     @Test
     fun `'arbeidGjenopptatt' i løpet av arbeidsgiverperioden i arbeidsgiversøknad medfører ikke forbrukte sykedager`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         assertEquals(28.desember, inspektør.maksdatoVedSisteVedtak())
         håndterSykmelding(Sykmeldingsperiode(1.mars, 21.mars))
         håndterSøknad(
@@ -994,7 +994,7 @@ internal class E2EEpic3Test : AbstractEndToEndTest() {
         )
         håndterInntektsmelding(listOf(1.mars til 16.mars))
         assertEquals(28.desember, inspektør.maksdatoVedSisteVedtak())
-        nyttVedtak(1.mai, 21.mai)
+        nyttVedtak(1.mai til 21.mai)
         assertEquals(12.april(2019), inspektør.maksdatoVedSisteVedtak())
     }
 }

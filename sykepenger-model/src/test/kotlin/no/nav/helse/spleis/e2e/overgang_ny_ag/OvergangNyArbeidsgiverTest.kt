@@ -17,7 +17,6 @@ import no.nav.helse.person.TilstandType.AVSLUTTET_UTEN_UTBETALING
 import no.nav.helse.person.TilstandType.AVVENTER_BLOKKERENDE_PERIODE
 import no.nav.helse.person.TilstandType.AVVENTER_GODKJENNING
 import no.nav.helse.person.TilstandType.AVVENTER_HISTORIKK
-import no.nav.helse.person.TilstandType.AVVENTER_INFOTRYGDHISTORIKK
 import no.nav.helse.person.TilstandType.AVVENTER_INNTEKTSMELDING
 import no.nav.helse.person.TilstandType.AVVENTER_SIMULERING
 import no.nav.helse.person.TilstandType.START
@@ -38,7 +37,7 @@ internal class OvergangNyArbeidsgiverTest : AbstractDslTest() {
     fun `overgang til ny arbeidsgiver - innenfor agp - reduksjon oppgitt`() {
         // Inntektsmelding-signal corner case
         a1 {
-            nyttVedtak(1.januar, 31.januar)
+            nyttVedtak(1.januar til 31.januar)
         }
         a2 {
             håndterSøknad(Sykdom(1.februar, 16.februar, 100.prosent))
@@ -55,7 +54,7 @@ internal class OvergangNyArbeidsgiverTest : AbstractDslTest() {
         val forventetSykepengegrunnlag = `6G`.beløp(1.januar)
 
         a1 {
-            nyttVedtak(1.januar, 31.januar, beregnetInntekt = inntektA1)
+            nyttVedtak(1.januar til 31.januar, beregnetInntekt = inntektA1)
         }
         a2 {
             håndterSøknad(Sykdom(1.februar, 20.februar, 100.prosent))

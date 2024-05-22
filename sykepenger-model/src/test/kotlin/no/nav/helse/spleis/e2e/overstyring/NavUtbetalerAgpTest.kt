@@ -9,7 +9,6 @@ import no.nav.helse.erHelg
 import no.nav.helse.februar
 import no.nav.helse.hendelser.Dagtype
 import no.nav.helse.hendelser.InntektForSykepengegrunnlag
-import no.nav.helse.hendelser.Inntektsmelding
 import no.nav.helse.hendelser.Inntektsmelding.Refusjon
 import no.nav.helse.hendelser.ManuellOverskrivingDag
 import no.nav.helse.hendelser.OverstyrTidslinje
@@ -87,7 +86,7 @@ internal class NavUtbetalerAgpTest: AbstractEndToEndTest() {
     fun `skal aldri foreslå sykedag NAV ved en hullete arbedisgiverperiode og begrunnelse for reduksjon satt`() {
         håndterSøknad(Sykdom(18.april, 30.april, 100.prosent))
         håndterSøknad(Sykdom(1.mai, 14.mai, 100.prosent))
-        håndterInntektsmelding(listOf(14.april til 14.april, 18.april til 2.mai),)
+        håndterInntektsmelding(listOf(14.april til 14.april, 18.april til 2.mai))
         håndterVilkårsgrunnlag(2.vedtaksperiode)
         håndterYtelser(2.vedtaksperiode)
         håndterSimulering(2.vedtaksperiode)
@@ -122,7 +121,7 @@ internal class NavUtbetalerAgpTest: AbstractEndToEndTest() {
     fun `begrunnelse satt med første fraværsdag og hullete arbeidsgiverperiode kan behandles`() {
         håndterSøknad(Sykdom(18.april, 30.april, 100.prosent))
         håndterSøknad(Sykdom(1.mai, 14.mai, 100.prosent))
-        håndterInntektsmelding(listOf(14.april til 14.april, 18.april til 2.mai),)
+        håndterInntektsmelding(listOf(14.april til 14.april, 18.april til 2.mai))
         håndterVilkårsgrunnlag(2.vedtaksperiode)
         håndterYtelser(2.vedtaksperiode)
         håndterSimulering(2.vedtaksperiode)
@@ -150,7 +149,7 @@ internal class NavUtbetalerAgpTest: AbstractEndToEndTest() {
     @Test
     fun `kort periode så gap til neste - korrigert inntektsmelding opplyser om ikke-utbetalt AGP`() {
         nyPeriode(1.januar til 15.januar)
-        håndterInntektsmelding(listOf(1.januar til 16.januar), førsteFraværsdag = 1.januar,)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), førsteFraværsdag = 1.januar)
         assertSisteTilstand(1.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING)
 
         nyPeriode(20.januar til 30.januar)
@@ -244,7 +243,7 @@ internal class NavUtbetalerAgpTest: AbstractEndToEndTest() {
     fun `Overstyrer agp til sykedagNav - ingen refusjon`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent))
-        håndterInntektsmelding(listOf(1.januar til 16.januar), refusjon = Refusjon(INGEN, null, emptyList()),)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), refusjon = Refusjon(INGEN, null, emptyList()))
         assertSisteTilstand(1.vedtaksperiode, AVVENTER_VILKÅRSPRØVING)
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode)
@@ -323,7 +322,7 @@ internal class NavUtbetalerAgpTest: AbstractEndToEndTest() {
     @Test
     fun `Overstyrer egenmeldingsdager til SykedagNav`() {
         håndterSøknad(Sykdom(16.januar, 31.januar, 100.prosent))
-        håndterInntektsmelding(listOf(1.januar til 16.januar), refusjon = Refusjon(INGEN, null, emptyList()),)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), refusjon = Refusjon(INGEN, null, emptyList()))
         assertSisteTilstand(1.vedtaksperiode, AVVENTER_VILKÅRSPRØVING)
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode)
@@ -348,7 +347,7 @@ internal class NavUtbetalerAgpTest: AbstractEndToEndTest() {
     fun `Overstyrer agp til sykedagNav - refusjon`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent))
-        håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        håndterInntektsmelding(listOf(1.januar til 16.januar))
         assertSisteTilstand(1.vedtaksperiode, AVVENTER_VILKÅRSPRØVING)
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode)
@@ -406,7 +405,7 @@ internal class NavUtbetalerAgpTest: AbstractEndToEndTest() {
 
     @Test
     fun `kort periode etter ferie uten sykdom`() {
-        nyttVedtak(1.juni, 30.juni)
+        nyttVedtak(1.juni til 30.juni)
         håndterSøknad(Sykdom(1.august, 10.august, 100.prosent))
         nullstillTilstandsendringer()
         håndterInntektsmelding(
@@ -423,10 +422,12 @@ internal class NavUtbetalerAgpTest: AbstractEndToEndTest() {
 
     @Test
     fun `kort periode etter ferie uten sykdom med arbeidsgiverperioden spredt litt utover`() {
-        nyttVedtak(1.juni, 30.juni, arbeidsgiverperiode = listOf(
-            1.juni til 5.juni,
-            8.juni til 18.juni
-        ))
+        nyttVedtak(
+            1.juni til 30.juni, arbeidsgiverperiode = listOf(
+                1.juni til 5.juni,
+                8.juni til 18.juni
+            )
+        )
         håndterSøknad(Sykdom(1.august, 10.august, 100.prosent))
         nullstillTilstandsendringer()
         håndterInntektsmelding(
@@ -449,7 +450,7 @@ internal class NavUtbetalerAgpTest: AbstractEndToEndTest() {
         assertSisteTilstand(1.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING)
         assertSisteTilstand(2.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING)
         assertSisteTilstand(3.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING)
-        håndterInntektsmelding(listOf(2.januar til 4.januar, 14.januar til 26.januar),)
+        håndterInntektsmelding(listOf(2.januar til 4.januar, 14.januar til 26.januar))
         assertEquals(2.januar til 20.januar, inspektør.periode(1.vedtaksperiode))
         assertSisteTilstand(3.vedtaksperiode, AVVENTER_INNTEKTSMELDING)
         assertEquals("UUUARR AAAAARH SSSSSHH SSSSS?? ??????? ???SSHH", inspektør.sykdomshistorikk.sykdomstidslinje().toShortString())
@@ -498,7 +499,7 @@ internal class NavUtbetalerAgpTest: AbstractEndToEndTest() {
 
     @Test
     fun `eget varsel ved oppgitt begrunnelse FerieEllerAvspasering`() {
-        nyttVedtak(1.juni, 30.juni)
+        nyttVedtak(1.juni til 30.juni)
 
         håndterSøknad(Sykdom(1.august, 31.august, 50.prosent))
         håndterInntektsmelding(

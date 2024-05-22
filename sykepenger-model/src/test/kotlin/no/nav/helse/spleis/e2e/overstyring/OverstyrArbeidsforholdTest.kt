@@ -49,7 +49,7 @@ internal class OverstyrArbeidsforholdTest : AbstractEndToEndTest() {
     fun `fjerner arbeidsforhold fra arbeidsforholdhistorikken ved overstyring`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))
         håndterSøknad(Søknad.Søknadsperiode.Sykdom(1.januar, 31.januar, 100.prosent))
-        håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        håndterInntektsmelding(listOf(1.januar til 16.januar))
         håndterVilkårsgrunnlag(
             1.vedtaksperiode, arbeidsforhold = listOf(
                 Vilkårsgrunnlag.Arbeidsforhold(a1, LocalDate.EPOCH, null, Arbeidsforholdtype.ORDINÆRT),
@@ -72,7 +72,7 @@ internal class OverstyrArbeidsforholdTest : AbstractEndToEndTest() {
     fun `Overstyring av arbeidsforhold fører til et nytt vilkårsgrunnlag med nye inntektsopplysninger`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))
         håndterSøknad(Søknad.Søknadsperiode.Sykdom(1.januar, 31.januar, 100.prosent))
-        håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        håndterInntektsmelding(listOf(1.januar til 16.januar))
         håndterVilkårsgrunnlag(
             1.vedtaksperiode, arbeidsforhold = listOf(
                 Vilkårsgrunnlag.Arbeidsforhold(a1, LocalDate.EPOCH, null, Arbeidsforholdtype.ORDINÆRT),
@@ -82,7 +82,7 @@ internal class OverstyrArbeidsforholdTest : AbstractEndToEndTest() {
         håndterYtelser(1.vedtaksperiode)
         håndterSimulering(1.vedtaksperiode)
         val skjæringstidspunkt = inspektør.skjæringstidspunkt(1.vedtaksperiode)
-        inspektør(a1).sisteUtbetalingUtbetalingstidslinje()[17.januar].also { it ->
+        inspektør(a1).sisteUtbetalingUtbetalingstidslinje()[17.januar].also {
             assertEquals(1431.daglig, it.økonomi.inspektør.arbeidsgiverbeløp)
             assertEquals(0.daglig, it.økonomi.inspektør.personbeløp)
             assertEquals(31000.månedlig, it.økonomi.inspektør.aktuellDagsinntekt)
@@ -90,7 +90,7 @@ internal class OverstyrArbeidsforholdTest : AbstractEndToEndTest() {
         håndterOverstyrArbeidsforhold(skjæringstidspunkt, listOf(OverstyrArbeidsforhold.ArbeidsforholdOverstyrt(a2, true, "forklaring")))
         håndterYtelser(1.vedtaksperiode)
         håndterSimulering(1.vedtaksperiode)
-        inspektør(a1).sisteUtbetalingUtbetalingstidslinje()[17.januar].also { it ->
+        inspektør(a1).sisteUtbetalingUtbetalingstidslinje()[17.januar].also {
             assertEquals(1431.daglig, it.økonomi.inspektør.arbeidsgiverbeløp)
             assertEquals(0.daglig, it.økonomi.inspektør.personbeløp)
             assertEquals(31000.månedlig, it.økonomi.inspektør.aktuellDagsinntekt)
@@ -112,14 +112,14 @@ internal class OverstyrArbeidsforholdTest : AbstractEndToEndTest() {
 
     @Test
     fun `godtar overstyring uavhengig av rekkefølgen på arbeidsgivere`() {
-        nyttVedtak(1.januar(2017), 31.januar(2017), orgnummer = a1)
+        nyttVedtak(1.januar(2017) til 31.januar(2017), orgnummer = a1)
 
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar), orgnummer = a2)
         håndterSøknad(Søknad.Søknadsperiode.Sykdom(1.januar, 31.januar, 100.prosent), orgnummer = a2)
 
         håndterSykmelding(Sykmeldingsperiode(1.februar, 28.februar), orgnummer = a1)
 
-        håndterInntektsmelding(listOf(1.januar til 16.januar), orgnummer = a2,)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), orgnummer = a2)
         håndterVilkårsgrunnlag(
             1.vedtaksperiode,
             arbeidsforhold = listOf(
@@ -138,7 +138,7 @@ internal class OverstyrArbeidsforholdTest : AbstractEndToEndTest() {
         )
         håndterYtelser(1.vedtaksperiode, orgnummer = a2)
         håndterSimulering(1.vedtaksperiode, orgnummer = a2)
-        inspektør(a2).sisteUtbetalingUtbetalingstidslinje()[17.januar].also { it ->
+        inspektør(a2).sisteUtbetalingUtbetalingstidslinje()[17.januar].also {
             assertEquals(1080.daglig, it.økonomi.inspektør.arbeidsgiverbeløp)
             assertEquals(0.daglig, it.økonomi.inspektør.personbeløp)
             assertEquals(31000.månedlig, it.økonomi.inspektør.aktuellDagsinntekt)
@@ -146,7 +146,7 @@ internal class OverstyrArbeidsforholdTest : AbstractEndToEndTest() {
         håndterOverstyrArbeidsforhold(1.januar, listOf(OverstyrArbeidsforhold.ArbeidsforholdOverstyrt(a3, true, "forklaring")))
         håndterYtelser(1.vedtaksperiode, orgnummer = a2)
 
-        inspektør(a2).sisteUtbetalingUtbetalingstidslinje()[17.januar].also { it ->
+        inspektør(a2).sisteUtbetalingUtbetalingstidslinje()[17.januar].also {
             assertEquals(1080.daglig, it.økonomi.inspektør.arbeidsgiverbeløp)
             assertEquals(0.daglig, it.økonomi.inspektør.personbeløp)
             assertEquals(31000.månedlig, it.økonomi.inspektør.aktuellDagsinntekt)
@@ -170,7 +170,7 @@ internal class OverstyrArbeidsforholdTest : AbstractEndToEndTest() {
     fun `kan ikke overstyre arbeidsforhold for arbeidsgiver vi ikke kjenner til`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar), orgnummer = a1)
         håndterSøknad(Søknad.Søknadsperiode.Sykdom(1.januar, 31.januar, 100.prosent), orgnummer = a1)
-        håndterInntektsmelding(listOf(1.januar til 16.januar), orgnummer = a1,)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), orgnummer = a1)
 
         håndterVilkårsgrunnlag(
             1.vedtaksperiode,
@@ -198,7 +198,7 @@ internal class OverstyrArbeidsforholdTest : AbstractEndToEndTest() {
     fun `deaktivering av arbeidsforhold uten sykdom fører til nytt sykepengegrunnlag uten arbeidsforholdet, selv med inntekt`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar), orgnummer = a1)
         håndterSøknad(Søknad.Søknadsperiode.Sykdom(1.januar, 31.januar, 100.prosent), orgnummer = a1)
-        håndterInntektsmelding(listOf(1.januar til 16.januar), orgnummer = a1,)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), orgnummer = a1)
 
         håndterVilkårsgrunnlag(
             1.vedtaksperiode,
@@ -219,14 +219,14 @@ internal class OverstyrArbeidsforholdTest : AbstractEndToEndTest() {
         )
         håndterYtelser(1.vedtaksperiode, orgnummer = a1)
         håndterSimulering(1.vedtaksperiode, orgnummer = a1)
-        inspektør(a1).sisteUtbetalingUtbetalingstidslinje()[17.januar].also { it ->
+        inspektør(a1).sisteUtbetalingUtbetalingstidslinje()[17.januar].also {
             assertEquals(1075.daglig, it.økonomi.inspektør.arbeidsgiverbeløp)
             assertEquals(0.daglig, it.økonomi.inspektør.personbeløp)
             assertEquals(31000.månedlig, it.økonomi.inspektør.aktuellDagsinntekt)
         }
         håndterOverstyrArbeidsforhold(1.januar, listOf(OverstyrArbeidsforhold.ArbeidsforholdOverstyrt(a3, true, "forklaring")))
         håndterYtelser(1.vedtaksperiode, orgnummer = a1)
-        inspektør(a1).sisteUtbetalingUtbetalingstidslinje()[17.januar].also { it ->
+        inspektør(a1).sisteUtbetalingUtbetalingstidslinje()[17.januar].also {
             assertEquals(1080.daglig, it.økonomi.inspektør.arbeidsgiverbeløp)
             assertEquals(0.daglig, it.økonomi.inspektør.personbeløp)
             assertEquals(31000.månedlig, it.økonomi.inspektør.aktuellDagsinntekt)
@@ -255,7 +255,7 @@ internal class OverstyrArbeidsforholdTest : AbstractEndToEndTest() {
     fun `tar med inntekt fra inntektsmelding selv om vi ikke finner et aktivt arbeidsforhold i arbeidsforholdhistorikken`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar), orgnummer = a2)
         håndterSøknad(Søknad.Søknadsperiode.Sykdom(1.januar, 31.januar, 100.prosent), orgnummer = a2)
-        håndterInntektsmelding(listOf(1.januar til 16.januar), orgnummer = a2,)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), orgnummer = a2)
         håndterVilkårsgrunnlag(
             1.vedtaksperiode,
             arbeidsforhold = listOf(
@@ -296,7 +296,7 @@ internal class OverstyrArbeidsforholdTest : AbstractEndToEndTest() {
     fun `kan ikke overstyre arbeidsforhold dersom ingen vedtaksperioder kan håndtere hendelsen`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar), orgnummer = a1)
         håndterSøknad(Søknad.Søknadsperiode.Sykdom(1.januar, 31.januar, 100.prosent), orgnummer = a1)
-        håndterInntektsmelding(listOf(1.januar til 16.januar), orgnummer = a1,)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), orgnummer = a1)
 
         håndterVilkårsgrunnlag(
             1.vedtaksperiode,
@@ -325,7 +325,7 @@ internal class OverstyrArbeidsforholdTest : AbstractEndToEndTest() {
     fun `vi vilkårsprøver krav om minimum inntekt ved overstyring av arbeidsforhold`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar), orgnummer = a1)
         håndterSøknad(Søknad.Søknadsperiode.Sykdom(1.januar, 31.januar, 100.prosent), orgnummer = a1)
-        håndterInntektsmelding(listOf(1.januar til 16.januar), beregnetInntekt = 3800.månedlig, orgnummer = a1,)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), beregnetInntekt = 3800.månedlig, orgnummer = a1)
 
         håndterVilkårsgrunnlag(
             1.vedtaksperiode,
@@ -366,7 +366,7 @@ internal class OverstyrArbeidsforholdTest : AbstractEndToEndTest() {
     fun `vi vilkårsprøver krav om opptjening ved overstyring av arbeidsforhold`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar), orgnummer = a1)
         håndterSøknad(Søknad.Søknadsperiode.Sykdom(1.januar, 31.januar, 100.prosent), orgnummer = a1)
-        håndterInntektsmelding(listOf(1.januar til 16.januar), beregnetInntekt = INNTEKT, orgnummer = a1,)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), beregnetInntekt = INNTEKT, orgnummer = a1)
 
         håndterVilkårsgrunnlag(
             1.vedtaksperiode,
@@ -384,7 +384,7 @@ internal class OverstyrArbeidsforholdTest : AbstractEndToEndTest() {
         )
         håndterYtelser(1.vedtaksperiode, orgnummer = a1)
         håndterSimulering(1.vedtaksperiode, orgnummer = a1)
-        inspektør(a1).sisteUtbetalingUtbetalingstidslinje()[17.januar].also { it ->
+        inspektør(a1).sisteUtbetalingUtbetalingstidslinje()[17.januar].also {
             assertEquals(1431.daglig, it.økonomi.inspektør.arbeidsgiverbeløp)
             assertEquals(0.daglig, it.økonomi.inspektør.personbeløp)
             assertEquals(31000.månedlig, it.økonomi.inspektør.aktuellDagsinntekt)
@@ -392,7 +392,7 @@ internal class OverstyrArbeidsforholdTest : AbstractEndToEndTest() {
         håndterOverstyrArbeidsforhold(1.januar, listOf(OverstyrArbeidsforhold.ArbeidsforholdOverstyrt(a2, true, "forklaring")))
         håndterYtelser(1.vedtaksperiode, orgnummer = a1)
 
-        inspektør(a1).sisteUtbetalingUtbetalingstidslinje()[17.januar].also { it ->
+        inspektør(a1).sisteUtbetalingUtbetalingstidslinje()[17.januar].also {
             assertEquals(0.daglig, it.økonomi.inspektør.arbeidsgiverbeløp)
             assertEquals(0.daglig, it.økonomi.inspektør.personbeløp)
             assertEquals(31000.månedlig, it.økonomi.inspektør.aktuellDagsinntekt)

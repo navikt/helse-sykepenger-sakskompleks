@@ -19,8 +19,6 @@ import no.nav.helse.person.aktivitetslogg.Varselkode
 import no.nav.helse.person.infotrygdhistorikk.ArbeidsgiverUtbetalingsperiode
 import no.nav.helse.person.nullstillTilstandsendringer
 import no.nav.helse.sykdomstidslinje.Dag
-import no.nav.helse.utbetalingstidslinje.Utbetalingsdag
-import no.nav.helse.økonomi.Inntekt.Companion.INGEN
 import no.nav.helse.økonomi.Prosentdel.Companion.prosent
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
@@ -40,12 +38,12 @@ internal class ManglerVilkårsgrunnlagE2ETest : AbstractEndToEndTest() {
         assertNull(inspektør.vilkårsgrunnlag(1.vedtaksperiode))
 
         nyPeriode(22.januar til 31.januar)
-        håndterInntektsmelding(arbeidsgiverperioder = listOf(1.januar til 16.januar), førsteFraværsdag = 22.januar,)
+        håndterInntektsmelding(arbeidsgiverperioder = listOf(1.januar til 16.januar), førsteFraværsdag = 22.januar)
 
         assertEquals(1.januar, inspektør.skjæringstidspunkt(1.vedtaksperiode))
         assertNull(inspektør.vilkårsgrunnlag(1.vedtaksperiode))
 
-        håndterInntektsmelding(arbeidsgiverperioder = listOf(1.januar til 16.januar), førsteFraværsdag = 1.januar,)
+        håndterInntektsmelding(arbeidsgiverperioder = listOf(1.januar til 16.januar), førsteFraværsdag = 1.januar)
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode)
         håndterSimulering(1.vedtaksperiode)
@@ -64,13 +62,13 @@ internal class ManglerVilkårsgrunnlagE2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `Infotrygd utbetaler periode i forkant - Skjæringstidspunktet flytter seg`() {
-        nyttVedtak(1.februar, 28.februar)
+        nyttVedtak(1.februar til 28.februar)
         assertEquals(1.februar, inspektør.skjæringstidspunkt(1.vedtaksperiode))
         assertNotNull(inspektør.vilkårsgrunnlag(1.vedtaksperiode))
 
         håndterUtbetalingshistorikkEtterInfotrygdendring(ArbeidsgiverUtbetalingsperiode(ORGNUMMER, 1.januar, 31.januar, 100.prosent, INNTEKT))
         nyPeriode(10.mars til 31.mars)
-        håndterInntektsmelding(listOf(10.mars til 26.mars),)
+        håndterInntektsmelding(listOf(10.mars til 26.mars))
         håndterVilkårsgrunnlag(2.vedtaksperiode)
 
         assertEquals(1.februar, inspektør.skjæringstidspunkt(1.vedtaksperiode))
@@ -150,14 +148,14 @@ internal class ManglerVilkårsgrunnlagE2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `korrigert arbeidsgiverperiode under pågående revurdering`() {
-        nyttVedtak(1.januar, 31.januar, 100.prosent)
+        nyttVedtak(1.januar til 31.januar, 100.prosent)
         forlengVedtak(1.februar, 28.februar, 100.prosent)
         håndterSøknad(Sykdom(1.januar, 31.januar, 80.prosent))
 
         assertSisteTilstand(1.vedtaksperiode, AVVENTER_HISTORIKK_REVURDERING)
         assertSisteTilstand(2.vedtaksperiode, AVVENTER_REVURDERING)
         nullstillTilstandsendringer()
-        håndterInntektsmelding(listOf(1.februar til 16.februar), førsteFraværsdag = 1.februar,)
+        håndterInntektsmelding(listOf(1.februar til 16.februar), førsteFraværsdag = 1.februar)
         assertEquals(listOf(1.januar), person.skjæringstidspunkter())
 
         håndterYtelser(1.vedtaksperiode)
@@ -168,14 +166,14 @@ internal class ManglerVilkårsgrunnlagE2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `korrigert arbeidsgiverperiode under pågående revurdering - korrigert søknad for februar`() {
-        nyttVedtak(1.januar, 31.januar, 100.prosent)
+        nyttVedtak(1.januar til 31.januar, 100.prosent)
         forlengVedtak(1.februar, 28.februar, 100.prosent)
         håndterSøknad(Sykdom(1.februar, 28.februar, 80.prosent))
 
         assertSisteTilstand(1.vedtaksperiode, AVSLUTTET)
         assertSisteTilstand(2.vedtaksperiode, AVVENTER_HISTORIKK_REVURDERING)
         nullstillTilstandsendringer()
-        håndterInntektsmelding(listOf(1.februar til 16.februar), førsteFraværsdag = 1.februar,)
+        håndterInntektsmelding(listOf(1.februar til 16.februar), førsteFraværsdag = 1.februar)
         assertEquals(listOf(1.januar), person.skjæringstidspunkter())
 
         håndterYtelser(2.vedtaksperiode)

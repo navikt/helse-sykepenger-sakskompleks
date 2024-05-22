@@ -64,7 +64,7 @@ internal class ReplayInntektsmeldingE2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `Når arbeidsgiver bommer med første fraværsdag, og IM kommer før søknad er vi avhengig av replay-sjekk mot første fraværsdag for å gå videre når søknaden kommer`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         val inntektsmelding = inntektsmelding(arbeidsgiverperioder = listOf(1.januar til 16.januar), førsteFraværsdag = 13.februar)
         håndterInntektsmelding(inntektsmelding)
         assertEquals(listOf(13.februar, 1.januar), inspektør.inntektInspektør.innteksdatoer)
@@ -76,8 +76,8 @@ internal class ReplayInntektsmeldingE2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `replay av IM medfører ikke at allerede revurdert skjæringstidspunkt revurderes på nytt`() {
-        nyttVedtak(1.mars, 31.mars)
-        håndterInntektsmelding(listOf(1.mars til 16.mars), beregnetInntekt = INNTEKT + 500.daglig,)
+        nyttVedtak(1.mars til 31.mars)
+        håndterInntektsmelding(listOf(1.mars til 16.mars), beregnetInntekt = INNTEKT + 500.daglig)
 
         assertSisteTilstand(1.vedtaksperiode, AVVENTER_HISTORIKK_REVURDERING)
         håndterSkjønnsmessigFastsettelse(1.mars, listOf(OverstyrtArbeidsgiveropplysning(a1, INNTEKT + 500.daglig)))
@@ -92,7 +92,7 @@ internal class ReplayInntektsmeldingE2ETest : AbstractEndToEndTest() {
         assertTilstander(1.vedtaksperiode, AVSLUTTET, TilstandType.AVVENTER_REVURDERING)
         assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING)
 
-        håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        håndterInntektsmelding(listOf(1.januar til 16.januar))
         håndterVilkårsgrunnlag(2.vedtaksperiode)
         håndterYtelser(2.vedtaksperiode)
         håndterSimulering(2.vedtaksperiode)

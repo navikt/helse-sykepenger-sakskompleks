@@ -4,7 +4,6 @@ import java.util.UUID
 import no.nav.helse.april
 import no.nav.helse.august
 import no.nav.helse.dsl.AbstractDslTest
-import no.nav.helse.dsl.nyttVedtak
 import no.nav.helse.februar
 import no.nav.helse.hendelser.Dagtype
 import no.nav.helse.hendelser.Institusjonsopphold.Institusjonsoppholdsperiode
@@ -49,8 +48,8 @@ internal class AnnulleringOgUtbetalingTest : AbstractDslTest() {
 
     @Test
     fun `annullere revurdering til godkjenning etter annen revurdering`() = a1 {
-        nyttVedtak(1.januar, 31.januar)
-        nyttVedtak(1.mars, 31.mars)
+        nyttVedtak(1.januar til 31.januar)
+        nyttVedtak(1.mars til 31.mars)
 
         håndterOverstyrTidslinje(listOf(ManuellOverskrivingDag(31.januar, Dagtype.Feriedag)))
         håndterYtelser(1.vedtaksperiode)
@@ -80,7 +79,7 @@ internal class AnnulleringOgUtbetalingTest : AbstractDslTest() {
 
         håndterSøknad(Sykdom(1.februar, 28.februar, 100.prosent), Arbeid(1.februar, 28.februar))
 
-        nyttVedtak(1.mars, 31.mars)
+        nyttVedtak(1.mars til 31.mars)
 
         håndterSøknad(Sykdom(1.februar, 28.februar, 100.prosent))
         håndterYtelser(2.vedtaksperiode)
@@ -146,8 +145,8 @@ internal class AnnulleringOgUtbetalingTest : AbstractDslTest() {
     }
     @Test
     fun `Forkaster feilaktig avsluttet periode når to utbetalinger blir til én`() = a1 {
-        nyttVedtak(1.januar, 31.januar)
-        nyttVedtak(1.mars, 31.mars)
+        nyttVedtak(1.januar til 31.januar)
+        nyttVedtak(1.mars til 31.mars)
 
         nullstillTilstandsendringer()
         nyPeriode(5.februar til 15.februar, a1)
@@ -200,7 +199,7 @@ internal class AnnulleringOgUtbetalingTest : AbstractDslTest() {
 
         håndterSøknad(Sykdom(1.februar, 28.februar, 100.prosent), Arbeid(1.februar, 28.februar))
 
-        nyttVedtak(1.mars, 31.mars)
+        nyttVedtak(1.mars til 31.mars)
 
         håndterSøknad(Sykdom(1.februar, 28.februar, 100.prosent))
         håndterYtelser(2.vedtaksperiode)
@@ -229,8 +228,8 @@ internal class AnnulleringOgUtbetalingTest : AbstractDslTest() {
 
     @Test
     fun `korrigerer periode med bare ferie`() = a1 {
-        nyttVedtak(3.januar, 26.januar)
-        nyttVedtak(3.mars, 26.mars)
+        nyttVedtak(3.januar til 26.januar)
+        nyttVedtak(3.mars til 26.mars)
         nullstillTilstandsendringer()
 
         håndterSøknad(Sykdom(3.mars, 26.mars, 100.prosent), Ferie(3.mars, 26.mars))
@@ -273,13 +272,13 @@ internal class AnnulleringOgUtbetalingTest : AbstractDslTest() {
 
     @Test
     fun `to uavhengige arbeidsgiverperioder blir til en som følge av overstyring`() = a1 {
-        nyttVedtak(3.januar, 26.januar)
+        nyttVedtak(3.januar til 26.januar)
         håndterSøknad(Sykdom(27.januar, 28.februar, 100.prosent), Arbeid(13.februar, 28.februar))
         håndterYtelser(2.vedtaksperiode)
         håndterSimulering(2.vedtaksperiode)
         håndterUtbetalingsgodkjenning(2.vedtaksperiode)
         håndterUtbetalt()
-        nyttVedtak(3.mars, 31.mars)
+        nyttVedtak(3.mars til 31.mars)
         nullstillTilstandsendringer()
 
         håndterOverstyrTidslinje(
@@ -355,8 +354,8 @@ internal class AnnulleringOgUtbetalingTest : AbstractDslTest() {
     @Test
     fun `arbeidsgiverperiode slås sammen pga avviklet ferie`() {
         a1 {
-            nyttVedtak(1.juni, 30.juni)
-            nyttVedtak(1.august, 31.august)
+            nyttVedtak(1.juni til 30.juni)
+            nyttVedtak(1.august til 31.august)
             nullstillTilstandsendringer()
             håndterOverstyrTidslinje(1.juli.til(30.juli).map {
                 ManuellOverskrivingDag(it, Dagtype.Feriedag)
@@ -402,8 +401,8 @@ internal class AnnulleringOgUtbetalingTest : AbstractDslTest() {
     @Test
     fun `arbeidsgiverperiode slås sammen pga avviklet ferie - med endring uten utbetalingsendring i forrige periode`() {
         a1 {
-            nyttVedtak(1.juni, lørdag.den(30.juni))
-            nyttVedtak(1.august, 31.august)
+            nyttVedtak(1.juni til lørdag.den(30.juni))
+            nyttVedtak(1.august til 31.august)
             nullstillTilstandsendringer()
             håndterOverstyrTidslinje(lørdag.den(30.juni).til(30.juli).map {
                 ManuellOverskrivingDag(it, Dagtype.Feriedag)
@@ -474,8 +473,8 @@ internal class AnnulleringOgUtbetalingTest : AbstractDslTest() {
     @Test
     fun `arbeidsgiverperiode slås sammen pga avviklet ferie - med endring uten utbetalingsendring i forrige periode - ny eldre periode mens til utbetaling`() {
         a1 {
-            nyttVedtak(1.juni, lørdag.den(30.juni))
-            nyttVedtak(1.august, 31.august)
+            nyttVedtak(1.juni til lørdag.den(30.juni))
+            nyttVedtak(1.august til 31.august)
             håndterOverstyrTidslinje(lørdag.den(30.juni).til(30.juli).map {
                 ManuellOverskrivingDag(it, Dagtype.Feriedag)
             }.plusElement(ManuellOverskrivingDag(31.juli, Dagtype.Arbeidsdag)))

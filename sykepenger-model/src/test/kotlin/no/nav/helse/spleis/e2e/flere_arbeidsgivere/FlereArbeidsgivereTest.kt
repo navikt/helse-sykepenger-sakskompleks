@@ -11,7 +11,6 @@ import no.nav.helse.dsl.TestPerson
 import no.nav.helse.dsl.TestPerson.Companion.INNTEKT
 import no.nav.helse.dsl.lagStandardSykepengegrunnlag
 import no.nav.helse.dsl.nyPeriode
-import no.nav.helse.dsl.nyttVedtak
 import no.nav.helse.dsl.tilGodkjenning
 import no.nav.helse.februar
 import no.nav.helse.fredag
@@ -67,13 +66,9 @@ import no.nav.helse.økonomi.Inntekt.Companion.INGEN
 import no.nav.helse.økonomi.Inntekt.Companion.månedlig
 import no.nav.helse.økonomi.Prosentdel.Companion.prosent
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertDoesNotThrow
-import org.junit.jupiter.api.assertThrows
 import no.nav.helse.person.inntekt.Inntektsmelding as InntektFraInntektsmelding
 
 internal class FlereArbeidsgivereTest : AbstractDslTest() {
@@ -398,7 +393,7 @@ internal class FlereArbeidsgivereTest : AbstractDslTest() {
 
     @Test
     fun `kort sykdom hos ag2 med eksisterende vedtak`() {
-        a1 { nyttVedtak(1.januar, 31.januar, 100.prosent) }
+        a1 { nyttVedtak(1.januar til 31.januar, 100.prosent) }
         nyPeriode(1.februar til 14.februar, a1, a2)
         a1 {
             assertEquals(1.januar, inspektør.vedtaksperioder(2.vedtaksperiode).inspektør.skjæringstidspunkt)
@@ -441,12 +436,12 @@ internal class FlereArbeidsgivereTest : AbstractDslTest() {
     @Test
     fun `vedtaksperioder atskilt med betydelig tid`() {
         a1 {
-            nyttVedtak(1.januar, 31.januar)
+            nyttVedtak(1.januar til 31.januar)
             assertIngenFunksjonelleFeil()
             assertSisteTilstand(1.vedtaksperiode, AVSLUTTET)
         }
         a2 {
-            nyttVedtak(1.mars, 31.mars)
+            nyttVedtak(1.mars til 31.mars)
             assertIngenFunksjonelleFeil()
             assertSisteTilstand(1.vedtaksperiode, AVSLUTTET)
         }

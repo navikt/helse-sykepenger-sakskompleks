@@ -20,7 +20,6 @@ import no.nav.helse.person.TilstandType.AVVENTER_BLOKKERENDE_PERIODE
 import no.nav.helse.person.TilstandType.AVVENTER_GODKJENNING_REVURDERING
 import no.nav.helse.person.TilstandType.AVVENTER_HISTORIKK
 import no.nav.helse.person.TilstandType.AVVENTER_HISTORIKK_REVURDERING
-import no.nav.helse.person.TilstandType.AVVENTER_INFOTRYGDHISTORIKK
 import no.nav.helse.person.TilstandType.AVVENTER_INNTEKTSMELDING
 import no.nav.helse.person.TilstandType.AVVENTER_REVURDERING
 import no.nav.helse.person.TilstandType.AVVENTER_SIMULERING
@@ -262,7 +261,7 @@ internal class RevurderingFlereAGV2E2ETest: AbstractEndToEndTest() {
 
     @Test
     fun `revurdering av tidligere frittstående periode hos ag3 mens overlappende hos ag1 og ag2 utbetales`() {
-        nyttVedtak(1.januar, 31.januar, orgnummer = a3)
+        nyttVedtak(1.januar til 31.januar, orgnummer = a3)
 
         nyeVedtak(1.mai, 31.mai, a1, a2)
         forlengelseTilGodkjenning(1.juni, 30.juni, a1, a2)
@@ -309,7 +308,7 @@ internal class RevurderingFlereAGV2E2ETest: AbstractEndToEndTest() {
         nyeVedtak(1.januar, 31.januar, a1, a2)
         forlengVedtak(1.februar, 28.februar, a1, a2)
 
-        nyttVedtak(1.april, 30. april, orgnummer = a1)
+        nyttVedtak(1.april til 30. april, orgnummer = a1)
 
         nullstillTilstandsendringer()
         håndterOverstyrTidslinje(listOf(ManuellOverskrivingDag(17.januar, Feriedag)), a1)
@@ -337,7 +336,7 @@ internal class RevurderingFlereAGV2E2ETest: AbstractEndToEndTest() {
         * 2. a1 v2 utbetalt, a1 v1 revurderes, a2 v1 avventer andre arbeidsgivere
         * 3. a1 v1 revurdert, a1 v2 revurderes, a2 v1 avventer andre arbeidsgivere
         * */
-        nyttVedtak(1.januar, 31.januar, orgnummer = a1)
+        nyttVedtak(1.januar til 31.januar, orgnummer = a1)
         førstegangTilGodkjenning(1.mars, 31.mars, a1, a2)
         håndterUtbetalingsgodkjenning(2.vedtaksperiode, orgnummer = a1)
 
@@ -537,7 +536,7 @@ internal class RevurderingFlereAGV2E2ETest: AbstractEndToEndTest() {
         nyeVedtak(1.januar, 31.januar, a1)
         nyPeriode(1.februar til 18.februar, a2)
 
-        håndterInntektsmelding(listOf(1.januar til 16.januar), orgnummer = a2,)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), orgnummer = a2)
         håndterOverstyrTidslinje(listOf(ManuellOverskrivingDag(17.januar, Feriedag)), orgnummer = a1)
 
         nullstillTilstandsendringer()

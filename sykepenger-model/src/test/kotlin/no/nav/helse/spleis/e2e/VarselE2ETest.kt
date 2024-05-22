@@ -59,7 +59,7 @@ internal class VarselE2ETest: AbstractEndToEndTest() {
     fun `varsel - Perioden er avslått på grunn av at den sykmeldte ikke er medlem av Folketrygden`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))
         håndterSøknad(Søknad.Søknadsperiode.Sykdom(1.januar, 31.januar, 100.prosent))
-        håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        håndterInntektsmelding(listOf(1.januar til 16.januar))
         håndterVilkårsgrunnlag(medlemskapstatus = Medlemskapsvurdering.Medlemskapstatus.Nei)
 
         assertVarsel(RV_MV_2, 1.vedtaksperiode.filter())
@@ -67,7 +67,7 @@ internal class VarselE2ETest: AbstractEndToEndTest() {
 
     @Test
     fun `varsel - Endrer tidligere oppdrag, Kontroller simuleringen`(){
-        nyttVedtak(3.januar, 26.januar)
+        nyttVedtak(3.januar til 26.januar)
         nullstillTilstandsendringer()
 
         håndterOverstyrTidslinje((20.januar til 22.januar).map { manuellFeriedag(it) })
@@ -83,7 +83,7 @@ internal class VarselE2ETest: AbstractEndToEndTest() {
 
     @Test
     fun `varsel - Det er institusjonsopphold i perioden - Vurder retten til sykepenger`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         håndterOverstyrTidslinje(listOf(ManuellOverskrivingDag(17.januar, Dagtype.Feriedag)))
         håndterYtelser(1.vedtaksperiode, institusjonsoppholdsperioder = listOf(Institusjonsopphold.Institusjonsoppholdsperiode(1.januar, 31.januar)))
 
@@ -100,7 +100,7 @@ internal class VarselE2ETest: AbstractEndToEndTest() {
 
     @Test
     fun `varsel revurdering - Støtter ikke overgang fra infotrygd for flere arbeidsgivere`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         håndterOverstyrTidslinje(listOf(ManuellOverskrivingDag(17.januar, Dagtype.Feriedag)))
         håndterUtbetalingshistorikkEtterInfotrygdendring(
             inntektshistorikk = listOf(
@@ -115,7 +115,7 @@ internal class VarselE2ETest: AbstractEndToEndTest() {
 
     @Test
     fun `varsel revurdering - Forlenger en Infotrygdperiode på tvers av arbeidsgivere`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         forlengVedtak(1.februar, 28.februar)
         håndterOverstyrTidslinje(listOf(ManuellOverskrivingDag(17.februar, Dagtype.Feriedag)))
         håndterUtbetalingshistorikkEtterInfotrygdendring(
@@ -131,7 +131,7 @@ internal class VarselE2ETest: AbstractEndToEndTest() {
     fun `varsel - skjæringstidspunkt endres som følge av historikk fra IT`() {
         nyPeriode(10.januar til 25.januar)
         nyPeriode(26.januar til 31.januar)
-        håndterInntektsmelding(listOf(10.januar til 25.januar),)
+        håndterInntektsmelding(listOf(10.januar til 25.januar))
         håndterVilkårsgrunnlag(2.vedtaksperiode)
         håndterUtbetalingshistorikkEtterInfotrygdendring(ArbeidsgiverUtbetalingsperiode(ORGNUMMER, 1.januar, 9.januar, 100.prosent, INNTEKT), inntektshistorikk = listOf(
             Inntektsopplysning(ORGNUMMER, 1.januar, INNTEKT, true)
@@ -142,7 +142,7 @@ internal class VarselE2ETest: AbstractEndToEndTest() {
 
     @Test
     fun `varsel - skjæringstidspunkt endres som følge av historikk fra IT - forlengelse`() {
-        nyttVedtak(10.februar, 28.februar)
+        nyttVedtak(10.februar til 28.februar)
         håndterSykmelding(Sykmeldingsperiode(1.mars, 31.mars))
         håndterSøknad(Søknad.Søknadsperiode.Sykdom(1.mars, 31.mars, 100.prosent))
         håndterUtbetalingshistorikkEtterInfotrygdendring(ArbeidsgiverUtbetalingsperiode(ORGNUMMER, 5.februar, 11.februar, 100.prosent, INNTEKT), inntektshistorikk = listOf(

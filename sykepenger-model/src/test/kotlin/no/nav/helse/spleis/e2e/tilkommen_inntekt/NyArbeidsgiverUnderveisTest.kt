@@ -27,7 +27,7 @@ internal class NyArbeidsgiverUnderveisTest : AbstractDslTest() {
     @Test
     fun `Omgjøring av overlappende periode med nytt skjæringstidspunkt`() {
         a1 {
-            nyttVedtak(1.januar, 31.januar)
+            nyttVedtak(1.januar til 31.januar)
             håndterOverstyrTidslinje(listOf(ManuellOverskrivingDag(30.januar, Dagtype.Arbeidsdag), ManuellOverskrivingDag(31.januar, Dagtype.Arbeidsdag)))
             håndterYtelser(1.vedtaksperiode)
             håndterSimulering(1.vedtaksperiode)

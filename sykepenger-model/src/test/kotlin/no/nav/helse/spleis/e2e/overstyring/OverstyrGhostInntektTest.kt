@@ -149,7 +149,7 @@ internal class OverstyrGhostInntektTest : AbstractEndToEndTest() {
     ) {
         håndterSykmelding(Sykmeldingsperiode(fom, tom), orgnummer = a1)
         håndterSøknad(Søknad.Søknadsperiode.Sykdom(fom, tom, 100.prosent), orgnummer = a1)
-        håndterInntektsmelding(listOf(fom til fom.plusDays(15)), beregnetInntekt = beregnetInntekt, orgnummer = a1,)
+        håndterInntektsmelding(listOf(fom til fom.plusDays(15)), beregnetInntekt = beregnetInntekt, orgnummer = a1)
 
         val inntektForSykepengegrunnlag = sykepengegrunnlag.keys.map { orgnummer ->
             grunnlag(orgnummer, fom, sykepengegrunnlag[orgnummer]!!.repeat(3))

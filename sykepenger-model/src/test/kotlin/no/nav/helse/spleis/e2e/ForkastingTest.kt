@@ -8,6 +8,7 @@ import no.nav.helse.hendelser.Periode
 import no.nav.helse.hendelser.Sykmeldingsperiode
 import no.nav.helse.hendelser.Søknad.Søknadsperiode.Papirsykmelding
 import no.nav.helse.hendelser.Søknad.Søknadsperiode.Sykdom
+import no.nav.helse.hendelser.til
 import no.nav.helse.januar
 import no.nav.helse.person.TilstandType.AVSLUTTET
 import no.nav.helse.person.TilstandType.AVVENTER_BLOKKERENDE_PERIODE
@@ -52,7 +53,7 @@ internal class ForkastingTest : AbstractEndToEndTest() {
     fun `når utbetaling er ikke godkjent skal påfølgende perioder også kastes ut`() {
         håndterSykmelding(Sykmeldingsperiode(3.januar, 26.januar))
         håndterSøknad(Sykdom(3.januar, 26.januar, 100.prosent))
-        håndterInntektsmelding(listOf(Periode(3.januar, 18.januar)),)
+        håndterInntektsmelding(listOf(Periode(3.januar, 18.januar)))
         håndterVilkårsgrunnlag(1.vedtaksperiode, INNTEKT)
         håndterYtelser(1.vedtaksperiode)
         håndterSimulering(1.vedtaksperiode)
@@ -86,7 +87,7 @@ internal class ForkastingTest : AbstractEndToEndTest() {
             håndterSykmelding(Sykmeldingsperiode(3.januar, 26.januar))
             håndterSøknad(Sykdom(3.januar, 26.januar, 100.prosent))
         } førerTil AVVENTER_INNTEKTSMELDING somEtterfulgtAv {
-            håndterInntektsmelding(listOf(Periode(3.januar, 18.januar)),)
+            håndterInntektsmelding(listOf(Periode(3.januar, 18.januar)))
         } førerTil AVVENTER_VILKÅRSPRØVING somEtterfulgtAv {
             håndterVilkårsgrunnlag(1.vedtaksperiode, INNTEKT)
         } førerTil AVVENTER_HISTORIKK somEtterfulgtAv {
@@ -108,7 +109,7 @@ internal class ForkastingTest : AbstractEndToEndTest() {
         håndterSøknad(Sykdom(3.januar, 26.januar, 100.prosent))
         håndterSykmelding(Sykmeldingsperiode(29.januar, 23.februar))
         håndterSøknad(Sykdom(29.januar, 23.februar, 100.prosent))
-        håndterInntektsmelding(listOf(Periode(3.januar, 18.januar)),)
+        håndterInntektsmelding(listOf(Periode(3.januar, 18.januar)))
         håndterVilkårsgrunnlag(1.vedtaksperiode, INNTEKT)
         håndterYtelser(1.vedtaksperiode)
         håndterSimulering(1.vedtaksperiode)
@@ -197,7 +198,7 @@ internal class ForkastingTest : AbstractEndToEndTest() {
     fun `forkaster ikke i til utbetaling ved overlapp`() {
         håndterSykmelding(Sykmeldingsperiode(3.januar, 26.januar))
         håndterSøknad(Sykdom(3.januar, 26.januar, 100.prosent))
-        håndterInntektsmelding(listOf(Periode(3.januar, 18.januar)),)
+        håndterInntektsmelding(listOf(Periode(3.januar, 18.januar)))
         håndterVilkårsgrunnlag(1.vedtaksperiode, INNTEKT)
         håndterYtelser(1.vedtaksperiode)
         håndterSimulering(1.vedtaksperiode)
@@ -225,7 +226,7 @@ internal class ForkastingTest : AbstractEndToEndTest() {
     fun `forkaster i avventer godkjenning ved overlapp`() {
         håndterSykmelding(Sykmeldingsperiode(3.januar, 26.januar))
         håndterSøknad(Sykdom(3.januar, 26.januar, 100.prosent))
-        håndterInntektsmelding(listOf(Periode(3.januar, 18.januar)),)
+        håndterInntektsmelding(listOf(Periode(3.januar, 18.januar)))
         håndterVilkårsgrunnlag(1.vedtaksperiode, INNTEKT)
         håndterYtelser(1.vedtaksperiode)
         håndterSimulering(1.vedtaksperiode)
@@ -249,7 +250,7 @@ internal class ForkastingTest : AbstractEndToEndTest() {
 
     @Test
     fun `forkaster ikke revurderinger - avventer simulering revurdering`() {
-        nyttVedtak(3.januar, 26.januar)
+        nyttVedtak(3.januar til 26.januar)
         nullstillTilstandsendringer()
         håndterOverstyrTidslinje(listOf(
             ManuellOverskrivingDag(26.januar, Dagtype.Feriedag)
@@ -263,7 +264,7 @@ internal class ForkastingTest : AbstractEndToEndTest() {
 
     @Test
     fun `forkaster ikke revurderinger - avventer godkjenning revurdering`() {
-        nyttVedtak(3.januar, 26.januar)
+        nyttVedtak(3.januar til 26.januar)
         nullstillTilstandsendringer()
         håndterOverstyrTidslinje(listOf(
             ManuellOverskrivingDag(26.januar, Dagtype.Feriedag)
@@ -278,7 +279,7 @@ internal class ForkastingTest : AbstractEndToEndTest() {
 
     @Test
     fun `forkaster ikke revurderinger - til utbetaling`() {
-        nyttVedtak(3.januar, 26.januar)
+        nyttVedtak(3.januar til 26.januar)
         nullstillTilstandsendringer()
         håndterOverstyrTidslinje(listOf(
             ManuellOverskrivingDag(26.januar, Dagtype.Feriedag)
@@ -294,7 +295,7 @@ internal class ForkastingTest : AbstractEndToEndTest() {
 
     @Test
     fun `forkaster ikke revurderinger - revurdering feilet`() {
-        nyttVedtak(3.januar, 26.januar)
+        nyttVedtak(3.januar til 26.januar)
         nullstillTilstandsendringer()
         håndterOverstyrTidslinje(listOf(
             ManuellOverskrivingDag(26.januar, Dagtype.Feriedag)

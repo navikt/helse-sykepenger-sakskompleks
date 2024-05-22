@@ -62,7 +62,7 @@ internal class InfotrygdhistorikkEndretTest: AbstractEndToEndTest() {
         håndterUtbetalingshistorikkEtterInfotrygdendring(*perioder.toTypedArray(), inntektshistorikk = inntektsopplysning)
         håndterSykmelding(Sykmeldingsperiode(1.mars, 31.mars))
         håndterSøknad(Sykdom(1.mars, 31.mars, 100.prosent))
-        håndterInntektsmelding(listOf(1.mars til 16.mars),)
+        håndterInntektsmelding(listOf(1.mars til 16.mars))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode)
         håndterSimulering(1.vedtaksperiode)

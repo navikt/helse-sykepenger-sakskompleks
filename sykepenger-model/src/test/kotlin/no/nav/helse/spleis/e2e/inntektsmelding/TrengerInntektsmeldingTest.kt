@@ -28,14 +28,14 @@ internal class TrengerInntektsmeldingTest : AbstractEndToEndTest() {
         assertTilstand(2.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING)
         assertEquals(2, observatør.trengerIkkeInntektsmeldingVedtaksperioder.size)
 
-        håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        håndterInntektsmelding(listOf(1.januar til 16.januar))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
 
         assertTilstand(1.vedtaksperiode, AVVENTER_HISTORIKK)
         assertTilstand(2.vedtaksperiode, AVVENTER_INNTEKTSMELDING)
         assertEquals(2, observatør.manglendeInntektsmeldingVedtaksperioder.size)
 
-        håndterInntektsmelding(listOf(1.januar til 16.januar), førsteFraværsdag = 20.januar,)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), førsteFraværsdag = 20.januar)
         assertEquals(4, observatør.trengerIkkeInntektsmeldingVedtaksperioder.size)
     }
 
@@ -43,14 +43,14 @@ internal class TrengerInntektsmeldingTest : AbstractEndToEndTest() {
     @Test
     fun `Sender ut trenger_ikke_inntektsmelding i revurdering dersom vi har fått inntektsmeldingen vi trenger`() {
         nyPeriode(1.januar til 31.januar)
-        håndterInntektsmelding(listOf(5.januar til 20.januar),)
+        håndterInntektsmelding(listOf(5.januar til 20.januar))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode)
         håndterSimulering(1.vedtaksperiode)
         håndterUtbetalingsgodkjenning(1.vedtaksperiode)
         håndterUtbetalt()
 
-        håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        håndterInntektsmelding(listOf(1.januar til 16.januar))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode)
         håndterSimulering(1.vedtaksperiode)

@@ -55,7 +55,7 @@ internal class ForeldetSøknadE2ETest : AbstractEndToEndTest() {
     fun `forledet søknad med inntektsmelding`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar), mottatt = 1.januar(2019).atStartOfDay())
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent), sendtTilNAVEllerArbeidsgiver = 1.januar(2019))
-        håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        håndterInntektsmelding(listOf(1.januar til 16.januar))
         assertVarsel(RV_SØ_2)
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode)
@@ -81,7 +81,7 @@ internal class ForeldetSøknadE2ETest : AbstractEndToEndTest() {
             Ferie(1.februar, 16.februar),
             sendtTilNAVEllerArbeidsgiver = 1.mai
         )
-        håndterInntektsmelding(listOf(15.januar til 30.januar),)
+        håndterInntektsmelding(listOf(15.januar til 30.januar))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode)
         håndterUtbetalingsgodkjenning(1.vedtaksperiode)
@@ -106,7 +106,7 @@ internal class ForeldetSøknadE2ETest : AbstractEndToEndTest() {
             Ferie(1.februar, 16.februar),
             sendtTilNAVEllerArbeidsgiver = 1.mai
         )
-        håndterInntektsmelding(listOf(16.januar til 31.januar),)
+        håndterInntektsmelding(listOf(16.januar til 31.januar))
         assertEquals(Dag.ForeldetSykedag::class, inspektør.vedtaksperiodeSykdomstidslinje(1.vedtaksperiode)[31.januar]::class)
         assertTilstander(
             1.vedtaksperiode,
@@ -121,7 +121,7 @@ internal class ForeldetSøknadE2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `forledet søknad ved forlengelse`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         håndterSykmelding(Sykmeldingsperiode(1.februar, 28.februar), mottatt = 1.februar(2019).atStartOfDay())
         håndterSøknad(Sykdom(1.februar, 28.februar, 100.prosent), sendtTilNAVEllerArbeidsgiver = 1.februar(2019))
         assertVarsel(RV_SØ_2)
@@ -135,7 +135,7 @@ internal class ForeldetSøknadE2ETest : AbstractEndToEndTest() {
 
         // foreldet søknad :(
         håndterSøknad(Sykdom(1.januar, 19.januar, 100.prosent), sendtTilNAVEllerArbeidsgiver = 1.mai)
-        håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        håndterInntektsmelding(listOf(1.januar til 16.januar))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode)
         håndterUtbetalingsgodkjenning(1.vedtaksperiode)
@@ -165,14 +165,14 @@ internal class ForeldetSøknadE2ETest : AbstractEndToEndTest() {
 
         // foreldet søknad :(
         håndterSøknad(Sykdom(1.januar, 19.januar, 100.prosent), sendtTilNAVEllerArbeidsgiver = 1.mai)
-        håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        håndterInntektsmelding(listOf(1.januar til 16.januar))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode)
         håndterUtbetalingsgodkjenning(1.vedtaksperiode)
 
         // foreldet søknad :(
         håndterSøknad(Sykdom(24.januar, 31.januar, 100.prosent), sendtTilNAVEllerArbeidsgiver = 1.mai)
-        håndterInntektsmelding(listOf(1.januar til 16.januar), førsteFraværsdag = 24.januar,)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), førsteFraværsdag = 24.januar)
 
         håndterYtelser(1.vedtaksperiode)
         håndterUtbetalingsgodkjenning(1.vedtaksperiode)
@@ -205,14 +205,14 @@ internal class ForeldetSøknadE2ETest : AbstractEndToEndTest() {
 
         // foreldet søknad :(
         håndterSøknad(Sykdom(1.januar, 19.januar, 100.prosent), sendtTilNAVEllerArbeidsgiver = 1.juni)
-        håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        håndterInntektsmelding(listOf(1.januar til 16.januar))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode)
         håndterUtbetalingsgodkjenning(1.vedtaksperiode)
 
         // foreldet søknad :(
         håndterSøknad(Sykdom(19.februar, 12.mars, 100.prosent), sendtTilNAVEllerArbeidsgiver = 1.juli)
-        håndterInntektsmelding(listOf(19.februar til 6.mars),)
+        håndterInntektsmelding(listOf(19.februar til 6.mars))
         håndterVilkårsgrunnlag(2.vedtaksperiode)
         håndterYtelser(2.vedtaksperiode)
         håndterUtbetalingsgodkjenning(2.vedtaksperiode)

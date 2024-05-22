@@ -13,7 +13,6 @@ import no.nav.helse.juli
 import no.nav.helse.juni
 import no.nav.helse.mai
 import no.nav.helse.mars
-import no.nav.helse.person.TilstandType.AVSLUTTET
 import no.nav.helse.person.TilstandType.AVSLUTTET_UTEN_UTBETALING
 import no.nav.helse.person.TilstandType.AVVENTER_HISTORIKK_REVURDERING
 import no.nav.helse.person.TilstandType.AVVENTER_INFOTRYGDHISTORIKK
@@ -174,9 +173,9 @@ internal class ForkastForlengelseAvForkastetPeriodeTest : AbstractEndToEndTest()
         nyPeriode(1.januar til 31.januar)
         forkastAlle(hendelselogg)
 
-        nyttVedtak(1.mars, 31.mars)
+        nyttVedtak(1.mars til 31.mars)
         forlengVedtak(1.april, 30.april)
-        nyttVedtak(1.juni, 30.juni)
+        nyttVedtak(1.juni til 30.juni)
 
         nyPeriode(1.februar til 28.februar)
 

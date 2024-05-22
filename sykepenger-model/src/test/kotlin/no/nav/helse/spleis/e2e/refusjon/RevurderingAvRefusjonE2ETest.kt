@@ -5,6 +5,7 @@ import no.nav.helse.dsl.OverstyrtArbeidsgiveropplysning
 import no.nav.helse.dsl.TestPerson.Companion.INNTEKT
 import no.nav.helse.etterlevelse.Ledd
 import no.nav.helse.etterlevelse.Paragraf
+import no.nav.helse.hendelser.til
 import no.nav.helse.inspectors.SubsumsjonInspektør
 import no.nav.helse.januar
 import no.nav.helse.juni
@@ -27,7 +28,7 @@ internal class RevurderingAvRefusjonE2ETest : AbstractDslTest() {
                 )
             }
 
-            nyttVedtak(1.januar, 31.januar)
+            nyttVedtak(1.januar til 31.januar)
             assertSubsumsjoner { assertEquals(1, antallSubsumsjoner(this)) }
             håndterOverstyrArbeidsgiveropplysninger(1.januar, listOf(
                 OverstyrtArbeidsgiveropplysning(a1, INNTEKT, "ingen endring", null, listOf(

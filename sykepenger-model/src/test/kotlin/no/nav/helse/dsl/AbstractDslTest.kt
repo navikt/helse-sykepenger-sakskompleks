@@ -324,17 +324,29 @@ internal abstract class AbstractDslTest {
     protected fun String.assertIngenVarsler(vararg filtre: AktivitetsloggFilter) =
         this { assertIngenVarsler(*filtre) }
     protected fun String.nyttVedtak(
-        fom: LocalDate,
-        tom: LocalDate,
+        periode: Periode,
         grad: Prosentdel = 100.prosent,
-        førsteFraværsdag: LocalDate = fom,
+        førsteFraværsdag: LocalDate = periode.start,
         beregnetInntekt: Inntekt = INNTEKT,
         refusjon: Inntektsmelding.Refusjon = Inntektsmelding.Refusjon(beregnetInntekt, null, emptyList()),
         arbeidsgiverperiode: List<Periode> = emptyList(),
         status: Oppdragstatus = Oppdragstatus.AKSEPTERT,
-        sykepengegrunnlagSkatt: InntektForSykepengegrunnlag = lagStandardSykepengegrunnlag(this, beregnetInntekt, førsteFraværsdag)
+        sykepengegrunnlagSkatt: InntektForSykepengegrunnlag = lagStandardSykepengegrunnlag(
+            this,
+            beregnetInntekt,
+            førsteFraværsdag
+        )
     ) =
-        this { nyttVedtak(fom, tom, grad, førsteFraværsdag, beregnetInntekt, refusjon, arbeidsgiverperiode, status, sykepengegrunnlagSkatt) }
+        this { nyttVedtak(
+            periode,
+            grad,
+            førsteFraværsdag,
+            beregnetInntekt,
+            refusjon,
+            arbeidsgiverperiode,
+            status,
+            sykepengegrunnlagSkatt
+        ) }
 
     protected fun String.tilGodkjenning(
         fom: LocalDate,
@@ -491,17 +503,29 @@ protected fun håndterInntektsmeldingPortal(
     }
 
     protected fun nyttVedtak(
-        fom: LocalDate,
-        tom: LocalDate,
+        periode: Periode,
         grad: Prosentdel = 100.prosent,
-        førsteFraværsdag: LocalDate = fom,
+        førsteFraværsdag: LocalDate = periode.start,
         beregnetInntekt: Inntekt = INNTEKT,
         refusjon: Inntektsmelding.Refusjon = Inntektsmelding.Refusjon(beregnetInntekt, null, emptyList()),
         arbeidsgiverperiode: List<Periode> = emptyList(),
         status: Oppdragstatus = Oppdragstatus.AKSEPTERT,
-        sykepengegrunnlagSkatt: InntektForSykepengegrunnlag = lagStandardSykepengegrunnlag(a1, beregnetInntekt, førsteFraværsdag)
+        sykepengegrunnlagSkatt: InntektForSykepengegrunnlag = lagStandardSykepengegrunnlag(
+            a1,
+            beregnetInntekt,
+            førsteFraværsdag
+        )
     ) =
-        bareÈnArbeidsgiver(a1).nyttVedtak(fom, tom, grad, førsteFraværsdag, beregnetInntekt, refusjon, arbeidsgiverperiode, status, sykepengegrunnlagSkatt)
+        bareÈnArbeidsgiver(a1).nyttVedtak(
+            periode,
+            grad,
+            førsteFraværsdag,
+            beregnetInntekt,
+            refusjon,
+            arbeidsgiverperiode,
+            status,
+            sykepengegrunnlagSkatt
+        )
 
     protected fun dto() = testperson.dto()
 

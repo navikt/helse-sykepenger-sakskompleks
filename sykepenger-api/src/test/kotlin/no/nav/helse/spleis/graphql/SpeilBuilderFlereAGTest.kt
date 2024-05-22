@@ -3,22 +3,22 @@ package no.nav.helse.spleis.graphql
 import java.time.LocalDate.EPOCH
 import java.time.Month
 import java.time.YearMonth
-import no.nav.helse.hendelser.Søknad.Søknadsperiode.Sykdom
-import no.nav.helse.hendelser.til
-import no.nav.helse.januar
-import no.nav.helse.spleis.speil.dto.BeregnetPeriode
-import no.nav.helse.spleis.testhelpers.OverstyrtArbeidsgiveropplysning
 import no.nav.helse.desember
 import no.nav.helse.februar
 import no.nav.helse.hendelser.OverstyrArbeidsforhold
+import no.nav.helse.hendelser.Søknad.Søknadsperiode.Sykdom
+import no.nav.helse.hendelser.til
+import no.nav.helse.januar
 import no.nav.helse.mars
 import no.nav.helse.oktober
 import no.nav.helse.spleis.speil.dto.Arbeidsgiverinntekt
+import no.nav.helse.spleis.speil.dto.BeregnetPeriode
 import no.nav.helse.spleis.speil.dto.GhostPeriodeDTO
 import no.nav.helse.spleis.speil.dto.Inntekt
 import no.nav.helse.spleis.speil.dto.InntekterFraAOrdningen
 import no.nav.helse.spleis.speil.dto.Inntektkilde
 import no.nav.helse.spleis.speil.dto.SpleisVilkårsgrunnlag
+import no.nav.helse.spleis.testhelpers.OverstyrtArbeidsgiveropplysning
 import no.nav.helse.økonomi.Inntekt.Companion.månedlig
 import no.nav.helse.økonomi.Prosentdel.Companion.prosent
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -332,7 +332,7 @@ internal class SpeilBuilderFlereAGTest : AbstractE2ETest() {
 
     @Test
     fun `Skal ikke ta med inntekt på vilkårsgrunnlaget som mangler både sykepengegrunnlag og sammenligningsgrunnlag på skjæringstidspunktet`() {
-        nyttVedtak(1.januar(2017), 31.januar(2017), orgnummer = a2)
+        nyttVedtak(1.januar(2017) til 31.januar(2017), orgnummer = a2)
 
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent), orgnummer = a1)
         håndterInntektsmelding(1.januar, orgnummer = a1)

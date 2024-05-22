@@ -49,7 +49,7 @@ internal class SøknadMedDagerUtenforPeriodeE2ETest: AbstractEndToEndTest() {
 
     @Test
     fun `søknad med arbeidsdager mellom to perioder bridger ikke de to periodene`(){
-        nyttVedtak(1.januar, 19.januar)
+        nyttVedtak(1.januar til 19.januar)
         håndterSykmelding(Sykmeldingsperiode(1.februar, 28.februar))
         håndterSøknad(Sykdom(1.februar, 28.februar, 100.prosent), Arbeid(20.januar, 31.januar))
         assertVarsel(RV_SØ_7, AktivitetsloggFilter.person())

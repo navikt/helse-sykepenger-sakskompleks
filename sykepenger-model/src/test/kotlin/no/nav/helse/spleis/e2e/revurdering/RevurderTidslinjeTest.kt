@@ -94,7 +94,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
 
     @Test
     fun `revurdere mens en forlengelse er til utbetaling`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         forlengTilGodkjentVedtak(1.februar, 28.februar)
         nullstillTilstandsendringer()
         håndterOverstyrTidslinje(listOf(ManuellOverskrivingDag(31.januar, Dagtype.Feriedag)))
@@ -126,7 +126,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
 
     @Test
     fun `revurdere mens en periode har feilet i utbetaling`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         forlengTilGodkjentVedtak(1.februar, 28.februar)
         håndterUtbetalt(Oppdragstatus.FEIL)
         nullstillTilstandsendringer()
@@ -137,7 +137,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
 
     @Test
     fun `annullering etter revurdering med utbetaling feilet`() {
-        nyttVedtak(3.januar, 26.januar)
+        nyttVedtak(3.januar til 26.januar)
         forlengVedtak(27.januar, 26.februar)
         nullstillTilstandsendringer()
         håndterOverstyrTidslinje(listOf(ManuellOverskrivingDag(26.januar, Dagtype.Feriedag)))
@@ -155,7 +155,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
 
     @Test
     fun `annullering etter revurdering feilet`() {
-        nyttVedtak(3.januar, 26.januar)
+        nyttVedtak(3.januar til 26.januar)
         forlengVedtak(29.januar, 26.februar)
 
         håndterOverstyrTidslinje(listOf(ManuellOverskrivingDag(26.januar, Dagtype.Feriedag)))
@@ -170,7 +170,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
 
     @Test
     fun `to perioder - revurder dager i eldste`() {
-        nyttVedtak(3.januar, 26.januar)
+        nyttVedtak(3.januar til 26.januar)
         forlengVedtak(27.januar, 14.februar)
         nullstillTilstandsendringer()
 
@@ -188,7 +188,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
 
     @Test
     fun `to perioder - revurder dag i nyeste`() {
-        nyttVedtak(3.januar, 26.januar)
+        nyttVedtak(3.januar til 26.januar)
         forlengVedtak(27.januar, 14.februar)
 
         håndterOverstyrTidslinje((4.februar til 8.februar).map { manuellFeriedag(it) })
@@ -237,7 +237,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
 
     @Test
     fun `to perioder - hele den nyeste perioden blir ferie`() {
-        nyttVedtak(3.januar, 26.januar)
+        nyttVedtak(3.januar til 26.januar)
         forlengVedtak(27.januar, 14.februar)
 
         håndterOverstyrTidslinje((27.januar til 14.februar).map { manuellFeriedag(it) })
@@ -287,7 +287,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
 
     @Test
     fun `kan ikke utvide perioden med sykedager`() {
-        nyttVedtak(3.januar, 26.januar)
+        nyttVedtak(3.januar til 26.januar)
         nullstillTilstandsendringer()
 
         håndterOverstyrTidslinje((25.januar til 14.februar).map { manuellSykedag(it) })
@@ -308,7 +308,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
 
     @Test
     fun `ferie i arbeidsgiverperiode`() {
-        nyttVedtak(3.januar, 26.januar)
+        nyttVedtak(3.januar til 26.januar)
         håndterSykmelding(Sykmeldingsperiode(27.januar, 14.februar))
         håndterSøknad(Sykdom(27.januar, 14.februar, 100.prosent))
         håndterYtelser(2.vedtaksperiode)
@@ -354,7 +354,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
 
     @Test
     fun `ledende uferdig periode`() {
-        nyttVedtak(3.januar, 26.januar)
+        nyttVedtak(3.januar til 26.januar)
         håndterSykmelding(Sykmeldingsperiode(27.januar, 14.februar))
         håndterSøknad(Sykdom(27.januar, 14.februar, 100.prosent))
         håndterYtelser(2.vedtaksperiode)
@@ -405,7 +405,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
 
     @Test
     fun `ledende uferdig periode som ikke har en utbetaling`() {
-        nyttVedtak(3.januar, 26.januar)
+        nyttVedtak(3.januar til 26.januar)
         håndterSykmelding(Sykmeldingsperiode(27.januar, 14.februar))
         håndterSøknad(Sykdom(27.januar, 14.februar, 100.prosent))
         nullstillTilstandsendringer()
@@ -433,8 +433,8 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
 
     @Test
     fun `samme fagsystemId og forskjellig skjæringstidspunkt - revurder første periode i siste skjæringstidspunkt`() {
-        nyttVedtak(3.januar, 26.januar)
-        nyttVedtak(1.februar, 20.februar)
+        nyttVedtak(3.januar til 26.januar)
+        nyttVedtak(1.februar til 20.februar)
         forlengVedtak(21.februar, 10.mars)
         nullstillTilstandsendringer()
         håndterOverstyrTidslinje((5.februar til 15.februar).map { manuellFeriedag(it) })
@@ -453,8 +453,8 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
 
     @Test
     fun `samme fagsystemId og forskjellig skjæringstidspunkt - revurder siste periode i siste skjæringstidspunkt`() {
-        nyttVedtak(3.januar, 26.januar)
-        nyttVedtak(1.februar, 20.februar)
+        nyttVedtak(3.januar til 26.januar)
+        nyttVedtak(1.februar til 20.februar)
         forlengVedtak(21.februar, 10.mars)
 
         håndterOverstyrTidslinje((22.februar til 25.februar).map { manuellFeriedag(it) })
@@ -508,7 +508,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
 
     @Test
     fun `forsøk på å revurdere eldre fagsystemId med nyere perioder uten utbetaling, og periode med utbetaling etterpå`() {
-        nyttVedtak(3.januar, 26.januar)
+        nyttVedtak(3.januar til 26.januar)
         tilGodkjenning(1.mai, 31.mai, 100.prosent, 1.mai)
 
         håndterOverstyrTidslinje((4.januar til 20.januar).map { manuellFeriedag(it) })
@@ -546,7 +546,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
 
     @Test
     fun `revurderer siste utbetalte periode med bare ferie og permisjon`() {
-        nyttVedtak(3.januar, 26.januar)
+        nyttVedtak(3.januar til 26.januar)
         nullstillTilstandsendringer()
 
         håndterOverstyrTidslinje((3.januar til 20.januar).map { manuellFeriedag(it) } + (21.januar til 26.januar).map { manuellPermisjonsdag(it) })
@@ -574,8 +574,8 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
 
     @Test
     fun `revurderer siste utbetalte periode med bare ferie og permisjon - med tidligere utbetaling`() {
-        nyttVedtak(3.januar, 26.januar)
-        nyttVedtak(3.mars, 26.mars)
+        nyttVedtak(3.januar til 26.januar)
+        nyttVedtak(3.mars til 26.mars)
         nullstillTilstandsendringer()
 
         håndterOverstyrTidslinje((3.mars til 20.mars).map { manuellFeriedag(it) } + (21.mars til 26.mars).map { manuellPermisjonsdag(it) })
@@ -675,7 +675,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
 
     @Test
     fun `Feilet simulering gir warning`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
 
         håndterOverstyrTidslinje(listOf(manuellFeriedag(18.januar)))
         håndterYtelser(1.vedtaksperiode)
@@ -725,7 +725,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
 
     @Test
     fun `påminnet revurdering timer ikke ut`() {
-        nyttVedtak(3.januar, 26.januar)
+        nyttVedtak(3.januar til 26.januar)
 
         håndterOverstyrTidslinje((16.januar til 26.januar).map { manuellFeriedag(it) })
 
@@ -754,7 +754,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
 
     @Test
     fun `revurder med kun ferie`() {
-        nyttVedtak(3.januar, 26.januar)
+        nyttVedtak(3.januar til 26.januar)
         forlengVedtak(27.januar, 13.februar)
         forlengPeriode(14.februar, 15.februar)
 
@@ -794,7 +794,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
 
     @Test
     fun `revurder en revurdering`() {
-        nyttVedtak(3.januar, 26.januar)
+        nyttVedtak(3.januar til 26.januar)
         nullstillTilstandsendringer()
 
         håndterOverstyrTidslinje((20.januar til 22.januar).map { manuellFeriedag(it) })
@@ -834,7 +834,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
 
     @Test
     fun `tre utbetalte perioder - midterste blir revurdert - to siste perioder blir revurdert, første er urørt`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         forlengVedtak(1.februar, 28.februar)
         forlengVedtak(1.mars, 31.mars)
         nullstillTilstandsendringer()
@@ -848,7 +848,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
 
     @Test
     fun `tre utbetalte perioder - midterste blir revurdert og utbetalt - to siste perioder blir revurdert, første er urørt`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         forlengVedtak(1.februar, 28.februar)
         forlengVedtak(1.mars, 31.mars)
         nullstillTilstandsendringer()
@@ -874,7 +874,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
 
     @Test
     fun `forleng uferdig revurdering`() {
-        nyttVedtak(3.januar, 26.januar)
+        nyttVedtak(3.januar til 26.januar)
 
         håndterOverstyrTidslinje((16.januar til 26.januar).map { manuellFeriedag(it) })
 
@@ -958,7 +958,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
 
     @Test
     fun `forlengelse samtidig som en aktiv revurdering hvor forlengelsen sin IM flytter skjæringstidspunktet til aktive revurderingen`() {
-        nyttVedtak(3.januar, 26.januar)
+        nyttVedtak(3.januar til 26.januar)
 
         håndterOverstyrTidslinje((16.januar til 26.januar).map { manuellFeriedag(it) })
         håndterYtelser(1.vedtaksperiode)
@@ -1000,7 +1000,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
 
     @Test
     fun `feilet revurdering blokkerer videre behandling`() {
-        nyttVedtak(3.januar, 26.januar)
+        nyttVedtak(3.januar til 26.januar)
 
         håndterOverstyrTidslinje((16.januar til 26.januar).map { manuellFeriedag(it) })
 
@@ -1016,7 +1016,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
 
     @Test
     fun `etterspør ytelser ved påminnelser i avventer_historikk_revurdering`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         assertEtterspurteYtelser(1, 1.vedtaksperiode)
 
         håndterOverstyrTidslinje((25.januar til 26.januar).map { manuellFeriedag(it) })
@@ -1028,7 +1028,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
 
     @Test
     fun `Håndter påminnelser i alle tilstandene knyttet til en revurdering med en arbeidsgiver`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         håndterOverstyrTidslinje((25.januar til 26.januar).map { manuellFeriedag(it) })
         håndterPåminnelse(1.vedtaksperiode, AVVENTER_HISTORIKK_REVURDERING)
         assertEtterspurteYtelser(3, 1.vedtaksperiode)
@@ -1217,7 +1217,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
 
     @Test
     fun `Kun periode berørt av endringene skal ha hendelseIden - forlengelse får hendelseId`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         forlengVedtak(1.februar, 28.februar)
         val hendelseId = UUID.randomUUID()
         håndterOverstyrTidslinje(
@@ -1232,8 +1232,8 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
 
     @Test
     fun `Kun periode berørt av endringene skal ha hendelseIden`() {
-        nyttVedtak(1.januar, 31.januar)
-        nyttVedtak(2.februar, 28.februar)
+        nyttVedtak(1.januar til 31.januar)
+        nyttVedtak(2.februar til 28.februar)
         val hendelseId = UUID.randomUUID()
         håndterOverstyrTidslinje(
             meldingsreferanseId = hendelseId,
@@ -1247,7 +1247,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
 
     @Test
     fun `revurder første dag i periode på en sykedag som forlenger tidligere arbeidsgiverperiode med nytt skjæringstidspunkt`() {
-        nyttVedtak(1.januar, 20.januar)
+        nyttVedtak(1.januar til 20.januar)
         håndterSøknad(Sykdom(25.januar, 25.januar, 100.prosent))
         håndterInntektsmelding(listOf(1.januar til 16.januar), førsteFraværsdag = 25.januar)
         håndterYtelser(1.vedtaksperiode)

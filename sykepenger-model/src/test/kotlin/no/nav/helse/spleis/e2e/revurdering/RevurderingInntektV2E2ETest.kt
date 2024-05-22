@@ -78,7 +78,7 @@ internal class RevurderingInntektV2E2ETest : AbstractEndToEndTest() {
     fun `revurdere enslig periode`() {
         val forventetEndring = 200.daglig
         val overstyrtInntekt = INNTEKT + forventetEndring
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         nullstillTilstandsendringer()
         assertDag<Sykedag, NavDag>(19.januar, 1431.daglig, INGEN, INNTEKT)
         håndterOverstyrInntekt(overstyrtInntekt, skjæringstidspunkt = 1.januar)
@@ -99,7 +99,7 @@ internal class RevurderingInntektV2E2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `skal kunne overstyre inntekt i utkast til revurdering`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         nullstillTilstandsendringer()
 
         håndterOverstyrInntekt(inntekt = 20000.månedlig, skjæringstidspunkt = 1.januar)
@@ -136,7 +136,7 @@ internal class RevurderingInntektV2E2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `skal kunne overstyre inntekt i utkast til revurdering, også når det er snakk om flere perioder`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         forlengVedtak(1.februar, 28.februar)
         nullstillTilstandsendringer()
 
@@ -161,7 +161,7 @@ internal class RevurderingInntektV2E2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `skal kunne overstyre inntekt i AvventerHistorikkRevurdering`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         nullstillTilstandsendringer()
 
         håndterOverstyrInntekt(inntekt = 20000.månedlig, skjæringstidspunkt = 1.januar)
@@ -186,7 +186,7 @@ internal class RevurderingInntektV2E2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `skal kunne overstyre inntekt i AvventerSimuleringRevurdering`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         nullstillTilstandsendringer()
 
         håndterOverstyrInntekt(inntekt = 20000.månedlig, skjæringstidspunkt = 1.januar)
@@ -213,7 +213,7 @@ internal class RevurderingInntektV2E2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `skal kunne overstyre inntekt i utkast til revurdering ved revurdering av tidslinje`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         forlengVedtak(1.februar, 28.februar)
         nullstillTilstandsendringer()
         assertDag<Sykedag, NavDag>(
@@ -282,7 +282,7 @@ internal class RevurderingInntektV2E2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `revurder inntekt ukjent skjæringstidspunkt`() {
-        nyttVedtak(1.januar, 31.januar, 100.prosent)
+        nyttVedtak(1.januar til 31.januar, 100.prosent)
         nullstillTilstandsendringer()
         assertThrows<IllegalStateException> { håndterOverstyrInntekt(inntekt = 32000.månedlig, skjæringstidspunkt = 2.januar) }
         assertIngenFunksjonelleFeil(AktivitetsloggFilter.person())
@@ -292,8 +292,8 @@ internal class RevurderingInntektV2E2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `revurder inntekt tidligere skjæringstidspunkt - med AGP imellom`() {
-        nyttVedtak(1.januar, 31.januar, 100.prosent)
-        nyttVedtak(1.mars, 31.mars, 100.prosent)
+        nyttVedtak(1.januar til 31.januar, 100.prosent)
+        nyttVedtak(1.mars til 31.mars, 100.prosent)
         nullstillTilstandsendringer()
 
         val korrelasjonsIdPåUtbetaling1 = inspektør.sisteAvsluttedeUtbetalingForVedtaksperiode(1.vedtaksperiode).inspektør.korrelasjonsId
@@ -345,8 +345,8 @@ internal class RevurderingInntektV2E2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `revurder inntekt tidligere skjæringstidspunkt - med samme AGP`() {
-        nyttVedtak(1.januar, 31.januar, 100.prosent)
-        nyttVedtak(2.februar, 28.februar, 100.prosent)
+        nyttVedtak(1.januar til 31.januar, 100.prosent)
+        nyttVedtak(2.februar til 28.februar, 100.prosent)
         nullstillTilstandsendringer()
 
         håndterOverstyrInntekt(inntekt = 32000.månedlig, skjæringstidspunkt = 1.januar)
@@ -410,7 +410,7 @@ internal class RevurderingInntektV2E2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `revurder inntekt til under krav til minste sykepengegrunnlag`() {
-        nyttVedtak(1.januar, 31.januar, 100.prosent)
+        nyttVedtak(1.januar til 31.januar, 100.prosent)
         nullstillTilstandsendringer()
         håndterOverstyrInntekt(inntekt = 3000.månedlig, skjæringstidspunkt = 1.januar)
         håndterYtelser(1.vedtaksperiode)
@@ -434,7 +434,7 @@ internal class RevurderingInntektV2E2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `revurder inntekt til under krav til minste sykepengegrunnlag slik at utbetaling opphører, og så revurder igjen til over krav til minste sykepengegrunnlag`() {
-        nyttVedtak(1.januar, 31.januar, 100.prosent, beregnetInntekt = 5000.månedlig)
+        nyttVedtak(1.januar til 31.januar, 100.prosent, beregnetInntekt = 5000.månedlig)
         nullstillTilstandsendringer()
         håndterOverstyrInntekt(inntekt = 3000.månedlig, skjæringstidspunkt = 1.januar)
         håndterSkjønnsmessigFastsettelse(1.januar, listOf(OverstyrtArbeidsgiveropplysning(a1, 3000.månedlig)))
@@ -542,7 +542,7 @@ internal class RevurderingInntektV2E2ETest : AbstractEndToEndTest() {
     fun `revurdering av inntekt delegeres til den første perioden som har en utbetalingstidslinje - periode uten utbetaling først`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent), Søknad.Søknadsperiode.Ferie(1.januar, 31.januar))
-        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)),)
+        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)))
 
         håndterSykmelding(Sykmeldingsperiode(1.februar, 28.februar))
         håndterSøknad(Sykdom(1.februar, 28.februar, 100.prosent))
@@ -586,8 +586,8 @@ internal class RevurderingInntektV2E2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `Perioder med aktuelt skjæringstidspunkt skal være stemplet med hendelseId`() {
-        nyttVedtak(1.januar, 31.januar)
-        nyttVedtak(1.mars, 31.mars)
+        nyttVedtak(1.januar til 31.januar)
+        nyttVedtak(1.mars til 31.mars)
         forlengVedtak(1.april, 30.april)
         val overstyrInntektHendelseId = UUID.randomUUID()
         håndterOverstyrInntekt(skjæringstidspunkt = 1.mars, meldingsreferanseId = overstyrInntektHendelseId)
@@ -608,7 +608,7 @@ internal class RevurderingInntektV2E2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `revurdere inntekt slik at det blir brukerutbetaling`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         håndterInntektsmelding(
             listOf(Periode(1.januar, 16.januar)),
             refusjon = Refusjon(
@@ -632,7 +632,7 @@ internal class RevurderingInntektV2E2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `revurdere inntekt slik at det blir delvis refusjon`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         håndterInntektsmelding(
             listOf(Periode(1.januar, 16.januar)),
             refusjon = Refusjon(
@@ -656,7 +656,7 @@ internal class RevurderingInntektV2E2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `revurdere mens en periode er til utbetaling`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         forlengTilGodkjentVedtak(1.februar, 28.februar)
         nullstillTilstandsendringer()
         håndterOverstyrInntekt(30000.månedlig, skjæringstidspunkt = 1.januar)
@@ -673,7 +673,7 @@ internal class RevurderingInntektV2E2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `revurdere mens en periode har feilet i utbetaling`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         forlengTilGodkjentVedtak(1.februar, 28.februar)
         nullstillTilstandsendringer()
         håndterUtbetalt(status = Oppdragstatus.FEIL)
@@ -685,7 +685,7 @@ internal class RevurderingInntektV2E2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `refusjonsopplysninger er uendret etter revurdert inntekt`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         val refusjonsopplysningerFørRevurdering = inspektør.refusjonsopplysningerFraVilkårsgrunnlag(1.januar).inspektør.refusjonsopplysninger
         håndterOverstyrInntekt(inntekt = 25000.månedlig, skjæringstidspunkt = 1.januar)
         val refusjonsopplysningerEtterRevurdering = inspektør.refusjonsopplysningerFraVilkårsgrunnlag(1.januar).inspektør.refusjonsopplysninger

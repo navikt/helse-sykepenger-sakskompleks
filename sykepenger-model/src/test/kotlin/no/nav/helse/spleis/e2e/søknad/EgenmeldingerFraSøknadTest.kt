@@ -39,7 +39,7 @@ internal class EgenmeldingerFraSøknadTest : AbstractEndToEndTest() {
 
     @Test
     fun `fjerner egenmeldingsdager fra søknad som er før tidligere vedtaksperioder`() {
-        nyttVedtak(3.januar, 21.januar)
+        nyttVedtak(3.januar til 21.januar)
 
         håndterSykmelding(Sykmeldingsperiode(25.januar, 31.januar))
         håndterSøknad(Sykdom(25.januar, 31.januar, 100.prosent), egenmeldinger = listOf(
@@ -53,7 +53,7 @@ internal class EgenmeldingerFraSøknadTest : AbstractEndToEndTest() {
 
     @Test
     fun `fjerner egenmeldingsdager fra søknad som overlapper med tidligere vedtaksperioder`() {
-        nyttVedtak(3.januar, 21.januar)
+        nyttVedtak(3.januar til 21.januar)
 
         håndterSykmelding(Sykmeldingsperiode(25.januar, 31.januar))
         håndterSøknad(Sykdom(25.januar, 31.januar, 100.prosent), egenmeldinger = listOf(
@@ -83,7 +83,7 @@ internal class EgenmeldingerFraSøknadTest : AbstractEndToEndTest() {
 
     @Test
     fun `egenmeldingsdager påvirker ikke hvilken vedtaksperiode som håndterer en søknad`() {
-        nyttVedtak(3.januar, 21.januar)
+        nyttVedtak(3.januar til 21.januar)
 
         håndterSykmelding(Sykmeldingsperiode(25.januar, 31.januar))
         val søknadId = håndterSøknad(Sykdom(25.januar, 31.januar, 100.prosent), egenmeldinger = listOf(
@@ -100,7 +100,7 @@ internal class EgenmeldingerFraSøknadTest : AbstractEndToEndTest() {
         håndterSøknad(Sykdom(2.januar, 17.januar, 100.prosent), egenmeldinger = listOf(
             Arbeidsgiverdag(1.januar, 1.januar)
         ))
-        håndterInntektsmelding(listOf(2.januar til 17.januar),)
+        håndterInntektsmelding(listOf(2.januar til 17.januar))
 
         assertTilstand(1.vedtaksperiode, TilstandType.AVSLUTTET_UTEN_UTBETALING)
     }
@@ -111,7 +111,7 @@ internal class EgenmeldingerFraSøknadTest : AbstractEndToEndTest() {
         håndterSøknad(Sykdom(7.januar, 31.januar, 100.prosent), egenmeldinger = listOf(
             Arbeidsgiverdag(3.januar, 5.januar)
         ))
-        håndterInntektsmelding(listOf(1.januar til 1.januar, 5.januar til 19.januar),)
+        håndterInntektsmelding(listOf(1.januar til 1.januar, 5.januar til 19.januar))
 
         assertTrue(inspektør.sykdomstidslinje[1.januar] is Dag.Arbeidsgiverdag)
         assertTrue(inspektør.sykdomstidslinje[2.januar] is Dag.Arbeidsdag)
@@ -134,7 +134,7 @@ internal class EgenmeldingerFraSøknadTest : AbstractEndToEndTest() {
         håndterSøknad(Sykdom(2.januar, 31.januar, 100.prosent), egenmeldinger = listOf(
             Arbeidsgiverdag(1.januar, 1.januar)
         ))
-        håndterInntektsmelding(listOf(2.januar til 17.januar),)
+        håndterInntektsmelding(listOf(2.januar til 17.januar))
 
         assertTrue(inspektør.sykdomstidslinje[1.januar] is Dag.Arbeidsdag)
         assertTrue(inspektør.sykdomstidslinje[1.januar].kommerFra("Inntektsmelding") )

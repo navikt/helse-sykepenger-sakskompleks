@@ -44,7 +44,7 @@ internal class FriskmeldtE2ETest : AbstractEndToEndTest() {
     @Test
     fun `friskmeldt forlengelse av utbetalt periode`() {
         nyPeriode(1.januar til 20.januar)
-        håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        håndterInntektsmelding(listOf(1.januar til 16.januar))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode)
         håndterSimulering(1.vedtaksperiode)
@@ -58,7 +58,7 @@ internal class FriskmeldtE2ETest : AbstractEndToEndTest() {
 
     @Test
     fun `Forlengelse med kun helg og friskmelding`() {
-        nyttVedtak(1.januar, 19.januar)
+        nyttVedtak(1.januar til 19.januar)
         håndterSykmelding(Sykmeldingsperiode(20.januar, 31.januar))
         håndterSøknad(Sykdom(20.januar, 31.januar, 100.prosent), Arbeid(22.januar, 31.januar))
         assertTilstander(2.vedtaksperiode, START, AVVENTER_BLOKKERENDE_PERIODE, AVSLUTTET_UTEN_UTBETALING)

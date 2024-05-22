@@ -35,7 +35,7 @@ internal class BerOmInntektsmeldingTest : AbstractEndToEndTest() {
     fun `Ber ikke om inntektsmelding på korte perioder med uferdige periode hos annen ag`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar), orgnummer = a1)
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent), orgnummer = a1)
-        håndterInntektsmelding(listOf(1.januar til 16.januar), orgnummer = a1,)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), orgnummer = a1)
         håndterVilkårsgrunnlag(1.vedtaksperiode, orgnummer = a1)
         håndterYtelser(1.vedtaksperiode, orgnummer = a1)
         håndterSimulering(1.vedtaksperiode, orgnummer = a1)
@@ -107,7 +107,7 @@ internal class BerOmInntektsmeldingTest : AbstractEndToEndTest() {
     fun `Sender ut event om at vi ikke trenger inntektsmelding når vi forlater AvventerInntektsmelding`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent))
-        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)),)
+        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)))
 
         assertTilstander(
             1.vedtaksperiode,
@@ -127,7 +127,7 @@ internal class BerOmInntektsmeldingTest : AbstractEndToEndTest() {
         håndterSykmelding(Sykmeldingsperiode(2.februar, 28.februar))
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent))
         håndterSøknad(Sykdom(2.februar, 28.februar, 100.prosent))
-        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)), 2.februar,)
+        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)), 2.februar)
 
         assertTilstander(
             2.vedtaksperiode,

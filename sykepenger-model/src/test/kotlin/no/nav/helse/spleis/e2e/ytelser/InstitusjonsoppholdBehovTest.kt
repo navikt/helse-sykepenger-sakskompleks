@@ -40,7 +40,7 @@ internal class InstitusjonsoppholdBehovTest : AbstractEndToEndTest() {
     fun `Periode for person der det ikke foreligger institusjonsopphold blir behandlet og sendt til godkjenning`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent))
-        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)),)
+        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode, institusjonsoppholdsperioder = emptyList())
         håndterSimulering(1.vedtaksperiode)
@@ -66,7 +66,7 @@ internal class InstitusjonsoppholdBehovTest : AbstractEndToEndTest() {
     fun `Periode som overlapper med institusjonsopphold blir sendt til Infotrygd`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent))
-        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)),)
+        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode, institusjonsoppholdsperioder = listOf(1.januar til 31.januar))
 
@@ -86,7 +86,7 @@ internal class InstitusjonsoppholdBehovTest : AbstractEndToEndTest() {
     fun `Periode som overlapper med institusjonsopphold i starten av perioden blir sendt til Infotrygd`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent))
-        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)),)
+        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode, institusjonsoppholdsperioder = listOf(1.desember(2017) til 1.januar))
 
@@ -106,7 +106,7 @@ internal class InstitusjonsoppholdBehovTest : AbstractEndToEndTest() {
     fun `Periode som overlapper med institusjonsopphold i slutten av perioden blir sendt til Infotrygd`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent))
-        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)),)
+        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode, institusjonsoppholdsperioder = listOf(31.januar til 14.februar))
 
@@ -126,7 +126,7 @@ internal class InstitusjonsoppholdBehovTest : AbstractEndToEndTest() {
     fun `Periode som ikke overlapper med institusjonsopphold blir behandlet og sendt til godkjenning`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent))
-        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)),)
+        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(
             1.vedtaksperiode,
@@ -158,7 +158,7 @@ internal class InstitusjonsoppholdBehovTest : AbstractEndToEndTest() {
     fun `Periode som er før fom i institusjonsopphold, uten tom, blir behandlet og sendt til godkjenning`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent))
-        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)),)
+        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode, institusjonsoppholdsperioder = listOf(1.februar til null))
         håndterSimulering(1.vedtaksperiode)
@@ -184,7 +184,7 @@ internal class InstitusjonsoppholdBehovTest : AbstractEndToEndTest() {
     fun `Periode som overlapper med fom i institusjonsopphold, uten tom, blir sendt til Infotrygd`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent))
-        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)),)
+        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode, institusjonsoppholdsperioder = listOf(31.januar til null))
 
@@ -204,7 +204,7 @@ internal class InstitusjonsoppholdBehovTest : AbstractEndToEndTest() {
     fun `Periode som er etter fom i institusjonsopphold, uten tom, blir sendt til Infotrygd`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent))
-        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)),)
+        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode, institusjonsoppholdsperioder = listOf(31.desember(2017) til null))
 

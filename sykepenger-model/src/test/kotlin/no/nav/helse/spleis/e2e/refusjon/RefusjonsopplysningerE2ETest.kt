@@ -1,7 +1,6 @@
 package no.nav.helse.spleis.e2e.refusjon
 
 import java.util.UUID
-import no.nav.helse.august
 import no.nav.helse.dsl.AbstractDslTest
 import no.nav.helse.dsl.TestPerson.Companion.INNTEKT
 import no.nav.helse.februar
@@ -10,16 +9,10 @@ import no.nav.helse.hendelser.Periode
 import no.nav.helse.hendelser.Sykmeldingsperiode
 import no.nav.helse.hendelser.Søknad.Søknadsperiode.Sykdom
 import no.nav.helse.hendelser.til
-import no.nav.helse.i
 import no.nav.helse.inspectors.inspektør
 import no.nav.helse.januar
-import no.nav.helse.juli
-import no.nav.helse.oktober
-import no.nav.helse.person.TilstandType.AVVENTER_SIMULERING
-import no.nav.helse.person.aktivitetslogg.Varselkode.RV_RE_1
 import no.nav.helse.person.inntekt.Refusjonsopplysning
 import no.nav.helse.person.inntekt.Refusjonsopplysning.Refusjonsopplysninger
-import no.nav.helse.september
 import no.nav.helse.økonomi.Inntekt
 import no.nav.helse.økonomi.Inntekt.Companion.INGEN
 import no.nav.helse.økonomi.Prosentdel.Companion.prosent
@@ -31,7 +24,11 @@ internal class RefusjonsopplysningerE2ETest : AbstractDslTest() {
     @Test
     fun `første fraværsdag oppgitt til dagen etter arbeidsgiverperioden`(){
         a1 {
-            nyttVedtak(førsteFraværsdag = 17.januar, arbeidsgiverperiode = listOf(1.januar til 16.januar), fom = 1.januar, tom = 31.januar)
+            nyttVedtak(
+                1.januar til 31.januar,
+                førsteFraværsdag = 17.januar,
+                arbeidsgiverperiode = listOf(1.januar til 16.januar)
+            )
             assertIngenInfoSomInneholder("Mangler refusjonsopplysninger på orgnummer")
         }
     }
@@ -39,7 +36,11 @@ internal class RefusjonsopplysningerE2ETest : AbstractDslTest() {
     @Test
     fun `første fraværsdag oppgitt til dagen etter arbeidsgiverperioden over helg`(){
         a1 {
-            nyttVedtak(førsteFraværsdag = 22.januar, arbeidsgiverperiode = listOf(4.januar til 19.januar), fom = 4.januar, tom = 31.januar)
+            nyttVedtak(
+                4.januar til 31.januar,
+                førsteFraværsdag = 22.januar,
+                arbeidsgiverperiode = listOf(4.januar til 19.januar)
+            )
             assertIngenInfoSomInneholder("Mangler refusjonsopplysninger på orgnummer")
         }
     }
@@ -48,7 +49,7 @@ internal class RefusjonsopplysningerE2ETest : AbstractDslTest() {
     fun `lager nytt innslag i vilkårsgrunnlaghistorikken med oppdaterte refusjonsopplysninger ved ny inntektsmelding`() {
         a1 {
             val arbeidsgiverperiode = listOf(1.januar til 16.januar)
-            nyttVedtak(1.januar, 31.januar, arbeidsgiverperiode = arbeidsgiverperiode, førsteFraværsdag = 1.januar, refusjon = Inntektsmelding.Refusjon(INNTEKT, opphørsdato = null))
+            nyttVedtak(1.januar til 31.januar, arbeidsgiverperiode = arbeidsgiverperiode, førsteFraværsdag = 1.januar, refusjon = Inntektsmelding.Refusjon(INNTEKT, opphørsdato = null))
             inspektør.refusjonsopplysningerFraVilkårsgrunnlag().assertRefusjonsbeløp(1.januar til 31.januar, INNTEKT)
             assertEquals(1, inspektør.vilkårsgrunnlagHistorikkInnslag().size)
             håndterInntektsmelding(arbeidsgiverperioder = arbeidsgiverperiode, førsteFraværsdag = 22.januar, refusjon = Inntektsmelding.Refusjon(beløp = INGEN, opphørsdato = null))
@@ -64,7 +65,7 @@ internal class RefusjonsopplysningerE2ETest : AbstractDslTest() {
     fun `Duplikat innhold i ny inntektsmelding`() {
         a1 {
             val arbeidsgiverperiode = listOf(1.januar til 16.januar)
-            nyttVedtak(1.januar, 31.januar, arbeidsgiverperiode = arbeidsgiverperiode, førsteFraværsdag = 1.januar, refusjon = Inntektsmelding.Refusjon(INNTEKT, opphørsdato = null))
+            nyttVedtak(1.januar til 31.januar, arbeidsgiverperiode = arbeidsgiverperiode, førsteFraværsdag = 1.januar, refusjon = Inntektsmelding.Refusjon(INNTEKT, opphørsdato = null))
             inspektør.refusjonsopplysningerFraVilkårsgrunnlag().assertRefusjonsbeløp(1.januar til 31.januar, INNTEKT)
             assertEquals(1, inspektør.vilkårsgrunnlagHistorikkInnslag().size)
             håndterInntektsmelding(arbeidsgiverperioder = arbeidsgiverperiode, førsteFraværsdag = 1.januar, refusjon = Inntektsmelding.Refusjon(beløp = INNTEKT, opphørsdato = null))

@@ -371,7 +371,7 @@ internal class FeriepengeberegnerVisitorTest : AbstractEndToEndTest() {
             Sykdom(arbeidsgiverperiode.start, syktil, 100.prosent),
             orgnummer = orgnummer
         )
-        håndterInntektsmelding(listOf(arbeidsgiverperiode), orgnummer = orgnummer,)
+        håndterInntektsmelding(listOf(arbeidsgiverperiode), orgnummer = orgnummer)
         håndterVilkårsgrunnlag(observatør.sisteVedtaksperiode(), orgnummer = orgnummer)
         håndterYtelser(observatør.sisteVedtaksperiode(), orgnummer = orgnummer)
         håndterSimulering(observatør.sisteVedtaksperiode(), orgnummer = orgnummer)
@@ -389,7 +389,7 @@ internal class FeriepengeberegnerVisitorTest : AbstractEndToEndTest() {
             Sykdom(arbeidsgiverperiode.start, syktil, 100.prosent),
             orgnummer = orgnummer
         )
-        håndterInntektsmelding(listOf(arbeidsgiverperiode), orgnummer = orgnummer,)
+        håndterInntektsmelding(listOf(arbeidsgiverperiode), orgnummer = orgnummer)
         håndterVilkårsgrunnlag(observatør.sisteVedtaksperiode(), orgnummer = orgnummer)
         håndterYtelser(observatør.sisteVedtaksperiode(), orgnummer = orgnummer)
         håndterSimulering(observatør.sisteVedtaksperiode(), orgnummer = orgnummer)
@@ -407,8 +407,8 @@ internal class FeriepengeberegnerVisitorTest : AbstractEndToEndTest() {
         håndterSykmelding(Sykmeldingsperiode(arbeidsgiverperiode.start, syktil), orgnummer = a2)
         håndterSøknad(Sykdom(arbeidsgiverperiode.start, syktil, 100.prosent), orgnummer = a1)
         håndterSøknad(Sykdom(arbeidsgiverperiode.start, syktil, 100.prosent), orgnummer = a2)
-        håndterInntektsmelding(listOf(arbeidsgiverperiode), orgnummer = a1,)
-        håndterInntektsmelding(listOf(arbeidsgiverperiode), orgnummer = a2,)
+        håndterInntektsmelding(listOf(arbeidsgiverperiode), orgnummer = a1)
+        håndterInntektsmelding(listOf(arbeidsgiverperiode), orgnummer = a2)
         håndterVilkårsgrunnlag(1.vedtaksperiode, orgnummer = a1)
         håndterYtelser(1.vedtaksperiode, orgnummer = a1)
         håndterSimulering(1.vedtaksperiode, orgnummer = a1)

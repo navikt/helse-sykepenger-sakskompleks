@@ -381,7 +381,7 @@ internal class GjenbrukeTidsnæreOpplysningerTest: AbstractDslTest() {
     @Test
     fun `flytter arbeidsgiverperioden frem 10 dager etter utbetalt - med tidligere utbetalt vedtak`() {
         a1 {
-            nyttVedtak(1.januar, 31.januar)
+            nyttVedtak(1.januar til 31.januar)
 
             håndterSøknad(Sykdom(1.mars, 31.mars, 100.prosent))
             håndterInntektsmelding(listOf(1.mars til 16.mars))
@@ -431,8 +431,8 @@ internal class GjenbrukeTidsnæreOpplysningerTest: AbstractDslTest() {
     @Test
     fun `innfører ny arbeidsgiverperiode på en førstegangsbehandling etter tidligere utbetalt`() {
         a1 {
-            nyttVedtak(1.januar, 31.januar)
-            nyttVedtak(14.februar, 10.mars, arbeidsgiverperiode = listOf(1.januar til 16.januar))
+            nyttVedtak(1.januar til 31.januar)
+            nyttVedtak(14.februar til 10.mars, arbeidsgiverperiode = listOf(1.januar til 16.januar))
             nullstillTilstandsendringer()
             val sykepengegrunnlagFør = inspektør.vilkårsgrunnlag(2.vedtaksperiode)?.inspektør?.sykepengegrunnlag ?: fail { "finner ikke vilkårsgrunnlag" }
             håndterOverstyrTidslinje((14.februar til 16.februar).map { dag ->
@@ -506,8 +506,8 @@ internal class GjenbrukeTidsnæreOpplysningerTest: AbstractDslTest() {
     @Test
     fun `innfører ny arbeidsgiverperiode ved å lage feriedager på en førstegangsbehandling etter tidligere utbetalt`() {
         a1 {
-            nyttVedtak(1.januar, 31.januar)
-            nyttVedtak(14.februar, 10.mars, arbeidsgiverperiode = listOf(1.januar til 16.januar))
+            nyttVedtak(1.januar til 31.januar)
+            nyttVedtak(14.februar til 10.mars, arbeidsgiverperiode = listOf(1.januar til 16.januar))
             nullstillTilstandsendringer()
             val sykepengegrunnlagFør = inspektør.vilkårsgrunnlag(2.vedtaksperiode)?.inspektør?.sykepengegrunnlag ?: fail { "finner ikke vilkårsgrunnlag" }
             håndterOverstyrTidslinje((14.februar til 16.februar).map { dag ->
@@ -581,7 +581,7 @@ internal class GjenbrukeTidsnæreOpplysningerTest: AbstractDslTest() {
     @Test
     fun `innfører arbeidsdager på halen av første vedtaksperiode`() {
         a1 {
-            nyttVedtak(1.januar, 31.januar)
+            nyttVedtak(1.januar til 31.januar)
             håndterSøknad(Sykdom(1.februar, 28.februar, 100.prosent))
             håndterYtelser(2.vedtaksperiode)
             håndterSimulering(2.vedtaksperiode)
@@ -609,7 +609,7 @@ internal class GjenbrukeTidsnæreOpplysningerTest: AbstractDslTest() {
     @Test
     fun `varsel når det er 60 dager eller mer mellom ny og gammel første fraværsdag`() {
         a1 {
-            nyttVedtak(1.januar, 31.januar)
+            nyttVedtak(1.januar til 31.januar)
             håndterSøknad(Sykdom(1.februar, 28.februar, 100.prosent))
             håndterYtelser(2.vedtaksperiode)
             håndterSimulering(2.vedtaksperiode)
@@ -636,7 +636,7 @@ internal class GjenbrukeTidsnæreOpplysningerTest: AbstractDslTest() {
     @Test
     fun `varsel når det er 16 dager eller mer opphold`() {
         a1 {
-            nyttVedtak(1.januar, 31.januar)
+            nyttVedtak(1.januar til 31.januar)
             håndterSøknad(Sykdom(1.februar, 28.februar, 100.prosent))
             håndterYtelser(2.vedtaksperiode)
             håndterSimulering(2.vedtaksperiode)
@@ -657,14 +657,14 @@ internal class GjenbrukeTidsnæreOpplysningerTest: AbstractDslTest() {
     @Test
     fun `ikke varsel når det var opphold`() {
         a1 {
-            nyttVedtak(1.januar, 31.januar)
+            nyttVedtak(1.januar til 31.januar)
             håndterSøknad(Sykdom(1.februar, 28.februar, 100.prosent))
             håndterYtelser(2.vedtaksperiode)
             håndterSimulering(2.vedtaksperiode)
             håndterUtbetalingsgodkjenning(2.vedtaksperiode)
             håndterUtbetalt()
 
-            nyttVedtak(5.mars, 31.mars, arbeidsgiverperiode = listOf(1.januar til 16.januar))
+            nyttVedtak(5.mars til 31.mars, arbeidsgiverperiode = listOf(1.januar til 16.januar))
 
             håndterSøknad(Sykdom(1.februar, 28.februar, 100.prosent), Arbeid(13.februar, 28.februar))
             assertIngenVarsler(3.vedtaksperiode.filter())
@@ -674,7 +674,7 @@ internal class GjenbrukeTidsnæreOpplysningerTest: AbstractDslTest() {
     @Test
     fun `ikke varsel når det er en korrigert søknad som ikke endrer noe`() {
         a1 {
-            nyttVedtak(1.januar, 31.januar)
+            nyttVedtak(1.januar til 31.januar)
             håndterSøknad(Sykdom(1.februar, 28.februar, 100.prosent))
             håndterYtelser(2.vedtaksperiode)
             håndterSimulering(2.vedtaksperiode)
@@ -689,8 +689,8 @@ internal class GjenbrukeTidsnæreOpplysningerTest: AbstractDslTest() {
     @Test
     fun `ikke varsel når det er en korrigert søknad som ikke endrer noe ettersom inntektsdatoen er lik som før`() {
         a1 {
-            nyttVedtak(1.januar, 31.januar)
-            nyttVedtak(1.juni, 30.juni)
+            nyttVedtak(1.januar til 31.januar)
+            nyttVedtak(1.juni til 30.juni)
             håndterSøknad(Sykdom(1.juni, 30.juni, 100.prosent), Arbeid(29.juni, 30.juni))
             assertIngenVarsel(RV_IV_7)
         }
@@ -699,7 +699,7 @@ internal class GjenbrukeTidsnæreOpplysningerTest: AbstractDslTest() {
     @Test
     fun `ikke varsel når det er en forlengelse korrigeres til ferie`() {
         a1 {
-            nyttVedtak(1.januar, 31.januar)
+            nyttVedtak(1.januar til 31.januar)
             håndterSøknad(Sykdom(1.februar, 28.februar, 100.prosent))
             håndterYtelser(2.vedtaksperiode)
             håndterSimulering(2.vedtaksperiode)
@@ -713,7 +713,7 @@ internal class GjenbrukeTidsnæreOpplysningerTest: AbstractDslTest() {
     @Test
     fun `gjenbruker saksbehandlerinntekt`() {
         a1 {
-            nyttVedtak(1.januar, 31.januar)
+            nyttVedtak(1.januar til 31.januar)
             håndterSøknad(Sykdom(1.februar, 28.februar, 100.prosent))
             håndterYtelser(2.vedtaksperiode)
             håndterSimulering(2.vedtaksperiode)

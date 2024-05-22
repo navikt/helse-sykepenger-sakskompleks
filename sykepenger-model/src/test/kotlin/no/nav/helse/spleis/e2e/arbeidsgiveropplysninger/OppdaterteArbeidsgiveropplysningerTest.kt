@@ -154,7 +154,7 @@ internal class OppdaterteArbeidsgiveropplysningerTest: AbstractEndToEndTest() {
 
     @Test
     fun `Søknad fra annen arbeidsgiver flytter skjæringstidspunktet, skal ikke be om nye opplysninger i annen tilstand enn AVVENTER_INNTEKTSMELDING`() {
-        nyttVedtak(2.januar, 31.januar, orgnummer = a1)
+        nyttVedtak(2.januar til 31.januar, orgnummer = a1)
         nyPeriode(1.januar til 31.januar, orgnummer = a2)
 
         assertEquals(1, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.filter { it.vedtaksperiodeId == 1.vedtaksperiode.id(a1) }.size)
@@ -273,7 +273,7 @@ internal class OppdaterteArbeidsgiveropplysningerTest: AbstractEndToEndTest() {
 
     @Test
     fun `sender oppdatert forespørsel om arbeidsgiveropplysninger når forrige periode som ikke er auu får et nytt vilkårsgrunnlag`() {
-        nyttVedtak(1.november(2017), 30.november(2017))     // skal ikke oppdatere tidligere perioder
+        nyttVedtak(1.november(2017) til 30.november(2017))     // skal ikke oppdatere tidligere perioder
         nyPeriode(1.januar til 31.januar)                   // periode som får et vilkårsgrunnlag som skal være med i oppdatert forespørsel
         nyPeriode(18.februar til 22.februar)                // en kort periode vi ikke skal bry oss om
         nyPeriode(1.mars til 31.mars)                       // perioden som skal sende ut oppdatert forespørsel
@@ -303,7 +303,7 @@ internal class OppdaterteArbeidsgiveropplysningerTest: AbstractEndToEndTest() {
 
     @Test
     fun `Sender ikke med skjønnsmessig inntekt ved oppdatert forespørsel`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         nyPeriode(1.mars til 31.mars)
         assertEquals(2, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.size)
 
@@ -318,7 +318,7 @@ internal class OppdaterteArbeidsgiveropplysningerTest: AbstractEndToEndTest() {
 
     @Test
     fun `Sender oppdatert forespørsel ved nytt vilkårsgrunnlag pga saksbehandleroverstyrt inntekt`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         nyPeriode(1.mars til 31.mars)
         assertEquals(2, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.size)
 
@@ -334,7 +334,7 @@ internal class OppdaterteArbeidsgiveropplysningerTest: AbstractEndToEndTest() {
 
     @Test
     fun `Sender oppdatert forespørsel ved nytt vilkårsgrunnlag pga korrigerende inntektsmelding -- revurdering`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         nyPeriode(1.mars til 31.mars)
 
         håndterInntektsmelding(listOf(1.januar til 16.januar), beregnetInntekt = 32000.månedlig)

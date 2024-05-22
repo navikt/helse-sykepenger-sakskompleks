@@ -9,7 +9,6 @@ import no.nav.helse.inspectors.inspektør
 import no.nav.helse.januar
 import no.nav.helse.mars
 import no.nav.helse.person.IdInnhenter
-import no.nav.helse.person.TilstandType.AVVENTER_INFOTRYGDHISTORIKK
 import no.nav.helse.person.TilstandType.AVVENTER_INNTEKTSMELDING
 import no.nav.helse.person.TilstandType.AVVENTER_SIMULERING
 import no.nav.helse.person.TilstandType.START
@@ -42,8 +41,8 @@ internal class InfotrygdTest : AbstractEndToEndTest() {
 
     @Test
     fun `infotrygd flytter skjæringstidspunkt`() {
-        nyttVedtak(1.januar, 31.januar)
-        nyttVedtak(10.februar, 28.februar, arbeidsgiverperiode = listOf(1.januar til 16.januar))
+        nyttVedtak(1.januar til 31.januar)
+        nyttVedtak(10.februar til 28.februar, arbeidsgiverperiode = listOf(1.januar til 16.januar))
         håndterUtbetalingshistorikkEtterInfotrygdendring(Friperiode(1.februar, 9.februar))
         assertEquals(2, inspektør.vilkårsgrunnlagHistorikkInnslag().first().inspektør.elementer.size)
     }

@@ -231,20 +231,19 @@ internal fun AbstractEndToEndTest.forlengVedtak(fom: LocalDate, tom: LocalDate, 
 }
 
 internal fun AbstractEndToEndTest.nyttVedtak(
-    fom: LocalDate,
-    tom: LocalDate,
+    periode: Periode,
     grad: Prosentdel = 100.prosent,
-    førsteFraværsdag: LocalDate = fom,
+    førsteFraværsdag: LocalDate = periode.start,
     fnr: Personidentifikator = UNG_PERSON_FNR_2018,
     orgnummer: String = AbstractPersonTest.ORGNUMMER,
     beregnetInntekt: Inntekt = INNTEKT,
     refusjon: Inntektsmelding.Refusjon = Inntektsmelding.Refusjon(beregnetInntekt, null, emptyList()),
     arbeidsgiverperiode: List<Periode>? = null,
     status: Oppdragstatus = Oppdragstatus.AKSEPTERT,
-    inntekterBlock: Inntektperioder.() -> Unit = { lagInntektperioder(orgnummer, fom, beregnetInntekt) },
+    inntekterBlock: Inntektperioder.() -> Unit = { lagInntektperioder(orgnummer, periode.start, beregnetInntekt) },
     inntektsmeldingId: UUID = UUID.randomUUID()
 ) {
-    tilGodkjent(fom, tom, grad, førsteFraværsdag, fnr = fnr, orgnummer = orgnummer, refusjon = refusjon, inntekterBlock = inntekterBlock, arbeidsgiverperiode = arbeidsgiverperiode, beregnetInntekt = beregnetInntekt, inntektsmeldingId = inntektsmeldingId)
+    tilGodkjent(periode.start, periode.endInclusive, grad, førsteFraværsdag, fnr = fnr, orgnummer = orgnummer, refusjon = refusjon, inntekterBlock = inntekterBlock, arbeidsgiverperiode = arbeidsgiverperiode, beregnetInntekt = beregnetInntekt, inntektsmeldingId = inntektsmeldingId)
     håndterUtbetalt(status = status, fnr = fnr, orgnummer = orgnummer)
 }
 

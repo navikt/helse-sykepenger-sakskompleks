@@ -59,7 +59,7 @@ internal class KorrigertSøknadTest : AbstractEndToEndTest() {
 
     @Test
     fun `korrigerer med arbeid gjenopptatt etter utbetalt`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent), Arbeid(1.januar, 31.januar))
         håndterYtelser(1.vedtaksperiode)
         håndterSimulering(1.vedtaksperiode)
@@ -143,7 +143,7 @@ internal class KorrigertSøknadTest : AbstractEndToEndTest() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))
         val søknadId = håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent))
         håndterSøknad(Sykdom(1.januar, 31.januar, 50.prosent), korrigerer = søknadId, opprinneligSendt = 1.februar)
-        håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        håndterInntektsmelding(listOf(1.januar til 16.januar))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode)
         assertEquals(50, inspektør.sykdomstidslinje.inspektør.grader[17.januar])
@@ -152,7 +152,7 @@ internal class KorrigertSøknadTest : AbstractEndToEndTest() {
 
     @Test
     fun `Korrigerer feriedag til sykedag i forlengelse`() {
-        nyttVedtak(1.januar, 31.januar)
+        nyttVedtak(1.januar til 31.januar)
         håndterSykmelding(Sykmeldingsperiode(1.februar, 28.februar))
         val søknadId = håndterSøknad(Sykdom(1.februar, 28.februar, 100.prosent), Ferie(28.februar, 28.februar))
         håndterSøknad(Sykdom(1.februar, 28.februar, 100.prosent), korrigerer = søknadId, opprinneligSendt = 1.mars)
@@ -177,7 +177,7 @@ internal class KorrigertSøknadTest : AbstractEndToEndTest() {
     fun `nytt skjæringstidspunkt på forlengelse etter friskmelding på førstegangsbehandling`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent))
-        håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        håndterInntektsmelding(listOf(1.januar til 16.januar))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode)
         håndterSimulering(1.vedtaksperiode)
@@ -245,7 +245,7 @@ internal class KorrigertSøknadTest : AbstractEndToEndTest() {
 
         håndterSykmelding(Sykmeldingsperiode(11.januar, 31.januar))
         val søknadId = håndterSøknad(Sykdom(11.januar, 31.januar, 100.prosent))
-        håndterInntektsmelding(listOf(1.januar til 16.januar), førsteFraværsdag = 1.januar,)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), førsteFraværsdag = 1.januar)
         håndterVilkårsgrunnlag(3.vedtaksperiode)
         håndterSøknad(Sykdom(11.januar, 31.januar, 100.prosent), Ferie(31.januar, 31.januar), korrigerer = søknadId, opprinneligSendt = 1.februar)
 
@@ -278,7 +278,7 @@ internal class KorrigertSøknadTest : AbstractEndToEndTest() {
     fun `avslutter periode med friskmelding -- avventer vilkårsprøving`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))
         val søknadId = håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent))
-        håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        håndterInntektsmelding(listOf(1.januar til 16.januar))
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent), Arbeid(17.januar, 31.januar), korrigerer = søknadId, opprinneligSendt = 1.februar)
 
         inspektør.sykdomstidslinje.inspektør.also { inspektør ->
@@ -303,7 +303,7 @@ internal class KorrigertSøknadTest : AbstractEndToEndTest() {
     fun `avslutter periode med 100 % ferie og ingen utbetaling -- avventer vilkårsprøving`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))
         val søknadId = håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent))
-        håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        håndterInntektsmelding(listOf(1.januar til 16.januar))
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent), Ferie(17.januar, 31.januar), korrigerer = søknadId, opprinneligSendt = 1.februar)
 
         inspektør.sykdomstidslinje.inspektør.also { inspektør ->
@@ -328,7 +328,7 @@ internal class KorrigertSøknadTest : AbstractEndToEndTest() {
     fun `Blir værende i nåværende tilstand dersom søknad kommer inn i AVVENTER_VILKÅRSPRØVING`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))
         val søknadId = håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent))
-        håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        håndterInntektsmelding(listOf(1.januar til 16.januar))
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent), Ferie(31.januar, 31.januar), korrigerer = søknadId, opprinneligSendt = 1.februar)
 
         inspektør.sykdomstidslinje.inspektør.also {
@@ -351,7 +351,7 @@ internal class KorrigertSøknadTest : AbstractEndToEndTest() {
     fun `Blir værende i nåværende tilstand dersom søknad kommer inn i AVVENTER_HISTORIKK`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))
         val søknadId = håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent))
-        håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        håndterInntektsmelding(listOf(1.januar til 16.januar))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent), Ferie(31.januar, 31.januar), korrigerer = søknadId, opprinneligSendt = 1.februar)
 
@@ -376,7 +376,7 @@ internal class KorrigertSøknadTest : AbstractEndToEndTest() {
     fun `Går tilbake til AVVENTER_HISTORIKK når søknaden kommer inn i AVVENTER_SIMULERING`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))
         val søknadId = håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent), Ferie(31.januar, 31.januar))
-        håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        håndterInntektsmelding(listOf(1.januar til 16.januar))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode)
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent), korrigerer = søknadId, opprinneligSendt = 1.februar)
@@ -403,7 +403,7 @@ internal class KorrigertSøknadTest : AbstractEndToEndTest() {
     fun `Går tilbake til AVVENTER_HISTORIKK når søknaden kommer inn i AVVENTER_GODKJENNING`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))
         val søknadId = håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent), Ferie(31.januar, 31.januar))
-        håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        håndterInntektsmelding(listOf(1.januar til 16.januar))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode)
         håndterSimulering(1.vedtaksperiode)

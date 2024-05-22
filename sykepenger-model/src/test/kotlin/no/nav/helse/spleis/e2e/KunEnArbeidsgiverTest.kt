@@ -28,6 +28,7 @@ import no.nav.helse.person.TilstandType.AVVENTER_VILKÅRSPRØVING
 import no.nav.helse.person.TilstandType.START
 import no.nav.helse.person.TilstandType.TIL_UTBETALING
 import no.nav.helse.person.aktivitetslogg.Aktivitet
+import no.nav.helse.person.aktivitetslogg.UtbetalingInntektskilde
 import no.nav.helse.person.aktivitetslogg.Varselkode.RV_SØ_8
 import no.nav.helse.september
 import no.nav.helse.sisteBehov
@@ -36,7 +37,6 @@ import no.nav.helse.sykdomstidslinje.Dag
 import no.nav.helse.sykdomstidslinje.Dag.SykHelgedag
 import no.nav.helse.sykdomstidslinje.Dag.Sykedag
 import no.nav.helse.utbetalingslinjer.Oppdragstatus
-import no.nav.helse.person.aktivitetslogg.UtbetalingInntektskilde
 import no.nav.helse.økonomi.Prosentdel.Companion.prosent
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -359,7 +359,7 @@ internal class KunEnArbeidsgiverTest : AbstractDslTest() {
 
     @Test
     fun `forlengelseperioden avsluttes ikke automatisk hvis warnings`() {
-        nyttVedtak(1.januar, 20.januar, 100.prosent)
+        nyttVedtak(1.januar til 20.januar, 100.prosent)
         håndterSykmelding(Sykmeldingsperiode(21.januar, 31.januar))
         håndterSøknad(Sykdom(21.januar, 31.januar, 100.prosent), Ferie(21.januar, 31.januar))
         håndterYtelser(2.vedtaksperiode, arbeidsavklaringspenger = listOf(3.januar.minusDays(60) til 5.januar.minusDays(60)))
@@ -782,7 +782,7 @@ internal class KunEnArbeidsgiverTest : AbstractDslTest() {
 
     @Test
     fun `foreldet sykdomsdag etter opphold skal ikke bli til navdag`() {
-        nyttVedtak(15.januar, 7.februar)
+        nyttVedtak(15.januar til 7.februar)
 
         håndterSykmelding(
             Sykmeldingsperiode(22.februar, 14.mars),
@@ -803,7 +803,7 @@ internal class KunEnArbeidsgiverTest : AbstractDslTest() {
 
     @Test
     fun `Periode som kommer inn som SøknadArbeidsgiver selv om det er mindre enn 16 dager gap til forrige periode`() {
-        nyttVedtak(1.september(2021), 24.september(2021))
+        nyttVedtak(1.september(2021) til 24.september(2021))
 
         håndterSykmelding(Sykmeldingsperiode(12.oktober(2021), 22.oktober(2021)))
         håndterSøknad(Sykdom(12.oktober(2021), 22.oktober(2021), 100.prosent))

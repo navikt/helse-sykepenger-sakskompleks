@@ -14,7 +14,6 @@ import no.nav.helse.person.TilstandType.AVSLUTTET_UTEN_UTBETALING
 import no.nav.helse.person.TilstandType.AVVENTER_BLOKKERENDE_PERIODE
 import no.nav.helse.person.TilstandType.AVVENTER_GODKJENNING
 import no.nav.helse.person.TilstandType.AVVENTER_HISTORIKK
-import no.nav.helse.person.TilstandType.AVVENTER_INFOTRYGDHISTORIKK
 import no.nav.helse.person.TilstandType.AVVENTER_INNTEKTSMELDING
 import no.nav.helse.person.TilstandType.AVVENTER_SIMULERING
 import no.nav.helse.person.TilstandType.AVVENTER_VILKÅRSPRØVING
@@ -52,8 +51,8 @@ internal class SkjæringstidspunktE2ETest: AbstractEndToEndTest() {
         håndterSøknad(Sykdom(24.februar, 24.mars, 100.prosent), orgnummer = a1)
         håndterSøknad(Sykdom(25.januar, 25.februar, 100.prosent), Arbeid(20.februar, 25.februar), orgnummer = a2)
 
-        håndterInntektsmelding(listOf(1.januar til 16.januar), beregnetInntekt = 15000.månedlig, orgnummer = a1,)
-        håndterInntektsmelding(listOf(25.januar til 10.februar), beregnetInntekt = 16000.månedlig, orgnummer = a2,)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), beregnetInntekt = 15000.månedlig, orgnummer = a1)
+        håndterInntektsmelding(listOf(25.januar til 10.februar), beregnetInntekt = 16000.månedlig, orgnummer = a2)
 
         val inntekter = listOf(
             grunnlag(a1, 1.januar, 15000.månedlig.repeat(3)),
@@ -73,7 +72,7 @@ internal class SkjæringstidspunktE2ETest: AbstractEndToEndTest() {
         håndterUtbetalingsgodkjenning(1.vedtaksperiode, orgnummer = a1)
         håndterUtbetalt(orgnummer = a1)
 
-        håndterInntektsmelding(listOf(24.februar til 11.mars), beregnetInntekt = 17000.månedlig, orgnummer = a1,)
+        håndterInntektsmelding(listOf(24.februar til 11.mars), beregnetInntekt = 17000.månedlig, orgnummer = a1)
 
         håndterYtelser(1.vedtaksperiode, orgnummer = a2)
         håndterSimulering(1.vedtaksperiode, orgnummer = a2)
@@ -108,8 +107,8 @@ internal class SkjæringstidspunktE2ETest: AbstractEndToEndTest() {
         håndterSøknad(Sykdom(23.februar, 24.mars, 100.prosent), orgnummer = a1)
         håndterSøknad(Sykdom(25.januar, 25.februar, 100.prosent), Arbeid(20.februar, 25.februar), orgnummer = a2)
 
-        håndterInntektsmelding(listOf(1.januar til 16.januar), beregnetInntekt = 15000.månedlig, orgnummer = a1,)
-        håndterInntektsmelding(listOf(25.januar til 10.februar), beregnetInntekt = 16000.månedlig, orgnummer = a2,)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), beregnetInntekt = 15000.månedlig, orgnummer = a1)
+        håndterInntektsmelding(listOf(25.januar til 10.februar), beregnetInntekt = 16000.månedlig, orgnummer = a2)
 
         val inntekter = listOf(
             grunnlag(a1, 1.januar, 15000.månedlig.repeat(3)),
@@ -135,7 +134,7 @@ internal class SkjæringstidspunktE2ETest: AbstractEndToEndTest() {
         assertTilstander(1.vedtaksperiode, AVVENTER_BLOKKERENDE_PERIODE, orgnummer = a2)
 
         nullstillTilstandsendringer()
-        håndterInntektsmelding(listOf(23.februar til 10.mars), beregnetInntekt = 15000.månedlig, orgnummer = a1,)
+        håndterInntektsmelding(listOf(23.februar til 10.mars), beregnetInntekt = 15000.månedlig, orgnummer = a1)
 
         håndterYtelser(1.vedtaksperiode, orgnummer = a2)
         håndterSimulering(1.vedtaksperiode, orgnummer = a2)
