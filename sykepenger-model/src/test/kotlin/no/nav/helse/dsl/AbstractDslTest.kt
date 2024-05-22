@@ -349,17 +349,29 @@ internal abstract class AbstractDslTest {
         ) }
 
     protected fun String.tilGodkjenning(
-        fom: LocalDate,
-        tom: LocalDate,
+        periode: Periode,
         grad: Prosentdel = 100.prosent,
-        førsteFraværsdag: LocalDate = fom,
+        førsteFraværsdag: LocalDate = periode.start,
         beregnetInntekt: Inntekt = INNTEKT,
         refusjon: Inntektsmelding.Refusjon = Inntektsmelding.Refusjon(beregnetInntekt, null, emptyList()),
         arbeidsgiverperiode: List<Periode> = emptyList(),
         status: Oppdragstatus = Oppdragstatus.AKSEPTERT,
-        sykepengegrunnlagSkatt: InntektForSykepengegrunnlag = lagStandardSykepengegrunnlag(this, beregnetInntekt, førsteFraværsdag)
+        sykepengegrunnlagSkatt: InntektForSykepengegrunnlag = lagStandardSykepengegrunnlag(
+            this,
+            beregnetInntekt,
+            førsteFraværsdag
+        )
     ) =
-        this { tilGodkjenning(fom, tom, grad, førsteFraværsdag, beregnetInntekt, refusjon, arbeidsgiverperiode, status, sykepengegrunnlagSkatt) }
+        this { tilGodkjenning(
+            periode,
+            grad,
+            førsteFraværsdag,
+            beregnetInntekt,
+            refusjon,
+            arbeidsgiverperiode,
+            status,
+            sykepengegrunnlagSkatt
+        ) }
 
 
     /* dsl for å gå direkte på arbeidsgiver1, eksempelvis i tester for det ikke er andre arbeidsgivere */

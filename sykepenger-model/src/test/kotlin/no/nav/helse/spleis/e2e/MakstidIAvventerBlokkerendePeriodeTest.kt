@@ -57,7 +57,7 @@ internal class MakstidIAvventerBlokkerendePeriodeTest: AbstractDslTest() {
     @Test
     fun `periode i avventer blokkerende venter på annen periode til godkjenning har evig timeout`() {
         a1 {
-            tilGodkjenning(1.januar, 31.januar)
+            tilGodkjenning(1.januar til 31.januar)
             håndterSøknad(Sykdom(1.mars, 31.mars, 100.prosent))
             håndterInntektsmelding(listOf(1.mars til 16.mars))
             assertSisteTilstand(1.vedtaksperiode, AVVENTER_GODKJENNING)
@@ -69,7 +69,7 @@ internal class MakstidIAvventerBlokkerendePeriodeTest: AbstractDslTest() {
     @Test
     fun `periode i avventer blokkerende som venter på inntektsmelding fra annen arbeidsgiver tross tidligere periode til godkjenning har samme timeout som avventer inntektsmelding`() {
         a1 {
-            tilGodkjenning(1.januar, 31.januar)
+            tilGodkjenning(1.januar til 31.januar)
             håndterSøknad(Sykdom(1.mars, 31.mars, 100.prosent))
         }
         a2 {
@@ -93,7 +93,7 @@ internal class MakstidIAvventerBlokkerendePeriodeTest: AbstractDslTest() {
     @Test
     fun `perioder i avventer blokkerende som kun venter på godkjenning har evig timeout`() {
         a1 {
-            tilGodkjenning(1.januar, 31.januar)
+            tilGodkjenning(1.januar til 31.januar)
             håndterSøknad(Sykdom(1.mars, 31.mars, 100.prosent))
         }
         a2 {

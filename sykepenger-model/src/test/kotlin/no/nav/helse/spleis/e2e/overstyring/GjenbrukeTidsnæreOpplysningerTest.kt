@@ -98,7 +98,7 @@ internal class GjenbrukeTidsnæreOpplysningerTest: AbstractDslTest() {
     @Test
     fun `vedtaksperiode strekker seg tilbake og endrer skjæringstidspunktet`() {
         a1 {
-            tilGodkjenning(10.januar, 31.januar, beregnetInntekt = 20000.månedlig)
+            tilGodkjenning(10.januar til 31.januar, beregnetInntekt = 20000.månedlig)
             val vilkårsgrunnlagFørEndring = inspektør.vilkårsgrunnlag(1.vedtaksperiode)!!
             nullstillTilstandsendringer()
             håndterOverstyrTidslinje(listOf(
@@ -131,7 +131,11 @@ internal class GjenbrukeTidsnæreOpplysningerTest: AbstractDslTest() {
     fun `endrer skjæringstidspunkt på en førstegangsbehandling ved å omgjøre en arbeidsdag til sykedag`() {
         a1 {
             håndterSøknad(Sykdom(1.januar, 9.januar, 100.prosent))
-            tilGodkjenning(10.januar, 31.januar, beregnetInntekt = 20000.månedlig, arbeidsgiverperiode = listOf(10.januar til 26.januar)) // 1. jan - 9. jan blir omgjort til arbeidsdager ved innsending av IM her
+            tilGodkjenning(
+                10.januar til 31.januar,
+                beregnetInntekt = 20000.månedlig,
+                arbeidsgiverperiode = listOf(10.januar til 26.januar)
+            ) // 1. jan - 9. jan blir omgjort til arbeidsdager ved innsending av IM her
             val sykepengegrunnlagFør = inspektør.vilkårsgrunnlag(2.vedtaksperiode)?.inspektør?.sykepengegrunnlag ?: fail { "finner ikke vilkårsgrunnlag" }
             nullstillTilstandsendringer()
             // Saksbehandler korrigerer; 9.januar var vedkommende syk likevel

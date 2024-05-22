@@ -147,7 +147,7 @@ internal class BehandlingerE2ETest : AbstractDslTest() {
     @Test
     fun `Saksbehandler må behandle søknad i Infotrygd`() {
         a1 {
-            tilGodkjenning(1.januar, 31.januar)
+            tilGodkjenning(1.januar til 31.januar)
             håndterUtbetalingsgodkjenning(1.vedtaksperiode, godkjent = false)
             inspektørForkastet(1.vedtaksperiode).behandlinger.also { behandlinger ->
                 assertEquals(1, behandlinger.size)
@@ -348,7 +348,7 @@ internal class BehandlingerE2ETest : AbstractDslTest() {
     @Test
     fun `korrigert tidslinje mens perioden er til godkjenning`() {
         a1 {
-            tilGodkjenning(2.januar, 31.januar)
+            tilGodkjenning(2.januar til 31.januar)
             håndterOverstyrTidslinje(listOf(ManuellOverskrivingDag(1.januar, Dagtype.Sykedag, 100)))
             håndterVilkårsgrunnlag(1.vedtaksperiode)
             håndterYtelser(1.vedtaksperiode)
@@ -402,7 +402,7 @@ internal class BehandlingerE2ETest : AbstractDslTest() {
     fun `korrigert søknad på tidligere periode, med senere periode til utbetaling, lager ny behandling`() {
         a1 {
             nyttVedtak(1.januar til 31.januar)
-            tilGodkjenning(1.mars, 31.mars)
+            tilGodkjenning(1.mars til 31.mars)
             håndterUtbetalingsgodkjenning(2.vedtaksperiode)
             håndterSøknad(Sykdom(1.januar, 31.januar, 90.prosent))
 
@@ -665,7 +665,7 @@ internal class BehandlingerE2ETest : AbstractDslTest() {
     @Test
     fun `tilbakedatert søknad forlenger forkastet periode`() {
         a1 {
-            tilGodkjenning(1.januar, 31.januar)
+            tilGodkjenning(1.januar til 31.januar)
             håndterUtbetalingsgodkjenning(1.vedtaksperiode, godkjent = false)
 
             håndterUtbetalingshistorikkEtterInfotrygdendring(listOf(

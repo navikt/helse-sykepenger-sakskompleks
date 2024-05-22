@@ -734,7 +734,7 @@ internal class SpeilBehandlingerBuilderTest : AbstractE2ETest() {
 
     @Test
     fun `to perioder etter hverandre, nyeste er i venter-tilstand`() {
-        tilGodkjenning(1.januar, 31.januar, a1)
+        tilGodkjenning(1.januar til 31.januar, a1)
         håndterSøknad(Sykdom(1.februar, 21.februar, 100.prosent))
 
         generasjoner {
@@ -748,7 +748,7 @@ internal class SpeilBehandlingerBuilderTest : AbstractE2ETest() {
 
     @Test
     fun `to førstegangsbehandlinger, nyeste er i venter-tilstand`() {
-        tilGodkjenning(1.januar, 31.januar, a1)
+        tilGodkjenning(1.januar til 31.januar, a1)
         håndterSøknad(Sykdom(1.mars, 31.mars, 100.prosent))
 
         generasjoner {
@@ -953,7 +953,7 @@ internal class SpeilBehandlingerBuilderTest : AbstractE2ETest() {
 
     @Test
     fun `ag2 venter på ag1 mens ag1 er til godkjenning`() {
-        tilGodkjenning(1.januar, 31.januar, a1, a2)
+        tilGodkjenning(1.januar til 31.januar, a1, a2)
 
         generasjoner(a1) {
             0.generasjon {
@@ -1154,7 +1154,7 @@ internal class SpeilBehandlingerBuilderTest : AbstractE2ETest() {
 
     @Test
     fun `utbetaling feilet`() {
-        tilGodkjenning(1.januar, 31.januar)
+        tilGodkjenning(1.januar til 31.januar)
         håndterUtbetalingsgodkjenning()
         håndterUtbetalt(status = Oppdragstatus.FEIL)
 
@@ -1711,7 +1711,7 @@ internal class SpeilBehandlingerBuilderTest : AbstractE2ETest() {
     @Test
     fun `out of order med gap`() {
         nyttVedtak(1.mars til 31.mars, orgnummer = a1)
-        tilGodkjenning(1.januar, 31.januar, a1)
+        tilGodkjenning(1.januar til 31.januar, a1)
 
 
         generasjoner {

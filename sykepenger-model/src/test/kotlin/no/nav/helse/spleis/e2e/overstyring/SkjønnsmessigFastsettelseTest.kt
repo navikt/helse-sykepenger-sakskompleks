@@ -215,7 +215,7 @@ internal class SkjønnsmessigFastsettelseTest: AbstractDslTest() {
     @Test
     fun `skjønnsmessig fastsettelse overstyres av en inntektmelding med samme beløp`() {
         a1 {
-            tilGodkjenning(1.januar, 31.januar)
+            tilGodkjenning(1.januar til 31.januar)
             val inntekt = INNTEKT
             håndterSkjønnsmessigFastsettelse(1.januar, listOf(OverstyrtArbeidsgiveropplysning(orgnummer = a1, inntekt = inntekt)))
             assertEquals(2, inspektør.vilkårsgrunnlagHistorikkInnslag().size)

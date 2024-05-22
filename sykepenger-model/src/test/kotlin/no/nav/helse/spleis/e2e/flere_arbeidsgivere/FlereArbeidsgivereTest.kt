@@ -277,7 +277,12 @@ internal class FlereArbeidsgivereTest : AbstractDslTest() {
         listOf(a1).nyeVedtak(1.januar til 31.januar, inntekt = inntekt, sykepengegrunnlagSkatt = lagStandardSykepengegrunnlag(inntekter, 1.januar), arbeidsforhold = arbeidsforhold)
         listOf(a1).forlengVedtak(1.februar til 28.februar)
         a2 {
-            tilGodkjenning(1.april, 30.april, beregnetInntekt = inntekt, sykepengegrunnlagSkatt = lagStandardSykepengegrunnlag(inntekter, 1.april), arbeidsforhold = arbeidsforhold)
+            tilGodkjenning(
+                1.april til 30.april,
+                beregnetInntekt = inntekt,
+                sykepengegrunnlagSkatt = lagStandardSykepengegrunnlag(inntekter, 1.april),
+                arbeidsforhold = arbeidsforhold
+            )
         }
         listOf(a1).forlengVedtak(1.mars til 31.mars)
 

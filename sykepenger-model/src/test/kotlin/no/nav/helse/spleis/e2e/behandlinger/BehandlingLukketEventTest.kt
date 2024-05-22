@@ -27,7 +27,7 @@ internal class BehandlingLukketEventTest : AbstractDslTest() {
     @Test
     fun `behandling lukkes når vedtak fattes`() {
         a1 {
-            tilGodkjenning(1.januar, 31.januar)
+            tilGodkjenning(1.januar til 31.januar)
             håndterUtbetalingsgodkjenning(1.vedtaksperiode, godkjent = true)
             val behandlingLukketEvent = observatør.behandlingLukketEventer.single()
             val sisteBehandling = inspektør(1.vedtaksperiode).behandlinger.single()
@@ -48,7 +48,7 @@ internal class BehandlingLukketEventTest : AbstractDslTest() {
     @Test
     fun `behandling lukkes ikke når vedtak avvises`() {
         a1 {
-            tilGodkjenning(1.januar, 31.januar)
+            tilGodkjenning(1.januar til 31.januar)
             håndterUtbetalingsgodkjenning(1.vedtaksperiode, godkjent = false)
             assertEquals(0, observatør.behandlingLukketEventer.size)
             val sisteBehandling = inspektørForkastet(1.vedtaksperiode).behandlinger.single()

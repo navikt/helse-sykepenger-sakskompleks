@@ -24,7 +24,7 @@ internal class BehandlingForkastetEventTest : AbstractDslTest() {
     @Test
     fun `uberegnet behandling forkastes`() {
         a1 {
-            tilGodkjenning(1.januar, 31.januar)
+            tilGodkjenning(1.januar til 31.januar)
             håndterUtbetalingsgodkjenning(1.vedtaksperiode, godkjent = false)
             val behandlingForkastetEvent = observatør.behandlingForkastetEventer.single()
             val sisteBehandling = inspektørForkastet(1.vedtaksperiode).behandlinger.single()
@@ -45,7 +45,7 @@ internal class BehandlingForkastetEventTest : AbstractDslTest() {
     @Test
     fun `uberegnet behandling forkastes manuelt`() {
         a1 {
-            tilGodkjenning(1.januar, 31.januar)
+            tilGodkjenning(1.januar til 31.januar)
             håndterUtbetalingsgodkjenning(1.vedtaksperiode, godkjent = false, automatiskBehandling = false)
             val behandlingForkastetEvent = observatør.behandlingForkastetEventer.single()
             val sisteBehandling = inspektørForkastet(1.vedtaksperiode).behandlinger.single()

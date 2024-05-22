@@ -302,9 +302,9 @@ internal abstract class AbstractE2ETest {
             meldingsreferanseId = meldingsreferanseId
         )).håndter(Person::håndter)
     }
-    protected fun tilGodkjenning(fom: LocalDate, tom: LocalDate, orgnummer: String = a1) {
-        håndterSøknad(fom til tom, orgnummer)
-        håndterInntektsmelding(fom, orgnummer = orgnummer)
+    protected fun tilGodkjenning(periode: Periode, orgnummer: String = a1) {
+        håndterSøknad(periode, orgnummer)
+        håndterInntektsmelding(periode.start, orgnummer = orgnummer)
         håndterVilkårsgrunnlag()
         håndterYtelserTilGodkjenning()
     }
@@ -317,8 +317,8 @@ internal abstract class AbstractE2ETest {
         orgnumre.forEach { håndterInntektsmelding(fom, orgnummer = it) }
         håndterVilkårsgrunnlag()
     }
-    protected fun tilGodkjenning(fom: LocalDate, tom: LocalDate, vararg orgnumre: String) {
-        tilYtelser(fom, tom, *orgnumre)
+    protected fun tilGodkjenning(periode: Periode, vararg orgnumre: String) {
+        tilYtelser(periode.start, periode.endInclusive, *orgnumre)
         håndterYtelserTilGodkjenning()
     }
 
@@ -339,7 +339,7 @@ internal abstract class AbstractE2ETest {
         }
     }
     protected fun nyttVedtak(periode: Periode, orgnummer: String = a1): Utbetalingbehov {
-        tilGodkjenning(periode.start, periode.endInclusive, orgnummer)
+        tilGodkjenning(periode, orgnummer)
         håndterUtbetalingsgodkjenning()
         return håndterUtbetalt()
     }

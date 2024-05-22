@@ -300,7 +300,7 @@ internal class KorrigertSøknadTest : AbstractEndToEndTest() {
     }
 
     @Test
-    fun `avslutter periode med 100 % ferie og ingen utbetaling -- avventer vilkårsprøving`() {
+    fun `avslutter periode med 100 prosent ferie og ingen utbetaling -- avventer vilkårsprøving`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar))
         val søknadId = håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent))
         håndterInntektsmelding(listOf(1.januar til 16.januar))

@@ -42,7 +42,7 @@ internal class SpeilBuilderTest : AbstractE2ETest() {
 
     @Test
     fun `nav utbetaler agp`() {
-        tilGodkjenning(1.januar, 31.januar)
+        tilGodkjenning(1.januar til 31.januar)
         val id = UUID.randomUUID()
         håndterOverstyrTidslinje((1.januar til 16.januar).map {
             ManuellOverskrivingDag(it, Dagtype.SykedagNav, 100)
