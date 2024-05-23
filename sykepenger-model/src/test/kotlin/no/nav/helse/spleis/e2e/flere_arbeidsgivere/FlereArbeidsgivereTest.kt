@@ -11,6 +11,7 @@ import no.nav.helse.dsl.TestPerson
 import no.nav.helse.dsl.TestPerson.Companion.INNTEKT
 import no.nav.helse.dsl.lagStandardSykepengegrunnlag
 import no.nav.helse.dsl.nyPeriode
+import no.nav.helse.dsl.nyttVedtak
 import no.nav.helse.dsl.tilGodkjenning
 import no.nav.helse.februar
 import no.nav.helse.fredag
@@ -441,12 +442,12 @@ internal class FlereArbeidsgivereTest : AbstractDslTest() {
     @Test
     fun `vedtaksperioder atskilt med betydelig tid`() {
         a1 {
-            nyttVedtak(1.januar til 31.januar)
+            this.nyttVedtak(1.januar til 31.januar)
             assertIngenFunksjonelleFeil()
             assertSisteTilstand(1.vedtaksperiode, AVSLUTTET)
         }
         a2 {
-            nyttVedtak(1.mars til 31.mars)
+            this.nyttVedtak(1.mars til 31.mars)
             assertIngenFunksjonelleFeil()
             assertSisteTilstand(1.vedtaksperiode, AVSLUTTET)
         }
