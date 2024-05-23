@@ -31,8 +31,8 @@ internal class SpeilBuilderFlereAGTest : AbstractE2ETest() {
 
     @Test
     fun `lager ikke hvit pølse i helg`() {
-        håndterSøknad(1.januar, 19.januar)
-        håndterSøknad(22.januar, 31.januar)
+        håndterSøknad(1.januar til 19.januar)
+        håndterSøknad(22.januar til 31.januar)
         håndterInntektsmelding(1.januar)
         håndterVilkårsgrunnlagTilGodkjenning()
 
@@ -42,7 +42,7 @@ internal class SpeilBuilderFlereAGTest : AbstractE2ETest() {
 
     @Test
     fun `sender med ghost tidslinjer til speil`() {
-        håndterSøknad(Sykdom(1.januar, 20.januar, 100.prosent), orgnummer = a1)
+        håndterSøknad(1.januar til 20.januar, orgnummer = a1)
         håndterInntektsmelding(1.januar, orgnummer = a1)
         håndterVilkårsgrunnlag(arbeidsgivere = listOf(a1 to INNTEKT, a2 to 10000.månedlig))
         håndterYtelserTilGodkjenning()
@@ -494,7 +494,7 @@ internal class SpeilBuilderFlereAGTest : AbstractE2ETest() {
 
     @Test
     fun `refusjon for flere arbeidsgivere`() {
-        nyeVedtak(1.januar, 31.januar, a1, a2)
+        nyeVedtak(1.januar til 31.januar, a1, a2)
 
         val personDto = speilApi()
         val speilVilkårsgrunnlagIdForAG1 = (personDto.arbeidsgivere.first().generasjoner.first().perioder.first() as BeregnetPeriode).vilkårsgrunnlagId

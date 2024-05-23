@@ -105,9 +105,6 @@ internal abstract class AbstractE2ETest {
         }
     }
 
-    protected fun håndterSøknad(fom: LocalDate, tom: LocalDate, orgnummer: String = a1): UUID {
-        return håndterSøknad(fom til tom, orgnummer)
-    }
     protected fun håndterSøknad(periode: Periode, orgnummer: String = a1): UUID {
         return håndterSøknad(Søknad.Søknadsperiode.Sykdom(periode.start, periode.endInclusive, 100.prosent), sykmeldingSkrevet = periode.start.atStartOfDay(), sendtTilNAV = periode.endInclusive.atStartOfDay(), orgnummer = orgnummer)
     }
@@ -312,18 +309,18 @@ internal abstract class AbstractE2ETest {
         håndterSøknad(periode, orgnummer)
         håndterYtelserTilGodkjenning()
     }
-    protected fun tilYtelser(fom: LocalDate, tom: LocalDate, vararg orgnumre: String) {
-        orgnumre.forEach { håndterSøknad(fom til tom, it) }
-        orgnumre.forEach { håndterInntektsmelding(fom, orgnummer = it) }
+    protected fun tilYtelser(periode: Periode, vararg orgnumre: String) {
+        orgnumre.forEach { håndterSøknad(periode, it) }
+        orgnumre.forEach { håndterInntektsmelding(periode.start, orgnummer = it) }
         håndterVilkårsgrunnlag()
     }
     protected fun tilGodkjenning(periode: Periode, vararg orgnumre: String) {
-        tilYtelser(periode.start, periode.endInclusive, *orgnumre)
+        tilYtelser(periode, *orgnumre)
         håndterYtelserTilGodkjenning()
     }
 
-    protected fun nyeVedtak(fom: LocalDate, tom: LocalDate, vararg orgnumre: String) {
-        tilYtelser(fom, tom, *orgnumre)
+    protected fun nyeVedtak(periode: Periode, vararg orgnumre: String) {
+        tilYtelser(periode, *orgnumre)
         orgnumre.forEach {
             håndterYtelserTilGodkjenning()
             håndterUtbetalingsgodkjenning()

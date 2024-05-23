@@ -1168,7 +1168,7 @@ internal class SpeilBehandlingerBuilderTest : AbstractE2ETest() {
 
     @Test
     fun `overlappende periode flere arbeidsgivere`() {
-        nyeVedtak(1.januar, 31.januar, a1, a2)
+        nyeVedtak(1.januar til 31.januar, a1, a2)
 
         håndterSøknad(1.februar til 28.februar, a1)
         håndterSøknad(1.februar til 28.februar, a2)
@@ -1206,7 +1206,7 @@ internal class SpeilBehandlingerBuilderTest : AbstractE2ETest() {
 
     @Test
     fun `lage generasjoner når a2 er i Avventer historikk revurdering og har blitt tildelt utbetaling`() {
-        nyeVedtak(1.januar, 31.januar, a1, a2)
+        nyeVedtak(1.januar til 31.januar, a1, a2)
         håndterOverstyrTidslinje(listOf(ManuellOverskrivingDag(17.januar, Dagtype.Feriedag)), orgnummer = a1)
         håndterYtelserTilUtbetalt()
         generasjoner(a1) {
@@ -1225,7 +1225,7 @@ internal class SpeilBehandlingerBuilderTest : AbstractE2ETest() {
 
     @Test
     fun `revurdering av flere arbeidsgivere`() {
-        nyeVedtak(1.januar, 31.januar, a1, a2)
+        nyeVedtak(1.januar til 31.januar, a1, a2)
         forlengVedtak(1.februar til 28.februar, a1, a2)
 
         håndterOverstyrTidslinje(listOf(ManuellOverskrivingDag(17.januar, Dagtype.Feriedag)), orgnummer = a1)
