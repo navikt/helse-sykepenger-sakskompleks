@@ -85,7 +85,7 @@ internal class BehandlingOpprettetEventTest : AbstractDslTest() {
     fun annullering() {
         a1 {
             nyttVedtak(1.januar til 31.januar)
-            forlengVedtak(1.februar, 28.februar)
+            forlengVedtak(1.februar til 28.februar)
             håndterAnnullering(inspektør.utbetaling(0).inspektør.utbetalingId)
             val behandlingOpprettetEventer = observatør.behandlingOpprettetEventer
             assertEquals(4, behandlingOpprettetEventer.size)

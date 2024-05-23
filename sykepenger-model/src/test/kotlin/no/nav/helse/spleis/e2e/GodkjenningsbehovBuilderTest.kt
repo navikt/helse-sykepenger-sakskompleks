@@ -136,7 +136,7 @@ internal class GodkjenningsbehovBuilderTest : AbstractEndToEndTest() {
     @Test
     fun `Sender ikke med tag IngenNyArbeidsgiverperiode når det ikke er ny AGP pga Infotrygforlengelse`() {
         createOvergangFraInfotrygdPerson()
-        forlengTilGodkjenning(1.mars, 31.mars)
+        forlengTilGodkjenning(1.mars til 31.mars)
         assertIngenTag("IngenNyArbeidsgiverperiode", 2.vedtaksperiode.id(a1))
         assertTags(setOf("InngangsvilkårFraInfotrygd"), 2.vedtaksperiode.id(a1))
     }
@@ -157,7 +157,7 @@ internal class GodkjenningsbehovBuilderTest : AbstractEndToEndTest() {
         assertIngenTag("IngenNyArbeidsgiverperiode", 1.vedtaksperiode.id(a1))
         håndterUtbetalingsgodkjenning()
         håndterUtbetalt()
-        forlengTilGodkjenning(1.februar, 28.februar)
+        forlengTilGodkjenning(1.februar til 28.februar)
         assertIngenTag("IngenNyArbeidsgiverperiode", 2.vedtaksperiode.id(a1))
     }
 
@@ -357,7 +357,7 @@ internal class GodkjenningsbehovBuilderTest : AbstractEndToEndTest() {
         )
         håndterUtbetalingsgodkjenning(1.vedtaksperiode)
         håndterUtbetalt()
-        forlengTilGodkjenning(1.februar, 28.februar)
+        forlengTilGodkjenning(1.februar til 28.februar)
         assertGodkjenningsbehov(
             tags = setOf("Forlengelse"),
             periodeFom = 1.februar,

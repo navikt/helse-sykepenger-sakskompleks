@@ -540,12 +540,11 @@ internal fun TestPerson.TestArbeidsgiver.nyttVedtak(
 }
 
 internal fun TestPerson.TestArbeidsgiver.forlengVedtak(
-    fom: LocalDate,
-    tom: LocalDate,
+    periode: Periode,
     grad: Prosentdel = 100.prosent,
     status: Oppdragstatus = Oppdragstatus.AKSEPTERT
 ): UUID {
-    val vedtaksperiode = nyPeriode(fom til tom, grad)
+    val vedtaksperiode = nyPeriode(periode, grad)
     håndterYtelser(vedtaksperiode)
     håndterSimulering(vedtaksperiode)
     håndterUtbetalingsgodkjenning(vedtaksperiode)

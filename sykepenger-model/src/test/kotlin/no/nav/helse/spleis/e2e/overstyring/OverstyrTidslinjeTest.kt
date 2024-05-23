@@ -403,8 +403,8 @@ internal class OverstyrTidslinjeTest : AbstractEndToEndTest() {
     @Test
     fun `Overstyring av utkast til revurdering`() {
         nyttVedtak(1.januar til 31.januar)
-        forlengVedtak(1.februar, 28.februar)
-        forlengVedtak(1.mars, 31.mars)
+        forlengVedtak(1.februar til 28.februar)
+        forlengVedtak(1.mars til 31.mars)
         nullstillTilstandsendringer()
         håndterOverstyrTidslinje((20.januar til 29.januar).map { manuellFeriedag(it) })
         håndterYtelser(1.vedtaksperiode)
@@ -420,7 +420,7 @@ internal class OverstyrTidslinjeTest : AbstractEndToEndTest() {
     @Test
     fun `skal kunne overstyre dagtype i utkast til revurdering ved revurdering av inntekt`() {
         nyttVedtak(1.januar til 31.januar)
-        forlengVedtak(1.februar, 28.februar)
+        forlengVedtak(1.februar til 28.februar)
         nullstillTilstandsendringer()
 
         håndterOverstyrInntekt(inntekt = 20000.månedlig, skjæringstidspunkt = 1.januar)

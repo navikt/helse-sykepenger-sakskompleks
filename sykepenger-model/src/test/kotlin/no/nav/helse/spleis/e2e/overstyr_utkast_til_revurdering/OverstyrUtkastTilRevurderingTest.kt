@@ -73,7 +73,7 @@ internal class OverstyrUtkastTilRevurderingTest: AbstractEndToEndTest() {
     @Test
     fun `skal kunne overstyre inntekt i utkast til revurdering ved revurdering av tidslinje`() {
         nyttVedtak(1.januar til 31.januar)
-        forlengVedtak(1.februar, 28.februar)
+        forlengVedtak(1.februar til 28.februar)
         nullstillTilstandsendringer()
         håndterOverstyrTidslinje((20.januar til 29.januar).map { manuellFeriedag(it) })
         håndterYtelser(1.vedtaksperiode)
@@ -164,7 +164,7 @@ internal class OverstyrUtkastTilRevurderingTest: AbstractEndToEndTest() {
     @Test
     fun `skal kunne overstyre inntekt i utkast til revurdering, også når det er snakk om flere perioder`() {
         nyttVedtak(1.januar til 31.januar)
-        forlengVedtak(1.februar, 28.februar)
+        forlengVedtak(1.februar til 28.februar)
         nullstillTilstandsendringer()
 
         håndterOverstyrInntekt(inntekt = 20000.månedlig, skjæringstidspunkt = 1.januar)
@@ -186,7 +186,7 @@ internal class OverstyrUtkastTilRevurderingTest: AbstractEndToEndTest() {
     @Test
     fun `overstyr dager i andre periode i pågående revurdering`() {
         nyttVedtak(1.januar til 31.januar)
-        forlengVedtak(1.februar, 28.februar)
+        forlengVedtak(1.februar til 28.februar)
         nullstillTilstandsendringer()
         håndterOverstyrTidslinje((28.januar til 31.januar).map { manuellFeriedag(it) })
         håndterYtelser(1.vedtaksperiode)
@@ -216,8 +216,8 @@ internal class OverstyrUtkastTilRevurderingTest: AbstractEndToEndTest() {
     @Test
     fun `overstyr dager i andre periode i pågående revurdering med tre perioder`() {
         nyttVedtak(1.januar til 31.januar)
-        forlengVedtak(1.februar, 28.februar)
-        forlengVedtak(1.mars, 31.mars)
+        forlengVedtak(1.februar til 28.februar)
+        forlengVedtak(1.mars til 31.mars)
         nullstillTilstandsendringer()
 
         håndterOverstyrTidslinje((28.januar til 31.januar).map { manuellFeriedag(it) })
@@ -250,7 +250,7 @@ internal class OverstyrUtkastTilRevurderingTest: AbstractEndToEndTest() {
     @Test
     fun `revurder tidligere periode når det finnes en periode til revurdering`() {
         nyttVedtak(1.januar til 31.januar)
-        forlengVedtak(1.februar, 28.februar)
+        forlengVedtak(1.februar til 28.februar)
         nullstillTilstandsendringer()
         håndterOverstyrTidslinje((1.februar til 2.februar).map { manuellFeriedag(it) })
         håndterYtelser(2.vedtaksperiode)

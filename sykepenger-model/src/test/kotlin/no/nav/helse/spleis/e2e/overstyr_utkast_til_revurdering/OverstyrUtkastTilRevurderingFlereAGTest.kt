@@ -35,7 +35,7 @@ internal class OverstyrUtkastTilRevurderingFlereAGTest : AbstractEndToEndTest() 
     @Test
     fun `overstyr utkast til revurdering flere ag - første ag mottar overstyring og går helt til utbetalt`() {
         nyeVedtak(1.januar, 31.januar, AG1, AG2)
-        forlengVedtak(1.februar, 28.februar, AG1, AG2)
+        forlengVedtak(1.februar til 28.februar, AG1, AG2)
         nullstillTilstandsendringer()
 
         håndterOverstyrTidslinje((29.januar til 29.januar).map { manuellFeriedag(it) }, orgnummer = AG1)
@@ -82,7 +82,7 @@ internal class OverstyrUtkastTilRevurderingFlereAGTest : AbstractEndToEndTest() 
     @Test
     fun `overstyr utkast til revurdering flere ag - første ag mottar overstyring`() {
         nyeVedtak(1.januar, 31.januar, AG1, AG2)
-        forlengVedtak(1.februar, 28.februar, AG1, AG2)
+        forlengVedtak(1.februar til 28.februar, AG1, AG2)
         nullstillTilstandsendringer()
 
         håndterOverstyrTidslinje((29.januar til 31.januar).map { manuellFeriedag(it) }, orgnummer = AG1)
@@ -116,7 +116,7 @@ internal class OverstyrUtkastTilRevurderingFlereAGTest : AbstractEndToEndTest() 
     @Test
     fun `overstyr utkast til revurdering flere ag - andre ag mottar overstyring`() {
         nyeVedtak(1.januar, 31.januar, AG1, AG2)
-        forlengVedtak(1.februar, 28.februar, AG1, AG2)
+        forlengVedtak(1.februar til 28.februar, AG1, AG2)
         nullstillTilstandsendringer()
 
         håndterOverstyrTidslinje((29.januar til 29.januar).map { manuellFeriedag(it) }, orgnummer = AG1)
@@ -152,7 +152,7 @@ internal class OverstyrUtkastTilRevurderingFlereAGTest : AbstractEndToEndTest() 
     @Test
     fun `overstyr utkast til revurdering flere ag - andre ag mottar overstyring i siste periode`() {
         nyeVedtak(1.januar, 31.januar, AG1, AG2)
-        forlengVedtak(1.februar, 28.februar, AG1, AG2)
+        forlengVedtak(1.februar til 28.februar, AG1, AG2)
         nullstillTilstandsendringer()
 
         håndterOverstyrTidslinje((29.januar til 31.januar).map { manuellFeriedag(it) }, orgnummer = AG1)
@@ -187,7 +187,7 @@ internal class OverstyrUtkastTilRevurderingFlereAGTest : AbstractEndToEndTest() 
     @Test
     fun `overstyr utkast til revurdering flere ag - kan overstyre periode i én ag dersom annen ag er revurdert ferdig`() {
         nyeVedtak(1.januar, 31.januar, AG1, AG2)
-        forlengVedtak(1.februar, 28.februar, AG1, AG2)
+        forlengVedtak(1.februar til 28.februar, AG1, AG2)
         nullstillTilstandsendringer()
 
         håndterOverstyrTidslinje((29.januar til 31.januar).map { manuellFeriedag(it) }, orgnummer = AG1)
@@ -219,7 +219,7 @@ internal class OverstyrUtkastTilRevurderingFlereAGTest : AbstractEndToEndTest() 
     @Test
     fun `revurder revurdering flere ag - kan ikke revurdere én ag hvis en annen ag ikke er ferdig revurdert`() {
         nyeVedtak(1.januar, 31.januar, AG1, AG2)
-        forlengVedtak(1.februar, 28.februar, AG1, AG2)
+        forlengVedtak(1.februar til 28.februar, AG1, AG2)
         nullstillTilstandsendringer()
 
         håndterOverstyrTidslinje((29.januar til 31.januar).map { manuellFeriedag(it) }, orgnummer = AG1)

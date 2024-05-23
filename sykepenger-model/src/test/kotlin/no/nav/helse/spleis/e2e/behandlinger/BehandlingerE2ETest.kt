@@ -183,7 +183,7 @@ internal class BehandlingerE2ETest : AbstractDslTest() {
     fun `annullere flere iverksatte vedtak`() {
         a1 {
             nyttVedtak(1.januar til 31.januar)
-            forlengVedtak(1.februar, 28.februar)
+            forlengVedtak(1.februar til 28.februar)
             nyttVedtak(10.mars til 31.mars, arbeidsgiverperiode = listOf(10.mars til 25.mars))
             håndterAnnullering(inspektør.utbetalinger.last().inspektør.utbetalingId)
             assertEquals(4, inspektør.utbetalinger.size)
@@ -462,7 +462,7 @@ internal class BehandlingerE2ETest : AbstractDslTest() {
     fun `inntektsmelding med første fraværsdag utenfor sykdom - to tidligere vedtak - inntektsmelding ikke håndtert fordi inntekt håndteres ikke`() {
         a1 {
             nyttVedtak(1.januar til 31.januar)
-            forlengVedtak(1.februar, 28.februar)
+            forlengVedtak(1.februar til 28.februar)
             val inntektsmeldingId = håndterInntektsmelding(listOf(1.februar til 16.februar), førsteFraværsdag = 1.mars)
             assertTrue(inntektsmeldingId in observatør.inntektsmeldingIkkeHåndtert)
             assertFalse(inntektsmeldingId in observatør.inntektsmeldingHåndtert.map { it.first })
@@ -673,7 +673,7 @@ internal class BehandlingerE2ETest : AbstractDslTest() {
             ))
 
             nyttVedtak(1.mars til 31.mars)
-            forlengVedtak(1.april, 30.april)
+            forlengVedtak(1.april til 30.april)
 
             håndterSøknad(Sykdom(1.februar, 28.februar, 100.prosent))
 
@@ -765,7 +765,7 @@ internal class BehandlingerE2ETest : AbstractDslTest() {
     fun `annullere tidligere periode`() {
         a1 {
             nyttVedtak(1.januar til 25.januar)
-            forlengVedtak(26.januar, 10.februar)
+            forlengVedtak(26.januar til 10.februar)
             nyttVedtak(14.februar til 20.februar, arbeidsgiverperiode = listOf(1.januar til 16.januar)) // samme agp, men nytt skjæringstidspunkt
 
             nyttVedtak(15.mars til 10.april)

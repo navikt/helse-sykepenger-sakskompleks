@@ -170,7 +170,7 @@ internal class YtelserE2ETest : AbstractEndToEndTest() {
     @Test
     fun `forlengelse trenger ikke sjekke mot 4-ukers vindu`() {
         nyttVedtak(1.januar til 31.januar)
-        forlengVedtak(1.februar, 28.februar)
+        forlengVedtak(1.februar til 28.februar)
 
         håndterOverstyrTidslinje(listOf(ManuellOverskrivingDag(31.januar, Dagtype.Feriedag)))
         håndterYtelser(1.vedtaksperiode,
@@ -282,7 +282,7 @@ internal class YtelserE2ETest : AbstractEndToEndTest() {
         createKorttidsPerson(UNG_PERSON_FNR_2018, 1.januar(1992), maksSykedager = 11)
 
         nyttVedtak(1.januar til 31.januar)
-        forlengVedtak(1.februar, 28.februar)
+        forlengVedtak(1.februar til 28.februar)
 
         håndterSøknad(Sykdom(1.februar, 28.februar, 95.prosent))
         håndterYtelser(

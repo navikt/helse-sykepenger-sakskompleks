@@ -1356,7 +1356,7 @@ internal class FlereArbeidsgivereUlikFomTest : AbstractEndToEndTest() {
         håndterUtbetalingsgodkjenning(1.vedtaksperiode, orgnummer = a1)
         håndterUtbetalt()
 
-        forlengVedtak(1.februar, 28.februar, orgnummer = a1)
+        forlengVedtak(1.februar til 28.februar, orgnummer = a1)
 
         nullstillTilstandsendringer()
         håndterSøknad(Sykdom(1.februar, 28.februar, 100.prosent), orgnummer = a2)
@@ -1450,7 +1450,7 @@ internal class FlereArbeidsgivereUlikFomTest : AbstractEndToEndTest() {
         håndterUtbetalingsgodkjenning(1.vedtaksperiode, orgnummer = a1)
         håndterUtbetalt()
 
-        forlengVedtak(1.februar, 28.februar, orgnummer = a1)
+        forlengVedtak(1.februar til 28.februar, orgnummer = a1)
 
         nullstillTilstandsendringer()
         håndterSøknad(Sykdom(20.januar, 28.februar, 100.prosent), orgnummer = a2)

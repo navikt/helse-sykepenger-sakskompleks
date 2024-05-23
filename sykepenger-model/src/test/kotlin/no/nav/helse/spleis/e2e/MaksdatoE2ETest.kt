@@ -59,7 +59,7 @@ internal class MaksdatoE2ETest : AbstractEndToEndTest() {
         // setter opp vedtaksperioder frem til 182 dager etter maksdato
         repeat(17) { _ ->
             forrigePeriode = nestePeriode(forrigePeriode)
-            forlengVedtak(forrigePeriode.start, forrigePeriode.endInclusive)
+            forlengVedtak(forrigePeriode)
         }
         // oppretter forlengelse fom 182 dager etter maksdato: denne blir kastet til Infotrygd
         forrigePeriode = nyPeriodeMedYtelser(forrigePeriode)
@@ -80,7 +80,7 @@ internal class MaksdatoE2ETest : AbstractEndToEndTest() {
         // setter opp vedtaksperioder frem til 182 dager etter maksdato
         repeat(17) { _ ->
             forrigePeriode = nestePeriode(forrigePeriode)
-            forlengVedtak(forrigePeriode.start, forrigePeriode.endInclusive)
+            forlengVedtak(forrigePeriode)
         }
         // oppretter forlengelse fom 182 dager etter maksdato
         forrigePeriode = nyPeriodeMedYtelser(forrigePeriode)

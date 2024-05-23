@@ -82,8 +82,8 @@ internal class KorrigerendeInntektsmeldingTest: AbstractEndToEndTest() {
     fun `bare varsel på første periode`() {
         nyPeriode(1.januar til 16.januar)
         nyttVedtak(17.januar til 31.januar, arbeidsgiverperiode = listOf(1.januar til 16.januar))
-        forlengVedtak(1.februar, 28.februar)
-        forlengVedtak(1.mars, 31.mars)
+        forlengVedtak(1.februar til 28.februar)
+        forlengVedtak(1.mars til 31.mars)
         håndterInntektsmelding(listOf(1.januar til 16.januar))
 
         assertIngenVarsel(RV_IM_4, 1.vedtaksperiode.filter())
@@ -167,8 +167,8 @@ internal class KorrigerendeInntektsmeldingTest: AbstractEndToEndTest() {
     @Test
     fun `Antall dager mellom opplyst agp og gammel agp er mer enn 10`()  {
         nyttVedtak(1.januar til 31.januar)
-        forlengVedtak(1.februar, 28.februar)
-        forlengVedtak(1.mars, 31.mars)
+        forlengVedtak(1.februar til 28.februar)
+        forlengVedtak(1.mars til 31.mars)
         håndterInntektsmelding(listOf(1.mars til 16.mars))
         assertEquals("SSSSSHH SSSSSHH SSSSSHH SSSSSHH SSSSSHH SSSSSHH SSSSSHH SSSSSHH SSSSSHH SSSSSHH SSSSSHH SSSSSHH SSSSSH", inspektør.sykdomshistorikk.sykdomstidslinje().toShortString())
         assertSisteTilstand(1.vedtaksperiode, AVSLUTTET)
@@ -183,8 +183,8 @@ internal class KorrigerendeInntektsmeldingTest: AbstractEndToEndTest() {
     @Test
     fun `Antall dager mellom opplyst agp og gammel agp er mindre enn 10`()  {
         nyttVedtak(10.januar til 31.januar)
-        forlengVedtak(1.februar, 28.februar)
-        forlengVedtak(1.mars, 31.mars)
+        forlengVedtak(1.februar til 28.februar)
+        forlengVedtak(1.mars til 31.mars)
         håndterInntektsmelding(listOf(1.februar til 16.februar))
         assertEquals("AAARR AAAAARR AAAAARR AAASSHH SSSSSHH SSSSSHH SSSSSHH SSSSSHH SSSSSHH SSSSSHH SSSSSHH SSSSSH", inspektør.sykdomshistorikk.sykdomstidslinje().toShortString())
         håndterYtelser(1.vedtaksperiode)
@@ -230,8 +230,8 @@ internal class KorrigerendeInntektsmeldingTest: AbstractEndToEndTest() {
     @Test
     fun `Antall dager mellom opplyst agp og gammel agp er mindre enn 10 - flere perioder før korrigerte dager`() {
         nyttVedtak(10.januar til 30.januar)
-        forlengVedtak(31.januar, 31.januar)
-        forlengVedtak(1.februar, 28.februar)
+        forlengVedtak(31.januar til 31.januar)
+        forlengVedtak(1.februar til 28.februar)
         håndterInntektsmelding(listOf(1.februar til 16.februar))
         assertEquals("AAARR AAAAARR AAAAARR AAASSHH SSSSSHH SSSSSHH SSSSSHH SSS", inspektør.sykdomshistorikk.sykdomstidslinje().toShortString())
         håndterYtelser(1.vedtaksperiode)

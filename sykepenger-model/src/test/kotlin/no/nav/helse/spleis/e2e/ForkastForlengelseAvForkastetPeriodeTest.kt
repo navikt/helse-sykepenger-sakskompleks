@@ -174,7 +174,7 @@ internal class ForkastForlengelseAvForkastetPeriodeTest : AbstractEndToEndTest()
         forkastAlle(hendelselogg)
 
         nyttVedtak(1.mars til 31.mars)
-        forlengVedtak(1.april, 30.april)
+        forlengVedtak(1.april til 30.april)
         nyttVedtak(1.juni til 30.juni)
 
         nyPeriode(1.februar til 28.februar)

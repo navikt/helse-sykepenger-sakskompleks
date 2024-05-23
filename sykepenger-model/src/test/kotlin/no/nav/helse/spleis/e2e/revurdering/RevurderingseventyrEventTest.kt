@@ -125,7 +125,7 @@ internal class RevurderingseventyrEventTest : AbstractEndToEndTest() {
     @Test
     fun `to vedtaksperioder berørt av en revurdering`() {
         nyttVedtak(1.januar til 31.januar)
-        forlengVedtak(1.februar, 28.februar)
+        forlengVedtak(1.februar til 28.februar)
         håndterOverstyrTidslinje(listOf(ManuellOverskrivingDag(17.januar, Dagtype.Feriedag))).meldingsreferanseId()
         val januar = observatør.utbetalteVedtaksperioder.first()
         val februar = observatør.utbetalteVedtaksperioder.last()
@@ -140,8 +140,8 @@ internal class RevurderingseventyrEventTest : AbstractEndToEndTest() {
     @Test
     fun `reberegning av revurdering`() {
         nyttVedtak(1.januar til 31.januar)
-        forlengVedtak(1.februar, 28.februar)
-        forlengVedtak(1.mars, 31.mars)
+        forlengVedtak(1.februar til 28.februar)
+        forlengVedtak(1.mars til 31.mars)
         håndterSøknad(Søknad.Søknadsperiode.Sykdom(27.februar, 28.februar, 50.prosent))
         nullstillTilstandsendringer()
         håndterPåminnelse(3.vedtaksperiode, AVVENTER_HISTORIKK_REVURDERING, skalReberegnes = true)
@@ -205,9 +205,9 @@ internal class RevurderingseventyrEventTest : AbstractEndToEndTest() {
     @Test
     fun `tidligere skjæringstidspunkt -- revurderer inntekt`() {
         nyttVedtak(1.januar til 31.januar)
-        forlengVedtak(1.februar, 15.februar)
+        forlengVedtak(1.februar til 15.februar)
         nyttVedtak(1.mars til 31.mars)
-        forlengVedtak(1.april, 30.april)
+        forlengVedtak(1.april til 30.april)
 
         val januar = observatør.utbetalteVedtaksperioder[0]
         val februar = observatør.utbetalteVedtaksperioder[1]
@@ -236,9 +236,9 @@ internal class RevurderingseventyrEventTest : AbstractEndToEndTest() {
     @Test
     fun `tidligere skjæringstidspunkt -- revurderer tidslinje`() {
         nyttVedtak(1.januar til 31.januar)
-        forlengVedtak(1.februar, 15.februar)
+        forlengVedtak(1.februar til 15.februar)
         nyttVedtak(1.mars til 31.mars)
-        forlengVedtak(1.april, 30.april)
+        forlengVedtak(1.april til 30.april)
 
         val februar = observatør.utbetalteVedtaksperioder[1]
         val mars = observatør.utbetalteVedtaksperioder[2]

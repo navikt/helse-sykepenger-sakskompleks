@@ -116,7 +116,7 @@ internal class SpeilBuilderTest : AbstractE2ETest() {
     @Test
     fun `beregnet periode peker på vilkårsgrunnlagid for infotrygdvilkårsgrunnlag`() {
         createOvergangFraInfotrygdPerson()
-        forlengVedtak(1.mars, 31.mars)
+        forlengVedtak(1.mars til 31.mars)
 
         val infotrygdVilkårsgrunnlag = dto().vilkårsgrunnlagHistorikk.historikk.first().vilkårsgrunnlag.first { it.skjæringstidspunkt == 1.januar }
         val infotrygdVilkårsgrunnlagId = infotrygdVilkårsgrunnlag.vilkårsgrunnlagId
@@ -166,7 +166,7 @@ internal class SpeilBuilderTest : AbstractE2ETest() {
     @Test
     fun `refusjon ligger på vilkårsgrunnlaget - også for infotrygd`() {
         createOvergangFraInfotrygdPerson()
-        forlengVedtak(1.mars, 31.mars)
+        forlengVedtak(1.mars til 31.mars)
         val personDto = speilApi()
         val speilVilkårsgrunnlagId = (personDto.arbeidsgivere.first().generasjoner.first().perioder.first() as BeregnetPeriode).vilkårsgrunnlagId
         val vilkårsgrunnlag = personDto.vilkårsgrunnlag[speilVilkårsgrunnlagId] as? InfotrygdVilkårsgrunnlag

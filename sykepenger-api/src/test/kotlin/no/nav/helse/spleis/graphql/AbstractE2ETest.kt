@@ -308,8 +308,8 @@ internal abstract class AbstractE2ETest {
         håndterVilkårsgrunnlag()
         håndterYtelserTilGodkjenning()
     }
-    protected fun forlengTilGodkjenning(fom: LocalDate, tom: LocalDate, orgnummer: String = a1) {
-        håndterSøknad(fom til tom, orgnummer)
+    protected fun forlengTilGodkjenning(periode: Periode, orgnummer: String = a1) {
+        håndterSøknad(periode, orgnummer)
         håndterYtelserTilGodkjenning()
     }
     protected fun tilYtelser(fom: LocalDate, tom: LocalDate, vararg orgnumre: String) {
@@ -330,8 +330,8 @@ internal abstract class AbstractE2ETest {
             håndterUtbetalt()
         }
     }
-    protected fun forlengVedtak(fom: LocalDate, tom: LocalDate, vararg orgnumre: String) {
-        orgnumre.forEach { håndterSøknad(fom til tom, it) }
+    protected fun forlengVedtak(periode: Periode, vararg orgnumre: String) {
+        orgnumre.forEach { håndterSøknad(periode, it) }
         orgnumre.forEach {
             håndterYtelserTilGodkjenning()
             håndterUtbetalingsgodkjenning()
@@ -343,8 +343,8 @@ internal abstract class AbstractE2ETest {
         håndterUtbetalingsgodkjenning()
         return håndterUtbetalt()
     }
-    protected fun forlengVedtak(fom: LocalDate, tom: LocalDate, orgnummer: String = a1): Utbetalingbehov {
-        forlengTilGodkjenning(fom, tom, orgnummer)
+    protected fun forlengVedtak(periode: Periode, orgnummer: String = a1): Utbetalingbehov {
+        forlengTilGodkjenning(periode, orgnummer)
         håndterUtbetalingsgodkjenning()
         return håndterUtbetalt()
     }

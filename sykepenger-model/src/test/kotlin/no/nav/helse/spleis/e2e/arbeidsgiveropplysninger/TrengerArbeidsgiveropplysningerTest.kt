@@ -213,7 +213,7 @@ internal class TrengerArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
     @Test
     fun `skal ikke be om arbeidsgiveropplysninger ved forlengelse`() {
         nyttVedtak(1.januar til 31.januar)
-        forlengVedtak(1.februar, 28.februar)
+        forlengVedtak(1.februar til 28.februar)
 
         assertEquals(1, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.size)
     }
@@ -306,7 +306,7 @@ internal class TrengerArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
     @Test
     fun `ber ikke om inntekt når vi allerede har inntekt på skjæringstidspunktet -- med arbeidsgiverperiode`() {
         nyeVedtak(1.januar, 31.januar, a1, a2)
-        forlengVedtak(1.februar, 28.februar, orgnummer = a2)
+        forlengVedtak(1.februar til 28.februar, orgnummer = a2)
         nyPeriode(1.mars til 31.mars, a1)
 
         assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, orgnummer = a1)
@@ -330,7 +330,7 @@ internal class TrengerArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
     @Test
     fun `ber ikke om inntekt og AGP når vi har inntekt på skjæringstidspunkt og det er mindre enn 16 dagers gap`() {
         nyeVedtak(1.januar, 31.januar, a1, a2)
-        forlengVedtak(1.februar, 10.februar, orgnummer = a2)
+        forlengVedtak(1.februar til 10.februar, orgnummer = a2)
         nyPeriode(11.februar til 28.februar, a1)
 
         assertEquals(4, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.size)
@@ -367,7 +367,7 @@ internal class TrengerArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
     @Test
     fun `sender med FastsattInntekt når vi allerede har en inntektsmelding lagt til grunn på skjæringstidspunktet`() {
         nyeVedtak(1.januar, 31.januar, a1, a2)
-        forlengVedtak(1.februar, 28.februar, orgnummer = a2)
+        forlengVedtak(1.februar til 28.februar, orgnummer = a2)
         nyPeriode(1.mars til 31.mars, a1)
 
         assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, orgnummer = a1)
@@ -424,7 +424,7 @@ internal class TrengerArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
                 a2 to (1.januar til 31.januar)
             )
         )
-        forlengVedtak(1.februar, 28.februar, orgnummer = a1)
+        forlengVedtak(1.februar til 28.februar, orgnummer = a1)
         nyPeriode(1.mars til 31.mars, a2)
         assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, orgnummer = a2)
 
@@ -1005,7 +1005,7 @@ internal class TrengerArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
 
         fraVilkårsprøvingTilGodkjent(INNTEKT_FLERE_AG)
 
-        forlengVedtak(1.februar, 28.februar, orgnummer = a1)
+        forlengVedtak(1.februar til 28.februar, orgnummer = a1)
         nyPeriode(1.mars til 31.mars, a2)
     }
 

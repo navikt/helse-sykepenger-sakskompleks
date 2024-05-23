@@ -95,7 +95,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
     @Test
     fun `revurdere mens en forlengelse er til utbetaling`() {
         nyttVedtak(1.januar til 31.januar)
-        forlengTilGodkjentVedtak(1.februar, 28.februar)
+        forlengTilGodkjentVedtak(1.februar til 28.februar)
         nullstillTilstandsendringer()
         håndterOverstyrTidslinje(listOf(ManuellOverskrivingDag(31.januar, Dagtype.Feriedag)))
         håndterUtbetalt()
@@ -127,7 +127,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
     @Test
     fun `revurdere mens en periode har feilet i utbetaling`() {
         nyttVedtak(1.januar til 31.januar)
-        forlengTilGodkjentVedtak(1.februar, 28.februar)
+        forlengTilGodkjentVedtak(1.februar til 28.februar)
         håndterUtbetalt(Oppdragstatus.FEIL)
         nullstillTilstandsendringer()
         håndterOverstyrTidslinje(listOf(ManuellOverskrivingDag(31.januar, Dagtype.Feriedag)))
@@ -138,7 +138,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
     @Test
     fun `annullering etter revurdering med utbetaling feilet`() {
         nyttVedtak(3.januar til 26.januar)
-        forlengVedtak(27.januar, 26.februar)
+        forlengVedtak(27.januar til 26.februar)
         nullstillTilstandsendringer()
         håndterOverstyrTidslinje(listOf(ManuellOverskrivingDag(26.januar, Dagtype.Feriedag)))
 
@@ -156,7 +156,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
     @Test
     fun `annullering etter revurdering feilet`() {
         nyttVedtak(3.januar til 26.januar)
-        forlengVedtak(29.januar, 26.februar)
+        forlengVedtak(29.januar til 26.februar)
 
         håndterOverstyrTidslinje(listOf(ManuellOverskrivingDag(26.januar, Dagtype.Feriedag)))
         håndterYtelser(1.vedtaksperiode)
@@ -171,7 +171,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
     @Test
     fun `to perioder - revurder dager i eldste`() {
         nyttVedtak(3.januar til 26.januar)
-        forlengVedtak(27.januar, 14.februar)
+        forlengVedtak(27.januar til 14.februar)
         nullstillTilstandsendringer()
 
         håndterOverstyrTidslinje((20.januar til 22.januar).map { manuellFeriedag(it) })
@@ -189,7 +189,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
     @Test
     fun `to perioder - revurder dag i nyeste`() {
         nyttVedtak(3.januar til 26.januar)
-        forlengVedtak(27.januar, 14.februar)
+        forlengVedtak(27.januar til 14.februar)
 
         håndterOverstyrTidslinje((4.februar til 8.februar).map { manuellFeriedag(it) })
         håndterYtelser(2.vedtaksperiode)
@@ -238,7 +238,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
     @Test
     fun `to perioder - hele den nyeste perioden blir ferie`() {
         nyttVedtak(3.januar til 26.januar)
-        forlengVedtak(27.januar, 14.februar)
+        forlengVedtak(27.januar til 14.februar)
 
         håndterOverstyrTidslinje((27.januar til 14.februar).map { manuellFeriedag(it) })
         håndterYtelser(2.vedtaksperiode)
@@ -435,7 +435,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
     fun `samme fagsystemId og forskjellig skjæringstidspunkt - revurder første periode i siste skjæringstidspunkt`() {
         nyttVedtak(3.januar til 26.januar)
         nyttVedtak(1.februar til 20.februar)
-        forlengVedtak(21.februar, 10.mars)
+        forlengVedtak(21.februar til 10.mars)
         nullstillTilstandsendringer()
         håndterOverstyrTidslinje((5.februar til 15.februar).map { manuellFeriedag(it) })
         håndterYtelser(2.vedtaksperiode)
@@ -455,7 +455,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
     fun `samme fagsystemId og forskjellig skjæringstidspunkt - revurder siste periode i siste skjæringstidspunkt`() {
         nyttVedtak(3.januar til 26.januar)
         nyttVedtak(1.februar til 20.februar)
-        forlengVedtak(21.februar, 10.mars)
+        forlengVedtak(21.februar til 10.mars)
 
         håndterOverstyrTidslinje((22.februar til 25.februar).map { manuellFeriedag(it) })
         håndterYtelser(3.vedtaksperiode)
@@ -755,7 +755,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
     @Test
     fun `revurder med kun ferie`() {
         nyttVedtak(3.januar til 26.januar)
-        forlengVedtak(27.januar, 13.februar)
+        forlengVedtak(27.januar til 13.februar)
         forlengPeriode(14.februar, 15.februar)
 
         håndterOverstyrTidslinje((27.januar til 13.februar).map { manuellFeriedag(it) })
@@ -835,8 +835,8 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
     @Test
     fun `tre utbetalte perioder - midterste blir revurdert - to siste perioder blir revurdert, første er urørt`() {
         nyttVedtak(1.januar til 31.januar)
-        forlengVedtak(1.februar, 28.februar)
-        forlengVedtak(1.mars, 31.mars)
+        forlengVedtak(1.februar til 28.februar)
+        forlengVedtak(1.mars til 31.mars)
         nullstillTilstandsendringer()
         håndterOverstyrTidslinje((15.februar til 28.februar).map { manuellFeriedag(it) })
 
@@ -849,8 +849,8 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
     @Test
     fun `tre utbetalte perioder - midterste blir revurdert og utbetalt - to siste perioder blir revurdert, første er urørt`() {
         nyttVedtak(1.januar til 31.januar)
-        forlengVedtak(1.februar, 28.februar)
-        forlengVedtak(1.mars, 31.mars)
+        forlengVedtak(1.februar til 28.februar)
+        forlengVedtak(1.mars til 31.mars)
         nullstillTilstandsendringer()
         håndterOverstyrTidslinje((15.februar til 28.februar).map { manuellFeriedag(it) })
         håndterYtelser(2.vedtaksperiode)
@@ -1218,7 +1218,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
     @Test
     fun `Kun periode berørt av endringene skal ha hendelseIden - forlengelse får hendelseId`() {
         nyttVedtak(1.januar til 31.januar)
-        forlengVedtak(1.februar, 28.februar)
+        forlengVedtak(1.februar til 28.februar)
         val hendelseId = UUID.randomUUID()
         håndterOverstyrTidslinje(
             meldingsreferanseId = hendelseId,

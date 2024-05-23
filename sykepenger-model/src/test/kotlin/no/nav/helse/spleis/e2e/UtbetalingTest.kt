@@ -96,7 +96,7 @@ internal class UtbetalingTest : AbstractEndToEndTest() {
     @Test
     fun `utbetaling_utbetalt tar med vedtaksperiode-ider for flere vedtak`() {
         nyttVedtak(1.januar til 31.januar, 100.prosent)
-        forlengVedtak(1.februar, 28.februar)
+        forlengVedtak(1.februar til 28.februar)
 
         val førsteEvent = observatør.utbetalingMedUtbetalingEventer.first()
         val andreEvent = observatør.utbetalingMedUtbetalingEventer.last()

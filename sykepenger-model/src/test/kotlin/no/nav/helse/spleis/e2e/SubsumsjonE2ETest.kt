@@ -2010,7 +2010,7 @@ internal class SubsumsjonE2ETest : AbstractEndToEndTest() {
             versjon = 16.desember(2011)
         )
 
-        forlengVedtak(1.februar, 28.februar)
+        forlengVedtak(1.februar til 28.februar)
         SubsumsjonInspektør(jurist).assertIkkeOppfylt(
             paragraf = PARAGRAF_8_51,
             ledd = LEDD_2,
@@ -2027,7 +2027,7 @@ internal class SubsumsjonE2ETest : AbstractEndToEndTest() {
             output = emptyMap()
         )
 
-        forlengVedtak(1.mars, 31.mars)
+        forlengVedtak(1.mars til 31.mars)
         assertEquals(1, SubsumsjonInspektør(jurist).antallSubsumsjoner(
             paragraf = PARAGRAF_8_3,
             ledd = LEDD_2,
@@ -2308,9 +2308,9 @@ internal class SubsumsjonE2ETest : AbstractEndToEndTest() {
         val personOver67år = "01025100065".somPersonidentifikator()
         createTestPerson(personOver67år, 1.februar(1951))
         nyttVedtak(1.januar til 31.januar, fnr = personOver67år)
-        forlengVedtak(1.februar, 28.februar, fnr = personOver67år)
-        forlengVedtak(1.mars, 31.mars, fnr = personOver67år)
-        forlengVedtak(1.april, 26.april, fnr = personOver67år)
+        forlengVedtak(1.februar til 28.februar, fnr = personOver67år)
+        forlengVedtak(1.mars til 31.mars, fnr = personOver67år)
+        forlengVedtak(1.april til 26.april, fnr = personOver67år)
 
         SubsumsjonInspektør(jurist).assertOppfylt(
             paragraf = PARAGRAF_8_51,
@@ -2430,9 +2430,9 @@ internal class SubsumsjonE2ETest : AbstractEndToEndTest() {
         val personOver67år = "01025100065".somPersonidentifikator()
         createTestPerson(personOver67år, 1.februar(1951))
         nyttVedtak(1.januar til 31.januar, fnr = personOver67år)
-        forlengVedtak(1.februar, 28.februar, fnr = personOver67år)
-        forlengVedtak(1.mars, 31.mars, fnr = personOver67år)
-        forlengVedtak(1.april, 27.april, fnr = personOver67år)
+        forlengVedtak(1.februar til 28.februar, fnr = personOver67år)
+        forlengVedtak(1.mars til 31.mars, fnr = personOver67år)
+        forlengVedtak(1.april til 27.april, fnr = personOver67år)
 
         SubsumsjonInspektør(jurist).assertOppfylt(
             paragraf = PARAGRAF_8_51,
@@ -2625,7 +2625,7 @@ internal class SubsumsjonE2ETest : AbstractEndToEndTest() {
     @Test
     fun `andre ytelser i snuten`() {
         nyttVedtak(1.januar til 31.januar)
-        forlengVedtak(1.februar, 28.februar)
+        forlengVedtak(1.februar til 28.februar)
         håndterOverstyrTidslinje(overstyringsdager = listOf(
             ManuellOverskrivingDag(1.februar, Dagtype.Foreldrepengerdag),
             ManuellOverskrivingDag(2.februar, Dagtype.Pleiepengerdag),

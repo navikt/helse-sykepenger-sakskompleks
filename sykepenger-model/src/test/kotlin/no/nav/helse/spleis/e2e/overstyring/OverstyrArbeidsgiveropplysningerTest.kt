@@ -158,8 +158,8 @@ internal class OverstyrArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
     @Test
     fun `overstyring av refusjon skal starte revurdering fom første dato med endring`() {
         nyttVedtak(1.januar til 31.januar)
-        forlengVedtak(1.februar, 28.februar)
-        forlengVedtak(1.mars, 31.mars)
+        forlengVedtak(1.februar til 28.februar)
+        forlengVedtak(1.mars til 31.mars)
         nullstillTilstandsendringer()
         val overstyringId = UUID.randomUUID()
         håndterOverstyrArbeidsgiveropplysninger(1.januar, listOf(
@@ -439,7 +439,7 @@ internal class OverstyrArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
     fun `to arbeidsgivere kun refusjonsendring på den ene og endring av inntekt på andre`() {
         val inntektPerArbeidsgiver = 19000.månedlig
         nyeVedtak(1.januar, 31.januar, a1, a2, inntekt = inntektPerArbeidsgiver)
-        forlengVedtak(1.februar, 28.februar, a1, a2)
+        forlengVedtak(1.februar til 28.februar, a1, a2)
         assertSisteTilstand(2.vedtaksperiode, AVSLUTTET, a1)
         assertSisteTilstand(2.vedtaksperiode, AVSLUTTET, a2)
 

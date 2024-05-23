@@ -23,8 +23,8 @@ internal class VedtaksperiodeForkastetE2ETest : AbstractEndToEndTest() {
     @Test
     fun `vedtaksperioder forkastes`() {
         nyttVedtak(1.januar til 31.januar)
-        forlengVedtak(1.februar, 28.februar)
-        forlengVedtak(1.mars, 31.mars)
+        forlengVedtak(1.februar til 28.februar)
+        forlengVedtak(1.mars til 31.mars)
         forlengPeriode(1.april, 30.april)
         håndterYtelser(4.vedtaksperiode)
         håndterSimulering(4.vedtaksperiode)

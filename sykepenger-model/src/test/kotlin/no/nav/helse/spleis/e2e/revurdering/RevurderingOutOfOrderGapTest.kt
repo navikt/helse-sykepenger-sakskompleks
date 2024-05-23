@@ -157,7 +157,7 @@ internal class RevurderingOutOfOrderGapTest : AbstractEndToEndTest() {
     @Test
     fun `out of order periode i helg mellom to andre perioder`() {
         nyttVedtak(1.januar til 26.januar)
-        forlengVedtak(29.januar, 11.februar)
+        forlengVedtak(29.januar til 11.februar)
         nullstillTilstandsendringer()
         nyPeriode(27.januar til 28.januar)
         håndterYtelser(3.vedtaksperiode)
@@ -469,7 +469,7 @@ internal class RevurderingOutOfOrderGapTest : AbstractEndToEndTest() {
     @Test
     fun `out of order periode trigger revurdering`() {
         nyttVedtak(1.mai til 31.mai)
-        forlengVedtak(1.juni, 30.juni)
+        forlengVedtak(1.juni til 30.juni)
         nullstillTilstandsendringer()
         nyttVedtak(1.januar til 31.januar)
         assertSisteTilstand(3.vedtaksperiode, AVSLUTTET)
@@ -490,7 +490,7 @@ internal class RevurderingOutOfOrderGapTest : AbstractEndToEndTest() {
     @Test
     fun `out of order periode uten utbetaling trigger revurdering`() {
         nyttVedtak(1.mai til 31.mai)
-        forlengVedtak(1.juni, 30.juni)
+        forlengVedtak(1.juni til 30.juni)
         nullstillTilstandsendringer()
         nyPeriode(1.januar til 15.januar)
         assertTilstander(3.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, AVSLUTTET_UTEN_UTBETALING)
@@ -750,7 +750,7 @@ internal class RevurderingOutOfOrderGapTest : AbstractEndToEndTest() {
     @Test
     fun `out of order periode mens senere periode revurderes til utbetaling`() {
         nyttVedtak(1.mai til 31.mai)
-        forlengTilGodkjenning(1.juni, 30.juni)
+        forlengTilGodkjenning(1.juni til 30.juni)
         håndterUtbetalingsgodkjenning(2.vedtaksperiode)
 
         nullstillTilstandsendringer()
@@ -919,8 +919,8 @@ internal class RevurderingOutOfOrderGapTest : AbstractEndToEndTest() {
     @Test
     fun `Warning ved out-of-order - én warning for perioden som trigger out-of-order, én warning for de som blir påvirket av out-of-order`() {
         nyttVedtak(1.mars til 31.mars)
-        forlengVedtak(1.april, 30.april)
-        forlengVedtak(1.mai, 31.mai)
+        forlengVedtak(1.april til 30.april)
+        forlengVedtak(1.mai til 31.mai)
 
         nyttVedtak(1.januar til 31.januar)
 
@@ -934,8 +934,8 @@ internal class RevurderingOutOfOrderGapTest : AbstractEndToEndTest() {
     @Test
     fun `Warning ved out-of-order - dukker ikke opp i revurderinger som ikke er out-of-order`() {
         nyttVedtak(1.mars til 31.mars)
-        forlengVedtak(1.april, 30.april)
-        forlengVedtak(1.mai, 31.mai)
+        forlengVedtak(1.april til 30.april)
+        forlengVedtak(1.mai til 31.mai)
 
         håndterOverstyrTidslinje(listOf(ManuellOverskrivingDag(17.mars, Sykedag, 50)))
 

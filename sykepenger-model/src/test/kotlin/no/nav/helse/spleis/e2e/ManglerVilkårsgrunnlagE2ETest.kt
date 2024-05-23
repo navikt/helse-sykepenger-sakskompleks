@@ -149,7 +149,7 @@ internal class ManglerVilkårsgrunnlagE2ETest : AbstractEndToEndTest() {
     @Test
     fun `korrigert arbeidsgiverperiode under pågående revurdering`() {
         nyttVedtak(1.januar til 31.januar, 100.prosent)
-        forlengVedtak(1.februar, 28.februar, 100.prosent)
+        forlengVedtak(1.februar til 28.februar, 100.prosent)
         håndterSøknad(Sykdom(1.januar, 31.januar, 80.prosent))
 
         assertSisteTilstand(1.vedtaksperiode, AVVENTER_HISTORIKK_REVURDERING)
@@ -167,7 +167,7 @@ internal class ManglerVilkårsgrunnlagE2ETest : AbstractEndToEndTest() {
     @Test
     fun `korrigert arbeidsgiverperiode under pågående revurdering - korrigert søknad for februar`() {
         nyttVedtak(1.januar til 31.januar, 100.prosent)
-        forlengVedtak(1.februar, 28.februar, 100.prosent)
+        forlengVedtak(1.februar til 28.februar, 100.prosent)
         håndterSøknad(Sykdom(1.februar, 28.februar, 80.prosent))
 
         assertSisteTilstand(1.vedtaksperiode, AVSLUTTET)

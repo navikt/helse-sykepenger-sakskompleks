@@ -134,7 +134,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
     @Test
     fun `korrigerer arbeidsgiverperiode etter utbetalt`() {
         nyttVedtak(1.januar til 25.januar)
-        forlengVedtak(26.januar, 28.februar)
+        forlengVedtak(26.januar til 28.februar)
         håndterInntektsmelding(listOf(26.januar til 10.februar))
         assertEquals("AAAAARR AAAAARR AAAAARR AAAASHH SSSSSHH SSSSSHH SSSSSHH SSSSSHH SSS", inspektør.sykdomstidslinje.toShortString())
         håndterYtelser(1.vedtaksperiode)
@@ -376,7 +376,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
     @Test
     fun `inntektsmelding i det blå`() {
         nyttVedtak(1.januar til 31.januar)
-        forlengVedtak(1.februar, 28.februar)
+        forlengVedtak(1.februar til 28.februar)
 
         håndterInntektsmelding(listOf(1.oktober til 16.oktober), orgnummer = a2)
         assertSisteTilstand(1.vedtaksperiode, AVSLUTTET)
@@ -806,8 +806,8 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
             førsteFraværsdag = 5.januar,
             arbeidsgiverperiode = listOf(5.januar til 20.januar)
         )
-        forlengVedtak(1.februar, 28.februar)
-        forlengVedtak(1.mars, 31.mars)
+        forlengVedtak(1.februar til 28.februar)
+        forlengVedtak(1.mars til 31.mars)
         nyPeriode(10.april til 30.april)
         håndterInntektsmelding(
             listOf(1.januar til 16.januar),
@@ -1110,8 +1110,8 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
         nyPeriode(1.januar til 16.januar)
         nyttVedtak(17.januar til 31.januar, arbeidsgiverperiode = listOf(1.januar til 16.januar))
 
-        forlengVedtak(1.februar, 28.februar)
-        forlengVedtak(1.mars, 31.mars)
+        forlengVedtak(1.februar til 28.februar)
+        forlengVedtak(1.mars til 31.mars)
         håndterOverstyrInntekt(INNTEKT + 500.månedlig, skjæringstidspunkt = 1.januar)
         håndterYtelser(2.vedtaksperiode)
 

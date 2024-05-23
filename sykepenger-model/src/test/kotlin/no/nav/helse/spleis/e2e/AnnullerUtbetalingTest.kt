@@ -63,7 +63,7 @@ internal class AnnullerUtbetalingTest : AbstractEndToEndTest() {
     @Test
     fun `forkaster senere perioder ved annullering`() {
         nyttVedtak(1.januar til 31.januar)
-        forlengVedtak(1.februar, 28.februar) // forlengelse
+        forlengVedtak(1.februar til 28.februar) // forlengelse
         nyttVedtak(10.mars til 31.mars) // førstegangsbehandling, men med samme agp
         håndterSykmelding(Sykmeldingsperiode(1.mai, 20.mai)) // førstegangsbehandling, ny agp
         håndterSøknad(Sykdom(1.mai, 20.mai, 100.prosent))
@@ -204,7 +204,7 @@ internal class AnnullerUtbetalingTest : AbstractEndToEndTest() {
     @Test
     fun `Annullering av én periode fører til at alle avsluttede sammenhengende perioder blir satt i tilstand TilAnnullering`() {
         nyttVedtak(3.januar til 26.januar, 100.prosent, 3.januar)
-        forlengVedtak(27.januar, 31.januar, 100.prosent)
+        forlengVedtak(27.januar til 31.januar, 100.prosent)
         forlengPeriode(1.februar, 20.februar, 100.prosent)
         nullstillTilstandsendringer()
         håndterAnnullerUtbetaling(utbetalingId = inspektør.utbetalingId(1.vedtaksperiode))
@@ -232,7 +232,7 @@ internal class AnnullerUtbetalingTest : AbstractEndToEndTest() {
     @Test
     fun `Annullering av én periode fører kun til at sammehengende utbetalte perioder blir forkastet og værende i Avsluttet`() {
         nyttVedtak(3.januar til 26.januar, 100.prosent, 3.januar)
-        forlengVedtak(27.januar, 30.januar, 100.prosent)
+        forlengVedtak(27.januar til 30.januar, 100.prosent)
         nyttVedtak(1.mars til 20.mars, 100.prosent, 1.mars)
         val behovTeller = person.personLogg.behov().size
         nullstillTilstandsendringer()
@@ -267,7 +267,7 @@ internal class AnnullerUtbetalingTest : AbstractEndToEndTest() {
     @Test
     fun `publiserer kun ett event ved annullering av utbetaling som strekker seg over flere vedtaksperioder med full refusjon`() {
         nyttVedtak(3.januar til 26.januar, 100.prosent, 3.januar)
-        forlengVedtak(27.januar, 20.februar, 100.prosent)
+        forlengVedtak(27.januar til 20.februar, 100.prosent)
         assertEquals(2, inspektør.vedtaksperiodeTeller)
 
         håndterAnnullerUtbetaling(utbetalingId = inspektør.utbetalingId(2.vedtaksperiode))
@@ -295,7 +295,7 @@ internal class AnnullerUtbetalingTest : AbstractEndToEndTest() {
     @Test
     fun `setter datoStatusFom som fom dato i annullering hvor graden endres`() {
         nyttVedtak(3.januar til 26.januar, 100.prosent, 3.januar)
-        forlengVedtak(27.januar, 20.februar, 30.prosent)
+        forlengVedtak(27.januar til 20.februar, 30.prosent)
         assertEquals(2, inspektør.vedtaksperiodeTeller)
         val utbetalingId = inspektør.utbetalingId(2.vedtaksperiode)
 

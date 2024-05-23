@@ -137,7 +137,7 @@ internal class RevurderingInntektV2E2ETest : AbstractEndToEndTest() {
     @Test
     fun `skal kunne overstyre inntekt i utkast til revurdering, også når det er snakk om flere perioder`() {
         nyttVedtak(1.januar til 31.januar)
-        forlengVedtak(1.februar, 28.februar)
+        forlengVedtak(1.februar til 28.februar)
         nullstillTilstandsendringer()
 
         håndterOverstyrInntekt(inntekt = 20000.månedlig, skjæringstidspunkt = 1.januar)
@@ -214,7 +214,7 @@ internal class RevurderingInntektV2E2ETest : AbstractEndToEndTest() {
     @Test
     fun `skal kunne overstyre inntekt i utkast til revurdering ved revurdering av tidslinje`() {
         nyttVedtak(1.januar til 31.januar)
-        forlengVedtak(1.februar, 28.februar)
+        forlengVedtak(1.februar til 28.februar)
         nullstillTilstandsendringer()
         assertDag<Sykedag, NavDag>(
             dato = 22.januar,
@@ -588,7 +588,7 @@ internal class RevurderingInntektV2E2ETest : AbstractEndToEndTest() {
     fun `Perioder med aktuelt skjæringstidspunkt skal være stemplet med hendelseId`() {
         nyttVedtak(1.januar til 31.januar)
         nyttVedtak(1.mars til 31.mars)
-        forlengVedtak(1.april, 30.april)
+        forlengVedtak(1.april til 30.april)
         val overstyrInntektHendelseId = UUID.randomUUID()
         håndterOverstyrInntekt(skjæringstidspunkt = 1.mars, meldingsreferanseId = overstyrInntektHendelseId)
 
@@ -657,7 +657,7 @@ internal class RevurderingInntektV2E2ETest : AbstractEndToEndTest() {
     @Test
     fun `revurdere mens en periode er til utbetaling`() {
         nyttVedtak(1.januar til 31.januar)
-        forlengTilGodkjentVedtak(1.februar, 28.februar)
+        forlengTilGodkjentVedtak(1.februar til 28.februar)
         nullstillTilstandsendringer()
         håndterOverstyrInntekt(30000.månedlig, skjæringstidspunkt = 1.januar)
         assertTilstander(1.vedtaksperiode, AVSLUTTET, AVVENTER_REVURDERING)
@@ -674,7 +674,7 @@ internal class RevurderingInntektV2E2ETest : AbstractEndToEndTest() {
     @Test
     fun `revurdere mens en periode har feilet i utbetaling`() {
         nyttVedtak(1.januar til 31.januar)
-        forlengTilGodkjentVedtak(1.februar, 28.februar)
+        forlengTilGodkjentVedtak(1.februar til 28.februar)
         nullstillTilstandsendringer()
         håndterUtbetalt(status = Oppdragstatus.FEIL)
         håndterOverstyrInntekt(30000.månedlig, skjæringstidspunkt = 1.januar)

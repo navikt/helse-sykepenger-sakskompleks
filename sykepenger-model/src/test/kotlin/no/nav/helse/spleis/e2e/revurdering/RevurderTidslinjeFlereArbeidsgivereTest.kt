@@ -276,7 +276,7 @@ internal class RevurderTidslinjeFlereArbeidsgivereTest : AbstractEndToEndTest() 
     @Test
     fun `to AG - to perioder på hver - første periode blir revurdert på én AG og avventer godkjenning`() {
         nyeVedtak(1.januar, 31.januar, a2, a1)
-        forlengVedtak(1.februar, 28.februar, a2, a1)
+        forlengVedtak(1.februar til 28.februar, a2, a1)
         nullstillTilstandsendringer()
 
         håndterOverstyrTidslinje((20.januar til 22.januar).map { manuellFeriedag(it) }, orgnummer = a2)
@@ -333,7 +333,7 @@ internal class RevurderTidslinjeFlereArbeidsgivereTest : AbstractEndToEndTest() 
     @Test
     fun `to AG - to perioder på hver - én blir revurdert på én AG`() {
         nyeVedtak(1.januar, 31.januar, a2, a1)
-        forlengVedtak(1.februar, 28.februar, a2, a1)
+        forlengVedtak(1.februar til 28.februar, a2, a1)
         nullstillTilstandsendringer()
 
         håndterOverstyrTidslinje((20.januar til 22.januar).map { manuellFeriedag(it) }, orgnummer = a1)

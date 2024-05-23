@@ -321,7 +321,7 @@ internal class RevurderInntektTest : AbstractEndToEndTest() {
     @Test
     fun `utbetaling_utbetalt tar med vedtaksperiode-ider for flere vedtak`() {
         nyttVedtak(1.januar til 31.januar, 100.prosent)
-        forlengVedtak(1.februar, 28.februar)
+        forlengVedtak(1.februar til 28.februar)
 
         val førsteEvent = observatør.utbetalingMedUtbetalingEventer.first()
         val andreEvent = observatør.utbetalingMedUtbetalingEventer.last()
@@ -335,7 +335,7 @@ internal class RevurderInntektTest : AbstractEndToEndTest() {
     @Test
     fun `utbetaling_utbetalt tar med vedtaksperiode-ider for revurdering over flere perioder`() {
         nyttVedtak(1.januar til 31.januar, 100.prosent)
-        forlengVedtak(1.februar, 28.februar)
+        forlengVedtak(1.februar til 28.februar)
 
         håndterInntektsmelding(
             listOf(1.januar til 16.januar),
@@ -593,7 +593,7 @@ internal class RevurderInntektTest : AbstractEndToEndTest() {
     @Test
     fun `revurdere mens en forlengelse er til utbetaling`() {
         nyttVedtak(1.januar til 31.januar)
-        forlengTilGodkjentVedtak(1.februar, 28.februar)
+        forlengTilGodkjentVedtak(1.februar til 28.februar)
         nullstillTilstandsendringer()
         håndterOverstyrInntekt(INNTEKT * 1.05, skjæringstidspunkt = 1.januar)
         håndterUtbetalt()
@@ -625,7 +625,7 @@ internal class RevurderInntektTest : AbstractEndToEndTest() {
     @Test
     fun `revurdere mens en periode har feilet i utbetaling`() {
         nyttVedtak(1.januar til 31.januar)
-        forlengTilGodkjentVedtak(1.februar, 28.februar)
+        forlengTilGodkjentVedtak(1.februar til 28.februar)
         håndterUtbetalt(status = Oppdragstatus.FEIL)
         håndterOverstyrInntekt(INNTEKT /2, skjæringstidspunkt = 1.januar)
         assertTilstander(
