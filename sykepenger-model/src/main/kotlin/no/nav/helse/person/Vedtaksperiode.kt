@@ -1691,6 +1691,9 @@ internal class Vedtaksperiode private constructor(
             hendelse: Hendelse
         ) = tilstand(hendelse, vedtaksperiode, arbeidsgivere).gjenopptaBehandling(vedtaksperiode, hendelse)
 
+        fun trengerInntektsmelding(vedtaksperiode: Vedtaksperiode, arbeidsgivere: Iterable<Arbeidsgiver>, hendelse: IAktivitetslogg)
+            = tilstand(hendelse, vedtaksperiode, arbeidsgivere) == TrengerInntektsmelding
+
         override fun håndter(vedtaksperiode: Vedtaksperiode, påminnelse: Påminnelse) {
             if (påminnelse.skalReberegnes()) return vedtaksperiode.tilstand(påminnelse, AvventerInntektsmelding)
             if (vedtaksperiode.manglerNødvendigInntektVedTidligereBeregnetSykepengegrunnlag()) {
@@ -1754,6 +1757,7 @@ internal class Vedtaksperiode private constructor(
             override fun gjenopptaBehandling(vedtaksperiode: Vedtaksperiode, hendelse: Hendelse) {
                 hendelse.info("Mangler inntekt og/eller refusjon for sykepengegrunnlag som følge av at skjæringstidspunktet har endret seg")
                 vedtaksperiode.tilstand(hendelse, AvventerInntektsmelding)
+                vedtaksperiode.person.gjenopptaBehandling(hendelse)
             }
         }
 
@@ -2404,6 +2408,10 @@ internal class Vedtaksperiode private constructor(
         }
 
         private val IKKE_FERDIG_BEHANDLET: VedtaksperiodeFilter = { !it.tilstand.erFerdigBehandlet }
+        private val FØRSTE_AVVENTER_BLOKKERENDE_SOM_TRENGER_INNTEKTSMELDING = fun(arbeidsgivere: Iterable<Arbeidsgiver>, hendelse: IAktivitetslogg): VedtaksperiodeFilter = {
+            val tilstand = it.tilstand
+            tilstand is AvventerBlokkerendePeriode && tilstand.trengerInntektsmelding(it, arbeidsgivere, hendelse)
+        }
 
         private val OVERLAPPER_MED = { other: Vedtaksperiode ->
             { vedtaksperiode: Vedtaksperiode -> vedtaksperiode.periode.overlapperMed(other.periode) }
@@ -2473,6 +2481,9 @@ internal class Vedtaksperiode private constructor(
 
         internal fun Iterable<Vedtaksperiode>.nestePeriodeSomSkalGjenopptas() =
             filter(IKKE_FERDIG_BEHANDLET).førstePeriode()
+
+        internal fun Iterable<Vedtaksperiode>.førsteAvventerBlokkerendeSomTrengerInntektsmelding(arbeidsgivere: Iterable<Arbeidsgiver>, hendelse: IAktivitetslogg) =
+            filter(FØRSTE_AVVENTER_BLOKKERENDE_SOM_TRENGER_INNTEKTSMELDING(arbeidsgivere, hendelse)).førstePeriode()
 
 
         internal fun List<Vedtaksperiode>.finnNesteVedtaksperiodeSomTrengerInntektsmelding(vedtaksperiode: Vedtaksperiode): Vedtaksperiode? {

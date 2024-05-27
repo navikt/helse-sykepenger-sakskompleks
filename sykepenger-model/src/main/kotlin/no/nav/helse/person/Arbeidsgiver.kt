@@ -44,6 +44,7 @@ import no.nav.helse.person.Vedtaksperiode.Companion.aktiveSkjæringstidspunkter
 import no.nav.helse.person.Vedtaksperiode.Companion.beregnSkjæringstidspunkter
 import no.nav.helse.person.Vedtaksperiode.Companion.checkBareEnPeriodeTilGodkjenningSamtidig
 import no.nav.helse.person.Vedtaksperiode.Companion.finnNesteVedtaksperiodeSomTrengerInntektsmelding
+import no.nav.helse.person.Vedtaksperiode.Companion.førsteAvventerBlokkerendeSomTrengerInntektsmelding
 import no.nav.helse.person.Vedtaksperiode.Companion.førstePeriode
 import no.nav.helse.person.Vedtaksperiode.Companion.iderMedUtbetaling
 import no.nav.helse.person.Vedtaksperiode.Companion.nestePeriodeSomSkalGjenopptas
@@ -51,6 +52,7 @@ import no.nav.helse.person.Vedtaksperiode.Companion.nåværendeVedtaksperiode
 import no.nav.helse.person.Vedtaksperiode.Companion.venter
 import no.nav.helse.person.Yrkesaktivitet.Companion.tilYrkesaktivitet
 import no.nav.helse.person.aktivitetslogg.Aktivitetskontekst
+import no.nav.helse.person.aktivitetslogg.Aktivitetslogg
 import no.nav.helse.person.aktivitetslogg.IAktivitetslogg
 import no.nav.helse.person.aktivitetslogg.SpesifikkKontekst
 import no.nav.helse.person.builders.UtbetalingsdagerBuilder
@@ -239,14 +241,16 @@ internal class Arbeidsgiver private constructor(
         private fun Iterable<Arbeidsgiver>.førsteAuuSomVilUtbetales() = nåværendeVedtaksperioder(AUU_SOM_VIL_UTBETALES).minOrNull()
         internal fun Iterable<Arbeidsgiver>.gjenopptaBehandling(hendelse: Hendelse) {
             if (harPågåeneUtbetaling()) return hendelse.info("Stopper gjenoppta behandling pga. pågående utbetaling")
-            val periodeSomSkalGjenopptas = periodeSomSkalGjenopptas() ?: return
+            val periodeSomSkalGjenopptas = periodeSomSkalGjenopptas(hendelse) ?: return
             checkBareEnPeriodeTilGodkjenningSamtidig(periodeSomSkalGjenopptas)
             periodeSomSkalGjenopptas.gjenopptaBehandling(hendelse, this)
         }
 
         internal fun Iterable<Arbeidsgiver>.nestemann() = sistePeriodeSomHarPågåendeUtbetaling() ?: periodeSomSkalGjenopptas() ?: førsteAuuSomVilUtbetales()
 
-        private fun Iterable<Arbeidsgiver>.periodeSomSkalGjenopptas() = flatMap { it.vedtaksperioder }.nestePeriodeSomSkalGjenopptas()
+        private fun Iterable<Arbeidsgiver>.periodeSomSkalGjenopptas(hendelse: IAktivitetslogg = Aktivitetslogg()) = flatMap { it.vedtaksperioder }.let { vedtaksperioder ->
+            vedtaksperioder.førsteAvventerBlokkerendeSomTrengerInntektsmelding(this, hendelse) ?: vedtaksperioder.nestePeriodeSomSkalGjenopptas()
+        }
         private fun Iterable<Arbeidsgiver>.checkBareEnPeriodeTilGodkjenningSamtidig(periodeSomSkalGjenopptas: Vedtaksperiode) = flatMap { it.vedtaksperioder }.checkBareEnPeriodeTilGodkjenningSamtidig(periodeSomSkalGjenopptas)
 
         internal fun søppelbøtte(
