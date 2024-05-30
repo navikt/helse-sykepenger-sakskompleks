@@ -77,13 +77,13 @@ internal class ArbeidsgiverInntektsopplysningTest {
         val original = listOf(a1Opplysning, a2Opplysning)
         val new = listOf(a1Overstyrt)
 
-        assertEquals(original, original.overstyrInntekter(opptjening, listOf(a1Overstyrt, a1Overstyrt), NullObserver)) { "kan ikke velge mellom inntekter for samme orgnr" }
+        assertEquals(original, original.overstyrInntekter(skjæringstidspunkt, opptjening, listOf(a1Overstyrt, a1Overstyrt), NullObserver)) { "kan ikke velge mellom inntekter for samme orgnr" }
 
-        assertEquals(emptyList<ArbeidsgiverInntektsopplysning>(), emptyList<ArbeidsgiverInntektsopplysning>().overstyrInntekter(opptjening, new, NullObserver))
-        assertEquals(original, original.overstyrInntekter(opptjening, emptyList(), NullObserver))
-        assertEquals(listOf(a1Overstyrt, a2Opplysning), original.overstyrInntekter(opptjening, new, NullObserver))
+        assertEquals(emptyList<ArbeidsgiverInntektsopplysning>(), emptyList<ArbeidsgiverInntektsopplysning>().overstyrInntekter(skjæringstidspunkt, opptjening, new, NullObserver))
+        assertEquals(original, original.overstyrInntekter(skjæringstidspunkt, opptjening, emptyList(), NullObserver))
+        assertEquals(listOf(a1Overstyrt, a2Opplysning), original.overstyrInntekter(skjæringstidspunkt, opptjening, new, NullObserver))
         val forMange = listOf(a1Overstyrt, a3Overstyrt)
-        assertEquals(listOf(a1Overstyrt, a2Opplysning), original.overstyrInntekter(opptjening, forMange, NullObserver)) { "skal ikke kunne legge til inntekter som ikke finnes fra før" }
+        assertEquals(listOf(a1Overstyrt, a2Opplysning), original.overstyrInntekter(skjæringstidspunkt, opptjening, forMange, NullObserver)) { "skal ikke kunne legge til inntekter som ikke finnes fra før" }
     }
 
     @Test
@@ -106,7 +106,7 @@ internal class ArbeidsgiverInntektsopplysningTest {
         val expected = listOf(forventetA1Opplysning, a2Opplysning, a3Opplysning)
         val new = listOf(overstyrtA1Opplysning)
 
-        val actual = original.overstyrInntekter(opptjening, new, NullObserver)
+        val actual = original.overstyrInntekter(skjæringstidspunkt, opptjening, new, NullObserver)
         assertEquals(expected, actual) { "kan ikke velge mellom inntekter for samme orgnr" }
     }
 
@@ -134,7 +134,7 @@ internal class ArbeidsgiverInntektsopplysningTest {
         val expected = listOf(forventetA1Opplysning, a2Opplysning, a3Opplysning)
         val new = listOf(overstyrtA1Opplysning)
 
-        val actual = original.overstyrInntekter(opptjening, new, NullObserver)
+        val actual = original.overstyrInntekter(skjæringstidspunkt, opptjening, new, NullObserver)
         assertEquals(expected, actual) { "kan ikke velge mellom inntekter for samme orgnr" }
     }
 
@@ -165,7 +165,7 @@ internal class ArbeidsgiverInntektsopplysningTest {
         val a1Overstyrt = ArbeidsgiverInntektsopplysning(orgnummer, skjæringstidspunkt til LocalDate.MAX, Saksbehandler(skjæringstidspunkt, UUID.randomUUID(), overstyrtBeløp, "Jeg bare måtte gjøre det", subsumsjon, LocalDateTime.now()), Refusjonsopplysninger())
 
         val jurist = MaskinellJurist()
-        listOf(a1Opplysning).overstyrInntekter(opptjening, listOf(a1Overstyrt), jurist)
+        listOf(a1Opplysning).overstyrInntekter(skjæringstidspunkt, opptjening, listOf(a1Overstyrt), jurist)
         SubsumsjonInspektør(jurist).assertBeregnet(
             paragraf = paragraf,
             versjon = LocalDate.of(2019, 1, 1),

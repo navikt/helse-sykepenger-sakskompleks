@@ -70,7 +70,7 @@ internal class Sykepengegrunnlag private constructor(
 ) : Comparable<Inntekt> {
 
     init {
-        arbeidsgiverInntektsopplysninger.validerSkjønnsmessigAltEllerIntet()
+        arbeidsgiverInntektsopplysninger.validerSkjønnsmessigAltEllerIntet(skjæringstidspunkt)
     }
 
     private val `6G`: Inntekt = `6G` ?: Grunnbeløp.`6G`.beløp(skjæringstidspunkt, LocalDate.now())
@@ -256,7 +256,7 @@ internal class Sykepengegrunnlag private constructor(
     }
 
     internal fun overstyrArbeidsgiveropplysninger(person: Person, hendelse: OverstyrArbeidsgiveropplysninger, opptjening: Opptjening?, subsumsjonslogg: Subsumsjonslogg): Sykepengegrunnlag {
-        val builder = ArbeidsgiverInntektsopplysningerOverstyringer(arbeidsgiverInntektsopplysninger, opptjening, subsumsjonslogg)
+        val builder = ArbeidsgiverInntektsopplysningerOverstyringer(skjæringstidspunkt, arbeidsgiverInntektsopplysninger, opptjening, subsumsjonslogg)
         hendelse.overstyr(builder)
         val resultat = builder.resultat()
         arbeidsgiverInntektsopplysninger.forEach { it.arbeidsgiveropplysningerKorrigert(person, hendelse) }
@@ -281,7 +281,7 @@ internal class Sykepengegrunnlag private constructor(
     }
 
     internal fun skjønnsmessigFastsettelse(hendelse: SkjønnsmessigFastsettelse, opptjening: Opptjening?, subsumsjonslogg: Subsumsjonslogg): Sykepengegrunnlag {
-        val builder = ArbeidsgiverInntektsopplysningerOverstyringer(arbeidsgiverInntektsopplysninger, opptjening, subsumsjonslogg)
+        val builder = ArbeidsgiverInntektsopplysningerOverstyringer(skjæringstidspunkt, arbeidsgiverInntektsopplysninger, opptjening, subsumsjonslogg)
         hendelse.overstyr(builder)
         val resultat = builder.resultat()
         return kopierSykepengegrunnlagOgValiderMinsteinntekt(resultat, deaktiverteArbeidsforhold, subsumsjonslogg)
@@ -295,7 +295,7 @@ internal class Sykepengegrunnlag private constructor(
         inntektsmelding: Inntektsmelding,
         subsumsjonslogg: Subsumsjonslogg
     ): Sykepengegrunnlag {
-        val builder = ArbeidsgiverInntektsopplysningerOverstyringer(arbeidsgiverInntektsopplysninger, null, subsumsjonslogg)
+        val builder = ArbeidsgiverInntektsopplysningerOverstyringer(skjæringstidspunkt, arbeidsgiverInntektsopplysninger, null, subsumsjonslogg)
         inntektsmelding.nyeArbeidsgiverInntektsopplysninger(builder, skjæringstidspunkt)
         val resultat = builder.resultat()
         arbeidsgiverInntektsopplysninger
@@ -454,6 +454,7 @@ internal class Sykepengegrunnlag private constructor(
     }
 
     internal class ArbeidsgiverInntektsopplysningerOverstyringer(
+        private val skjæringstidspunkt: LocalDate,
         private val opprinneligArbeidsgiverInntektsopplysninger: List<ArbeidsgiverInntektsopplysning>,
         private val opptjening: Opptjening?,
         private val subsumsjonslogg: Subsumsjonslogg
@@ -467,7 +468,7 @@ internal class Sykepengegrunnlag private constructor(
         internal fun ingenRefusjonsopplysninger(organisasjonsnummer: String) = opprinneligArbeidsgiverInntektsopplysninger.ingenRefusjonsopplysninger(organisasjonsnummer)
 
         internal fun resultat(): List<ArbeidsgiverInntektsopplysning> {
-            return opprinneligArbeidsgiverInntektsopplysninger.overstyrInntekter(opptjening, nyeInntektsopplysninger, subsumsjonslogg)
+            return opprinneligArbeidsgiverInntektsopplysninger.overstyrInntekter(skjæringstidspunkt, opptjening, nyeInntektsopplysninger, subsumsjonslogg)
         }
     }
 

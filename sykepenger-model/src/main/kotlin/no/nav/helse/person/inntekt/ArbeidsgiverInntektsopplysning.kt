@@ -4,12 +4,12 @@ import java.time.LocalDate
 import java.util.UUID
 import no.nav.helse.Toggle
 import no.nav.helse.dto.deserialisering.ArbeidsgiverInntektsopplysningInnDto
+import no.nav.helse.dto.serialisering.ArbeidsgiverInntektsopplysningUtDto
 import no.nav.helse.etterlevelse.Subsumsjonslogg
 import no.nav.helse.hendelser.Inntektsmelding
 import no.nav.helse.hendelser.OverstyrArbeidsgiveropplysninger
 import no.nav.helse.hendelser.Periode
 import no.nav.helse.hendelser.til
-import no.nav.helse.dto.serialisering.ArbeidsgiverInntektsopplysningUtDto
 import no.nav.helse.person.Arbeidsgiver
 import no.nav.helse.person.Opptjening
 import no.nav.helse.person.Person
@@ -141,7 +141,8 @@ class ArbeidsgiverInntektsopplysning(
     }
 
     internal companion object {
-        internal fun List<ArbeidsgiverInntektsopplysning>.validerSkjønnsmessigAltEllerIntet() = map { it.inntektsopplysning }.validerSkjønnsmessigAltEllerIntet()
+        internal fun List<ArbeidsgiverInntektsopplysning>.validerSkjønnsmessigAltEllerIntet(skjæringstidspunkt: LocalDate) =
+            omregnetÅrsinntekter(skjæringstidspunkt, this).validerSkjønnsmessigAltEllerIntet()
 
         internal fun List<ArbeidsgiverInntektsopplysning>.finn(orgnummer: String) = firstOrNull { it.gjelder(orgnummer) }
 
@@ -165,23 +166,25 @@ class ArbeidsgiverInntektsopplysning(
         }
 
         // overskriver eksisterende verdier i *this* med verdier fra *other*,
-        // og ignorerer ting i *other* som ikke finnes i *this*
-        internal fun List<ArbeidsgiverInntektsopplysning>.overstyrInntekter(opptjening: Opptjening?, other: List<ArbeidsgiverInntektsopplysning>, subsumsjonslogg: Subsumsjonslogg): List<ArbeidsgiverInntektsopplysning> {
-            val omregnetÅrsinntekt = map { it.inntektsopplysning }
+        // og legger til ting i *other* som ikke finnes i *this* som tilkommet inntekter
+        internal fun List<ArbeidsgiverInntektsopplysning>.overstyrInntekter(skjæringstidspunkt: LocalDate, opptjening: Opptjening?, other: List<ArbeidsgiverInntektsopplysning>, subsumsjonslogg: Subsumsjonslogg): List<ArbeidsgiverInntektsopplysning> {
+            val tilkommetInntekter = other
+                .filter { inntekt -> none { it.gjelder(inntekt.orgnummer) } }
+                .takeIf { Toggle.TilkommenInntekt.enabled } ?: emptyList()
             val endringen = this
                 .map { inntekt -> inntekt.overstyr(other) }
                 .also { it.subsummer(subsumsjonslogg, opptjening, this) }
-                .toMutableList()
-            val nyeInntektsopplysningerAnnetOrgnummer = other.mapNotNull { inntekt ->
-                if (this.any { it.gjelder(inntekt.orgnummer) }) null
-                else inntekt
-            }
-            if (Toggle.TilkommenInntekt.enabled) {
-                endringen.addAll(nyeInntektsopplysningerAnnetOrgnummer)
-            }
-            val omregnetÅrsinntektEtterpå = endringen.map { it.inntektsopplysning }
-            if (Inntektsopplysning.erOmregnetÅrsinntektEndret(omregnetÅrsinntekt, omregnetÅrsinntektEtterpå)) return endringen.map { it.rullTilbake() }
+                .plus(tilkommetInntekter)
+            if (erOmregnetÅrsinntektEndret(skjæringstidspunkt, this, endringen)) return endringen.map { it.rullTilbake() }
             return endringen
+        }
+
+        private fun erOmregnetÅrsinntektEndret(skjæringstidspunkt: LocalDate, før: List<ArbeidsgiverInntektsopplysning>, etter: List<ArbeidsgiverInntektsopplysning>): Boolean {
+            return Inntektsopplysning.erOmregnetÅrsinntektEndret(omregnetÅrsinntekter(skjæringstidspunkt, før), omregnetÅrsinntekter(skjæringstidspunkt, etter))
+        }
+
+        private fun omregnetÅrsinntekter(skjæringstidspunkt: LocalDate, opplysninger: List<ArbeidsgiverInntektsopplysning>): List<Inntektsopplysning> {
+            return opplysninger.filter { it.gjelderPåSkjæringstidspunktet(skjæringstidspunkt) }.map { it.inntektsopplysning }
         }
 
         internal fun List<ArbeidsgiverInntektsopplysning>.sjekkForNyArbeidsgiver(aktivitetslogg: IAktivitetslogg, opptjening: Opptjening, orgnummer: String) {
