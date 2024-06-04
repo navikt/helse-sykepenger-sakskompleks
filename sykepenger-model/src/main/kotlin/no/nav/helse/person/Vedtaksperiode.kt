@@ -1521,11 +1521,12 @@ internal class Vedtaksperiode private constructor(
         override fun håndter(vedtaksperiode: Vedtaksperiode, dager: DagerFraInntektsmelding) {
             vedtaksperiode.håndterDager(dager)
             if (dager.harFunksjonelleFeilEllerVerre()) return vedtaksperiode.forkast(dager)
-            if (vedtaksperiode .sykdomstidslinje.egenmeldingerFraSøknad().isNotEmpty()) {
+            if (vedtaksperiode.sykdomstidslinje.egenmeldingerFraSøknad().isNotEmpty()) {
                 dager.info("Det er egenmeldingsdager fra søknaden på sykdomstidlinjen, selv etter at inntektsmeldingen har oppdatert historikken. Undersøk hvorfor inntektsmeldingen ikke har overskrevet disse. Da er kanskje denne aktørId-en til hjelp: ${vedtaksperiode.aktørId}.")
             }
-            if (vedtaksperiode.forventerInntekt()) return
-            vedtaksperiode.tilstand(dager, AvsluttetUtenUtbetaling)
+            vedtaksperiode.person.igangsettOverstyring(
+                Revurderingseventyr.arbeidsgiverperiode(dager, vedtaksperiode.skjæringstidspunkt, vedtaksperiode.periode)
+            )
         }
 
         override fun håndtertInntektPåSkjæringstidspunktet(vedtaksperiode: Vedtaksperiode, hendelse: Inntektsmelding) {
@@ -1638,6 +1639,7 @@ internal class Vedtaksperiode private constructor(
 
         override fun håndtertInntektPåSkjæringstidspunktet(vedtaksperiode: Vedtaksperiode, hendelse: Inntektsmelding) {
             if (vedtaksperiode.inntektsmeldingHåndtert(hendelse)) return
+            if (vedtaksperiode.behandlinger.dokumentsporing()) return
             hendelse.varsel(RV_IM_4)
         }
 

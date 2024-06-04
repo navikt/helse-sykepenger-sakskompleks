@@ -86,7 +86,7 @@ internal class FlereUkjenteArbeidsgivereTest : AbstractEndToEndTest() {
         assertEquals(inntektA2, a2Inspektør.inntektsopplysning.inspektør.beløp)
 
         val overstyringerIgangsatt = observatør.overstyringIgangsatt
-        assertEquals(4, overstyringerIgangsatt.size)
+        assertEquals(5, overstyringerIgangsatt.size)
 
         overstyringerIgangsatt[0].also { event ->
             assertEquals(PersonObserver.OverstyringIgangsatt(
@@ -131,6 +131,18 @@ internal class FlereUkjenteArbeidsgivereTest : AbstractEndToEndTest() {
         }
 
         overstyringerIgangsatt[3].also { event ->
+            assertEquals(PersonObserver.OverstyringIgangsatt(
+                årsak = "ARBEIDSGIVERPERIODE",
+                skjæringstidspunkt = 1.januar,
+                periodeForEndring = 1.mars til 20.mars,
+                berørtePerioder = listOf(
+                    VedtaksperiodeData(a1, 3.vedtaksperiode.id(a1), 1.mars til 31.mars, 1.januar, "REVURDERING")
+                ),
+                meldingsreferanseId = im2
+            ), event)
+        }
+
+        overstyringerIgangsatt[4].also { event ->
             assertEquals(PersonObserver.OverstyringIgangsatt(
                 årsak = "KORRIGERT_INNTEKTSMELDING_INNTEKTSOPPLYSNINGER",
                 skjæringstidspunkt = 1.januar,
