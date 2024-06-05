@@ -292,18 +292,12 @@ internal class Arbeidsgiver private constructor(
         return harNødvendigInntektITidligereBeregnetSykepengegrunnlag(skjæringstidspunkt) ?: kanBeregneSykepengegrunnlag(skjæringstidspunkt)
     }
 
-    internal fun harNødvendigRefusjonsopplysninger(skjæringstidspunkt: LocalDate, vedtaksperiode: Vedtaksperiode, hendelse: IAktivitetslogg) : Boolean {
-        val refusjonsopplysninger = when (val vilkårsgrunnlag = person.vilkårsgrunnlagFor(skjæringstidspunkt)) {
-            null -> refusjonshistorikk.refusjonsopplysninger(skjæringstidspunkt)
-            else -> vilkårsgrunnlag.refusjonsopplysninger(organisasjonsnummer)
-        }
-        return vedtaksperiode.harNødvendigRefusjonsopplysninger(refusjonsopplysninger, hendelse)
-    }
+    internal fun refusjonsopplysninger(skjæringstidspunkt: LocalDate) = refusjonshistorikk.refusjonsopplysninger(skjæringstidspunkt)
 
     internal fun harTilstrekkeligInformasjonTilUtbetaling(skjæringstidspunkt: LocalDate, vedtaksperiode: Vedtaksperiode, hendelse: IAktivitetslogg): Boolean {
         val harNødvendigInntektForVilkårsprøving = harNødvendigInntektForVilkårsprøving(skjæringstidspunkt)
         if (!harNødvendigInntektForVilkårsprøving) hendelse.info("Mangler inntekt for vilkårsprøving på $skjæringstidspunkt for $organisasjonsnummer")
-        return harNødvendigInntektForVilkårsprøving && harNødvendigRefusjonsopplysninger(skjæringstidspunkt, vedtaksperiode, hendelse)
+        return harNødvendigInntektForVilkårsprøving && vedtaksperiode.harNødvendigRefusjonsopplysninger(hendelse)
     }
 
     private fun harNødvendigInntektITidligereBeregnetSykepengegrunnlag(skjæringstidspunkt: LocalDate) =

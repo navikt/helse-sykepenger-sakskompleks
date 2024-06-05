@@ -116,12 +116,15 @@ class Refusjonsopplysning(
     }
 
     class Refusjonsopplysninger private constructor(
-        refusjonsopplysninger: List<Refusjonsopplysning>
+        refusjonsopplysninger: List<Refusjonsopplysning>,
+        private val oppholdsdagbegrenser: Oppholdsdagbegrenser = Begrens
     ) {
         private val validerteRefusjonsopplysninger = refusjonsopplysninger.sortedBy { it.fom }
 
         internal val erTom = validerteRefusjonsopplysninger.isEmpty()
         constructor(): this(emptyList())
+
+        internal fun tidligereBegrenset() = Refusjonsopplysninger(this.validerteRefusjonsopplysninger, TidligereBegrenset)
 
         init {
             check(!validerteRefusjonsopplysninger.overlapper()) { "Refusjonsopplysninger skal ikke kunne inneholde overlappende informasjon: $refusjonsopplysninger" }
@@ -177,11 +180,6 @@ class Refusjonsopplysning(
 
         override fun toString() = validerteRefusjonsopplysninger.toString()
 
-        private fun hensyntattSisteOppholdagFørUtbetalingsdager(sisteOppholdsdagFørUtbetalingsdager: LocalDate?) = when (sisteOppholdsdagFørUtbetalingsdager) {
-            null -> this
-            else -> Refusjonsopplysninger(validerteRefusjonsopplysninger.mapNotNull { it.begrensTil(sisteOppholdsdagFørUtbetalingsdager )})
-        }
-
         private fun harNødvendigRefusjonsopplysninger(
             skjæringstidspunkt: LocalDate,
             utbetalingsdager: List<LocalDate>,
@@ -204,7 +202,8 @@ class Refusjonsopplysning(
             sisteOppholdsdagFørUtbetalingsdager: LocalDate?,
             hendelse: IAktivitetslogg,
             organisasjonsnummer: String
-        ) = hensyntattSisteOppholdagFørUtbetalingsdager(sisteOppholdsdagFørUtbetalingsdager).harNødvendigRefusjonsopplysninger(skjæringstidspunkt, utbetalingsdager, hendelse, organisasjonsnummer)
+        ) = oppholdsdagbegrenser.begrens(this, sisteOppholdsdagFørUtbetalingsdager).harNødvendigRefusjonsopplysninger(skjæringstidspunkt,utbetalingsdager, hendelse,organisasjonsnummer)
+
         internal fun refusjonsbeløpOrNull(dag: LocalDate) = validerteRefusjonsopplysninger.singleOrNull { it.dekker(dag) }?.beløp
 
         private fun førsteRefusjonsopplysning() = validerteRefusjonsopplysninger.minByOrNull { it.fom }
@@ -239,7 +238,7 @@ class Refusjonsopplysning(
             internal val Refusjonsopplysning.refusjonsopplysninger get() = Refusjonsopplysninger(listOf(this))
 
             internal fun gjenopprett(dto: RefusjonsopplysningerInnDto) = Refusjonsopplysninger(
-                refusjonsopplysninger = dto.opplysninger.map { Refusjonsopplysning.gjenopprett(it) }
+                refusjonsopplysninger = dto.opplysninger.map { gjenopprett(it) }
             )
         }
 
@@ -259,6 +258,22 @@ class Refusjonsopplysning(
         internal fun dto() = RefusjonsopplysningerUtDto(
             opplysninger = this.validerteRefusjonsopplysninger.map { it.dto() }
         )
+
+        private sealed interface Oppholdsdagbegrenser {
+            fun begrens(refusjonsopplysninger: Refusjonsopplysninger, sisteOppholdsdagFørUtbetalingsdager: LocalDate?): Refusjonsopplysninger
+        }
+
+        private data object Begrens: Oppholdsdagbegrenser {
+            override fun begrens(refusjonsopplysninger: Refusjonsopplysninger, sisteOppholdsdagFørUtbetalingsdager: LocalDate?): Refusjonsopplysninger {
+                if (sisteOppholdsdagFørUtbetalingsdager == null) return refusjonsopplysninger
+                val begrensedeRefusjonsopplysninger = refusjonsopplysninger.validerteRefusjonsopplysninger.mapNotNull { it.begrensTil(sisteOppholdsdagFørUtbetalingsdager )}
+                return Refusjonsopplysninger(begrensedeRefusjonsopplysninger)
+            }
+        }
+
+        private data object TidligereBegrenset: Oppholdsdagbegrenser {
+            override fun begrens(refusjonsopplysninger: Refusjonsopplysninger, sisteOppholdsdagFørUtbetalingsdager: LocalDate?) = refusjonsopplysninger
+        }
     }
 
     internal fun dto() = RefusjonsopplysningUtDto(

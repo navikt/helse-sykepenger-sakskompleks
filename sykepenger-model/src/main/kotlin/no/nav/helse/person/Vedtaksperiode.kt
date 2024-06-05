@@ -673,10 +673,10 @@ internal class Vedtaksperiode private constructor(
         medlemskap(hendelse, skjæringstidspunkt, periode.start, periode.endInclusive)
     }
 
-    internal fun harNødvendigRefusjonsopplysninger(refusjonsopplysninger: Refusjonsopplysninger, hendelse: IAktivitetslogg): Boolean {
+    internal fun harNødvendigRefusjonsopplysninger(hendelse: IAktivitetslogg): Boolean {
         val arbeidsgiverperiode = finnArbeidsgiverperiode() ?: return false
-        return if (behandlinger.erFørstegangsvurdering()) Arbeidsgiverperiode.harNødvendigeRefusjonsopplysninger(skjæringstidspunkt, periode, refusjonsopplysninger, arbeidsgiverperiode, hendelse, organisasjonsnummer)
-        else Arbeidsgiverperiode.harNødvendigeRefusjonsopplysningerRevurdering(skjæringstidspunkt, periode, refusjonsopplysninger, arbeidsgiverperiode, hendelse, organisasjonsnummer)
+        val refusjonsopplysninger = tilstand.refusjonsopplysninger(this, arbeidsgiverperiode)
+        return Arbeidsgiverperiode.harNødvendigeRefusjonsopplysninger(skjæringstidspunkt, periode, refusjonsopplysninger, arbeidsgiverperiode, hendelse, organisasjonsnummer)
     }
 
     private fun trengerArbeidsgiveropplysninger(hendelse: IAktivitetslogg): Boolean {
@@ -1203,6 +1203,11 @@ internal class Vedtaksperiode private constructor(
 
         fun leaving(vedtaksperiode: Vedtaksperiode, hendelse: IAktivitetslogg) {}
 
+        fun refusjonsopplysninger(vedtaksperiode: Vedtaksperiode, arbeidsgiverperiode: Arbeidsgiverperiode): Refusjonsopplysninger {
+            val vilkårsgrunnlag = vedtaksperiode.vilkårsgrunnlag ?: vedtaksperiode.person.vilkårsgrunnlagFor(vedtaksperiode.skjæringstidspunkt)
+            if (vilkårsgrunnlag == null) return vedtaksperiode.arbeidsgiver.refusjonsopplysninger(vedtaksperiode.skjæringstidspunkt)
+            return vilkårsgrunnlag.refusjonsopplysninger(vedtaksperiode.organisasjonsnummer).tidligereBegrenset()
+        }
     }
 
     internal data object Start : Vedtaksperiodetilstand {
@@ -1605,6 +1610,9 @@ internal class Vedtaksperiode private constructor(
             if (!vedtaksperiode.harTilstrekkeligInformasjonTilUtbetaling(hendelse)) return
             vedtaksperiode.tilstand(hendelse, AvventerBlokkerendePeriode)
         }
+
+        override fun refusjonsopplysninger(vedtaksperiode: Vedtaksperiode, arbeidsgiverperiode: Arbeidsgiverperiode) =
+            vedtaksperiode.arbeidsgiver.refusjonsopplysninger(vedtaksperiode.skjæringstidspunkt)
     }
 
     internal data object AvventerBlokkerendePeriode : Vedtaksperiodetilstand {
@@ -2363,7 +2371,7 @@ internal class Vedtaksperiode private constructor(
                 .filter { it.periode.overlapperMed(vedtaksperiode.periode) }
                 .filter { it.skjæringstidspunkt == vedtaksperiode.skjæringstidspunkt }
                 .filter { it.forventerInntekt() }
-                .filter { !it.arbeidsgiver.harNødvendigRefusjonsopplysninger(vedtaksperiode.skjæringstidspunkt, it, Aktivitetslogg()) }
+                .filter { !it.harNødvendigRefusjonsopplysninger(Aktivitetslogg()) }
                 .minOrNull()
         }
 
