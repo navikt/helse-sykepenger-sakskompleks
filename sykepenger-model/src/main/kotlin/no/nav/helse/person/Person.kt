@@ -55,6 +55,7 @@ import no.nav.helse.person.Arbeidsgiver.Companion.gjenopptaBehandling
 import no.nav.helse.person.Arbeidsgiver.Companion.håndter
 import no.nav.helse.person.Arbeidsgiver.Companion.håndterHistorikkFraInfotrygd
 import no.nav.helse.person.Arbeidsgiver.Companion.igangsettOverstyring
+import no.nav.helse.person.Arbeidsgiver.Companion.makstid
 import no.nav.helse.person.Arbeidsgiver.Companion.manglerNødvendigInntektVedTidligereBeregnetSykepengegrunnlag
 import no.nav.helse.person.Arbeidsgiver.Companion.nestemann
 import no.nav.helse.person.Arbeidsgiver.Companion.nåværendeVedtaksperioder
@@ -849,7 +850,7 @@ class Person private constructor(
         val event = PersonObserver.VedtaksperiodeOpprettet(vedtaksperiodeId, organisasjonsnummer, periode, skjæringstidspunkt, opprettet)
         observers.forEach { it.vedtaksperiodeOpprettet(event) }
     }
-    internal fun makstid(vedtaksperiode: Vedtaksperiode) = vedtaksperiode.makstid(arbeidsgivere)
+    internal fun makstid(vedtaksperiode: Vedtaksperiode) = arbeidsgivere.makstid(vedtaksperiode)
 
     internal fun erBehandletIInfotrygd(vedtaksperiode: Periode): Boolean {
         return infotrygdhistorikk.harUtbetaltI(vedtaksperiode) || infotrygdhistorikk.harFerieI(vedtaksperiode)

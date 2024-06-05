@@ -131,8 +131,9 @@ internal class Arbeidsgiver private constructor(
         }
 
         internal fun List<Arbeidsgiver>.venter(nestemann: Vedtaksperiode) {
+            val venteårsaker = this.venteårsaker()
             forEach { arbeidsgiver ->
-                arbeidsgiver.vedtaksperioder.venter(this, nestemann)
+                arbeidsgiver.vedtaksperioder.venter(this, venteårsaker, nestemann)
             }
         }
 
@@ -248,13 +249,25 @@ internal class Arbeidsgiver private constructor(
             if (harPågåeneUtbetaling()) return hendelse.info("Stopper gjenoppta behandling pga. pågående utbetaling")
             val periodeSomSkalGjenopptas = periodeSomSkalGjenopptas() ?: return
             checkBareEnPeriodeTilGodkjenningSamtidig(periodeSomSkalGjenopptas)
-            periodeSomSkalGjenopptas.gjenopptaBehandling(hendelse, this)
+            periodeSomSkalGjenopptas.gjenopptaBehandling(hendelse, this, this.venteårsaker())
         }
 
         internal fun Iterable<Arbeidsgiver>.nestemann() = sistePeriodeSomHarPågåendeUtbetaling() ?: periodeSomSkalGjenopptas() ?: førsteAuuSomVilUtbetales()
 
         private fun Iterable<Arbeidsgiver>.periodeSomSkalGjenopptas() = flatMap { it.vedtaksperioder }.nestePeriodeSomSkalGjenopptas()
         private fun Iterable<Arbeidsgiver>.checkBareEnPeriodeTilGodkjenningSamtidig(periodeSomSkalGjenopptas: Vedtaksperiode) = flatMap { it.vedtaksperioder }.checkBareEnPeriodeTilGodkjenningSamtidig(periodeSomSkalGjenopptas)
+
+        internal fun List<Arbeidsgiver>.makstid(vedtaksperiode: Vedtaksperiode) =
+            vedtaksperiode.makstid(this, this.venteårsaker())
+
+        internal fun Iterable<Arbeidsgiver>.venteårsaker(): Iterable<Venteårsaker> {
+            return map { arbeidsgiver ->
+                Venteårsaker(
+                    organisasjonsnummer = arbeidsgiver.organisasjonsnummer,
+                    arbeidsgiverperioder = arbeidsgiver.beregnArbeidsgiverperioder()
+                )
+            }
+        }
 
         internal fun søppelbøtte(
             arbeidsgivere: List<Arbeidsgiver>,
@@ -597,7 +610,7 @@ internal class Arbeidsgiver private constructor(
 
     internal fun håndter(påminnelse: Påminnelse, arbeidsgivere: List<Arbeidsgiver>): Boolean {
         påminnelse.kontekst(this)
-        return énHarHåndtert(påminnelse) { håndter(it, arbeidsgivere) }
+        return énHarHåndtert(påminnelse) { håndter(it, arbeidsgivere, arbeidsgivere.venteårsaker()) }
     }
 
     override fun utbetalingUtbetalt(
@@ -764,8 +777,12 @@ internal class Arbeidsgiver private constructor(
             .merge(sykdomstidslinje(), replace)
     }
 
+    private fun beregnArbeidsgiverperioder(sykdomstidslinje: Sykdomstidslinje = sykdomstidslinje()): List<Arbeidsgiverperiode> {
+        return person.arbeidsgiverperiodeFor(organisasjonsnummer, sykdomstidslinje, null)
+    }
+
     private fun arbeidsgiverperiode(periode: Periode, sykdomstidslinje: Sykdomstidslinje): Arbeidsgiverperiode? {
-        val arbeidsgiverperioder = person.arbeidsgiverperiodeFor(organisasjonsnummer, sykdomstidslinje, null)
+        val arbeidsgiverperioder = beregnArbeidsgiverperioder(sykdomstidslinje)
         return arbeidsgiverperioder.finn(periode)
     }
     internal fun arbeidsgiverperiode(periode: Periode) =
@@ -971,7 +988,7 @@ internal class Arbeidsgiver private constructor(
         inntektshistorikk = inntektshistorikk.dto(),
         sykdomshistorikk = sykdomshistorikk.dto(),
         sykmeldingsperioder = sykmeldingsperioder.dto(),
-        vedtaksperioder = vedtaksperioder.map { it.dto(nestemann, arbeidsgivere) },
+        vedtaksperioder = vedtaksperioder.map { it.dto(nestemann, arbeidsgivere, arbeidsgivere.venteårsaker()) },
         forkastede = forkastede.map { it.dto() },
         utbetalinger = utbetalinger.map { it.dto() },
         feriepengeutbetalinger = feriepengeutbetalinger.map { it.dto() },
