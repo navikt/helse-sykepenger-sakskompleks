@@ -409,6 +409,19 @@ internal class Sykepengegrunnlag private constructor(
             .begrensning(this.begrensning)
             .sykepengegrunnlagsfakta(fakta)
     }
+
+    internal fun build(builder: GodkjenningsbehovBuilder) {
+        val fakta = when (vurdertInfotrygd) {
+            true -> GodkjenningsbehovBuilder.FastsattIInfotrygdBuilder(omregnetÅrsinntekt.reflection { årlig, _, _, _ -> årlig })
+            false -> GodkjenningsbehovBuilder.FastsattISpleisBuilder(
+                omregnetÅrsinntekt.reflection { årlig, _, _, _ -> årlig },
+                `6G`.reflection { årlig, _, _, _ -> årlig }
+            ).apply {
+                arbeidsgiverInntektsopplysninger.build(this)
+            }
+        }.build()
+        builder.sykepengegrunnlagsfakta(fakta)
+    }
     override fun equals(other: Any?): Boolean {
         if (other !is Sykepengegrunnlag) return false
         return sykepengegrunnlag == other.sykepengegrunnlag

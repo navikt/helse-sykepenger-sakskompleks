@@ -2,7 +2,6 @@ package no.nav.helse.person.inntekt
 
 import java.time.LocalDate
 import java.util.UUID
-import no.nav.helse.Toggle
 import no.nav.helse.dto.deserialisering.ArbeidsgiverInntektsopplysningInnDto
 import no.nav.helse.dto.serialisering.ArbeidsgiverInntektsopplysningUtDto
 import no.nav.helse.etterlevelse.Subsumsjonslogg
@@ -250,6 +249,16 @@ class ArbeidsgiverInntektsopplysning(
                     arbeidsgiver = arbeidsgiver.orgnummer,
                     omregnetÅrsinntekt = arbeidsgiver.inntektsopplysning.omregnetÅrsinntekt().fastsattÅrsinntekt(),
                     skjønnsfastsatt = if (arbeidsgiver.inntektsopplysning is SkjønnsmessigFastsatt) arbeidsgiver.inntektsopplysning.fastsattÅrsinntekt() else null
+                )
+            }
+        }
+
+        internal fun List<ArbeidsgiverInntektsopplysning>.build(builder: GodkjenningsbehovBuilder.FastsattISpleisBuilder) {
+            forEach { arbeidsgiver ->
+                builder.arbeidsgiver(
+                    arbeidsgiver = arbeidsgiver.orgnummer,
+                    omregnetÅrsinntekt = arbeidsgiver.inntektsopplysning.omregnetÅrsinntekt().fastsattÅrsinntekt().reflection { årlig, _, _, _ -> årlig },
+                    skjønnsfastsatt = if (arbeidsgiver.inntektsopplysning is SkjønnsmessigFastsatt) arbeidsgiver.inntektsopplysning.fastsattÅrsinntekt().reflection { årlig, _, _, _ -> årlig } else null
                 )
             }
         }

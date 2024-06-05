@@ -85,7 +85,7 @@ internal class VedtakFattetBuilder(
         internal fun innrapportertÅrsinntekt(innrapportertÅrsinntekt: Inntekt) = apply { this.innrapportertÅrsinntekt = innrapportertÅrsinntekt }
 
         private val arbeidsgivere = mutableListOf<Arbeidsgiver>()
-        internal fun arbeidsgiver(arbeidsgiver: String, omregnetÅrsinntekt: Inntekt, skjønnsfastsatt: Inntekt?) = apply {
+        fun arbeidsgiver(arbeidsgiver: String, omregnetÅrsinntekt: Inntekt, skjønnsfastsatt: Inntekt?) = apply {
             arbeidsgivere.add(Arbeidsgiver(arbeidsgiver, omregnetÅrsinntekt.årlig, skjønnsfastsatt?.årlig))
         }
         override fun build() = FastsattISpeil(

@@ -28,6 +28,9 @@ class GodkjenningsbehovBuilder(
     private lateinit var orgnummereMedRelevanteArbeidsforhold: Set<String>
     private val omregnedeÅrsinntekter: MutableList<Map<String, Any>> = mutableListOf()
 
+    private lateinit var sykepengegrunnlagsfakta: Sykepengegrunnlagsfakta
+    fun sykepengegrunnlagsfakta(sykepengegrunnlagsfakta: Sykepengegrunnlagsfakta) = apply { this.sykepengegrunnlagsfakta = sykepengegrunnlagsfakta }
+
     init {
         if (førstegangsbehandling) tags.add("Førstegangsbehandling")
         else tags.add("Forlengelse")
@@ -122,9 +125,83 @@ class GodkjenningsbehovBuilder(
                 "fom" to it.periode.start.toString(),
                 "tom" to it.periode.endInclusive.toString()
             )
+        },
+        "sykepengegrunnlagsfakta" to when (sykepengegrunnlagsfakta) {
+            is FastsattIInfotrygd -> mapOf(
+                "omregnetÅrsinntektTotalt" to sykepengegrunnlagsfakta.omregnetÅrsinntektTotalt,
+                "fastsatt" to sykepengegrunnlagsfakta.fastsatt.name
+            )
+            is FastsattISpeil -> mutableMapOf(
+                "omregnetÅrsinntektTotalt" to sykepengegrunnlagsfakta.omregnetÅrsinntektTotalt,
+                "6G" to (sykepengegrunnlagsfakta as FastsattISpeil).`6G`,
+                "fastsatt" to sykepengegrunnlagsfakta.fastsatt.name,
+                "arbeidsgivere" to (sykepengegrunnlagsfakta as FastsattISpeil).arbeidsgivere.map {
+                    mutableMapOf(
+                        "arbeidsgiver" to it.arbeidsgiver,
+                        "omregnetÅrsinntekt" to it.omregnetÅrsinntekt,
+                    ).apply {
+                        compute("skjønnsfastsatt") { _, _ -> it.skjønnsfastsatt }
+                    }
+                },
+            ).apply {
+                compute("skjønnsfastsatt") { _, _ -> (sykepengegrunnlagsfakta as FastsattISpeil).skjønnsfastsatt}
+            }
         }
     )
 
     fun tags() = tags.toSet()
+
+    sealed class SykepengegrunnlagsfaktaBuilder {
+        abstract fun build(): Sykepengegrunnlagsfakta
+    }
+
+    class FastsattIInfotrygdBuilder(private val omregnetÅrsinntektTotalt: Double) : SykepengegrunnlagsfaktaBuilder() {
+        override fun build() = FastsattIInfotrygd(omregnetÅrsinntektTotalt)
+    }
+    class FastsattISpleisBuilder(
+        private val omregnetÅrsinntektTotalt: Double,
+        private val `6G`: Double
+    ) : SykepengegrunnlagsfaktaBuilder() {
+
+        private val arbeidsgivere = mutableListOf<FastsattISpeil.Arbeidsgiver>()
+        fun arbeidsgiver(arbeidsgiver: String, omregnetÅrsinntekt: Double, skjønnsfastsatt: Double?) = apply {
+            arbeidsgivere.add(
+                FastsattISpeil.Arbeidsgiver(
+                    arbeidsgiver,
+                    omregnetÅrsinntekt,
+                    skjønnsfastsatt
+                )
+            )
+        }
+
+        override fun build() = FastsattISpeil(
+            omregnetÅrsinntektTotalt = omregnetÅrsinntektTotalt,
+            `6G`= `6G`,
+            arbeidsgivere = arbeidsgivere.toList()
+        )
+    }
+
+    enum class Fastsatt {
+        EtterHovedregel,
+        EtterSkjønn,
+        IInfotrygd
+    }
+
+    sealed class Sykepengegrunnlagsfakta {
+        abstract val fastsatt: Fastsatt
+        abstract val omregnetÅrsinntektTotalt: Double
+    }
+    data class FastsattIInfotrygd(override val omregnetÅrsinntektTotalt: Double) : Sykepengegrunnlagsfakta() {
+        override val fastsatt = Fastsatt.IInfotrygd
+    }
+    data class FastsattISpeil(
+        override val omregnetÅrsinntektTotalt: Double,
+        val `6G`: Double,
+        val arbeidsgivere: List<Arbeidsgiver>
+    ) : Sykepengegrunnlagsfakta() {
+        val skjønnsfastsatt: Double? = arbeidsgivere.mapNotNull { it.skjønnsfastsatt }.takeIf(List<*>::isNotEmpty)?.sum()
+        override val fastsatt = if (skjønnsfastsatt == null) Fastsatt.EtterHovedregel else Fastsatt.EtterSkjønn
+        data class Arbeidsgiver(val arbeidsgiver: String, val omregnetÅrsinntekt: Double, val skjønnsfastsatt: Double?)
+    }
 
 }

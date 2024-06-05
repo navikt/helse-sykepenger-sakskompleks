@@ -9,6 +9,9 @@ import no.nav.helse.flex.sykepengesoknad.kafka.SoknadsperiodeDTO
 import no.nav.helse.januar
 import no.nav.helse.person.aktivitetslogg.Aktivitet
 import no.nav.helse.person.aktivitetslogg.Aktivitet.Behov.Behovtype.*
+import no.nav.helse.person.aktivitetslogg.GodkjenningsbehovBuilder.Fastsatt.EtterHovedregel
+import no.nav.helse.person.aktivitetslogg.GodkjenningsbehovBuilder.Fastsatt.EtterSkjønn
+import no.nav.helse.person.aktivitetslogg.GodkjenningsbehovBuilder.Fastsatt.IInfotrygd
 import no.nav.helse.spleis.meldinger.model.SimuleringMessage
 import no.nav.inntektsmeldingkontrakt.Periode
 import org.junit.jupiter.api.Assertions.*
@@ -245,6 +248,18 @@ internal class BehovkontraktTest : AbstractEndToEndMediatorTest() {
             assertTrue(it.path("behandlingId").asText().isNotEmpty())
             assertDato(it.path("fom").asText())
             assertDato(it.path("tom").asText())
+        }
+        godkjenning.path("sykepengegrunnlagsfakta").also {
+            it.path("fastsatt").asText() in listOf(EtterSkjønn.name, EtterHovedregel.name, IInfotrygd.name)
+            assertTrue(it.path("omregnetÅrsinntektTotalt").isDouble)
+            assertTrue(it.path("6G").isDouble)
+            assertTrue(it.path("skjønnsfastsatt").isMissingNode)
+            assertTrue(it.path("arbeidsgivere").isArray)
+            it.path("arbeidsgivere").path(0)?.also { arbeidsgiver ->
+                assertTrue(arbeidsgiver.path("arbeidsgiver").isTextual)
+                assertTrue(arbeidsgiver.path("omregnetÅrsinntekt").isDouble)
+                assertTrue(arbeidsgiver.path("skjønnsfastsatt").isMissingNode)
+            }
         }
     }
 

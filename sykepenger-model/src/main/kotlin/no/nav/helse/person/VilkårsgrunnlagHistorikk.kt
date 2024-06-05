@@ -9,8 +9,8 @@ import no.nav.helse.dto.deserialisering.VilkårsgrunnlagInnDto
 import no.nav.helse.dto.deserialisering.VilkårsgrunnlagInnslagInnDto
 import no.nav.helse.dto.deserialisering.VilkårsgrunnlaghistorikkInnDto
 import no.nav.helse.dto.serialisering.SykepengegrunnlagUtDto
-import no.nav.helse.dto.serialisering.VilkårsgrunnlagUtDto
 import no.nav.helse.dto.serialisering.VilkårsgrunnlagInnslagUtDto
+import no.nav.helse.dto.serialisering.VilkårsgrunnlagUtDto
 import no.nav.helse.dto.serialisering.VilkårsgrunnlaghistorikkUtDto
 import no.nav.helse.etterlevelse.Subsumsjonslogg
 import no.nav.helse.etterlevelse.Subsumsjonslogg.Companion.NullObserver
@@ -275,6 +275,11 @@ internal class VilkårsgrunnlagHistorikk private constructor(private val histori
         internal fun build(builder: VedtakFattetBuilder) {
             sykepengegrunnlag.build(builder)
         }
+
+        internal fun build(builder: GodkjenningsbehovBuilder) {
+            sykepengegrunnlag.build(builder)
+        }
+
         internal fun inntektskilde() = sykepengegrunnlag.inntektskilde()
 
         internal fun forespurtInntektOgRefusjonsopplysninger(organisasjonsnummer: String, periode: Periode) =
@@ -388,6 +393,7 @@ internal class VilkårsgrunnlagHistorikk private constructor(private val histori
             builder.erInfotrygd(this is InfotrygdVilkårsgrunnlag)
             builder.skjæringstidspunkt(skjæringstidspunkt)
             builder.vilkårsgrunnlagId(vilkårsgrunnlagId)
+            this.build(builder)
             sykepengegrunnlag.byggGodkjenningsbehov(builder)
         }
 

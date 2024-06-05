@@ -1,14 +1,12 @@
 package no.nav.helse.spleis.e2e
 
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.UUID
 import no.nav.helse.assertForventetFeil
 import no.nav.helse.august
 import no.nav.helse.etterspurtBehov
 import no.nav.helse.februar
 import no.nav.helse.hendelser.Dagtype
-import no.nav.helse.hendelser.Hendelse
 import no.nav.helse.hendelser.Inntektsmelding
 import no.nav.helse.hendelser.ManuellOverskrivingDag
 import no.nav.helse.hendelser.Sykmeldingsperiode
@@ -22,6 +20,7 @@ import no.nav.helse.mars
 import no.nav.helse.person.IdInnhenter
 import no.nav.helse.person.TilstandType
 import no.nav.helse.person.aktivitetslogg.Aktivitet
+import no.nav.helse.person.aktivitetslogg.GodkjenningsbehovBuilder
 import no.nav.helse.person.nullstillTilstandsendringer
 import no.nav.helse.somPersonidentifikator
 import no.nav.helse.økonomi.Inntekt
@@ -38,7 +37,7 @@ internal class GodkjenningsbehovBuilderTest : AbstractEndToEndTest() {
 
     @Test
     fun forlengelse() {
-        nyeVedtak(1.januar, 31.januar, a1, a2)
+        nyeVedtak(1.januar, 31.januar, a1, a2, inntekt = 20000.månedlig)
         forlengelseTilGodkjenning(1.februar, 10.februar, a1, a2)
         assertGodkjenningsbehov(
             vedtaksperiodeId = 2.vedtaksperiode.id(a1),
@@ -59,6 +58,20 @@ internal class GodkjenningsbehovBuilderTest : AbstractEndToEndTest() {
                 mapOf("vedtaksperiodeId" to 1.vedtaksperiode.id(a2).toString(), "behandlingId" to 1.vedtaksperiode.sisteBehandlingId(a2).toString(), "fom" to 1.januar.toString(), "tom" to 31.januar.toString()),
                 mapOf("vedtaksperiodeId" to 2.vedtaksperiode.id(a1).toString(), "behandlingId" to 2.vedtaksperiode.sisteBehandlingId(a1).toString(), "fom" to 1.februar.toString(), "tom" to 10.februar.toString()),
                 mapOf("vedtaksperiodeId" to 2.vedtaksperiode.id(a2).toString(), "behandlingId" to 2.vedtaksperiode.sisteBehandlingId(a2).toString(), "fom" to 1.februar.toString(), "tom" to 10.februar.toString()),
+            ),
+            sykepengegrunnlagsfakta = mapOf(
+                "omregnetÅrsinntektTotalt" to 480000.0,
+                "6G" to 561804.0,
+                "fastsatt" to GodkjenningsbehovBuilder.Fastsatt.EtterHovedregel.name,
+                "arbeidsgivere" to listOf (
+                    mapOf(
+                        "arbeidsgiver" to a1,
+                        "omregnetÅrsinntekt" to 240000.0
+                    ), mapOf(
+                        "arbeidsgiver" to a2,
+                        "omregnetÅrsinntekt" to 240000.0
+                    )
+                )
             )
         )
     }
@@ -66,13 +79,41 @@ internal class GodkjenningsbehovBuilderTest : AbstractEndToEndTest() {
     @Test
     fun arbeidsgiverutbetaling() {
         tilGodkjenning(1.januar, 31.januar, a1)
-        assertGodkjenningsbehov(tags = setOf("Arbeidsgiverutbetaling"), omregnedeÅrsinntekter = listOf(mapOf("organisasjonsnummer" to a1, "beløp" to 240000.0)))
+        assertGodkjenningsbehov(
+            tags = setOf("Arbeidsgiverutbetaling"),
+            omregnedeÅrsinntekter = listOf(mapOf("organisasjonsnummer" to a1, "beløp" to 240000.0)),
+            sykepengegrunnlagsfakta = mapOf(
+                "omregnetÅrsinntektTotalt" to 240000.0,
+                "6G" to 561804.0,
+                "fastsatt" to GodkjenningsbehovBuilder.Fastsatt.EtterHovedregel.name,
+                "arbeidsgivere" to listOf (
+                    mapOf(
+                        "arbeidsgiver" to a1,
+                        "omregnetÅrsinntekt" to 240000.0
+                    )
+                )
+            )
+        )
     }
 
     @Test
     fun `6G-begrenset`() {
         tilGodkjenning(1.januar, 31.januar, a1, beregnetInntekt = 100000.månedlig)
-        assertGodkjenningsbehov(tags = setOf("Arbeidsgiverutbetaling", "6GBegrenset"), omregnedeÅrsinntekter = listOf(mapOf("organisasjonsnummer" to a1, "beløp" to 1200000.0)))
+        assertGodkjenningsbehov(
+            tags = setOf("Arbeidsgiverutbetaling", "6GBegrenset"),
+            omregnedeÅrsinntekter = listOf(mapOf("organisasjonsnummer" to a1, "beløp" to 1200000.0)),
+            sykepengegrunnlagsfakta = mapOf(
+                "omregnetÅrsinntektTotalt" to 1200000.0,
+                "6G" to 561804.0,
+                "fastsatt" to GodkjenningsbehovBuilder.Fastsatt.EtterHovedregel.name,
+                "arbeidsgivere" to listOf (
+                    mapOf(
+                        "arbeidsgiver" to a1,
+                        "omregnetÅrsinntekt" to 1200000.0
+                    )
+                )
+            )
+        )
     }
 
     @Test
@@ -94,7 +135,19 @@ internal class GodkjenningsbehovBuilderTest : AbstractEndToEndTest() {
                     "fom" to 10.februar.toString(),
                     "tom" to 20.februar.toString()
                 ),
+            ),
+            sykepengegrunnlagsfakta = mapOf(
+                "omregnetÅrsinntektTotalt" to 10000.månedlig.reflection { årlig, _, _, _ ->  årlig }.toDouble(),
+                "6G" to 561804.0,
+                "fastsatt" to GodkjenningsbehovBuilder.Fastsatt.EtterHovedregel.name,
+                "arbeidsgivere" to listOf (
+                    mapOf(
+                        "arbeidsgiver" to a1,
+                        "omregnetÅrsinntekt" to 120000.0
+                    )
+                )
             )
+
         )
     }
 
@@ -140,7 +193,13 @@ internal class GodkjenningsbehovBuilderTest : AbstractEndToEndTest() {
         createOvergangFraInfotrygdPerson()
         forlengTilGodkjenning(1.mars, 31.mars)
         assertIngenTag("IngenNyArbeidsgiverperiode", 2.vedtaksperiode.id(a1))
-        assertTags(setOf("InngangsvilkårFraInfotrygd"), 2.vedtaksperiode.id(a1))
+        assertSykepengegrunnlagsfakta(
+            sykepengegrunnlagsfakta = mapOf(
+                "omregnetÅrsinntektTotalt" to INNTEKT.reflection { årlig, _, _, _ ->  årlig }.toDouble(),
+                "fastsatt" to GodkjenningsbehovBuilder.Fastsatt.IInfotrygd.name
+            ),
+            vedtaksperiodeId = 2.vedtaksperiode.id(a1)
+        )
     }
 
     @Test
@@ -234,6 +293,17 @@ internal class GodkjenningsbehovBuilderTest : AbstractEndToEndTest() {
             perioderMedSammeSkjæringstidspunkt = listOf(
                 mapOf("vedtaksperiodeId" to 1.vedtaksperiode.id(a1).toString(), "behandlingId" to 1.vedtaksperiode.sisteBehandlingId(a1).toString(), "fom" to 1.januar.toString(), "tom" to 31.januar.toString()),
                 mapOf("vedtaksperiodeId" to 2.vedtaksperiode.id(a1).toString(), "behandlingId" to 2.vedtaksperiode.sisteBehandlingId(a1).toString(), "fom" to 1.februar.toString(), "tom" to 28.februar.toString())
+            ),
+            sykepengegrunnlagsfakta = mapOf(
+                "omregnetÅrsinntektTotalt" to INNTEKT.reflection { årlig, _, _, _ -> årlig }.toDouble(),
+                "6G" to 561804.0,
+                "fastsatt" to GodkjenningsbehovBuilder.Fastsatt.EtterHovedregel.name,
+                "arbeidsgivere" to listOf (
+                    mapOf(
+                        "arbeidsgiver" to a1,
+                        "omregnetÅrsinntekt" to INNTEKT.reflection { årlig, _, _, _ -> årlig }.toDouble()
+                    )
+                )
             )
         )
     }
@@ -276,6 +346,21 @@ internal class GodkjenningsbehovBuilderTest : AbstractEndToEndTest() {
             perioderMedSammeSkjæringstidspunkt = listOf(
                 mapOf("vedtaksperiodeId" to 1.vedtaksperiode.id(a1).toString(), "behandlingId" to 1.vedtaksperiode.sisteBehandlingId(a1).toString(), "fom" to 1.januar.toString(), "tom" to 31.januar.toString()),
                 mapOf("vedtaksperiodeId" to 1.vedtaksperiode.id(a2).toString(), "behandlingId" to 1.vedtaksperiode.sisteBehandlingId(a2).toString(), "fom" to 1.januar.toString(), "tom" to 31.januar.toString())
+            ),
+            sykepengegrunnlagsfakta = mapOf(
+                "omregnetÅrsinntektTotalt" to 40000.månedlig.reflection { årlig, _, _, _ -> årlig }.toDouble(),
+                "6G" to 561804.0,
+                "fastsatt" to GodkjenningsbehovBuilder.Fastsatt.EtterHovedregel.name,
+                "arbeidsgivere" to listOf (
+                    mapOf(
+                        "arbeidsgiver" to a1,
+                        "omregnetÅrsinntekt" to 20000.månedlig.reflection { årlig, _, _, _ -> årlig }.toDouble()
+                    ),
+                    mapOf (
+                        "arbeidsgiver" to a2,
+                        "omregnetÅrsinntekt" to 20000.månedlig.reflection { årlig, _, _, _ -> årlig }.toDouble()
+                    )
+                )
             )
         )
     }
@@ -390,6 +475,39 @@ internal class GodkjenningsbehovBuilderTest : AbstractEndToEndTest() {
         )
     }
 
+    @Test
+    fun `markerer sykepengegrunnlagsfakta som skjønnsfastsatt dersom én arbeidsgiver har fått skjønnmessig fastsatt sykepengegrunnlaget`() {
+        tilGodkjenning(1.januar, 31.januar, a1, a2,  beregnetInntekt = 20000.månedlig)
+        håndterSkjønnsmessigFastsettelse(1.januar, arbeidsgiveropplysninger = listOf(
+            OverstyrtArbeidsgiveropplysning(a1, 41000.månedlig),
+            OverstyrtArbeidsgiveropplysning(a2, 30000.månedlig)
+        ))
+        håndterYtelser(1.vedtaksperiode)
+        håndterSimulering(1.vedtaksperiode)
+
+        assertSykepengegrunnlagsfakta(
+            vedtaksperiodeId = 1.vedtaksperiode.id(a1),
+            sykepengegrunnlagsfakta = mapOf(
+                "omregnetÅrsinntektTotalt" to 480000.0,
+                "6G" to 561804.0,
+                "fastsatt" to GodkjenningsbehovBuilder.Fastsatt.EtterSkjønn.name,
+                "arbeidsgivere" to listOf (
+                    mapOf(
+                        "arbeidsgiver" to a1,
+                        "omregnetÅrsinntekt" to 240000.0,
+                        "skjønnsfastsatt" to 492000.0
+                    ),
+                    mapOf(
+                        "arbeidsgiver" to a2,
+                        "omregnetÅrsinntekt" to 240000.0,
+                        "skjønnsfastsatt" to 360000.0
+                    )
+                ),
+                "skjønnsfastsatt" to 852000.0
+            )
+        )
+    }
+
     private fun assertTags(tags: Set<String>, vedtaksperiodeId: UUID = 1.vedtaksperiode.id(a1),) {
         val actualtags = hentFelt<Set<String>>(vedtaksperiodeId = vedtaksperiodeId, feltNavn = "tags") ?: emptySet()
         assertTrue(actualtags.containsAll(tags))
@@ -401,6 +519,18 @@ internal class GodkjenningsbehovBuilderTest : AbstractEndToEndTest() {
         assertFalse(actualtags.contains(tag))
         val utkastTilVedtak = observatør.utkastTilVedtakEventer.last()
         assertFalse(utkastTilVedtak.tags.contains(tag))
+    }
+    private fun assertSykepengegrunnlagsfakta(
+        vedtaksperiodeId: UUID = 1.vedtaksperiode.id(a1),
+        sykepengegrunnlagsfakta: Map<String, Any>
+    ) {
+        val actualSykepengegrunnlagsfakta = hentFelt<Any>(vedtaksperiodeId = vedtaksperiodeId, feltNavn = "sykepengegrunnlagsfakta")!!
+        assertEquals(sykepengegrunnlagsfakta, actualSykepengegrunnlagsfakta)
+    }
+
+    private fun assertHendelser(hendelser: Set<UUID>, vedtaksperiodeId: UUID) {
+        val actualHendelser = hentFelt<Set<UUID>>(vedtaksperiodeId = vedtaksperiodeId, feltNavn = "hendelser")!!
+        assertEquals(hendelser, actualHendelser)
     }
 
     private fun assertGodkjenningsbehov(
@@ -420,6 +550,17 @@ internal class GodkjenningsbehovBuilderTest : AbstractEndToEndTest() {
         behandlingId: UUID = inspektør.vedtaksperioder(1.vedtaksperiode).inspektør.behandlinger.last().id,
         perioderMedSammeSkjæringstidspunkt: List<Map<String, String>> = listOf(
             mapOf("vedtaksperiodeId" to 1.vedtaksperiode.id(a1).toString(), "behandlingId" to 1.vedtaksperiode.sisteBehandlingId(a1).toString(), "fom" to 1.januar.toString(), "tom" to 31.januar.toString()),
+        ),
+        sykepengegrunnlagsfakta: Map<String, Any> = mapOf(
+            "omregnetÅrsinntektTotalt" to INNTEKT.reflection { årlig, _, _, _ -> årlig }.toDouble(),
+            "6G" to 561804.0,
+            "fastsatt" to GodkjenningsbehovBuilder.Fastsatt.EtterHovedregel.name,
+            "arbeidsgivere" to listOf(
+                mapOf(
+                    "arbeidsgiver" to a1,
+                    "omregnetÅrsinntekt" to INNTEKT.reflection { årlig, _, _, _ -> årlig }.toDouble()
+                )
+            )
         )
     ) {
         val actualtags = hentFelt<Set<String>>(vedtaksperiodeId = vedtaksperiodeId, feltNavn = "tags") ?: emptySet()
@@ -436,11 +577,8 @@ internal class GodkjenningsbehovBuilderTest : AbstractEndToEndTest() {
         val actualBehandlingId = hentFelt<String>(vedtaksperiodeId = vedtaksperiodeId, feltNavn = "behandlingId")!!
         val actualPerioderMedSammeSkjæringstidspunkt = hentFelt<Any>(vedtaksperiodeId = vedtaksperiodeId, feltNavn = "perioderMedSammeSkjæringstidspunkt")!!
 
-        if (hendelser != null) {
-            val actualHendelser = hentFelt<Set<UUID>>(vedtaksperiodeId = vedtaksperiodeId, feltNavn = "hendelser")!!
-            assertEquals(hendelser, actualHendelser)
-        }
-
+        hendelser?.let { assertHendelser(it, vedtaksperiodeId) }
+        assertSykepengegrunnlagsfakta(vedtaksperiodeId, sykepengegrunnlagsfakta)
         assertTrue(actualtags.containsAll(tags))
         assertEquals(skjæringstidspunkt.toString(), actualSkjæringstidspunkt)
         assertEquals(inntektskilde, actualInntektskilde)
