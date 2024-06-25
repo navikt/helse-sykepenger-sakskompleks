@@ -567,12 +567,6 @@ internal class Vedtaksperiode private constructor(
         tilstand.entering(this, event)
     }
 
-    private fun oppdaterHistorikk(hendelse: SykdomstidslinjeHendelse, validering: () -> Unit) {
-        val periodeFør = arbeidsgiver.finnVedtaksperiodeFør(this)
-        val periodeEtter = arbeidsgiver.finnVedtaksperiodeEtter(this)
-        behandlinger.håndterEndringOgLagreTidsnæreOpplysninger(person, arbeidsgiver, hendelse, person.beregnSkjæringstidspunkt(), arbeidsgiver.beregnArbeidsgiverperiode(), periodeFør?.behandlinger, periodeEtter?.behandlinger, periodeEtter?.aktivitetsloggkopi(hendelse), validering)
-    }
-
     private fun oppdaterHistorikk(hendelse: SykdomshistorikkHendelse, validering: () -> Unit) {
         behandlinger.håndterEndring(person, arbeidsgiver, hendelse, person.beregnSkjæringstidspunkt(), arbeidsgiver.beregnArbeidsgiverperiode(), validering)
     }
@@ -952,6 +946,7 @@ internal class Vedtaksperiode private constructor(
         if (revurdering.ikkeRelevant(periode)) return
         kontekst(revurdering)
         tilstand.igangsettOverstyring(this, revurdering)
+        tilstand.arbeidsgiveropplysningerStrategi.lagreGjenbrukbareOpplysninger(this, revurdering)
     }
 
     internal fun inngåIRevurderingseventyret(
@@ -1128,7 +1123,7 @@ internal class Vedtaksperiode private constructor(
 
     private data object EtterInntektsmelding: ArbeidsgiveropplysningerStrategi() {
         override fun harInntektOgRefusjon(vedtaksperiode: Vedtaksperiode, arbeidsgiverperiode: Arbeidsgiverperiode, hendelse: IAktivitetslogg) =
-            harEksisterendeInntektOgRefusjon(vedtaksperiode, arbeidsgiverperiode, hendelse)// TODO: || vedtaksperiode.behandlinger.harGjenbrukbareOpplysninger(vedtaksperiode.organisasjonsnummer)
+            harEksisterendeInntektOgRefusjon(vedtaksperiode, arbeidsgiverperiode, hendelse) || vedtaksperiode.behandlinger.harGjenbrukbareOpplysninger(vedtaksperiode.organisasjonsnummer)
         override fun harRefusjonsopplysninger(vedtaksperiode: Vedtaksperiode, arbeidsgiverperiode: Arbeidsgiverperiode, refusjonsopplysninger: Refusjonsopplysninger, hendelse: IAktivitetslogg) =
             Arbeidsgiverperiode.harNødvendigeRefusjonsopplysningerEtterInntektsmelding(vedtaksperiode.skjæringstidspunkt, vedtaksperiode.periode, refusjonsopplysninger, arbeidsgiverperiode, hendelse, vedtaksperiode.organisasjonsnummer)
         override fun lagreGjenbrukbareOpplysninger(vedtaksperiode: Vedtaksperiode, hendelse: IAktivitetslogg) {
