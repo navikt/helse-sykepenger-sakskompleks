@@ -221,7 +221,26 @@ internal class DagerFraInntektsmelding(
         return periode
     }
 
-    private fun skalValideresAv(periode: Periode) = overlappsperiode?.overlapperMed(periode) == true || ikkeUtbetaltAGPOgAGPOverlapper(periode)
+    private fun skalValideresAv(periode: Periode): Boolean {
+        val overlapperMed = overlappsperiode?.overlapperMed(periode)
+        val ikkeUtbetaltAGPOgAGPOverlapper = ikkeUtbetaltAGPOgAGPOverlapper(periode)
+        val ikkeOpplystOmAGPOgFørsteFraværsdagIRimeligTidPeriode = ikkeOpplystOmAGPOgFørsteFraværsdagIRimeligTidPeriode(periode)
+        return overlapperMed == true || ikkeUtbetaltAGPOgAGPOverlapper || ikkeOpplystOmAGPOgFørsteFraværsdagIRimeligTidPeriode
+    }
+
+    private fun ikkeOpplystOmAGPOgFørsteFraværsdagIRimeligTidPeriode(periode: Periode): Boolean {
+        if (begrunnelseForReduksjonEllerIkkeUtbetalt == null) return false
+        if (arbeidsgiverperiode != null) return false
+        if (førsteFraværsdag != null) {
+            if (periode.erRettFør(førsteFraværsdag)) return true
+            val periodeMellom = periode.periodeMellom(førsteFraværsdag)?.count()
+            if (periodeMellom != null && periodeMellom < 30) {
+                return true
+            }
+        }
+        return false
+    }
+
     private fun ikkeUtbetaltAGPOgAGPOverlapper(periode: Periode): Boolean {
         if (begrunnelseForReduksjonEllerIkkeUtbetalt == null) return false
         if (arbeidsgiverperiode == null) return false

@@ -4,10 +4,13 @@ import no.nav.helse.assertForventetFeil
 import no.nav.helse.dsl.AbstractDslTest
 import no.nav.helse.dsl.TestPerson.Companion.INNTEKT
 import no.nav.helse.dsl.nyPeriode
+import no.nav.helse.februar
+import no.nav.helse.fredag
 import no.nav.helse.hendelser.Søknad.Søknadsperiode.Sykdom
 import no.nav.helse.hendelser.til
 import no.nav.helse.inspectors.inspektør
 import no.nav.helse.januar
+import no.nav.helse.mandag
 import no.nav.helse.person.aktivitetslogg.Varselkode
 import no.nav.helse.spleis.e2e.AktivitetsloggFilter.Companion.filter
 import no.nav.helse.sykdomstidslinje.Dag
@@ -76,6 +79,41 @@ internal class BegrunnelseForReduksjonEllerIkkeUtbetaltTest: AbstractDslTest() {
                     }
                 }
             )
+        }
+    }
+
+    @Test
+    fun `Ingen AGP og første fraværsdag på første dag i forlengelse`() {
+        a1 {
+            nyPeriode(1.januar til 31.januar)
+            nyPeriode(1.februar til 28.februar)
+            håndterInntektsmelding(emptyList(), begrunnelseForReduksjonEllerIkkeUtbetalt = "IkkeFravær", førsteFraværsdag = 1.februar)
+            assertVarsel(Varselkode.RV_IM_8, 1.vedtaksperiode.filter())
+            assertVarsel(Varselkode.RV_IM_8, 2.vedtaksperiode.filter())
+        }
+    }
+
+    @Test
+    fun `Ingen AGP og første fraværsdag på første dag i forlengelse etter en helg`() {
+        a1 {
+            nyPeriode(1.januar til fredag(26.januar))
+            nyPeriode(mandag(29.januar) til 10.februar)
+            assertEquals(1.januar, inspektør.skjæringstidspunkt(2.vedtaksperiode))
+            håndterInntektsmelding(emptyList(), begrunnelseForReduksjonEllerIkkeUtbetalt = "IkkeFravær", førsteFraværsdag = 29.januar)
+            assertVarsel(Varselkode.RV_IM_8, 1.vedtaksperiode.filter())
+            assertVarsel(Varselkode.RV_IM_8, 2.vedtaksperiode.filter())
+        }
+    }
+
+    @Test
+    fun `Ingen AGP og første fraværsdag midt i forlengelse`() {
+        a1 {
+            nyPeriode(1.januar til 26.januar)
+            nyPeriode(29.januar til 10.februar)
+            assertEquals(1.januar, inspektør.skjæringstidspunkt(2.vedtaksperiode))
+            håndterInntektsmelding(emptyList(), begrunnelseForReduksjonEllerIkkeUtbetalt = "IkkeFravær", førsteFraværsdag = 3.februar)
+            assertVarsel(Varselkode.RV_IM_8, 1.vedtaksperiode.filter())
+            assertVarsel(Varselkode.RV_IM_8, 2.vedtaksperiode.filter())
         }
     }
 
