@@ -182,7 +182,7 @@ internal class SpeilGenerasjonerBuilder(
                 annulleringen.arbeidsgiverFagsystemId,
                 annulleringen.personFagsystemId,
                 emptyMap(),
-                null
+                annulleringen.vurdering
             )
         )
     }
@@ -285,6 +285,7 @@ internal class SpeilGenerasjonerBuilder(
                     vurdering = it.vurdering?.let { vurdering ->
                         Utbetaling.Vurdering(
                             godkjent = vurdering.godkjent,
+                            annullert = false,
                             tidsstempel = vurdering.tidspunkt,
                             automatisk = vurdering.automatiskBehandling,
                             ident = vurdering.ident
@@ -313,6 +314,15 @@ internal class SpeilGenerasjonerBuilder(
                         UtbetalingTilstandDto.OVERFØRT -> Utbetalingstatus.Overført
                         UtbetalingTilstandDto.UTBETALT -> Utbetalingstatus.Utbetalt
                         else -> return@mapNotNull null
+                    },
+                    vurdering = it.vurdering?.let { v ->
+                        Utbetaling.Vurdering(
+                            godkjent = v.godkjent,
+                            tidsstempel = v.tidspunkt,
+                            annullert = true,
+                            automatisk = v.automatiskBehandling,
+                            ident = v.ident
+                        )
                     }
                 )
             }

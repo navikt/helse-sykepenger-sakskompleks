@@ -208,6 +208,10 @@ private fun mapUtbetaling(utbetaling: Utbetaling) = GraphQLUtbetaling(
     vurdering = utbetaling.vurdering?.let {
         GraphQLVurdering(
             godkjent = it.godkjent,
+            annullert = when (utbetaling.status) {
+                Utbetalingstatus.Annullert -> true
+                else -> false
+            },
             tidsstempel = it.tidsstempel,
             automatisk = it.automatisk,
             ident = it.ident
@@ -229,6 +233,7 @@ private fun mapHendelse(hendelse: HendelseDTO) = when (hendelse.type) {
         tom = hendelse.tom!!,
         rapportertDato = hendelse.rapportertdato!!
     )
+
     HendelsetypeDto.SENDT_SØKNAD_NAV -> GraphQLSoknadNav(
         id = hendelse.id,
         eksternDokumentId = hendelse.eksternDokumentId,
@@ -237,6 +242,7 @@ private fun mapHendelse(hendelse: HendelseDTO) = when (hendelse.type) {
         rapportertDato = hendelse.rapportertdato!!,
         sendtNav = hendelse.sendtNav!!
     )
+
     HendelsetypeDto.SENDT_SØKNAD_FRILANS -> GraphQLSoknadFrilans(
         id = hendelse.id,
         eksternDokumentId = hendelse.eksternDokumentId,
@@ -245,6 +251,7 @@ private fun mapHendelse(hendelse: HendelseDTO) = when (hendelse.type) {
         rapportertDato = hendelse.rapportertdato!!,
         sendtNav = hendelse.sendtNav!!
     )
+
     HendelsetypeDto.SENDT_SØKNAD_SELVSTENDIG -> GraphQLSoknadSelvstendig(
         id = hendelse.id,
         eksternDokumentId = hendelse.eksternDokumentId,
@@ -253,6 +260,7 @@ private fun mapHendelse(hendelse: HendelseDTO) = when (hendelse.type) {
         rapportertDato = hendelse.rapportertdato!!,
         sendtNav = hendelse.sendtNav!!
     )
+
     HendelsetypeDto.SENDT_SØKNAD_ARBEIDSLEDIG -> GraphQLSoknadArbeidsledig(
         id = hendelse.id,
         eksternDokumentId = hendelse.eksternDokumentId,
@@ -261,6 +269,7 @@ private fun mapHendelse(hendelse: HendelseDTO) = when (hendelse.type) {
         rapportertDato = hendelse.rapportertdato!!,
         sendtNav = hendelse.sendtNav!!
     )
+
     HendelsetypeDto.SENDT_SØKNAD_ARBEIDSGIVER -> GraphQLSoknadArbeidsgiver(
         id = hendelse.id,
         eksternDokumentId = hendelse.eksternDokumentId,
@@ -276,6 +285,7 @@ private fun mapHendelse(hendelse: HendelseDTO) = when (hendelse.type) {
         mottattDato = hendelse.mottattDato!!,
         beregnetInntekt = hendelse.beregnetInntekt!!
     )
+
     else -> null
 }
 
@@ -329,6 +339,7 @@ internal fun mapTidslinjeperiode(periode: SpeilTidslinjeperiode, hendelser: List
             hendelser = periode.hendelser.tilHendelseDTO(hendelser)
         )
     }
+
 private fun mapBeregnetPeriode(periode: BeregnetPeriode, hendelser: List<HendelseDTO>) =
     GraphQLBeregnetPeriode(
         behandlingId = periode.behandlingId,
@@ -352,6 +363,7 @@ private fun mapBeregnetPeriode(periode: BeregnetPeriode, hendelser: List<Hendels
         periodetilstand = mapTilstand(periode.periodetilstand),
         vilkarsgrunnlagId = periode.vilkårsgrunnlagId
     )
+
 private fun mapAnnullertPeriode(periode: AnnullertPeriode, hendelser: List<HendelseDTO>) =
     GraphQLBeregnetPeriode(
         behandlingId = periode.behandlingId,
@@ -387,6 +399,7 @@ private fun mapAnnullertPeriode(periode: AnnullertPeriode, hendelser: List<Hende
         periodetilstand = mapTilstand(periode.periodetilstand),
         vilkarsgrunnlagId = null
     )
+
 private fun Set<UUID>.tilHendelseDTO(hendelser: List<HendelseDTO>): List<GraphQLHendelse> {
     return this
         .mapNotNull { dokumentId -> hendelser.firstOrNull { hendelseDTO -> hendelseDTO.id == dokumentId.toString() } }
@@ -453,33 +466,47 @@ private fun Inntekt.tilGraphQLOmregnetArsinntekt() = GraphQLOmregnetArsinntekt(
 )
 
 internal fun mapVilkårsgrunnlag(id: UUID, vilkårsgrunnlag: Vilkårsgrunnlag) =
-        when (vilkårsgrunnlag) {
-            is SpleisVilkårsgrunnlag -> GraphQLSpleisVilkarsgrunnlag(
-                id = id,
-                skjaeringstidspunkt = vilkårsgrunnlag.skjæringstidspunkt,
-                omregnetArsinntekt = vilkårsgrunnlag.omregnetÅrsinntekt,
-                sykepengegrunnlag = vilkårsgrunnlag.sykepengegrunnlag,
-                inntekter = vilkårsgrunnlag.inntekter.map { inntekt -> mapInntekt(inntekt) },
-                grunnbelop = vilkårsgrunnlag.grunnbeløp,
-                sykepengegrunnlagsgrense = mapSykepengergrunnlagsgrense(vilkårsgrunnlag.sykepengegrunnlagsgrense),
-                antallOpptjeningsdagerErMinst = vilkårsgrunnlag.antallOpptjeningsdagerErMinst,
-                opptjeningFra = vilkårsgrunnlag.opptjeningFra,
-                oppfyllerKravOmMinstelonn = vilkårsgrunnlag.oppfyllerKravOmMinstelønn,
-                oppfyllerKravOmOpptjening = vilkårsgrunnlag.oppfyllerKravOmOpptjening,
-                oppfyllerKravOmMedlemskap = vilkårsgrunnlag.oppfyllerKravOmMedlemskap,
-                arbeidsgiverrefusjoner = vilkårsgrunnlag.arbeidsgiverrefusjoner.map{ refusjon -> mapArbeidsgiverRefusjon(refusjon)}
-            )
-            is InfotrygdVilkårsgrunnlag -> GraphQLInfotrygdVilkarsgrunnlag(
-                id = id,
-                skjaeringstidspunkt = vilkårsgrunnlag.skjæringstidspunkt,
-                omregnetArsinntekt = vilkårsgrunnlag.beregningsgrunnlag, // For infotrygd har vi ikke noe konsept for hvorvidt en inntekt er skjønnsfastsatt
-                sykepengegrunnlag = vilkårsgrunnlag.sykepengegrunnlag,
-                inntekter = vilkårsgrunnlag.inntekter.map { inntekt -> mapInntekt(inntekt) },
-                arbeidsgiverrefusjoner = vilkårsgrunnlag.arbeidsgiverrefusjoner.map{ refusjon -> mapArbeidsgiverRefusjon(refusjon)}
-            )
-            else -> throw IllegalStateException("har ikke mapping for vilkårsgrunnlag ${vilkårsgrunnlag::class.simpleName ?: "[ukjent klassenavn]"}")
-        }
+    when (vilkårsgrunnlag) {
+        is SpleisVilkårsgrunnlag -> GraphQLSpleisVilkarsgrunnlag(
+            id = id,
+            skjaeringstidspunkt = vilkårsgrunnlag.skjæringstidspunkt,
+            omregnetArsinntekt = vilkårsgrunnlag.omregnetÅrsinntekt,
+            sykepengegrunnlag = vilkårsgrunnlag.sykepengegrunnlag,
+            inntekter = vilkårsgrunnlag.inntekter.map { inntekt -> mapInntekt(inntekt) },
+            grunnbelop = vilkårsgrunnlag.grunnbeløp,
+            sykepengegrunnlagsgrense = mapSykepengergrunnlagsgrense(vilkårsgrunnlag.sykepengegrunnlagsgrense),
+            antallOpptjeningsdagerErMinst = vilkårsgrunnlag.antallOpptjeningsdagerErMinst,
+            opptjeningFra = vilkårsgrunnlag.opptjeningFra,
+            oppfyllerKravOmMinstelonn = vilkårsgrunnlag.oppfyllerKravOmMinstelønn,
+            oppfyllerKravOmOpptjening = vilkårsgrunnlag.oppfyllerKravOmOpptjening,
+            oppfyllerKravOmMedlemskap = vilkårsgrunnlag.oppfyllerKravOmMedlemskap,
+            arbeidsgiverrefusjoner = vilkårsgrunnlag.arbeidsgiverrefusjoner.map { refusjon ->
+                mapArbeidsgiverRefusjon(
+                    refusjon
+                )
+            }
+        )
+
+        is InfotrygdVilkårsgrunnlag -> GraphQLInfotrygdVilkarsgrunnlag(
+            id = id,
+            skjaeringstidspunkt = vilkårsgrunnlag.skjæringstidspunkt,
+            omregnetArsinntekt = vilkårsgrunnlag.beregningsgrunnlag, // For infotrygd har vi ikke noe konsept for hvorvidt en inntekt er skjønnsfastsatt
+            sykepengegrunnlag = vilkårsgrunnlag.sykepengegrunnlag,
+            inntekter = vilkårsgrunnlag.inntekter.map { inntekt -> mapInntekt(inntekt) },
+            arbeidsgiverrefusjoner = vilkårsgrunnlag.arbeidsgiverrefusjoner.map { refusjon ->
+                mapArbeidsgiverRefusjon(
+                    refusjon
+                )
+            }
+        )
+
+        else -> throw IllegalStateException("har ikke mapping for vilkårsgrunnlag ${vilkårsgrunnlag::class.simpleName ?: "[ukjent klassenavn]"}")
+    }
 
 
 private fun mapSykepengergrunnlagsgrense(sykepengegrunnlagsgrenseDTO: SykepengegrunnlagsgrenseDTO) =
-    GraphQLSykepengegrunnlagsgrense(sykepengegrunnlagsgrenseDTO.grunnbeløp, sykepengegrunnlagsgrenseDTO.grense, sykepengegrunnlagsgrenseDTO.virkningstidspunkt)
+    GraphQLSykepengegrunnlagsgrense(
+        sykepengegrunnlagsgrenseDTO.grunnbeløp,
+        sykepengegrunnlagsgrenseDTO.grense,
+        sykepengegrunnlagsgrenseDTO.virkningstidspunkt
+    )

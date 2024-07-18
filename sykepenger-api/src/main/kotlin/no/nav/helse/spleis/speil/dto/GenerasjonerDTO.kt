@@ -219,7 +219,8 @@ internal class AnnullertUtbetaling(
     internal val annulleringstidspunkt: LocalDateTime,
     internal val arbeidsgiverFagsystemId: String,
     internal val personFagsystemId: String,
-    internal val utbetalingstatus: Utbetalingstatus
+    internal val utbetalingstatus: Utbetalingstatus,
+    internal val vurdering: Utbetaling.Vurdering?,
 ) {
     val periodetilstand = when (utbetalingstatus) {
         Utbetalingstatus.Annullert -> Periodetilstand.Annullert
@@ -317,6 +318,7 @@ class Utbetaling(
     data class Vurdering(
         val godkjent: Boolean,
         val tidsstempel: LocalDateTime,
+        val annullert: Boolean,
         val automatisk: Boolean,
         val ident: String
     )

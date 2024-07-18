@@ -513,8 +513,10 @@ internal class SpeilBehandlingerBuilderTest : AbstractE2ETest() {
         generasjoner {
             assertEquals(2, size)
             0.generasjon {
+                assertEquals(true, annullertPeriode(0).utbetaling.vurdering?.annullert)
                 assertEquals(1, size)
                 annullertPeriode(0) er Overført avType ANNULLERING fra (1.januar til 31.januar) medAntallDager 0 forkastet true medTilstand TilAnnullering
+
             }
             1.generasjon {
                 assertEquals(1, size)

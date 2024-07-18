@@ -123,6 +123,7 @@ data class GraphQLUtbetalingsinfo(
 
 data class GraphQLVurdering(
     val godkjent: Boolean,
+    val annullert: Boolean,
     val tidsstempel: LocalDateTime,
     val automatisk: Boolean,
     val ident: String
