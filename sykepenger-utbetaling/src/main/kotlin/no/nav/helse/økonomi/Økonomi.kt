@@ -36,10 +36,30 @@ class Økonomi private constructor(
             tilstand = Tilstand.IkkeBetalt
         )
 
-        fun List<Økonomi>.totalSykdomsgrad() = totalSykdomsgrad(this).first().totalGrad
+        fun List<Økonomi>.totalSykdomsgrad(): Prosentdel {
+            val økonomiList = totalSykdomsgrad(this)
+            return økonomiList.first().totalGrad
+        }
+
         private fun List<Økonomi>.beregningsgrunnlag() = map { it.beregningsgrunnlag }.summer()
+
         fun totalSykdomsgrad(økonomiList: List<Økonomi>): List<Økonomi> {
-            val totalgrad = Inntekt.vektlagtGjennomsnitt(økonomiList.map { it.sykdomsgrad() to it.aktuellDagsinntekt }, økonomiList.beregningsgrunnlag())
+            val beregningsgrunnlag = økonomiList.beregningsgrunnlag()
+            if (beregningsgrunnlag == INGEN) {
+                val økonomiListMedSykdomsgrad = økonomiList.filter { it.sykdomsgrad() > 0.prosent }
+                if (økonomiListMedSykdomsgrad.isEmpty()) {
+                    return økonomiList.map { økonomi: Økonomi ->
+                        økonomi.kopierMed(totalgrad = 0.prosent)
+                    }
+                }
+                else {
+                    val totalgrad = Inntekt.vektlagtGjennomsnitt(økonomiListMedSykdomsgrad.map { it.sykdomsgrad() to it.aktuellDagsinntekt }, beregningsgrunnlag)
+                    return økonomiList.map { økonomi: Økonomi ->
+                        økonomi.kopierMed(totalgrad = totalgrad)
+                    }
+                }
+            }
+            val totalgrad = Inntekt.vektlagtGjennomsnitt(økonomiList.map { it.sykdomsgrad() to it.aktuellDagsinntekt }, beregningsgrunnlag)
             return økonomiList.map { økonomi: Økonomi ->
                 økonomi.kopierMed(totalgrad = totalgrad)
             }

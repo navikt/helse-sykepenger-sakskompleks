@@ -42,7 +42,7 @@ import org.junit.jupiter.api.fail
 internal class SkjønnsmessigFastsettelseTest: AbstractDslTest() {
 
     @Test
-    fun `Når inntekt skjønnsfastsettes til 0 brukes antall arbeidsgivere på personen til å beregne totalGrad`() {
+    fun `Når inntekt skjønnsfastsettes til 0 og det finnes andre arbeidsgivere i økonomi-lista`() {
         "a1" {}
         "a2" {}
         "a3" {}
@@ -52,11 +52,7 @@ internal class SkjønnsmessigFastsettelseTest: AbstractDslTest() {
             tilGodkjenning(mars)
             håndterSkjønnsmessigFastsettelse(1.mars, listOf(OverstyrtArbeidsgiveropplysning("a6", INGEN)))
             håndterYtelser(1.vedtaksperiode)
-            assertForventetFeil(
-                forklaring = "Når inntekt skjønnsfastsettes til 0 brukes antall arbeidsgivere på personen til å beregne totalGrad",
-                nå = { assertEquals(16, inspektør(1.vedtaksperiode).utbetalingstidslinje[17.mars].økonomi.inspektør.totalGrad) },
-                ønsket = { assertEquals(100, inspektør(1.vedtaksperiode).utbetalingstidslinje[17.mars].økonomi.inspektør.totalGrad) }
-            )
+            assertEquals(100, inspektør(1.vedtaksperiode).utbetalingstidslinje[17.mars].økonomi.inspektør.totalGrad)
         }
     }
 

@@ -37,7 +37,7 @@ internal class ØkonomiTest {
             8.prosent.sykdomsgrad.inntekt(30000.månedlig, `6G` = `6G`.beløp(1.januar)),
             54.prosent.sykdomsgrad.inntekt(10312.40.månedlig, `6G` = `6G`.beløp(1.januar))
         )
-        val totalSykdomsgrad = totalSykdomsgrad(økonomi)
+        val totalSykdomsgrad = økonomi.totalSykdomsgrad()
         assertNotEquals(20.prosent, totalSykdomsgrad)
         assertTrue(totalSykdomsgrad.erUnderGrensen())
     }
@@ -53,8 +53,8 @@ internal class ØkonomiTest {
             0.prosent.sykdomsgrad.inntekt(0.månedlig, `6G` = `6G`.beløp(1.januar)),
             0.prosent.sykdomsgrad.inntekt(0.månedlig, `6G` = `6G`.beløp(1.januar)),
         )
-        val totalSykdomsgrad = totalSykdomsgrad(økonomi).totalSykdomsgrad()
-        assertEquals(14.285714285714286.prosent, totalSykdomsgrad) // 🤔
+        val totalSykdomsgrad = økonomi.totalSykdomsgrad()
+        assertEquals(100.prosent, totalSykdomsgrad)
     }
 
     @Test
