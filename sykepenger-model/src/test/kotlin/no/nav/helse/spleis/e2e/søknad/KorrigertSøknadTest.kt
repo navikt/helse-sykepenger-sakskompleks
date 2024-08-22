@@ -483,4 +483,26 @@ internal class KorrigertSøknadTest : AbstractEndToEndTest() {
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent), Ferie(31.januar, 31.januar), sendtTilNAVEllerArbeidsgiver = 2.mai, korrigerer = søknadId, opprinneligSendt = 1.mai)
         assertEquals("KKKKKHH KKKKKHH KKKKKHH KKKKKHH KKF", inspektør.sykdomshistorikk.sykdomstidslinje().toShortString().trim())
     }
+
+    @Test
+    fun `Korrigerende søknad appender egenmeldingsperioder til vedtaksperioden`() {
+        håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent), egenmeldinger = listOf(1.januar til 2.januar))
+        assertEquals(listOf(1.januar til 2.januar), inspektør.vedtaksperioder(1.vedtaksperiode).inspektør.egenmeldingsperioder)
+
+        håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent), egenmeldinger = listOf(5.januar til 6.januar))
+        assertEquals(listOf(1.januar til 2.januar, 5.januar til 6.januar), inspektør.vedtaksperioder(1.vedtaksperiode).inspektør.egenmeldingsperioder)
+
+        håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent), egenmeldinger = listOf(2.januar til  5.januar))
+        assertEquals(listOf(1.januar til 6.januar), inspektør.vedtaksperioder(1.vedtaksperiode).inspektør.egenmeldingsperioder)
+
+        håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent), egenmeldinger = listOf(1.januar til  6.januar))
+        assertEquals(listOf(1.januar til 6.januar), inspektør.vedtaksperioder(1.vedtaksperiode).inspektør.egenmeldingsperioder)
+    }
+
+    @Test
+    fun `Korrigerende søknad som fører til revurdering appender egenmeldingsperioder til vedtaksperioden`() {
+        nyttVedtak(januar)
+        håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent), egenmeldinger = listOf(1.januar til 5.januar, 8.januar til 10.januar))
+        assertEquals(listOf(1.januar til 10.januar), inspektør.vedtaksperioder(1.vedtaksperiode).inspektør.egenmeldingsperioder)
+    }
 }

@@ -14,8 +14,8 @@ import no.nav.helse.hendelser.GjenopplivVilkårsgrunnlag
 import no.nav.helse.hendelser.GradertPeriode
 import no.nav.helse.hendelser.Grunnbeløpsregulering
 import no.nav.helse.hendelser.IdentOpphørt
-import no.nav.helse.hendelser.InntekterForOpptjeningsvurdering
 import no.nav.helse.hendelser.InntektForSykepengegrunnlag
+import no.nav.helse.hendelser.InntekterForOpptjeningsvurdering
 import no.nav.helse.hendelser.Inntektsmelding
 import no.nav.helse.hendelser.InntektsmeldingerReplay
 import no.nav.helse.hendelser.Institusjonsopphold
@@ -91,7 +91,7 @@ internal class ArbeidsgiverHendelsefabrikk(
         opprinneligSendt: LocalDate? = null,
         yrkesskade: Boolean = false,
         aktivitetslogg: Aktivitetslogg = Aktivitetslogg(),
-        egenmeldinger: List<Søknad.Søknadsperiode.Arbeidsgiverdag> = emptyList(),
+        egenmeldinger: List<Periode> = emptyList(),
         søknadstype: Søknad.Søknadstype = Søknad.Søknadstype.Arbeidstaker,
         registrert: LocalDateTime = LocalDateTime.now()
     ): Søknad {

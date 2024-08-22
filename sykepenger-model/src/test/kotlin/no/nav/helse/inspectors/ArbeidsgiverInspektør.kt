@@ -52,7 +52,8 @@ internal class ArbeidsgiverInspektør(arbeidsgiver: Arbeidsgiver): ArbeidsgiverV
         periode: Periode,
         opprinneligPeriode: Periode,
         skjæringstidspunkt: LocalDate,
-        hendelseIder: Set<Dokumentsporing>
+        hendelseIder: Set<Dokumentsporing>,
+        egenmeldingsperioder: List<Periode>
     ) {
         vedtaksperioder[id] = vedtaksperiode
         sisteVedtaksperiodeTilstander[id] = tilstand.type

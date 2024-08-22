@@ -21,7 +21,6 @@ import no.nav.helse.hendelser.Inntektsmelding
 import no.nav.helse.hendelser.ManuellOverskrivingDag
 import no.nav.helse.hendelser.Medlemskapsvurdering
 import no.nav.helse.hendelser.Periode
-import no.nav.helse.hendelser.Søknad.Søknadsperiode.Arbeidsgiverdag
 import no.nav.helse.hendelser.Søknad.Søknadsperiode.Ferie
 import no.nav.helse.hendelser.Søknad.Søknadsperiode.Sykdom
 import no.nav.helse.hendelser.Vilkårsgrunnlag
@@ -292,9 +291,7 @@ internal class FlereArbeidsgivereTest : AbstractDslTest() {
         a1 {
             håndterSøknad(
                 Sykdom(mandag den 22.januar, 23.januar, 100.prosent),
-                egenmeldinger = listOf(
-                    Arbeidsgiverdag(fredag den 19.januar, fredag den 19.januar)
-                )
+                egenmeldinger = listOf(fredag den 19.januar til fredag den 19.januar)
             )
             håndterInntektsmelding(listOf(3.januar til 17.januar, 19.januar.somPeriode()), beregnetInntekt = INNTEKT)
             håndterVilkårsgrunnlag(2.vedtaksperiode,
@@ -403,7 +400,7 @@ internal class FlereArbeidsgivereTest : AbstractDslTest() {
         }
         a2 {
             håndterSykmelding(februar)
-            håndterSøknad(Sykdom(3.februar, 28.februar, 100.prosent), egenmeldinger = listOf(Arbeidsgiverdag(1.februar, 1.februar)))
+            håndterSøknad(Sykdom(3.februar, 28.februar, 100.prosent), egenmeldinger = listOf(1.februar til 1.februar))
             assertSisteTilstand(2.vedtaksperiode, AVVENTER_INNTEKTSMELDING)
         }
     }

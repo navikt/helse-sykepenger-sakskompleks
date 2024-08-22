@@ -3,7 +3,7 @@ package no.nav.helse.spleis.meldinger.model
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
-import no.nav.helse.hendelser.Søknad
+import no.nav.helse.hendelser.Periode
 import kotlin.properties.Delegates
 
 internal abstract class SøknadBuilder {
@@ -14,7 +14,7 @@ internal abstract class SøknadBuilder {
     protected lateinit var fødselsdato: LocalDate
     protected lateinit var organisasjonsnummer: String
     protected var registrert: LocalDateTime = LocalDateTime.now()
-    protected lateinit var egenmeldinger: List<Søknad.Søknadsperiode.Arbeidsgiverdag>
+    protected lateinit var egenmeldinger: List<Periode>
     private lateinit var fom: LocalDate
     private lateinit var tom: LocalDate
     protected var permittert = false
@@ -32,7 +32,7 @@ internal abstract class SøknadBuilder {
     internal fun tom(tom: LocalDate) = apply { this.tom = tom }
     internal fun sendt(tidspunkt: LocalDateTime) = apply { this.innsendt = tidspunkt }
     internal fun permittert(permittert: Boolean) = apply { this.permittert = permittert }
-    internal fun egenmeldinger(egenmeldinger: List<Søknad.Søknadsperiode.Arbeidsgiverdag>) = apply { this.egenmeldinger = egenmeldinger }
+    internal fun egenmeldinger(egenmeldinger: List<Periode>) = apply { this.egenmeldinger = egenmeldinger }
     internal fun arbeidUtenforNorge(arbeidUtenforNorge: Boolean) = apply { this.arbeidUtenforNorge = arbeidUtenforNorge }
     internal fun yrkesskade(yrkesskade: Boolean) = apply { this.yrkesskade = yrkesskade }
     internal fun fravær(type: String, fom: LocalDate, tom: LocalDate?) {

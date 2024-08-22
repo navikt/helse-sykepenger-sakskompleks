@@ -1,0 +1,18 @@
+{
+  "arbeidsgivere": [
+    {
+      "vedtaksperioder": [
+        {},
+        {}
+      ],
+      "forkastede": [
+        {
+          "vedtaksperiode": {}
+        },
+        {
+          "vedtaksperiode": {}
+        }
+      ]
+    }
+  ]
+}

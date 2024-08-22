@@ -1,0 +1,27 @@
+{
+  "skjemaVersjon": 298,
+  "arbeidsgivere": [
+    {
+      "vedtaksperioder": [
+        {
+          "egenmeldingsperioder": []
+        },
+        {
+          "egenmeldingsperioder": []
+        }
+      ],
+      "forkastede": [
+        {
+          "vedtaksperiode": {
+            "egenmeldingsperioder": []
+          }
+        },
+        {
+          "vedtaksperiode": {
+            "egenmeldingsperioder": []
+          }
+        }
+      ]
+    }
+  ]
+}

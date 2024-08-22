@@ -171,7 +171,7 @@ internal class RefusjonsopplysningerE2ETest : AbstractDslTest() {
         }
         a1 {
             håndterSykmelding(Sykmeldingsperiode(2.januar, 31.januar))
-            håndterSøknad(Sykdom(2.januar, 31.januar, 100.prosent), egenmeldinger = listOf(Søknad.Søknadsperiode.Arbeidsgiverdag(fom = 29.desember(2017), tom = 29.desember(2017))))
+            håndterSøknad(Sykdom(2.januar, 31.januar, 100.prosent), egenmeldinger = listOf(29.desember(2017) til 29.desember(2017)))
             håndterInntektsmeldingPortal(førsteFraværsdag = 2.januar, arbeidsgiverperioder = emptyList(), inntektsdato = 1.desember(2017))
 
             håndterYtelser(1.vedtaksperiode)

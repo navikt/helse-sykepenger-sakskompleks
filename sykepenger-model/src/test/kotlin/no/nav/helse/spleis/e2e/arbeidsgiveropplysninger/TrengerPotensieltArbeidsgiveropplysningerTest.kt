@@ -3,7 +3,6 @@ package no.nav.helse.spleis.e2e.arbeidsgiveropplysninger
 import no.nav.helse.februar
 import no.nav.helse.hendelser.Sykmeldingsperiode
 import no.nav.helse.hendelser.Søknad
-import no.nav.helse.hendelser.Søknad.Søknadsperiode.Arbeidsgiverdag
 import no.nav.helse.hendelser.Søknad.Søknadsperiode.Sykdom
 import no.nav.helse.hendelser.til
 import no.nav.helse.januar
@@ -112,27 +111,21 @@ internal class TrengerPotensieltArbeidsgiveropplysningerTest : AbstractEndToEndT
         håndterSykmelding(Sykmeldingsperiode(5.januar, 16.januar))
         håndterSøknad(
             Sykdom(5.januar, 16.januar, 100.prosent),
-            egenmeldinger = listOf(
-                Arbeidsgiverdag(1.januar, 4.januar)
-            )
+            egenmeldinger = listOf(1.januar til 4.januar)
         )
 
         // Langt gap fra forrige periode
         håndterSykmelding(Sykmeldingsperiode(5.mars, 8.mars))
         håndterSøknad(
             Sykdom(5.mars, 8.mars, 100.prosent),
-            egenmeldinger = listOf(
-                Arbeidsgiverdag(1.mars, 2.mars)
-            )
+            egenmeldinger = listOf(1.mars til 2.mars)
         )
 
         // Kort gap fra forrige periode
         håndterSykmelding(Sykmeldingsperiode(14.mars, 16.mars))
         håndterSøknad(
             Sykdom(14.mars, 16.mars, 100.prosent),
-            egenmeldinger = listOf(
-                Arbeidsgiverdag(13.mars, 13.mars)
-            )
+            egenmeldinger = listOf(13.mars til 13.mars)
         )
 
         assertEquals(0, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.size)
@@ -155,9 +148,9 @@ internal class TrengerPotensieltArbeidsgiveropplysningerTest : AbstractEndToEndT
     @Test
     fun `Skal ikke sende med egenmeldingsdager etter vedtaksperioden sin potensielle forespørsel`() {
         håndterSykmelding(Sykmeldingsperiode(10.januar, 16.januar))
-        håndterSøknad(Sykdom(10.januar, 16.januar, 100.prosent), egenmeldinger = listOf(Arbeidsgiverdag(9.januar, 9.januar)))
+        håndterSøknad(Sykdom(10.januar, 16.januar, 100.prosent), egenmeldinger = listOf(9.januar til 9.januar))
         håndterSykmelding(Sykmeldingsperiode(2.januar, 5.januar))
-        håndterSøknad(Sykdom(2.januar, 5.januar, 100.prosent), egenmeldinger = listOf(Arbeidsgiverdag(1.januar, 1.januar)))
+        håndterSøknad(Sykdom(2.januar, 5.januar, 100.prosent), egenmeldinger = listOf(1.januar til 1.januar))
 
 
         val trengerPotensieltArbeidsgiveropplysningerVedtaksperioder = observatør.trengerPotensieltArbeidsgiveropplysningerVedtaksperioder

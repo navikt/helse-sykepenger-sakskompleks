@@ -1,11 +1,9 @@
 package no.nav.helse.spleis.e2e.inntektsmelding
 
-import java.time.LocalDate
 import java.util.UUID
 import no.nav.helse.dsl.AbstractDslTest
 import no.nav.helse.dsl.nyttVedtak
 import no.nav.helse.februar
-import no.nav.helse.hendelser.Søknad
 import no.nav.helse.hendelser.Søknad.Søknadsperiode.Sykdom
 import no.nav.helse.hendelser.til
 import no.nav.helse.inspectors.TestArbeidsgiverInspektør
@@ -23,7 +21,7 @@ internal class FlereSkjæringstidspunktTest: AbstractDslTest() {
         a1 {
             nyttVedtak(januar)
 
-            håndterSøknad(Sykdom(15.februar, 28.februar, 100.prosent), egenmeldinger = listOf(5.februar.arbeidsgiverdag))
+            håndterSøknad(Sykdom(15.februar, 28.februar, 100.prosent), egenmeldinger = listOf(5.februar til 5.februar))
             observatør.vedtaksperiodeVenter.last().let {
                 assertEquals("INNTEKTSMELDING", it.venterPå.venteårsak.hva)
                 assertEquals("U?????? ???SSHH SSSSSHH SSS", inspektør.sykdomstidslinje(2.vedtaksperiode).toShortString())
@@ -42,7 +40,7 @@ internal class FlereSkjæringstidspunktTest: AbstractDslTest() {
     @Test
     fun `Egenmeldingsdager fra sykmelding møter begrunnelseForReduksjonEllerIkkeUtbetalt`() {
         a1 {
-            håndterSøknad(Sykdom(9.mars, 14.mars, 100.prosent), egenmeldinger = listOf(2.mars.arbeidsgiverdag, 3.mars.arbeidsgiverdag))
+            håndterSøknad(Sykdom(9.mars, 14.mars, 100.prosent), egenmeldinger = listOf(2.mars til 3.mars))
             håndterInntektsmelding(listOf(2.januar til 17.januar), førsteFraværsdag = 2.mars, begrunnelseForReduksjonEllerIkkeUtbetalt = "IkkeFullStillingsandel")
 
             observatør.vedtaksperiodeVenter.last().let {
@@ -54,7 +52,6 @@ internal class FlereSkjæringstidspunktTest: AbstractDslTest() {
     }
 
     private companion object {
-        private val LocalDate.arbeidsgiverdag get() = Søknad.Søknadsperiode.Arbeidsgiverdag(this, this)
         private fun TestArbeidsgiverInspektør.sykdomstidslinje(vedtaksperiodeId: UUID) = vedtaksperioder(vedtaksperiodeId).inspektør.behandlinger.last().endringer.last().sykdomstidslinje
     }
 }

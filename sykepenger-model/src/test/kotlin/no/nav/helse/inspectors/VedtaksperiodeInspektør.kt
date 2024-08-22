@@ -38,6 +38,7 @@ internal class VedtaksperiodeInspektør(vedtaksperiode: Vedtaksperiode) : Vedtak
     internal lateinit var utbetalingstidslinje: Utbetalingstidslinje
         private set
     internal val behandlinger = mutableListOf<Behandling>()
+    internal var egenmeldingsperioder = listOf<Periode>()
     init {
         vedtaksperiode.accept(this)
     }
@@ -84,13 +85,15 @@ internal class VedtaksperiodeInspektør(vedtaksperiode: Vedtaksperiode) : Vedtak
         periode: Periode,
         opprinneligPeriode: Periode,
         skjæringstidspunkt: LocalDate,
-        hendelseIder: Set<Dokumentsporing>
+        hendelseIder: Set<Dokumentsporing>,
+        egenmeldingsperioder: List<Periode>
     ) {
         this.id = id
         this.periode = periode
         this.oppdatert = oppdatert
         this.skjæringstidspunkt = skjæringstidspunkt
         this.tilstand = tilstand
+        this.egenmeldingsperioder = egenmeldingsperioder
     }
 
     override fun preVisitBehandling(

@@ -7,7 +7,6 @@ import no.nav.helse.hendelser.InntektForSykepengegrunnlag
 import no.nav.helse.hendelser.Inntektsmelding
 import no.nav.helse.hendelser.Periode
 import no.nav.helse.hendelser.Sykmeldingsperiode
-import no.nav.helse.hendelser.Søknad.Søknadsperiode.Arbeidsgiverdag
 import no.nav.helse.hendelser.Søknad.Søknadsperiode.Sykdom
 import no.nav.helse.hendelser.Vilkårsgrunnlag
 import no.nav.helse.hendelser.Vilkårsgrunnlag.Arbeidsforhold.Arbeidsforholdtype
@@ -91,7 +90,7 @@ internal class FlereArbeidsgivereFlytTest : AbstractEndToEndTest() {
     @Test
     fun `En egenmelding på bare en arbeidsgiver`() {
         håndterSøknad(Sykdom(2.januar, 17.januar, 100.prosent), orgnummer = a1)
-        håndterSøknad(Sykdom(2.januar, 17.januar, 100.prosent), egenmeldinger = listOf(Arbeidsgiverdag(fom = 1.januar, tom = 1.januar)), orgnummer = a2)
+        håndterSøknad(Sykdom(2.januar, 17.januar, 100.prosent), egenmeldinger = listOf(1.januar til 1.januar), orgnummer = a2)
 
         assertSisteTilstand(1.vedtaksperiode, AVVENTER_BLOKKERENDE_PERIODE, orgnummer = a1)
         assertSisteTilstand(1.vedtaksperiode, AVVENTER_INNTEKTSMELDING, orgnummer = a2)

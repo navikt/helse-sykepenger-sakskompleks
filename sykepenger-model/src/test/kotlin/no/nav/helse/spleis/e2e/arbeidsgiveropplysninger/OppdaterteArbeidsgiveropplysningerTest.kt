@@ -44,7 +44,7 @@ internal class OppdaterteArbeidsgiveropplysningerTest: AbstractEndToEndTest() {
     @Test
     fun `Sender ny forespørsel når korrigerende søknad kommer før vi har fått svar på forrige forespørsel -- flytter skjæringstidspunktet`() {
         nyPeriode(2.januar til 31.januar)
-        håndterSøknad(Søknad.Søknadsperiode.Sykdom(2.januar, 31.januar, 100.prosent), egenmeldinger = listOf(Søknad.Søknadsperiode.Arbeidsgiverdag(1.januar, 1.januar)))
+        håndterSøknad(Søknad.Søknadsperiode.Sykdom(2.januar, 31.januar, 100.prosent), egenmeldinger = listOf(1.januar til 1.januar))
 
         val expectedForespørsel = PersonObserver.TrengerArbeidsgiveropplysningerEvent(
             organisasjonsnummer = ORGNUMMER,
@@ -75,8 +75,8 @@ internal class OppdaterteArbeidsgiveropplysningerTest: AbstractEndToEndTest() {
     @Test
     fun `Sender ny forespørsel når korrigerende søknad kommer før vi har fått svar på forrige forespørsel -- flytter ikke skjæringstidspunktet`() {
         håndterSykmelding(Sykmeldingsperiode(5.januar, 31.januar))
-        håndterSøknad(Søknad.Søknadsperiode.Sykdom(5.januar, 31.januar, 100.prosent), egenmeldinger = listOf(Søknad.Søknadsperiode.Arbeidsgiverdag(1.januar, 1.januar)))
-        håndterSøknad(Søknad.Søknadsperiode.Sykdom(5.januar, 31.januar, 100.prosent), egenmeldinger = listOf(Søknad.Søknadsperiode.Arbeidsgiverdag(1.januar, 2.januar)))
+        håndterSøknad(Søknad.Søknadsperiode.Sykdom(5.januar, 31.januar, 100.prosent), egenmeldinger = listOf(1.januar til 1.januar))
+        håndterSøknad(Søknad.Søknadsperiode.Sykdom(5.januar, 31.januar, 100.prosent), egenmeldinger = listOf(1.januar til 2.januar))
 
         val expectedForespørsel = PersonObserver.TrengerArbeidsgiveropplysningerEvent(
             organisasjonsnummer = ORGNUMMER,
@@ -107,7 +107,7 @@ internal class OppdaterteArbeidsgiveropplysningerTest: AbstractEndToEndTest() {
     @Test
     fun `Korrigerende søknad fjerner ikke egenmeldingsdager, er det tiltenkt`() {
         håndterSykmelding(Sykmeldingsperiode(2.januar, 31.januar))
-        håndterSøknad(Søknad.Søknadsperiode.Sykdom(2.januar, 31.januar, 100.prosent), egenmeldinger = listOf(Søknad.Søknadsperiode.Arbeidsgiverdag(1.januar, 1.januar)))
+        håndterSøknad(Søknad.Søknadsperiode.Sykdom(2.januar, 31.januar, 100.prosent), egenmeldinger = listOf(1.januar til 1.januar))
         håndterSøknad(Søknad.Søknadsperiode.Sykdom(2.januar, 31.januar, 100.prosent))
 
         val actualForespørsel = observatør.trengerArbeidsgiveropplysningerVedtaksperioder.last()

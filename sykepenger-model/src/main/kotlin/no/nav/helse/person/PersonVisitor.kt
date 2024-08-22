@@ -33,8 +33,8 @@ import no.nav.helse.utbetalingslinjer.Utbetaling
 import no.nav.helse.utbetalingslinjer.UtbetalingVisitor
 import no.nav.helse.utbetalingstidslinje.Feriepengeberegner
 import no.nav.helse.utbetalingstidslinje.UtbetalingsdagVisitor
-import no.nav.helse.økonomi.Inntekt
 import no.nav.helse.økonomi.Avviksprosent
+import no.nav.helse.økonomi.Inntekt
 import no.nav.helse.økonomi.Prosentdel
 
 internal interface PersonVisitor : AlderVisitor, ArbeidsgiverVisitor, AktivitetsloggVisitor, VilkårsgrunnlagHistorikkVisitor, InfotrygdhistorikkVisitor {
@@ -383,7 +383,8 @@ internal interface VedtaksperiodeVisitor : BehandlingerVisitor, UtbetalingsdagVi
         periode: Periode,
         opprinneligPeriode: Periode,
         skjæringstidspunkt: LocalDate,
-        hendelseIder: Set<Dokumentsporing>
+        hendelseIder: Set<Dokumentsporing>,
+        egenmeldingsperioder: List<Periode>
     ) {}
 
     fun postVisitVedtaksperiode(

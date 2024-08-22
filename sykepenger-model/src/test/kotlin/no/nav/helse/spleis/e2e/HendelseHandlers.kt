@@ -17,8 +17,8 @@ import no.nav.helse.hendelser.Dagtype
 import no.nav.helse.hendelser.GradertPeriode
 import no.nav.helse.hendelser.Hendelse
 import no.nav.helse.hendelser.Infotrygdendring
-import no.nav.helse.hendelser.InntekterForOpptjeningsvurdering
 import no.nav.helse.hendelser.InntektForSykepengegrunnlag
+import no.nav.helse.hendelser.InntekterForOpptjeningsvurdering
 import no.nav.helse.hendelser.Inntektsmelding
 import no.nav.helse.hendelser.InntektsmeldingerReplay
 import no.nav.helse.hendelser.Institusjonsopphold
@@ -426,7 +426,7 @@ internal fun AbstractEndToEndTest.håndterSøknad(
     opprinneligSendt: LocalDate? = null,
     merknaderFraSykmelding: List<Søknad.Merknad> = emptyList(),
     permittert: Boolean = false,
-    egenmeldinger: List<Søknadsperiode.Arbeidsgiverdag> = emptyList()
+    egenmeldinger: List<Periode> = emptyList()
 ): UUID {
     håndterOgReplayInntektsmeldinger(orgnummer) {
         søknad(

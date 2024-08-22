@@ -21,6 +21,7 @@ import no.nav.helse.hendelser.OverstyrArbeidsgiveropplysninger
 import no.nav.helse.hendelser.OverstyrSykepengegrunnlag
 import no.nav.helse.hendelser.OverstyrTidslinje
 import no.nav.helse.hendelser.Periode
+import no.nav.helse.hendelser.Periode.Companion.grupperSammenhengendePerioderMedHensynTilHelg
 import no.nav.helse.hendelser.Periode.Companion.periode
 import no.nav.helse.hendelser.PersonHendelse
 import no.nav.helse.hendelser.Påminnelse
@@ -32,6 +33,7 @@ import no.nav.helse.hendelser.Vilkårsgrunnlag
 import no.nav.helse.hendelser.Ytelser
 import no.nav.helse.hendelser.Ytelser.Companion.familieYtelserPeriode
 import no.nav.helse.hendelser.inntektsmelding.DagerFraInntektsmelding
+import no.nav.helse.hendelser.til
 import no.nav.helse.hendelser.utbetaling.AnnullerUtbetaling
 import no.nav.helse.hendelser.utbetaling.UtbetalingHendelse
 import no.nav.helse.hendelser.utbetaling.Utbetalingsavgjørelse
@@ -135,6 +137,7 @@ internal class Vedtaksperiode private constructor(
     private val organisasjonsnummer: String,
     private var tilstand: Vedtaksperiodetilstand,
     private val behandlinger: Behandlinger,
+    private var egenmeldingsperioder: List<Periode>,
     private val opprettet: LocalDateTime,
     private var oppdatert: LocalDateTime = opprettet,
     private val arbeidsgiverjurist: MaskinellJurist
@@ -160,6 +163,7 @@ internal class Vedtaksperiode private constructor(
         organisasjonsnummer = organisasjonsnummer,
         tilstand = Start,
         behandlinger = Behandlinger(),
+        egenmeldingsperioder = emptyList(),
         opprettet = LocalDateTime.now(),
         arbeidsgiverjurist = jurist
     ) {
@@ -191,7 +195,8 @@ internal class Vedtaksperiode private constructor(
             periode,
             sykmeldingsperiode,
             skjæringstidspunkt,
-            behandlinger.hendelseIder()
+            behandlinger.hendelseIder(),
+            egenmeldingsperioder
         )
         sykdomstidslinje.accept(visitor)
         behandlinger.accept(visitor)
@@ -585,7 +590,12 @@ internal class Vedtaksperiode private constructor(
         behandlinger.håndterEndring(person, arbeidsgiver, hendelse, person.beregnSkjæringstidspunkt(), arbeidsgiver.beregnArbeidsgiverperiode(), validering)
     }
 
+    private fun håndterEgenmeldingsperioder(søknad: Søknad) {
+        egenmeldingsperioder = (egenmeldingsperioder + søknad.egenmeldingsperioder()).grupperSammenhengendePerioderMedHensynTilHelg()
+    }
+
     private fun håndterSøknad(søknad: Søknad, nesteTilstand: () -> Vedtaksperiodetilstand? = { null }) {
+        håndterEgenmeldingsperioder(søknad)
         oppdaterHistorikk(søknad) {
             søknad.valider(vilkårsgrunnlag, jurist)
         }
@@ -608,6 +618,7 @@ internal class Vedtaksperiode private constructor(
         if (søknad.sendtTilGosys()) return søknad.funksjonellFeil(RV_SØ_30)
         if (søknad.utenlandskSykmelding()) return søknad.funksjonellFeil(RV_SØ_29)
         else {
+            håndterEgenmeldingsperioder(søknad)
             søknad.info("Søknad har trigget en revurdering")
             oppdaterHistorikk(søknad) {
                 søknad.valider(vilkårsgrunnlag, jurist)
@@ -2705,6 +2716,7 @@ internal class Vedtaksperiode private constructor(
                     VedtaksperiodetilstandDto.TIL_UTBETALING -> TilUtbetaling
                 },
                 behandlinger = Behandlinger.gjenopprett(dto.behandlinger, grunnlagsdata, utbetalinger, arbeidsgiver.migrerArbeidsgiverperiode()),
+                egenmeldingsperioder = dto.egenmeldingsperioder.map { egenmeldingsperiode -> egenmeldingsperiode.fom til egenmeldingsperiode.tom },
                 opprettet = dto.opprettet,
                 oppdatert = dto.oppdatert,
                 arbeidsgiverjurist = arbeidsgiverjurist
@@ -2761,6 +2773,7 @@ internal class Vedtaksperiode private constructor(
         sykmeldingTom = this.sykmeldingsperiode.endInclusive,
         behandlinger = behandlinger.dto(),
         venteårsak = LazyVedtaksperiodeVenterDto { nestemann?.let { tilstand.venter(this, arbeidsgivere, it)?.dto() } },
+        egenmeldingsdager = egenmeldingsperioder.map { it.dto() },
         opprettet = opprettet,
         oppdatert = oppdatert
     )

@@ -16,8 +16,8 @@ import no.nav.helse.hendelser.Dagpenger
 import no.nav.helse.hendelser.Dagtype
 import no.nav.helse.hendelser.Foreldrepenger
 import no.nav.helse.hendelser.GradertPeriode
-import no.nav.helse.hendelser.InntekterForOpptjeningsvurdering
 import no.nav.helse.hendelser.InntektForSykepengegrunnlag
+import no.nav.helse.hendelser.InntekterForOpptjeningsvurdering
 import no.nav.helse.hendelser.Inntektsmelding
 import no.nav.helse.hendelser.Institusjonsopphold
 import no.nav.helse.hendelser.ManuellOverskrivingDag
@@ -139,7 +139,7 @@ internal fun AbstractEndToEndTest.søknad(
     opprinneligSendt: LocalDate? = null,
     merknaderFraSykmelding: List<Søknad.Merknad> = emptyList(),
     permittert: Boolean = false,
-    egenmeldinger: List<Søknadsperiode.Arbeidsgiverdag> = emptyList()
+    egenmeldinger: List<Periode> = emptyList()
 ) = ArbeidsgiverHendelsefabrikk(AKTØRID, fnr, orgnummer).lagSøknad(
     id = id,
     perioder = perioder,

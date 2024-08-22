@@ -92,7 +92,7 @@ internal class UtbetalingTest : AbstractEndToEndTest() {
 
         håndterSøknad(
             Sykdom(1.desember, 31.desember, 10.prosent),
-            egenmeldinger = listOf(Søknad.Søknadsperiode.Arbeidsgiverdag(13.november, 14.november))
+            egenmeldinger = listOf(13.november til 14.november)
         )
         håndterInntektsmelding(listOf(1.desember til 16.desember))
         håndterVilkårsgrunnlag(2.vedtaksperiode)

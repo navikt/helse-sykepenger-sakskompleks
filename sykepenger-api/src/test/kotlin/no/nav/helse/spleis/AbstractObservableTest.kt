@@ -11,8 +11,8 @@ import no.nav.helse.hendelser.ArbeidsgiverInntekt
 import no.nav.helse.hendelser.Dagpenger
 import no.nav.helse.hendelser.Foreldrepenger
 import no.nav.helse.hendelser.GradertPeriode
-import no.nav.helse.hendelser.InntekterForOpptjeningsvurdering
 import no.nav.helse.hendelser.InntektForSykepengegrunnlag
+import no.nav.helse.hendelser.InntekterForOpptjeningsvurdering
 import no.nav.helse.hendelser.Inntektsmelding
 import no.nav.helse.hendelser.Institusjonsopphold
 import no.nav.helse.hendelser.Medlemskapsvurdering
@@ -86,7 +86,7 @@ internal abstract class AbstractObservableTest {
         orgnummer: String = ORGNUMMER,
         sykmeldingSkrevet: LocalDateTime = FOM.atStartOfDay(),
         fnr: String = UNG_PERSON_FNR,
-        egenmeldinger: List<Søknadsperiode.Arbeidsgiverdag> = emptyList()
+        egenmeldinger: List<Periode> = emptyList()
     ): Søknad = Søknad(
         meldingsreferanseId = id,
         fnr = fnr,

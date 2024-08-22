@@ -287,7 +287,7 @@ internal class SøknadTest {
         merknaderFraSykmelding: List<Merknad> = emptyList(),
         hendelsefabrikk: ArbeidsgiverHendelsefabrikk = ungPersonFnr2018Hendelsefabrikk,
         sendtTilNAVEllerArbeidsgiver: LocalDate? = null,
-        egenmeldinger: List<Søknadsperiode.Arbeidsgiverdag> = emptyList(),
+        egenmeldinger: List<Periode> = emptyList(),
         ikkeJobbetIDetSisteFraAnnetArbeidsforhold: Boolean = false
     ) {
         aktivitetslogg = Aktivitetslogg()

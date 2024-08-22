@@ -17,7 +17,6 @@ import no.nav.helse.hendelser.Avsender
 import no.nav.helse.hendelser.Dagtype
 import no.nav.helse.hendelser.ManuellOverskrivingDag
 import no.nav.helse.hendelser.Sykmeldingsperiode
-import no.nav.helse.hendelser.Søknad.Søknadsperiode.Arbeidsgiverdag
 import no.nav.helse.hendelser.Søknad.Søknadsperiode.Ferie
 import no.nav.helse.hendelser.Søknad.Søknadsperiode.Permisjon
 import no.nav.helse.hendelser.Søknad.Søknadsperiode.Sykdom
@@ -336,7 +335,7 @@ internal class BehandlingerE2ETest : AbstractDslTest() {
     @Test
     fun `ny periode som starter med egenmeldinger påvirker ikke sykmeldingsperiode`() {
         a1 {
-            håndterSøknad(Sykdom(3.januar, 17.januar, 100.prosent), egenmeldinger = listOf(Arbeidsgiverdag(1.januar, 2.januar)))
+            håndterSøknad(Sykdom(3.januar, 17.januar, 100.prosent), egenmeldinger = listOf(1.januar til 2.januar))
             inspektør(1.vedtaksperiode).behandlinger.also { behandlinger ->
                 assertEquals(1, behandlinger.size)
                 assertEquals(2, behandlinger.single().endringer.size)

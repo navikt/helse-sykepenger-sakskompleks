@@ -12,24 +12,23 @@ import no.nav.helse.dsl.TestPerson.Companion.INNTEKT
 import no.nav.helse.dsl.TestPerson.Companion.UNG_PERSON_FDATO_2018
 import no.nav.helse.dsl.TestPerson.Companion.UNG_PERSON_FNR_2018
 import no.nav.helse.dsl.lagStandardSykepengegrunnlag
-import no.nav.helse.dto.serialisering.ArbeidsgiverUtDto
 import no.nav.helse.dto.AvsenderDto
 import no.nav.helse.dto.BegrunnelseDto
 import no.nav.helse.dto.DokumenttypeDto
 import no.nav.helse.dto.InntektDto
 import no.nav.helse.dto.InntektbeløpDto
-import no.nav.helse.dto.serialisering.InntektsopplysningUtDto
 import no.nav.helse.dto.ProsentdelDto
 import no.nav.helse.dto.SykdomstidslinjeDagDto
-import no.nav.helse.dto.serialisering.UtbetalingsdagUtDto
 import no.nav.helse.dto.VedtaksperiodetilstandDto
+import no.nav.helse.dto.serialisering.ArbeidsgiverUtDto
+import no.nav.helse.dto.serialisering.InntektsopplysningUtDto
+import no.nav.helse.dto.serialisering.UtbetalingsdagUtDto
 import no.nav.helse.dto.serialisering.VilkårsgrunnlaghistorikkUtDto
 import no.nav.helse.erHelg
 import no.nav.helse.etterlevelse.Subsumsjonslogg.Companion.NullObserver
 import no.nav.helse.februar
 import no.nav.helse.hendelser.Inntektsmelding
 import no.nav.helse.hendelser.Sykmeldingsperiode
-import no.nav.helse.hendelser.Søknad
 import no.nav.helse.hendelser.Søknad.Søknadsperiode.Arbeid
 import no.nav.helse.hendelser.Søknad.Søknadsperiode.Sykdom
 import no.nav.helse.hendelser.Vilkårsgrunnlag
@@ -114,9 +113,11 @@ internal class PersonDataBuilderTest : AbstractDslTest() {
             håndterSykmelding(Sykmeldingsperiode(1.august, 5.august))
         }
         a2 {
-            håndterSøknad(Sykdom(3.februar, 28.februar, 100.prosent), Arbeid(21.februar, 28.februar), egenmeldinger = listOf(
-                Søknad.Søknadsperiode.Arbeidsgiverdag(1.februar, 2.februar)
-            ), sendtTilNAVEllerArbeidsgiver = 1.juni)
+            håndterSøknad(
+                Sykdom(3.februar, 28.februar, 100.prosent), Arbeid(21.februar, 28.februar),
+                egenmeldinger = listOf(1.februar til 2.februar),
+                sendtTilNAVEllerArbeidsgiver = 1.juni
+            )
             håndterInntektsmeldingPortal(listOf(1.februar til 16.februar), inntektsdato = 1.februar, førsteFraværsdag = 1.februar)
             håndterVilkårsgrunnlag(1.vedtaksperiode)
             håndterYtelser(1.vedtaksperiode)

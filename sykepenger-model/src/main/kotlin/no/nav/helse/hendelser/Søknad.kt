@@ -56,7 +56,7 @@ class Søknad(
     private val arbeidUtenforNorge: Boolean,
     private val sendTilGosys: Boolean,
     private val yrkesskade: Boolean,
-    egenmeldinger: List<Søknadsperiode.Arbeidsgiverdag>,
+    private val egenmeldinger: List<Periode>,
     private val søknadstype: Søknadstype,
     aktivitetslogg: Aktivitetslogg = Aktivitetslogg(),
     private val registrert: LocalDateTime
@@ -75,6 +75,7 @@ class Søknad(
         sykdomsperiode = Søknadsperiode.sykdomsperiode(perioder) ?: logiskFeil("Søknad inneholder ikke sykdomsperioder")
         if (perioder.inneholderDagerEtter(sykdomsperiode.endInclusive)) logiskFeil("Søknad inneholder dager etter siste sykdomsdag")
         val egenmeldingstidslinje = egenmeldinger
+            .map { Søknadsperiode.Arbeidsgiverdag(it.start, it.endInclusive) }
             .map { it.sykdomstidslinje(sykdomsperiode, avskjæringsdato(), kilde) }
             .merge(Dagturnering.SØKNAD::beste)
             .fremTilOgMed(sykdomsperiode.endInclusive)
@@ -93,6 +94,10 @@ class Søknad(
 
     override fun sykdomstidslinje(): Sykdomstidslinje {
         return sykdomstidslinje
+    }
+
+    internal fun egenmeldingsperioder(): List<Periode> {
+        return egenmeldinger
     }
 
     override fun trimSykdomstidslinje(fom: LocalDate) {

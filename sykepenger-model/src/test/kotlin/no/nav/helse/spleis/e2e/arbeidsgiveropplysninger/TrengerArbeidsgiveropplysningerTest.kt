@@ -165,7 +165,7 @@ internal class TrengerArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
         assertEquals(1, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.count { it.organisasjonsnummer == a1 })
         assertEquals(2, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.count { it.organisasjonsnummer == a2 })
 
-        håndterInntektsmelding(listOf(1.februar til 16.februar), orgnummer = a2,)
+        håndterInntektsmelding(listOf(1.februar til 16.februar), orgnummer = a2)
 
         assertEquals(2, observatør.inntektsmeldingHåndtert.size)
         assertEquals(1, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.count { it.organisasjonsnummer == a1 })
@@ -185,7 +185,7 @@ internal class TrengerArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
     fun `auu håndterer dager før forlengelsen håndterer inntekt`() {
         håndterSøknad(Sykdom(1.januar, 15.januar, 100.prosent), Ferie(1.januar, 11.januar))
         håndterSøknad(Sykdom(16.januar, 29.januar, 100.prosent), Ferie(16.januar, 16.januar))
-        håndterInntektsmelding(listOf(12.januar til 27.januar),)
+        håndterInntektsmelding(listOf(12.januar til 27.januar))
         assertEquals(1, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.size)
         assertEquals(2.vedtaksperiode.id(ORGNUMMER), observatør.trengerArbeidsgiveropplysningerVedtaksperioder.single().vedtaksperiodeId)
     }
@@ -465,7 +465,7 @@ internal class TrengerArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
         håndterSykmelding(Sykmeldingsperiode(20.januar, 25.januar))
         håndterSøknad(Sykdom(20.januar, 25.januar, 100.prosent))
 
-        håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        håndterInntektsmelding(listOf(1.januar til 16.januar))
 
         val trengerArbeidsgiveropplysningerEvent = observatør.trengerArbeidsgiveropplysningerVedtaksperioder.last()
         assertFalse(trengerArbeidsgiveropplysningerEvent.forespurteOpplysninger.contains(PersonObserver.Arbeidsgiverperiode))
@@ -474,7 +474,7 @@ internal class TrengerArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
     @Test
     fun `blir syk fra ghost`() {
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent), orgnummer = a1)
-        håndterInntektsmelding(listOf(1.januar til 16.januar), orgnummer = a1,)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), orgnummer = a1)
         håndterVilkårsgrunnlag(1.vedtaksperiode,
             inntektsvurderingForSykepengegrunnlag = InntektForSykepengegrunnlag(inntektperioderForSykepengegrunnlag {
                 1.oktober(2017) til 1.desember(2017) inntekter {
@@ -612,7 +612,7 @@ internal class TrengerArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
 
     @Test
     fun `Skal ikke sende ut forespørsel for en periode som allerede har mottatt inntektsmelding`() {
-        håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        håndterInntektsmelding(listOf(1.januar til 16.januar))
         nyPeriode(januar)
         assertEquals(0, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.size)
     }
@@ -621,7 +621,7 @@ internal class TrengerArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
     fun `Periode etter kort gap skal ikke sende forespørsel dersom inntektsmeldingen allerede er mottatt`() {
         nyttVedtak(januar)
 
-        håndterInntektsmelding(listOf(1.januar til 16.januar), førsteFraværsdag = 10.februar,)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), førsteFraværsdag = 10.februar)
         håndterSykmelding(Sykmeldingsperiode(10.februar, 5.mars))
         håndterSøknad(Sykdom(10.februar, 5.mars, sykmeldingsgrad = 100.prosent))
 
@@ -630,14 +630,14 @@ internal class TrengerArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
 
     @Test
     fun `Skal ikke sende ut forespørsel for en periode som allerede har mottatt inntektsmelding -- selv om håndteringen feiler`() {
-        håndterInntektsmelding(listOf(1.januar til 16.januar), harOpphørAvNaturalytelser = true,)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), harOpphørAvNaturalytelser = true)
         nyPeriode(januar)
         assertEquals(0, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.size)
     }
 
     @Test
     fun `Skal sende ut forespørsel for en periode dersom inntektsmeldingReplay ikke bærer noen frukter`() {
-        håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        håndterInntektsmelding(listOf(1.januar til 16.januar))
         nyPeriode(februar)
         assertEquals(1, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.size)
     }
@@ -645,9 +645,7 @@ internal class TrengerArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
     @Test
     fun `Skal sende egenmeldingsdager fra søknad i forespørsel`() {
         håndterSykmelding(Sykmeldingsperiode(5.januar, 31.januar))
-        håndterSøknad(Sykdom(5.januar, 31.januar, 100.prosent), egenmeldinger = listOf(
-            Søknad.Søknadsperiode.Arbeidsgiverdag(1.januar, 4.januar)
-        ))
+        håndterSøknad(Sykdom(5.januar, 31.januar, 100.prosent), egenmeldinger = listOf(1.januar til 4.januar))
 
         val expectedEgenmeldinger = listOf(1.januar til 4.januar)
         assertEquals(expectedEgenmeldinger, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.last().egenmeldingsperioder)
@@ -656,9 +654,7 @@ internal class TrengerArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
     @Test
     fun `Sender med egenmeldingsdager fra kort søknad`() {
         håndterSykmelding(Sykmeldingsperiode(5.januar, 10.januar))
-        håndterSøknad(Sykdom(5.januar, 10.januar, 100.prosent), egenmeldinger = listOf(
-            Søknad.Søknadsperiode.Arbeidsgiverdag(4.januar, 4.januar)
-        ))
+        håndterSøknad(Sykdom(5.januar, 10.januar, 100.prosent), egenmeldinger = listOf(4.januar til 4.januar))
         nyPeriode(11.januar til 31.januar)
 
         val expectedEgenmeldinger = listOf(4.januar til 4.januar)
@@ -831,7 +827,7 @@ internal class TrengerArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
         nyPeriode(1.januar til 2.januar)
         nyPeriode(3.januar til 6.januar)
 
-        håndterInntektsmelding(emptyList(), begrunnelseForReduksjonEllerIkkeUtbetalt = "ManglerOpptjening",)
+        håndterInntektsmelding(emptyList(), begrunnelseForReduksjonEllerIkkeUtbetalt = "ManglerOpptjening")
         assertEquals(0, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.size)
         assertEquals(0, observatør.trengerIkkeArbeidsgiveropplysningerVedtaksperioder.size)
     }
@@ -857,7 +853,7 @@ internal class TrengerArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
     @Test
     fun `Kort periode som blir lang pga korrigerende søknad med egenmeldingsdager skal sende ut forespørsel`() {
         nyPeriode(2.januar til 17.januar)
-        håndterSøknad(Sykdom(2.januar, 17.januar, 100.prosent), egenmeldinger = listOf(Søknad.Søknadsperiode.Arbeidsgiverdag(1.januar, 1.januar)))
+        håndterSøknad(Sykdom(2.januar, 17.januar, 100.prosent), egenmeldinger = listOf(1.januar til 1.januar))
 
         val expectedForespørsel = PersonObserver.TrengerArbeidsgiveropplysningerEvent(
             organisasjonsnummer = ORGNUMMER,
@@ -903,7 +899,7 @@ internal class TrengerArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
         håndterSykmelding(Sykmeldingsperiode(20.januar, 31.januar))
         håndterSøknad(
             Sykdom(20.januar, 31.januar, 100.prosent),
-            egenmeldinger = listOf(Søknad.Søknadsperiode.Arbeidsgiverdag(19.januar, 19.januar))
+            egenmeldinger = listOf(19.januar til 19.januar)
         )
         håndterInntektsmeldingPortal(emptyList(), inntektsdato = 20.januar, førsteFraværsdag = 20.januar)
         håndterVilkårsgrunnlag(2.vedtaksperiode)

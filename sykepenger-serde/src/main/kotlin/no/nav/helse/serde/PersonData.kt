@@ -692,7 +692,8 @@ data class PersonData(
             val skjæringstidspunkt: LocalDate,
             val behandlinger: List<BehandlingData>,
             val opprettet: LocalDateTime,
-            val oppdatert: LocalDateTime
+            val oppdatert: LocalDateTime,
+            val egenmeldingsperioder: List<PeriodeData>
         ) {
             enum class TilstandTypeData {
                 AVVENTER_HISTORIKK,
@@ -738,6 +739,7 @@ data class PersonData(
                     TilstandTypeData.AVVENTER_GODKJENNING_REVURDERING -> VedtaksperiodetilstandDto.AVVENTER_GODKJENNING_REVURDERING
                 },
                 behandlinger = BehandlingerInnDto(this.behandlinger.map { it.tilDto() }),
+                egenmeldingsperioder = egenmeldingsperioder.map { it.tilDto() },
                 opprettet = opprettet,
                 oppdatert = oppdatert
             )

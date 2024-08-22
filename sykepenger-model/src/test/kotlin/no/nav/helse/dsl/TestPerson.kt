@@ -16,8 +16,8 @@ import no.nav.helse.etterlevelse.MaskinellJurist
 import no.nav.helse.februar
 import no.nav.helse.hendelser.ArbeidsgiverInntekt
 import no.nav.helse.hendelser.GradertPeriode
-import no.nav.helse.hendelser.InntekterForOpptjeningsvurdering
 import no.nav.helse.hendelser.InntektForSykepengegrunnlag
+import no.nav.helse.hendelser.InntekterForOpptjeningsvurdering
 import no.nav.helse.hendelser.Inntektsmelding
 import no.nav.helse.hendelser.ManuellOverskrivingDag
 import no.nav.helse.hendelser.Medlemskapsvurdering
@@ -173,7 +173,7 @@ internal class TestPerson(
 
         internal fun håndterSøknad(
             vararg perioder: Søknad.Søknadsperiode,
-            egenmeldinger: List<Søknad.Søknadsperiode.Arbeidsgiverdag> = emptyList(),
+            egenmeldinger: List<Periode> = emptyList(),
             andreInntektskilder: Boolean = false,
             arbeidUtenforNorge: Boolean = false,
             yrkesskade: Boolean = false,

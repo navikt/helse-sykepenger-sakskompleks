@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ArrayNode
 import java.time.LocalDate
 import no.nav.helse.hendelser.Periode.Companion.grupperSammenhengendePerioderMedHensynTilHelg
-import no.nav.helse.hendelser.Søknad
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.asLocalDate
@@ -31,7 +30,6 @@ internal class SendtSøknadNavMessage(packet: JsonMessage, private val builder: 
                 .takeIf(JsonNode::isArray)
                 ?.map { LocalDate.parse(it.asText()) }
                 ?.grupperSammenhengendePerioderMedHensynTilHelg()
-                ?.map { Søknad.Søknadsperiode.Arbeidsgiverdag(it.start, it.endInclusive) }
                 ?: emptyList()
             )
             packet["merknaderFraSykmelding"].takeIf(JsonNode::isArray)?.forEach {

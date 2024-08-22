@@ -3,9 +3,9 @@ package no.nav.helse.inspectors
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
+import no.nav.helse.dto.SimuleringResultatDto
 import no.nav.helse.hendelser.Periode
 import no.nav.helse.hendelser.Periode.Companion.grupperSammenhengendePerioder
-import no.nav.helse.dto.SimuleringResultatDto
 import no.nav.helse.person.Arbeidsgiver
 import no.nav.helse.person.Dokumentsporing
 import no.nav.helse.person.Dokumentsporing.Companion.ider
@@ -29,9 +29,9 @@ import no.nav.helse.utbetalingslinjer.Oppdrag
 import no.nav.helse.utbetalingslinjer.Oppdragstatus
 import no.nav.helse.utbetalingslinjer.Satstype
 import no.nav.helse.utbetalingslinjer.Utbetaling
-import no.nav.helse.utbetalingslinjer.Utbetalingtype
 import no.nav.helse.utbetalingslinjer.Utbetalingslinje
 import no.nav.helse.utbetalingslinjer.Utbetalingstatus
+import no.nav.helse.utbetalingslinjer.Utbetalingtype
 import no.nav.helse.utbetalingstidslinje.Utbetalingstidslinje
 import org.junit.jupiter.api.fail
 
@@ -139,7 +139,8 @@ internal class TestArbeidsgiverInspektør(
         periode: Periode,
         opprinneligPeriode: Periode,
         skjæringstidspunkt: LocalDate,
-        hendelseIder: Set<Dokumentsporing>
+        hendelseIder: Set<Dokumentsporing>,
+        egenmeldingsperioder: List<Periode>
     ) {
         inVedtaksperiode = true
         vedtaksperiodeTeller += 1
@@ -369,7 +370,8 @@ internal class TestArbeidsgiverInspektør(
             periode: Periode,
             opprinneligPeriode: Periode,
             skjæringstidspunkt: LocalDate,
-            hendelseIder: Set<Dokumentsporing>
+            hendelseIder: Set<Dokumentsporing>,
+            egenmeldingsperioder: List<Periode>
         ) {
             vedtaksperiodeId = id
         }
