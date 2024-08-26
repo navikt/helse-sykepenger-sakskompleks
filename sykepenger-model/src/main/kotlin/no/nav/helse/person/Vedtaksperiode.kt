@@ -2548,7 +2548,11 @@ internal class Vedtaksperiode private constructor(
             return vedtaksperioder.map { it.sykmeldingsperiode }
         }
         private fun egenmeldingsperioder(vedtaksperioder: List<Vedtaksperiode>): List<Periode> {
-            return vedtaksperioder.map { it.sykdomstidslinje }.merge().egenmeldingerFraSøknad()
+            if (Toggle.EgenmeldingStrekkerIkkeSykdomstidslinje.enabled) {
+                return vedtaksperioder.flatMap { it.egenmeldingsperioder }
+            } else {
+                return vedtaksperioder.map { it.sykdomstidslinje }.merge().egenmeldingerFraSøknad()
+            }
         }
 
         internal fun List<Vedtaksperiode>.beregnSkjæringstidspunkter(beregnSkjæringstidspunkt: () -> Skjæringstidspunkt, beregnArbeidsgiverperiode: (Periode) -> List<Periode>) {

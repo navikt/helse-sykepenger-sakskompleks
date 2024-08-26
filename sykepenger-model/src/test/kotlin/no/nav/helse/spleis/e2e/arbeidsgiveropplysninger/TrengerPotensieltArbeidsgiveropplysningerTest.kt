@@ -1,5 +1,6 @@
 package no.nav.helse.spleis.e2e.arbeidsgiveropplysninger
 
+import no.nav.helse.Toggle
 import no.nav.helse.februar
 import no.nav.helse.hendelser.Sykmeldingsperiode
 import no.nav.helse.hendelser.Søknad
@@ -146,7 +147,7 @@ internal class TrengerPotensieltArbeidsgiveropplysningerTest : AbstractEndToEndT
     }
 
     @Test
-    fun `Skal ikke sende med egenmeldingsdager etter vedtaksperioden sin potensielle forespørsel`() {
+    fun `Skal ikke sende med egenmeldingsdager etter vedtaksperioden sin potensielle forespørsel`() = Toggle.EgenmeldingStrekkerIkkeSykdomstidslinje.enable {
         håndterSykmelding(Sykmeldingsperiode(10.januar, 16.januar))
         håndterSøknad(Sykdom(10.januar, 16.januar, 100.prosent), egenmeldinger = listOf(9.januar til 9.januar))
         håndterSykmelding(Sykmeldingsperiode(2.januar, 5.januar))

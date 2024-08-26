@@ -90,11 +90,9 @@ internal class UtbetalingTest : AbstractEndToEndTest() {
     fun `Utbetaling med stort gap kobles ikke sammen med forrige utbetaling -- når snutete egenmeldingsdager og denne utbetalingen ikke har penger`() {
         nyttVedtak(januar)
 
-        håndterSøknad(
-            Sykdom(1.desember, 31.desember, 10.prosent),
-            egenmeldinger = listOf(13.november til 14.november)
-        )
-        håndterInntektsmelding(listOf(1.desember til 16.desember))
+        håndterSøknad(Sykdom(1.desember, 31.desember, 10.prosent))
+
+        håndterInntektsmelding(listOf(13.november til 14.november, 1.desember til 14.desember))
         håndterVilkårsgrunnlag(2.vedtaksperiode)
         håndterYtelser(2.vedtaksperiode)
 

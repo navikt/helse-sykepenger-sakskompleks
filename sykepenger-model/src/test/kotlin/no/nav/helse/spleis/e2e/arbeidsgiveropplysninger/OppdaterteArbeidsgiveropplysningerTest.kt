@@ -105,24 +105,6 @@ internal class OppdaterteArbeidsgiveropplysningerTest: AbstractEndToEndTest() {
     }
 
     @Test
-    fun `Korrigerende søknad fjerner ikke egenmeldingsdager, er det tiltenkt`() {
-        håndterSykmelding(Sykmeldingsperiode(2.januar, 31.januar))
-        håndterSøknad(Søknad.Søknadsperiode.Sykdom(2.januar, 31.januar, 100.prosent), egenmeldinger = listOf(1.januar til 1.januar))
-        håndterSøknad(Søknad.Søknadsperiode.Sykdom(2.januar, 31.januar, 100.prosent))
-
-        val actualForespørsel = observatør.trengerArbeidsgiveropplysningerVedtaksperioder.last()
-        assertForventetFeil(
-            forklaring = "Vi fjerner ikke egenmeldingsdager dersom korrigerende søknad ikke har egenmeldinger, er dette tiltenkt?",
-            nå = {
-                assertEquals(listOf(1.januar til 1.januar), actualForespørsel.egenmeldingsperioder)
-            },
-            ønsket = {
-                Assertions.fail("""\_(ツ)_/¯""")
-            }
-        )
-    }
-
-    @Test
     fun `Søknad fra annen arbeidsgiver flytter skjæringstidspunktet i AVVENTER_INNTEKTSMELDING`() {
         nyPeriode(2.januar til 31.januar, orgnummer = a1)
         nyPeriode(januar, orgnummer = a2)

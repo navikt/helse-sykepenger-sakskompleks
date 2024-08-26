@@ -2,6 +2,7 @@ package no.nav.helse.spleis.e2e.arbeidsgiveropplysninger
 
 import java.time.LocalDate
 import java.util.UUID
+import no.nav.helse.Toggle
 import no.nav.helse.april
 import no.nav.helse.assertForventetFeil
 import no.nav.helse.desember
@@ -17,6 +18,7 @@ import no.nav.helse.hendelser.Søknad.Søknadsperiode.Sykdom
 import no.nav.helse.hendelser.Vilkårsgrunnlag
 import no.nav.helse.hendelser.Vilkårsgrunnlag.Arbeidsforhold.Arbeidsforholdtype
 import no.nav.helse.hendelser.til
+import no.nav.helse.inspectors.inspektør
 import no.nav.helse.januar
 import no.nav.helse.mars
 import no.nav.helse.oktober
@@ -38,6 +40,7 @@ import no.nav.helse.spleis.e2e.AbstractEndToEndTest
 import no.nav.helse.spleis.e2e.AktivitetsloggFilter
 import no.nav.helse.spleis.e2e.OverstyrtArbeidsgiveropplysning
 import no.nav.helse.spleis.e2e.assertSisteTilstand
+import no.nav.helse.spleis.e2e.assertTilstand
 import no.nav.helse.spleis.e2e.assertTilstander
 import no.nav.helse.spleis.e2e.assertVarsel
 import no.nav.helse.spleis.e2e.finnSkjæringstidspunkt
@@ -646,6 +649,7 @@ internal class TrengerArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
     fun `Skal sende egenmeldingsdager fra søknad i forespørsel`() {
         håndterSykmelding(Sykmeldingsperiode(5.januar, 31.januar))
         håndterSøknad(Sykdom(5.januar, 31.januar, 100.prosent), egenmeldinger = listOf(1.januar til 4.januar))
+        assertEquals(1.januar til 31.januar, inspektør.vedtaksperioder(1.vedtaksperiode).inspektør.periode)
 
         val expectedEgenmeldinger = listOf(1.januar til 4.januar)
         assertEquals(expectedEgenmeldinger, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.last().egenmeldingsperioder)
@@ -655,7 +659,11 @@ internal class TrengerArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
     fun `Sender med egenmeldingsdager fra kort søknad`() {
         håndterSykmelding(Sykmeldingsperiode(5.januar, 10.januar))
         håndterSøknad(Sykdom(5.januar, 10.januar, 100.prosent), egenmeldinger = listOf(4.januar til 4.januar))
+
         nyPeriode(11.januar til 31.januar)
+
+        val exeptectedVedtaksperiode = if (Toggle.EgenmeldingStrekkerIkkeSykdomstidslinje.enabled) { 5.januar til 10.januar } else { 4.januar til 10.januar }
+        assertEquals(exeptectedVedtaksperiode, inspektør.vedtaksperioder(1.vedtaksperiode).inspektør.periode)
 
         val expectedEgenmeldinger = listOf(4.januar til 4.januar)
         assertEquals(expectedEgenmeldinger, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.last().egenmeldingsperioder)
@@ -855,6 +863,12 @@ internal class TrengerArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
         nyPeriode(2.januar til 17.januar)
         håndterSøknad(Sykdom(2.januar, 17.januar, 100.prosent), egenmeldinger = listOf(1.januar til 1.januar))
 
+        val expectedVedtaksperiodePeriode = if (Toggle.EgenmeldingStrekkerIkkeSykdomstidslinje.enabled) 2.januar til 17.januar else 1.januar til 17.januar
+        assertEquals(expectedVedtaksperiodePeriode, inspektør.vedtaksperioder(1.vedtaksperiode).inspektør.periode)
+
+        val expectedTilstand = if (Toggle.EgenmeldingStrekkerIkkeSykdomstidslinje.enabled) AVSLUTTET_UTEN_UTBETALING else AVVENTER_INNTEKTSMELDING
+        assertTilstand(1.vedtaksperiode, expectedTilstand)
+
         val expectedForespørsel = PersonObserver.TrengerArbeidsgiveropplysningerEvent(
             organisasjonsnummer = ORGNUMMER,
             vedtaksperiodeId = 1.vedtaksperiode.id(ORGNUMMER),
@@ -901,6 +915,8 @@ internal class TrengerArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
             Sykdom(20.januar, 31.januar, 100.prosent),
             egenmeldinger = listOf(19.januar til 19.januar)
         )
+        assertEquals(19.januar til 31.januar, inspektør.vedtaksperioder(1.vedtaksperiode).inspektør.periode)
+
         håndterInntektsmeldingPortal(emptyList(), inntektsdato = 20.januar, førsteFraværsdag = 20.januar)
         håndterVilkårsgrunnlag(2.vedtaksperiode)
         håndterYtelser(2.vedtaksperiode)

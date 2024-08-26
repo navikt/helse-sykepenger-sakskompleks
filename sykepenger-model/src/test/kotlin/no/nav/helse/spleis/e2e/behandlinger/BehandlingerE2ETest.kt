@@ -3,6 +3,7 @@ package no.nav.helse.spleis.e2e.behandlinger
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
+import no.nav.helse.Toggle
 import no.nav.helse.april
 import no.nav.helse.august
 import no.nav.helse.dsl.AbstractDslTest
@@ -333,14 +334,14 @@ internal class BehandlingerE2ETest : AbstractDslTest() {
     }
 
     @Test
-    fun `ny periode som starter med egenmeldinger påvirker ikke sykmeldingsperiode`() {
+    fun `ny periode som starter med egenmeldinger påvirker ikke sykmeldingsperiode`() = Toggle.EgenmeldingStrekkerIkkeSykdomstidslinje.enable {
         a1 {
             håndterSøknad(Sykdom(3.januar, 17.januar, 100.prosent), egenmeldinger = listOf(1.januar til 2.januar))
             inspektør(1.vedtaksperiode).behandlinger.also { behandlinger ->
                 assertEquals(1, behandlinger.size)
                 assertEquals(2, behandlinger.single().endringer.size)
-                assertEquals(1.januar til 17.januar, behandlinger.last().periode)
-                assertEquals(1.januar, behandlinger.last().endringer.last().skjæringstidspunkt)
+                assertEquals(3.januar til 17.januar, behandlinger.first().endringer.first().sykmeldingsperiode)
+                assertEquals(3.januar, behandlinger.last().endringer.last().skjæringstidspunkt)
             }
         }
     }

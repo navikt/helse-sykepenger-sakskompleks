@@ -1,5 +1,6 @@
 package no.nav.helse.spleis.e2e.søknad
 
+import no.nav.helse.Toggle
 import no.nav.helse.assertForventetFeil
 import no.nav.helse.desember
 import no.nav.helse.februar
@@ -26,7 +27,7 @@ import org.junit.jupiter.api.Test
 internal class EgenmeldingerFraSøknadTest : AbstractEndToEndTest() {
 
     @Test
-    fun `legger egenmeldingsdager fra søknad på sykdomstidslinjen`() {
+    fun `legger egenmeldingsdager fra søknad på sykdomstidslinjen`() = Toggle.EgenmeldingStrekkerIkkeSykdomstidslinje.disable {
         håndterSykmelding(Sykmeldingsperiode(2.januar, 31.januar))
         håndterSøknad(Sykdom(2.januar, 31.januar, 100.prosent), egenmeldinger = listOf(1.januar til 1.januar))
 
@@ -35,7 +36,7 @@ internal class EgenmeldingerFraSøknadTest : AbstractEndToEndTest() {
     }
 
     @Test
-    fun `fjerner egenmeldingsdager fra søknad som er før tidligere vedtaksperioder`() {
+    fun `fjerner egenmeldingsdager fra søknad som er før tidligere vedtaksperioder`() = Toggle.EgenmeldingStrekkerIkkeSykdomstidslinje.disable {
         nyttVedtak(3.januar til 21.januar)
 
         håndterSykmelding(Sykmeldingsperiode(25.januar, 31.januar))
@@ -49,7 +50,7 @@ internal class EgenmeldingerFraSøknadTest : AbstractEndToEndTest() {
     }
 
     @Test
-    fun `fjerner egenmeldingsdager fra søknad som overlapper med tidligere vedtaksperioder`() {
+    fun `fjerner egenmeldingsdager fra søknad som overlapper med tidligere vedtaksperioder`() = Toggle.EgenmeldingStrekkerIkkeSykdomstidslinje.disable {
         nyttVedtak(3.januar til 21.januar)
 
         håndterSykmelding(Sykmeldingsperiode(25.januar, 31.januar))
@@ -66,7 +67,7 @@ internal class EgenmeldingerFraSøknadTest : AbstractEndToEndTest() {
     }
 
     @Test
-    fun `fjerner egenmeldingsdager fra søknad som er etter starten av sykmeldingsperioden`() {
+    fun `fjerner egenmeldingsdager fra søknad som er etter starten av sykmeldingsperioden`() = Toggle.EgenmeldingStrekkerIkkeSykdomstidslinje.disable {
         håndterSykmelding(januar)
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent), egenmeldinger = listOf(
             31.desember(2017) til 1.februar
@@ -126,7 +127,7 @@ internal class EgenmeldingerFraSøknadTest : AbstractEndToEndTest() {
         }
     }
     @Test
-    fun `arbeidsdager fra inntektsmelding vinner over egenmeldingsdager fra søknad`() {
+    fun `arbeidsdager fra inntektsmelding vinner over egenmeldingsdager fra søknad`() = Toggle.EgenmeldingStrekkerIkkeSykdomstidslinje.disable {
         håndterSykmelding(Sykmeldingsperiode(2.januar, 31.januar))
         håndterSøknad(Sykdom(2.januar, 31.januar, 100.prosent), egenmeldinger = listOf(
             1.januar til 1.januar
@@ -142,7 +143,7 @@ internal class EgenmeldingerFraSøknadTest : AbstractEndToEndTest() {
     }
 
     @Test
-    fun `skal kutte bort egenmeldingsdager som ikke påvirker arbeidsgiverperioden`() {
+    fun `skal kutte bort egenmeldingsdager som ikke påvirker arbeidsgiverperioden`() = Toggle.EgenmeldingStrekkerIkkeSykdomstidslinje.disable {
         håndterSykmelding(Sykmeldingsperiode(1.mars, 31.mars))
         håndterSøknad(Sykdom(1.mars, 31.mars, 100.prosent), egenmeldinger = listOf(
             26.desember(2017) til 26.desember(2017),
