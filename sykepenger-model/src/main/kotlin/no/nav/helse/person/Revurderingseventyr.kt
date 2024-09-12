@@ -46,6 +46,7 @@ class Revurderingseventyr private constructor(
         fun grunnbeløpsregulering(hendelse: Hendelse, skjæringstidspunkt: LocalDate) = Revurderingseventyr(Grunnbeløpsregulering, skjæringstidspunkt, skjæringstidspunkt.somPeriode(), hendelse)
         fun annullering(hendelse: Hendelse, periode: Periode) = Revurderingseventyr(Annullering, periode.start, periode, hendelse)
         fun minimumSykdomsgradVurdert(hendelse: Hendelse, periode: Periode) = Revurderingseventyr(MinimumSykdomsgradVurdert, periode.start, periode, hendelse)
+        fun andreYtelser(hendelse: Hendelse, skjæringstidspunkt: LocalDate, periode: Periode) = Revurderingseventyr(RevurderingÅrsak.AndreYtelser, skjæringstidspunkt, periode, hendelse)
 
         fun tidligsteEventyr(a: Revurderingseventyr?, b: Revurderingseventyr?) = when {
             b == null || (a != null && a.periodeForEndring.start <= b.periodeForEndring.start) -> a
@@ -147,6 +148,10 @@ class Revurderingseventyr private constructor(
 
         data object MinimumSykdomsgradVurdert : RevurderingÅrsak {
             override fun navn(): String = "MINIMUM_SYKDOMSGRAD_VURDERT"
+        }
+
+        data object AndreYtelser : RevurderingÅrsak {
+            override fun navn(): String = "ANDRE_YTELSER"
         }
 
         data object Reberegning : RevurderingÅrsak {

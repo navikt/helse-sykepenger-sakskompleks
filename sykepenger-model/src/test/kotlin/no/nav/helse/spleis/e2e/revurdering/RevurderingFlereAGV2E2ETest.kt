@@ -464,7 +464,10 @@ internal class RevurderingFlereAGV2E2ETest: AbstractEndToEndTest() {
         nyeVedtak(januar, a1, a2)
         håndterOverstyrTidslinje(listOf(ManuellOverskrivingDag(17.januar, Feriedag)), a1)
 
+        nullstillTilstandsendringer()
         håndterYtelser(1.vedtaksperiode, foreldrepenger = listOf(GradertPeriode(20.januar til 31.januar, 100)), orgnummer = a1)
+        håndterYtelser(1.vedtaksperiode, foreldrepenger = listOf(GradertPeriode(20.januar til 31.januar, 100)), orgnummer = a1)
+        assertTilstander(1.vedtaksperiode, AVVENTER_HISTORIKK_REVURDERING, AVVENTER_REVURDERING, AVVENTER_HISTORIKK_REVURDERING, AVVENTER_SIMULERING_REVURDERING)
         assertVarsel(RV_AY_5, 1.vedtaksperiode.filter(a1))
         assertIngenVarsel(RV_AY_5, 1.vedtaksperiode.filter(a2))
     }

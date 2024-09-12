@@ -2,7 +2,6 @@ package no.nav.helse.spleis.e2e.ytelser
 
 import java.time.LocalDate
 import no.nav.helse.april
-import no.nav.helse.assertForventetFeil
 import no.nav.helse.desember
 import no.nav.helse.februar
 import no.nav.helse.fredag
@@ -18,7 +17,6 @@ import no.nav.helse.hendelser.Søknad.Søknadsperiode.Permisjon
 import no.nav.helse.hendelser.Søknad.Søknadsperiode.Sykdom
 import no.nav.helse.hendelser.Vilkårsgrunnlag
 import no.nav.helse.hendelser.til
-import no.nav.helse.inspectors.inspektør
 import no.nav.helse.januar
 import no.nav.helse.mai
 import no.nav.helse.mars
@@ -73,7 +71,6 @@ import no.nav.helse.testhelpers.inntektperioderForSykepengegrunnlag
 import no.nav.helse.økonomi.Prosentdel.Companion.prosent
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
@@ -101,26 +98,24 @@ internal class YtelserE2ETest : AbstractEndToEndTest() {
         assertEquals(1.januar, inspektør.skjæringstidspunkt(3.vedtaksperiode))
         nullstillTilstandsendringer()
         håndterYtelser(2.vedtaksperiode, foreldrepenger = listOf(GradertPeriode(1.februar til 1.mars, 100)))
+        håndterYtelser(2.vedtaksperiode, foreldrepenger = listOf(GradertPeriode(1.februar til 1.mars, 100)))
         assertEquals(2.mars, inspektør.skjæringstidspunkt(3.vedtaksperiode))
 
         håndterUtbetalingsgodkjenning(2.vedtaksperiode)
-        assertTilstander(2.vedtaksperiode, AVVENTER_HISTORIKK, AVVENTER_GODKJENNING, AVSLUTTET)
+        assertTilstander(2.vedtaksperiode, AVVENTER_HISTORIKK, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_HISTORIKK, AVVENTER_GODKJENNING, AVSLUTTET)
         assertTilstander(3.vedtaksperiode, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_INNTEKTSMELDING)
     }
 
     @Test
-    fun `periode med bare andre ytelser etter langt gap kobler seg på feil utbetaling`() {
+    fun `periode med bare andre ytelser etter langt gap kobler seg ikke på feil utbetaling fordi den går jo til auu`() {
         nyttVedtak(januar)
 
         håndterSøknad(mars)
         håndterInntektsmelding(listOf(1.mars til 16.mars))
         håndterVilkårsgrunnlag(2.vedtaksperiode)
+        nullstillTilstandsendringer()
         håndterYtelser(2.vedtaksperiode, foreldrepenger = listOf(GradertPeriode(mars, 100)))
-
-        val korrelasjonsIdJanuar = inspektør.vedtaksperioder(1.vedtaksperiode).inspektør.behandlinger.last().endringer.last().utbetaling!!.inspektør.korrelasjonsId
-        val korrelasjonsIdMars = inspektør.vedtaksperioder(2.vedtaksperiode).inspektør.behandlinger.last().endringer.last().utbetaling!!.inspektør.korrelasjonsId
-
-        assertNotEquals(korrelasjonsIdJanuar, korrelasjonsIdMars)
+        assertTilstander(2.vedtaksperiode, AVVENTER_HISTORIKK, AVVENTER_BLOKKERENDE_PERIODE, AVSLUTTET_UTEN_UTBETALING)
     }
 
     @Test
@@ -312,7 +307,8 @@ internal class YtelserE2ETest : AbstractEndToEndTest() {
 
         håndterSykmelding(Sykmeldingsperiode(1.februar, 28.februar))
         håndterSøknad(februar)
-        håndterYtelser(
+
+        fun håndterMasseYtelser() = håndterYtelser(
             2.vedtaksperiode,
             foreldrepenger = listOf(GradertPeriode(februar, 100)),
             svangerskapspenger = listOf(GradertPeriode(februar, 100)),
@@ -322,8 +318,11 @@ internal class YtelserE2ETest : AbstractEndToEndTest() {
             institusjonsoppholdsperioder = listOf(Institusjonsopphold.Institusjonsoppholdsperiode(1.februar, 28.februar))
         )
 
+        nullstillTilstandsendringer()
+        håndterMasseYtelser()
+        håndterMasseYtelser()
         assertIngenFunksjonelleFeil()
-        assertTilstand(2.vedtaksperiode, AVVENTER_GODKJENNING)
+        assertTilstander(2.vedtaksperiode, AVVENTER_HISTORIKK, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_HISTORIKK, AVVENTER_GODKJENNING)
     }
 
     @Test

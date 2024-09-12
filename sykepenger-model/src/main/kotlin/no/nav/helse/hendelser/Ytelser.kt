@@ -4,6 +4,7 @@ package no.nav.helse.hendelser
 import java.time.LocalDate
 import java.util.UUID
 import no.nav.helse.person.Dokumentsporing
+import no.nav.helse.person.Revurderingseventyr
 import no.nav.helse.person.aktivitetslogg.Aktivitetslogg
 import no.nav.helse.person.aktivitetslogg.Varselkode
 import no.nav.helse.sykdomstidslinje.Dag.Companion.default
@@ -74,6 +75,9 @@ class Ytelser(
     override fun dokumentsporing(): Dokumentsporing {
         return Dokumentsporing.andreYtelser(meldingsreferanseId())
     }
+
+    override fun revurderingseventyr(skjæringstidspunkt: LocalDate, periode: Periode) =
+        Revurderingseventyr.andreYtelser(this, skjæringstidspunkt, periode)
 
     override fun oppdaterFom(other: Periode): Periode {
         return other
