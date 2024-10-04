@@ -14,7 +14,7 @@ import no.nav.helse.forrigeDag
 import no.nav.helse.hendelser.AnnullerUtbetalingHendelse
 import no.nav.helse.hendelser.Periode
 import no.nav.helse.hendelser.SimuleringHendelse
-import no.nav.helse.hendelser.UtbetalingHendelse
+import no.nav.helse.hendelser.UtbetalingHendelseHendelse
 import no.nav.helse.hendelser.UtbetalingpåminnelseHendelse
 import no.nav.helse.hendelser.UtbetalingsavgjørelseHendelse
 import no.nav.helse.hendelser.valider
@@ -110,9 +110,9 @@ class Utbetaling private constructor(
 
     private val stønadsdager get() = Oppdrag.stønadsdager(arbeidsgiverOppdrag, personOppdrag)
     private val observers = mutableSetOf<UtbetalingObserver>()
-    private var forrigeHendelse: UtbetalingHendelse? = null
+    private var forrigeHendelse: UtbetalingHendelseHendelse? = null
 
-    private fun harHåndtert(hendelse: UtbetalingHendelse) =
+    private fun harHåndtert(hendelse: UtbetalingHendelseHendelse) =
         (hendelse === forrigeHendelse).also { forrigeHendelse = hendelse }
 
     fun registrer(observer: UtbetalingObserver) {
@@ -157,20 +157,20 @@ class Utbetaling private constructor(
         godkjenn(hendelse, hendelse.vurdering)
     }
 
-    fun håndter(utbetaling: UtbetalingHendelse) {
+    fun håndter(utbetaling: UtbetalingHendelseHendelse) {
         if (!relevantFor(utbetaling)) return håndterKvitteringForAnnullering(utbetaling)
         if (harHåndtert(utbetaling)) return
         utbetaling.kontekst(this)
         tilstand.kvittér(this, utbetaling)
     }
 
-    private fun håndterKvitteringForAnnullering(hendelse: UtbetalingHendelse) {
+    private fun håndterKvitteringForAnnullering(hendelse: UtbetalingHendelseHendelse) {
         if (annulleringer.none { it.relevantFor(hendelse) }) return
         hendelse.kontekst(this)
         tilstand.kvittérAnnullering(this, hendelse)
     }
 
-    private fun relevantFor(utbetaling: UtbetalingHendelse) =
+    private fun relevantFor(utbetaling: UtbetalingHendelseHendelse) =
         utbetaling.utbetalingId == this.id && (utbetaling.fagsystemId in setOf(this.arbeidsgiverOppdrag.fagsystemId, this.personOppdrag.fagsystemId))
 
     fun håndter(simulering: SimuleringHendelse) {
@@ -191,7 +191,7 @@ class Utbetaling private constructor(
         tilstand.håndterPåminnelse(this, påminnelse)
     }
 
-    fun gjelderFor(hendelse: UtbetalingHendelse) =
+    fun gjelderFor(hendelse: UtbetalingHendelseHendelse) =
         relevantFor(hendelse) || annulleringer.any { it.relevantFor(hendelse) }
 
     fun gjelderFor(hendelse: UtbetalingsavgjørelseHendelse) = hendelse.utbetalingId == this.id
@@ -472,7 +472,7 @@ class Utbetaling private constructor(
         vurdering?.overfør(hendelse, personOppdrag, maksdato.takeUnless { type == ANNULLERING })
     }
 
-    private fun håndterKvittering(hendelse: UtbetalingHendelse) {
+    private fun håndterKvittering(hendelse: UtbetalingHendelseHendelse) {
         when (hendelse.status) {
             Oppdragstatus.OVERFØRT,
             Oppdragstatus.AKSEPTERT -> { } // all is good
@@ -536,11 +536,11 @@ class Utbetaling private constructor(
             return null
         }
 
-        fun kvittér(utbetaling: Utbetaling, hendelse: UtbetalingHendelse) {
+        fun kvittér(utbetaling: Utbetaling, hendelse: UtbetalingHendelseHendelse) {
             hendelse.info("Forventet ikke kvittering på utbetaling=${utbetaling.id} i tilstand=${this::class.simpleName}")
             hendelse.funksjonellFeil(RV_UT_11)
         }
-        fun kvittérAnnullering(utbetaling: Utbetaling, hendelse: UtbetalingHendelse) {
+        fun kvittérAnnullering(utbetaling: Utbetaling, hendelse: UtbetalingHendelseHendelse) {
             hendelse.info("Forventet ikke kvittering for annullering på utbetaling=${utbetaling.id} i tilstand=${this::class.simpleName}")
             hendelse.funksjonellFeil(RV_UT_11)
         }
@@ -600,7 +600,7 @@ class Utbetaling private constructor(
             vurderNesteTilstand(utbetaling, påminnelse)
         }
 
-        override fun kvittérAnnullering(utbetaling: Utbetaling, hendelse: UtbetalingHendelse) {
+        override fun kvittérAnnullering(utbetaling: Utbetaling, hendelse: UtbetalingHendelseHendelse) {
             vurderNesteTilstand(utbetaling, hendelse)
         }
 
@@ -644,7 +644,7 @@ class Utbetaling private constructor(
             utbetaling.overførBegge(påminnelse)
         }
 
-        override fun kvittér(utbetaling: Utbetaling, hendelse: UtbetalingHendelse) {
+        override fun kvittér(utbetaling: Utbetaling, hendelse: UtbetalingHendelseHendelse) {
             utbetaling.lagreOverføringsinformasjon(hendelse, hendelse.avstemmingsnøkkel, hendelse.overføringstidspunkt)
             utbetaling.arbeidsgiverOppdrag.lagreOverføringsinformasjon(hendelse)
             utbetaling.personOppdrag.lagreOverføringsinformasjon(hendelse)

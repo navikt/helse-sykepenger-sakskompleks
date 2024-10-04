@@ -13,7 +13,8 @@ enum class KontekstType {
     OverstyrArbeidsgiveropplysninger,
     OverstyrArbeidsforhold,
     SkjønnsmessigFastsettelse,
-    AndreYtelser
+    AndreYtelser,
+    System
 }
 
 data class Subsumsjonskontekst(

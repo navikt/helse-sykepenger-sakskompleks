@@ -6,6 +6,7 @@ import no.nav.helse.erHelg
 import no.nav.helse.dto.SykdomstidslinjeDagDto
 import no.nav.helse.dto.SykdomstidslinjeDagDto.AndreYtelserDto.YtelseDto
 import no.nav.helse.dto.HendelseskildeDto
+import no.nav.helse.hendelser.Melding
 import no.nav.helse.person.PersonObserver
 import no.nav.helse.person.PersonObserver.Utbetalingsdag.EksternBegrunnelseDTO.AndreYtelserAap
 import no.nav.helse.person.PersonObserver.Utbetalingsdag.EksternBegrunnelseDTO.AndreYtelserDagpenger
@@ -21,7 +22,7 @@ import no.nav.helse.sykdomstidslinje.Dag.AndreYtelser.AnnenYtelse.Omsorgspenger
 import no.nav.helse.sykdomstidslinje.Dag.AndreYtelser.AnnenYtelse.Opplæringspenger
 import no.nav.helse.sykdomstidslinje.Dag.AndreYtelser.AnnenYtelse.Pleiepenger
 import no.nav.helse.sykdomstidslinje.Dag.AndreYtelser.AnnenYtelse.Svangerskapspenger
-import no.nav.helse.sykdomstidslinje.SykdomshistorikkHendelse.Hendelseskilde
+import no.nav.helse.hendelser.SykdomshistorikkHendelse.Hendelseskilde
 import no.nav.helse.økonomi.Prosentdel
 import no.nav.helse.økonomi.Økonomi
 

@@ -6,6 +6,7 @@ import no.nav.helse.april
 import no.nav.helse.desember
 import no.nav.helse.februar
 import no.nav.helse.fredag
+import no.nav.helse.hendelser.SykdomshistorikkHendelse
 import no.nav.helse.hendelser.til
 import no.nav.helse.inspectors.inspektør
 import no.nav.helse.januar
@@ -15,7 +16,7 @@ import no.nav.helse.onsdag
 import no.nav.helse.sykdomstidslinje.Dag.AndreYtelser.AnnenYtelse.Foreldrepenger
 import no.nav.helse.sykdomstidslinje.Dag.AndreYtelser.AnnenYtelse.Pleiepenger
 import no.nav.helse.sykdomstidslinje.Dag.Companion.default
-import no.nav.helse.sykdomstidslinje.SykdomshistorikkHendelse.Hendelseskilde
+import no.nav.helse.hendelser.SykdomshistorikkHendelse.Hendelseskilde
 import no.nav.helse.testhelpers.A
 import no.nav.helse.testhelpers.AIG
 import no.nav.helse.testhelpers.F

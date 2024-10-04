@@ -824,6 +824,7 @@ data class PersonData(
                         DokumentTypeData.OverstyrArbeidsforhold -> DokumenttypeDto.OverstyrArbeidsforhold
                         DokumentTypeData.SkjønnsmessigFastsettelse -> DokumenttypeDto.SkjønnsmessigFastsettelse
                         DokumentTypeData.AndreYtelser -> DokumenttypeDto.AndreYtelser
+                        DokumentTypeData.System -> DokumenttypeDto.System
                     }
                 )
             }
@@ -839,7 +840,8 @@ data class PersonData(
                 OverstyrArbeidsgiveropplysninger,
                 OverstyrArbeidsforhold,
                 SkjønnsmessigFastsettelse,
-                AndreYtelser
+                AndreYtelser,
+                System
             }
 
             data class BehandlingData(

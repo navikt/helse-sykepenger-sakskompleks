@@ -17,6 +17,7 @@ import no.nav.helse.juni
 import no.nav.helse.mars
 import no.nav.helse.perioder
 import no.nav.helse.Personidentifikator
+import no.nav.helse.hendelser.SykdomshistorikkHendelse
 import no.nav.helse.testhelpers.A
 import no.nav.helse.testhelpers.AIG
 import no.nav.helse.testhelpers.F

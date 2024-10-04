@@ -12,7 +12,7 @@ import no.nav.helse.dto.serialisering.OppdragUtDto
 import no.nav.helse.erHelg
 import no.nav.helse.hendelser.Periode
 import no.nav.helse.hendelser.SimuleringHendelse
-import no.nav.helse.hendelser.UtbetalingHendelse
+import no.nav.helse.hendelser.UtbetalingHendelseHendelse
 import no.nav.helse.hendelser.til
 import no.nav.helse.person.aktivitetslogg.Aktivitet.Behov.Behovtype
 import no.nav.helse.person.aktivitetslogg.Aktivitetskontekst
@@ -353,7 +353,7 @@ class Oppdrag private constructor(
         Endringskode.ENDR
     )
 
-    fun lagreOverføringsinformasjon(hendelse: UtbetalingHendelse) {
+    fun lagreOverføringsinformasjon(hendelse: UtbetalingHendelseHendelse) {
         if (hendelse.fagsystemId != this.fagsystemId) return
         if (this.avstemmingsnøkkel == null) this.avstemmingsnøkkel = hendelse.avstemmingsnøkkel
         if (this.overføringstidspunkt == null) this.overføringstidspunkt = hendelse.overføringstidspunkt

@@ -1,26 +1,24 @@
-package no.nav.helse.sykdomstidslinje
+package no.nav.helse.hendelser
 
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
-import no.nav.helse.hendelser.ArbeidstakerHendelse
-import no.nav.helse.hendelser.Periode
-import no.nav.helse.hendelser.somPeriode
 import no.nav.helse.nesteDag
 import no.nav.helse.person.Behandlinger
 import no.nav.helse.person.aktivitetslogg.Aktivitetslogg
-import no.nav.helse.sykdomstidslinje.SykdomshistorikkHendelse.Hendelseskilde
+import no.nav.helse.hendelser.SykdomshistorikkHendelse.Hendelseskilde
 
-abstract class SykdomstidslinjeHendelse internal constructor(
+sealed class SykdomstidslinjeHendelse(
     meldingsreferanseId: UUID,
     fødselsnummer: String,
     aktørId: String,
     organisasjonsnummer: String,
-    private val opprettet: LocalDateTime,
+    opprettet: LocalDateTime,
     melding: Melding? = null,
-    private val aktivitetslogg: Aktivitetslogg = Aktivitetslogg()
-) : ArbeidstakerHendelse(meldingsreferanseId, fødselsnummer, aktørId, organisasjonsnummer, aktivitetslogg), SykdomshistorikkHendelse {
-    protected constructor(meldingsreferanseId: UUID, other: SykdomstidslinjeHendelse) : this(meldingsreferanseId, other.fødselsnummer, other.aktørId, other.organisasjonsnummer, other.opprettet, null, other.aktivitetslogg)
+    aktivitetslogg: Aktivitetslogg = Aktivitetslogg()
+) : ArbeidstakerHendelse(meldingsreferanseId, fødselsnummer, aktørId, organisasjonsnummer, aktivitetslogg),
+    SykdomshistorikkHendelse {
+
     private val håndtertAv = mutableSetOf<UUID>()
     private var nesteFraOgMed: LocalDate = LocalDate.MIN
     internal val kilde: Hendelseskilde = Hendelseskilde(melding ?: this::class, meldingsreferanseId(), opprettet)

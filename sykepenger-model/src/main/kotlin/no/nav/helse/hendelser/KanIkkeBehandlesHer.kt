@@ -4,7 +4,6 @@ import java.time.LocalDateTime
 import java.util.UUID
 import no.nav.helse.hendelser.Avsender.SAKSBEHANDLER
 import no.nav.helse.hendelser.Avsender.SYSTEM
-import no.nav.helse.hendelser.utbetaling.Behandlingsavgjørelse
 import no.nav.helse.person.aktivitetslogg.Aktivitetslogg
 
 class KanIkkeBehandlesHer(
@@ -18,7 +17,8 @@ class KanIkkeBehandlesHer(
     private val saksbehandlerEpost: String,
     private val opprettet: LocalDateTime,
     override val automatisert: Boolean
-) : ArbeidstakerHendelse(meldingsreferanseId, fødselsnummer, aktørId, organisasjonsnummer, Aktivitetslogg()), Behandlingsavgjørelse {
+) : ArbeidstakerHendelse(meldingsreferanseId, fødselsnummer, aktørId, organisasjonsnummer, Aktivitetslogg()),
+    Behandlingsavgjørelse {
     override val avgjørelsestidspunkt = opprettet
     override val godkjent = false
     override fun saksbehandler() = Saksbehandler(saksbehandlerIdent, saksbehandlerEpost)

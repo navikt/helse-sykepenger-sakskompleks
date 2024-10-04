@@ -11,6 +11,7 @@ import no.nav.helse.juni
 import no.nav.helse.mai
 import no.nav.helse.mars
 import no.nav.helse.Personidentifikator
+import no.nav.helse.hendelser.SykdomstidslinjeHendelse
 import no.nav.helse.sykdomstidslinje.Dag.ForeldetSykedag
 import no.nav.helse.sykdomstidslinje.Dag.SykHelgedag
 import no.nav.helse.sykdomstidslinje.Dag.Sykedag

@@ -38,12 +38,12 @@ import no.nav.helse.hendelser.Validation.Companion.validation
 import no.nav.helse.hendelser.Vilkårsgrunnlag
 import no.nav.helse.hendelser.Ytelser
 import no.nav.helse.hendelser.Ytelser.Companion.familieYtelserPeriode
-import no.nav.helse.hendelser.inntektsmelding.DagerFraInntektsmelding
 import no.nav.helse.hendelser.til
-import no.nav.helse.hendelser.utbetaling.AnnullerUtbetaling
-import no.nav.helse.hendelser.utbetaling.UtbetalingHendelse
-import no.nav.helse.hendelser.utbetaling.Behandlingsavgjørelse
-import no.nav.helse.hendelser.utbetaling.Utbetalingsgodkjenning
+import no.nav.helse.hendelser.AnnullerUtbetaling
+import no.nav.helse.hendelser.UtbetalingHendelse
+import no.nav.helse.hendelser.Behandlingsavgjørelse
+import no.nav.helse.hendelser.DagerFraInntektsmelding
+import no.nav.helse.hendelser.Utbetalingsgodkjenning
 import no.nav.helse.person.Behandlinger.Companion.berik
 import no.nav.helse.person.PersonObserver.Inntektsopplysningstype
 import no.nav.helse.person.PersonObserver.Inntektsopplysningstype.SAKSBEHANDLER
@@ -127,10 +127,10 @@ import no.nav.helse.person.infotrygdhistorikk.PersonUtbetalingsperiode
 import no.nav.helse.person.inntekt.Refusjonshistorikk
 import no.nav.helse.person.inntekt.Refusjonsopplysning.Refusjonsopplysninger
 import no.nav.helse.sykdomstidslinje.Skjæringstidspunkt
-import no.nav.helse.sykdomstidslinje.SykdomshistorikkHendelse
+import no.nav.helse.hendelser.SykdomshistorikkHendelse
 import no.nav.helse.sykdomstidslinje.Sykdomstidslinje
 import no.nav.helse.sykdomstidslinje.Sykdomstidslinje.Companion.slåSammenForkastedeSykdomstidslinjer
-import no.nav.helse.sykdomstidslinje.SykdomstidslinjeHendelse
+import no.nav.helse.hendelser.SykdomstidslinjeHendelse
 import no.nav.helse.utbetalingslinjer.Utbetaling
 import no.nav.helse.utbetalingstidslinje.ArbeidsgiverFaktaavklartInntekt
 import no.nav.helse.utbetalingstidslinje.Arbeidsgiverperiode
@@ -992,9 +992,9 @@ internal class Vedtaksperiode private constructor(
 
     internal fun igangsettOverstyring(revurdering: Revurderingseventyr) {
         if (revurdering.ikkeRelevant(periode)) return
-        kontekst(revurdering)
+        kontekst(revurdering.hendelse)
         tilstand.igangsettOverstyring(this, revurdering)
-        tilstand.arbeidsgiveropplysningerStrategi.lagreGjenbrukbareOpplysninger(this, revurdering)
+        tilstand.arbeidsgiveropplysningerStrategi.lagreGjenbrukbareOpplysninger(this, revurdering.hendelse)
     }
 
     internal fun inngåIRevurderingseventyret(
@@ -1225,16 +1225,16 @@ internal class Vedtaksperiode private constructor(
     }
 
     private fun håndterOverstyringIgangsattRevurdering(revurdering: Revurderingseventyr) {
-        revurdering.inngåSomRevurdering(this, periode)
-        behandlinger.sikreNyBehandling(arbeidsgiver, revurdering, person.beregnSkjæringstidspunkt(), arbeidsgiver.beregnArbeidsgiverperiode(jurist))
-        tilstand(revurdering, AvventerRevurdering)
+        revurdering.inngåSomRevurdering(this)
+        behandlinger.sikreNyBehandling(arbeidsgiver, revurdering.hendelse, person.beregnSkjæringstidspunkt(), arbeidsgiver.beregnArbeidsgiverperiode(jurist))
+        tilstand(revurdering.hendelse, AvventerRevurdering)
     }
 
     private fun håndterOverstyringIgangsattFørstegangsvurdering(revurdering: Revurderingseventyr) {
-        revurdering.inngåSomEndring(this, periode)
-        behandlinger.forkastUtbetaling(revurdering)
-        if (måInnhenteInntektEllerRefusjon(revurdering)) return tilstand(revurdering, AvventerInntektsmelding)
-        tilstand(revurdering, AvventerBlokkerendePeriode)
+        revurdering.inngåSomEndring(this)
+        behandlinger.forkastUtbetaling(revurdering.hendelse)
+        if (måInnhenteInntektEllerRefusjon(revurdering.hendelse)) return tilstand(revurdering.hendelse, AvventerInntektsmelding)
+        tilstand(revurdering.hendelse, AvventerBlokkerendePeriode)
     }
 
     private fun periodeRettFørHarFåttInntektsmelding(): Boolean {
@@ -1531,7 +1531,7 @@ internal class Vedtaksperiode private constructor(
             revurdering: Revurderingseventyr
         ) {
             vedtaksperiode.håndterOverstyringIgangsattRevurdering(revurdering)
-            vedtaksperiode.behandlinger.forkastUtbetaling(revurdering)
+            vedtaksperiode.behandlinger.forkastUtbetaling(revurdering.hendelse)
         }
 
         override fun venter(vedtaksperiode: Vedtaksperiode, nestemann: Vedtaksperiode): VedtaksperiodeVenter? {
@@ -1784,9 +1784,9 @@ internal class Vedtaksperiode private constructor(
         }
 
         override fun igangsettOverstyring(vedtaksperiode: Vedtaksperiode, revurdering: Revurderingseventyr) {
-            vurderOmKanGåVidere(vedtaksperiode, revurdering)
+            vurderOmKanGåVidere(vedtaksperiode, revurdering.hendelse)
             if (vedtaksperiode.tilstand !in setOf(AvventerInntektsmelding, AvventerBlokkerendePeriode)) return
-            if (vedtaksperiode.tilstand == AvventerInntektsmelding && vedtaksperiode.sjekkTrengerArbeidsgiveropplysninger(revurdering)) {
+            if (vedtaksperiode.tilstand == AvventerInntektsmelding && vedtaksperiode.sjekkTrengerArbeidsgiveropplysninger(revurdering.hendelse)) {
                 vedtaksperiode.sendTrengerArbeidsgiveropplysninger()
             }
             revurdering.inngåVedSaksbehandlerendring(vedtaksperiode, vedtaksperiode.periode)
@@ -1927,8 +1927,8 @@ internal class Vedtaksperiode private constructor(
         }
 
         override fun igangsettOverstyring(vedtaksperiode: Vedtaksperiode, revurdering: Revurderingseventyr) {
-            vedtaksperiode.behandlinger.forkastUtbetaling(revurdering)
-            if (vedtaksperiode.måInnhenteInntektEllerRefusjon(revurdering)) vedtaksperiode.tilstand(revurdering, AvventerInntektsmelding)
+            vedtaksperiode.behandlinger.forkastUtbetaling(revurdering.hendelse)
+            if (vedtaksperiode.måInnhenteInntektEllerRefusjon(revurdering.hendelse)) vedtaksperiode.tilstand(revurdering.hendelse, AvventerInntektsmelding)
             revurdering.inngåVedSaksbehandlerendring(vedtaksperiode, vedtaksperiode.periode)
         }
 
@@ -2483,17 +2483,17 @@ internal class Vedtaksperiode private constructor(
         }
 
         override fun igangsettOverstyring(vedtaksperiode: Vedtaksperiode, revurdering: Revurderingseventyr) {
-            vedtaksperiode.behandlinger.sikreNyBehandling(vedtaksperiode.arbeidsgiver, revurdering, vedtaksperiode.person.beregnSkjæringstidspunkt(), vedtaksperiode.arbeidsgiver.beregnArbeidsgiverperiode(vedtaksperiode.jurist))
+            vedtaksperiode.behandlinger.sikreNyBehandling(vedtaksperiode.arbeidsgiver, revurdering.hendelse, vedtaksperiode.person.beregnSkjæringstidspunkt(), vedtaksperiode.arbeidsgiver.beregnArbeidsgiverperiode(vedtaksperiode.jurist))
             if (vedtaksperiode.forventerInntekt()) {
-                revurdering.inngåSomEndring(vedtaksperiode, vedtaksperiode.periode)
-                revurdering.loggDersomKorrigerendeSøknad(revurdering, "Startet omgjøring grunnet korrigerende søknad")
-                revurdering.info(RV_RV_1.varseltekst)
-                if (vedtaksperiode.måInnhenteInntektEllerRefusjon(revurdering)) {
-                    revurdering.info("mangler nødvendige opplysninger fra arbeidsgiver")
-                    return vedtaksperiode.tilstand(revurdering, AvventerInntektsmelding)
+                revurdering.inngåSomEndring(vedtaksperiode)
+                revurdering.loggDersomKorrigerendeSøknad(revurdering.hendelse, "Startet omgjøring grunnet korrigerende søknad")
+                revurdering.hendelse.info(RV_RV_1.varseltekst)
+                if (vedtaksperiode.måInnhenteInntektEllerRefusjon(revurdering.hendelse)) {
+                    revurdering.hendelse.info("mangler nødvendige opplysninger fra arbeidsgiver")
+                    return vedtaksperiode.tilstand(revurdering.hendelse, AvventerInntektsmelding)
                 }
             }
-            vedtaksperiode.tilstand(revurdering, AvventerBlokkerendePeriode)
+            vedtaksperiode.tilstand(revurdering.hendelse, AvventerBlokkerendePeriode)
         }
 
         override fun håndter(vedtaksperiode: Vedtaksperiode, søknad: Søknad, arbeidsgivere: List<Arbeidsgiver>, infotrygdhistorikk: Infotrygdhistorikk) {
@@ -2572,10 +2572,10 @@ internal class Vedtaksperiode private constructor(
             vedtaksperiode.skalHåndtereDagerRevurdering(dager)
 
         override fun igangsettOverstyring(vedtaksperiode: Vedtaksperiode, revurdering: Revurderingseventyr) {
-            vedtaksperiode.behandlinger.sikreNyBehandling(vedtaksperiode.arbeidsgiver, revurdering, vedtaksperiode.person.beregnSkjæringstidspunkt(), vedtaksperiode.arbeidsgiver.beregnArbeidsgiverperiode(vedtaksperiode.jurist))
+            vedtaksperiode.behandlinger.sikreNyBehandling(vedtaksperiode.arbeidsgiver, revurdering.hendelse, vedtaksperiode.person.beregnSkjæringstidspunkt(), vedtaksperiode.arbeidsgiver.beregnArbeidsgiverperiode(vedtaksperiode.jurist))
             vedtaksperiode.jurist.logg(`fvl § 35 ledd 1`())
-            revurdering.inngåSomRevurdering(vedtaksperiode, vedtaksperiode.periode)
-            vedtaksperiode.tilstand(revurdering, AvventerRevurdering)
+            revurdering.inngåSomRevurdering(vedtaksperiode)
+            vedtaksperiode.tilstand(revurdering.hendelse, AvventerRevurdering)
         }
 
         override fun håndter(vedtaksperiode: Vedtaksperiode, hendelse: OverstyrTidslinje) {

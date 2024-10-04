@@ -32,9 +32,8 @@ import no.nav.helse.person.inntekt.InntektFraSøknad
 import no.nav.helse.person.inntekt.Inntektsgrunnlag
 import no.nav.helse.person.inntekt.Refusjonsopplysning
 import no.nav.helse.sykdomstidslinje.Dag
-import no.nav.helse.sykdomstidslinje.SykdomshistorikkHendelse.Hendelseskilde
+import no.nav.helse.hendelser.SykdomshistorikkHendelse.Hendelseskilde
 import no.nav.helse.sykdomstidslinje.Sykdomstidslinje
-import no.nav.helse.sykdomstidslinje.SykdomstidslinjeHendelse
 import no.nav.helse.sykdomstidslinje.merge
 import no.nav.helse.tournament.Dagturnering
 import no.nav.helse.økonomi.Inntekt
@@ -92,9 +91,6 @@ class Søknad(
     internal fun egenmeldingsperioder(): List<Periode> {
         return egenmeldinger
     }
-
-    override fun dokumentsporing() =
-        Dokumentsporing.søknad(meldingsreferanseId())
 
     override fun innsendt() = sendtTilNAVEllerArbeidsgiver
     override fun registrert() = registrert

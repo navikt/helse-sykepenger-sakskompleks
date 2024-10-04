@@ -1,9 +1,7 @@
-package no.nav.helse.hendelser.utbetaling
+package no.nav.helse.hendelser
 
 import java.time.LocalDateTime
 import java.util.UUID
-import no.nav.helse.hendelser.ArbeidstakerHendelse
-import no.nav.helse.hendelser.Saksbehandler
 
 class Utbetalingsgodkjenning(
     meldingsreferanseId: UUID,
@@ -24,6 +22,6 @@ class Utbetalingsgodkjenning(
     override val avgjørelsestidspunkt = godkjenttidspunkt
     override val automatisert = automatiskBehandling
     override fun innsendt() = godkjenttidspunkt
-    override fun avsender() = if (automatisert) no.nav.helse.hendelser.Avsender.SYSTEM else no.nav.helse.hendelser.Avsender.SAKSBEHANDLER
+    override fun avsender() = if (automatisert) Avsender.SYSTEM else Avsender.SAKSBEHANDLER
 
 }

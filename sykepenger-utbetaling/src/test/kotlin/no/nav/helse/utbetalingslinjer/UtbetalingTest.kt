@@ -8,7 +8,7 @@ import no.nav.helse.dto.SimuleringResultatDto
 import no.nav.helse.hendelser.AnnullerUtbetalingHendelse
 import no.nav.helse.hendelser.Saksbehandler
 import no.nav.helse.hendelser.SimuleringHendelse
-import no.nav.helse.hendelser.UtbetalingHendelse
+import no.nav.helse.hendelser.UtbetalingHendelseHendelse
 import no.nav.helse.hendelser.UtbetalingsavgjørelseHendelse
 import no.nav.helse.hendelser.somPeriode
 import no.nav.helse.hendelser.til
@@ -875,7 +875,7 @@ internal class UtbetalingTest {
         override val utbetalingId: UUID,
         override val status: Oppdragstatus,
         val aktivitetslogg: Aktivitetslogg = Aktivitetslogg()
-    ) : UtbetalingHendelse, IAktivitetslogg by aktivitetslogg {
+    ) : UtbetalingHendelseHendelse, IAktivitetslogg by aktivitetslogg {
         override val avstemmingsnøkkel: Long = 123456789L
         override val overføringstidspunkt: LocalDateTime = LocalDateTime.now()
         override val melding: String = ""

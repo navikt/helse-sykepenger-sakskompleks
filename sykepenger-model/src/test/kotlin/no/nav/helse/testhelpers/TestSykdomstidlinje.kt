@@ -3,7 +3,7 @@ package no.nav.helse.testhelpers
 import no.nav.helse.hendelser.Periode
 import no.nav.helse.sykdomstidslinje.BesteStrategy
 import no.nav.helse.sykdomstidslinje.Sykdomstidslinje
-import no.nav.helse.sykdomstidslinje.SykdomshistorikkHendelse.Hendelseskilde
+import no.nav.helse.hendelser.SykdomshistorikkHendelse.Hendelseskilde
 import no.nav.helse.sykdomstidslinje.merge
 import no.nav.helse.økonomi.Prosentdel
 import no.nav.helse.økonomi.Prosentdel.Companion.prosent

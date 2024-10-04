@@ -3,7 +3,7 @@ package no.nav.helse.person.infotrygdhistorikk
 import java.time.LocalDate
 import no.nav.helse.dto.InfotrygdFerieperiodeDto
 import no.nav.helse.hendelser.Periode
-import no.nav.helse.sykdomstidslinje.SykdomshistorikkHendelse.Hendelseskilde
+import no.nav.helse.hendelser.SykdomshistorikkHendelse.Hendelseskilde
 import no.nav.helse.sykdomstidslinje.Sykdomstidslinje
 import no.nav.helse.utbetalingstidslinje.Utbetalingstidslinje
 import no.nav.helse.økonomi.Økonomi

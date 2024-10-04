@@ -5,6 +5,7 @@ import no.nav.helse.Personidentifikator
 import no.nav.helse.desember
 import no.nav.helse.dsl.ArbeidsgiverHendelsefabrikk
 import no.nav.helse.februar
+import no.nav.helse.hendelser.DagerFraInntektsmelding
 import no.nav.helse.hendelser.Periode
 import no.nav.helse.hendelser.somPeriode
 import no.nav.helse.hendelser.til

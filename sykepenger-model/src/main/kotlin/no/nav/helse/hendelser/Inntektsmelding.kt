@@ -10,7 +10,6 @@ import no.nav.helse.etterlevelse.Subsumsjonslogg
 import no.nav.helse.etterlevelse.`§ 8-10 ledd 3`
 import no.nav.helse.hendelser.Avsender.ARBEIDSGIVER
 import no.nav.helse.hendelser.Periode.Companion.grupperSammenhengendePerioder
-import no.nav.helse.hendelser.inntektsmelding.DagerFraInntektsmelding
 import no.nav.helse.nesteDag
 import no.nav.helse.person.Behandlinger
 import no.nav.helse.person.Dokumentsporing
@@ -31,15 +30,14 @@ import no.nav.helse.økonomi.Inntekt
 
 class Inntektsmelding(
     meldingsreferanseId: UUID,
-    private val refusjon: Refusjon,
+    refusjon: Refusjon,
     orgnummer: String,
     fødselsnummer: String,
     aktørId: String,
-    private val førsteFraværsdag: LocalDate?,
+    førsteFraværsdag: LocalDate?,
     private val inntektsdato: LocalDate?,
     private val beregnetInntekt: Inntekt,
     arbeidsgiverperioder: List<Periode>,
-    private val arbeidsforholdId: String?,
     begrunnelseForReduksjonEllerIkkeUtbetalt: String?,
     harOpphørAvNaturalytelser: Boolean = false,
     harFlereInntektsmeldinger: Boolean,

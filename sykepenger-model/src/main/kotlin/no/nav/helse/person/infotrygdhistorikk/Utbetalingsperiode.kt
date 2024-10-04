@@ -7,7 +7,7 @@ import no.nav.helse.dto.serialisering.InfotrygdArbeidsgiverutbetalingsperiodeUtD
 import no.nav.helse.dto.serialisering.InfotrygdPersonutbetalingsperiodeUtDto
 import no.nav.helse.erHelg
 import no.nav.helse.hendelser.Periode
-import no.nav.helse.sykdomstidslinje.SykdomshistorikkHendelse
+import no.nav.helse.hendelser.SykdomshistorikkHendelse
 import no.nav.helse.sykdomstidslinje.Sykdomstidslinje
 import no.nav.helse.utbetalingstidslinje.Utbetalingstidslinje
 import no.nav.helse.økonomi.Inntekt

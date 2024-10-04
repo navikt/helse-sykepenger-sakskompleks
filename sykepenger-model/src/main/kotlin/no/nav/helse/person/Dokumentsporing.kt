@@ -23,6 +23,7 @@ class Dokumentsporing private constructor(val id: UUID, val dokumentType: Dokume
         internal fun skjønnsmessigFastsettelse(id: UUID) = Dokumentsporing(id, DokumentType.SkjønnsmessigFastsettelse)
         internal fun grunnbeløpendring(id: UUID) = Dokumentsporing(id, DokumentType.SkjønnsmessigFastsettelse) // TODO: bytte DokumentType
         internal fun andreYtelser(id: UUID) = Dokumentsporing(id, DokumentType.AndreYtelser)
+        internal fun system(meldingsreferanseId: UUID) = Dokumentsporing(meldingsreferanseId, DokumentType.System)
 
         internal fun Iterable<Dokumentsporing>.ider() = map { it.id }.toSet()
         internal fun Iterable<Dokumentsporing>.søknadIder() = filter { it.dokumentType == DokumentType.Søknad }.map { it.id }.toSet()
@@ -44,6 +45,7 @@ class Dokumentsporing private constructor(val id: UUID, val dokumentType: Dokume
                     DokumentType.OverstyrArbeidsforhold -> KontekstType.OverstyrArbeidsforhold
                     DokumentType.SkjønnsmessigFastsettelse -> KontekstType.SkjønnsmessigFastsettelse
                     DokumentType.AndreYtelser -> KontekstType.AndreYtelser
+                    DokumentType.System -> KontekstType.System
                 },
                 verdi = it.id.toString()
             )
@@ -65,6 +67,7 @@ class Dokumentsporing private constructor(val id: UUID, val dokumentType: Dokume
                     DokumenttypeDto.Sykmelding -> DokumentType.Sykmelding
                     DokumenttypeDto.Søknad -> DokumentType.Søknad
                     DokumenttypeDto.AndreYtelser -> DokumentType.AndreYtelser
+                    DokumenttypeDto.System -> DokumentType.System
                 }
             )
         }
@@ -95,6 +98,7 @@ class Dokumentsporing private constructor(val id: UUID, val dokumentType: Dokume
             DokumentType.OverstyrArbeidsforhold -> DokumenttypeDto.OverstyrArbeidsforhold
             DokumentType.SkjønnsmessigFastsettelse -> DokumenttypeDto.SkjønnsmessigFastsettelse
             DokumentType.AndreYtelser -> DokumenttypeDto.AndreYtelser
+            DokumentType.System -> DokumenttypeDto.System
         }
     )
 }

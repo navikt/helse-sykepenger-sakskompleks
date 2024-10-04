@@ -4,6 +4,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 import java.util.stream.Collectors
+import no.nav.helse.hendelser.Melding
 import no.nav.helse.hendelser.Periode
 import no.nav.helse.januar
 import no.nav.helse.person.aktivitetslogg.Aktivitetslogg
@@ -14,10 +15,9 @@ import no.nav.helse.sykdomstidslinje.Dag.Permisjonsdag
 import no.nav.helse.sykdomstidslinje.Dag.ProblemDag
 import no.nav.helse.sykdomstidslinje.Dag.SykHelgedag
 import no.nav.helse.sykdomstidslinje.Dag.UkjentDag
-import no.nav.helse.sykdomstidslinje.Melding
-import no.nav.helse.sykdomstidslinje.SykdomshistorikkHendelse
-import no.nav.helse.sykdomstidslinje.SykdomshistorikkHendelse.Hendelseskilde
-import no.nav.helse.sykdomstidslinje.SykdomshistorikkHendelse.Hendelseskilde.Companion.INGEN
+import no.nav.helse.hendelser.SykdomshistorikkHendelse
+import no.nav.helse.hendelser.SykdomshistorikkHendelse.Hendelseskilde
+import no.nav.helse.hendelser.SykdomshistorikkHendelse.Hendelseskilde.Companion.INGEN
 import no.nav.helse.sykdomstidslinje.Sykdomstidslinje
 import no.nav.helse.økonomi.Prosentdel
 import no.nav.helse.økonomi.Prosentdel.Companion.prosent
@@ -209,7 +209,6 @@ internal val Int.FORELDET
 
 
 internal class TestHendelse(private val tidslinje: Sykdomstidslinje = Sykdomstidslinje(), private val meldingsreferanseId: UUID = UUID.randomUUID()) : SykdomshistorikkHendelse, IAktivitetslogg by (Aktivitetslogg()) {
-    override fun dokumentsporing() = error("ikke i bruk")
     override fun oppdaterFom(other: Periode) = other
     override fun meldingsreferanseId() =  meldingsreferanseId
     override fun sykdomstidslinje() = tidslinje

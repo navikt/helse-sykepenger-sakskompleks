@@ -3,11 +3,9 @@ package no.nav.helse.hendelser
 
 import java.time.LocalDate
 import java.util.UUID
-import no.nav.helse.person.Dokumentsporing
 import no.nav.helse.person.aktivitetslogg.Aktivitetslogg
 import no.nav.helse.person.aktivitetslogg.Varselkode
 import no.nav.helse.sykdomstidslinje.Dag.Companion.default
-import no.nav.helse.sykdomstidslinje.SykdomshistorikkHendelse
 import no.nav.helse.sykdomstidslinje.Sykdomstidslinje
 import no.nav.helse.sykdomstidslinje.merge
 
@@ -26,7 +24,8 @@ class Ytelser(
     private val arbeidsavklaringspenger: Arbeidsavklaringspenger,
     private val dagpenger: Dagpenger,
     aktivitetslogg: Aktivitetslogg
-) : ArbeidstakerHendelse(meldingsreferanseId, fødselsnummer, aktørId, organisasjonsnummer, aktivitetslogg), SykdomshistorikkHendelse {
+) : ArbeidstakerHendelse(meldingsreferanseId, fødselsnummer, aktørId, organisasjonsnummer, aktivitetslogg),
+    SykdomshistorikkHendelse {
 
     private val YTELSER_SOM_KAN_OPPDATERE_HISTORIKK: List<AnnenYtelseSomKanOppdatereHistorikk> = listOf(
         foreldrepenger
@@ -68,10 +67,6 @@ class Ytelser(
         if (sykdomstidslinjer.isEmpty()) return
         this.sykdomstidslinje = sykdomstidslinjer.merge(beste = default)
         oppdaterHistorikk()
-    }
-
-    override fun dokumentsporing(): Dokumentsporing {
-        return Dokumentsporing.andreYtelser(meldingsreferanseId())
     }
 
     override fun oppdaterFom(other: Periode): Periode {

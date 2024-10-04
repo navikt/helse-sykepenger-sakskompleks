@@ -10,7 +10,7 @@ internal class MigrateMessage(packet: JsonMessage) : HendelseMessage(packet) {
     private val aktørId = packet["aktørId"].asText()
     override val fødselsnummer: String = packet["fødselsnummer"].asText()
 
-    private val migrate     get() = Migrate(
+    private val migrate get() = Migrate(
         meldingsreferanseId = id,
         aktørId = aktørId,
         fødselsnummer = fødselsnummer

@@ -29,8 +29,8 @@ class Revurderingseventyr private constructor(
     private val hvorfor: RevurderingÅrsak,
     private val skjæringstidspunkt: LocalDate,
     private val periodeForEndring: Periode,
-    private val hendelse: Hendelse
-) : Hendelse by hendelse {
+    val hendelse: Hendelse
+) {
 
     internal companion object {
         fun nyPeriode(hendelse: Hendelse, skjæringstidspunkt: LocalDate, periodeForEndring: Periode) = Revurderingseventyr(NyPeriode, skjæringstidspunkt, periodeForEndring, hendelse)
@@ -55,20 +55,20 @@ class Revurderingseventyr private constructor(
 
     private val vedtaksperioder = mutableListOf<VedtaksperiodeData>()
 
-    internal fun inngåSomRevurdering(vedtaksperiode: Vedtaksperiode, periode: Periode) =
-        inngå(vedtaksperiode, TypeEndring.REVURDERING, periode)
+    internal fun inngåSomRevurdering(vedtaksperiode: Vedtaksperiode) =
+        inngå(vedtaksperiode, TypeEndring.REVURDERING)
 
-    internal fun inngåSomEndring(vedtaksperiode: Vedtaksperiode, periode: Periode) =
-        inngå(vedtaksperiode, TypeEndring.ENDRING, periode)
+    internal fun inngåSomEndring(vedtaksperiode: Vedtaksperiode) =
+        inngå(vedtaksperiode, TypeEndring.ENDRING)
 
     internal fun inngåVedSaksbehandlerendring(vedtaksperiode: Vedtaksperiode, periode: Periode) {
         if (hendelse.avsender() != Avsender.SAKSBEHANDLER) return
         if (!periode.overlapperMed(periodeForEndring)) return
-        inngåSomEndring(vedtaksperiode, periode)
+        inngåSomEndring(vedtaksperiode)
     }
 
-    private fun inngå(vedtaksperiode: Vedtaksperiode, typeEndring: TypeEndring, periode: Periode) {
-        hvorfor.dersomInngått(this, vedtaksperioder.isEmpty())
+    private fun inngå(vedtaksperiode: Vedtaksperiode, typeEndring: TypeEndring) {
+        hvorfor.dersomInngått(hendelse, vedtaksperioder.isEmpty())
         vedtaksperiode.inngåIRevurderingseventyret(vedtaksperioder, typeEndring.name)
     }
 

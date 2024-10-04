@@ -11,7 +11,7 @@ import no.nav.helse.person.aktivitetslogg.IAktivitetslogg
 import no.nav.helse.person.aktivitetslogg.SpesifikkKontekst
 import no.nav.helse.person.aktivitetslogg.Varselkode
 
-abstract class PersonHendelse protected constructor(
+sealed class PersonHendelse(
     private val meldingsreferanseId: UUID,
     protected val fødselsnummer: String,
     protected val aktørId: String,

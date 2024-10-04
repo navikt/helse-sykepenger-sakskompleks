@@ -31,10 +31,10 @@ import no.nav.helse.hendelser.UtbetalingshistorikkForFeriepenger
 import no.nav.helse.hendelser.Vilkårsgrunnlag
 import no.nav.helse.hendelser.Ytelser
 import no.nav.helse.hendelser.somPeriode
-import no.nav.helse.hendelser.utbetaling.AnnullerUtbetaling
-import no.nav.helse.hendelser.utbetaling.Behandlingsavgjørelse
-import no.nav.helse.hendelser.utbetaling.UtbetalingHendelse
-import no.nav.helse.hendelser.utbetaling.Utbetalingpåminnelse
+import no.nav.helse.hendelser.AnnullerUtbetaling
+import no.nav.helse.hendelser.Behandlingsavgjørelse
+import no.nav.helse.hendelser.UtbetalingHendelse
+import no.nav.helse.hendelser.Utbetalingpåminnelse
 import no.nav.helse.person.ForkastetVedtaksperiode.Companion.slåSammenSykdomstidslinjer
 import no.nav.helse.person.PersonObserver.UtbetalingEndretEvent.OppdragEventDetaljer
 import no.nav.helse.person.Vedtaksperiode.Companion.AUU_SOM_VIL_UTBETALES
@@ -68,9 +68,9 @@ import no.nav.helse.person.view.ArbeidsgiverView
 import no.nav.helse.sykdomstidslinje.Dag.Companion.replace
 import no.nav.helse.sykdomstidslinje.Skjæringstidspunkt
 import no.nav.helse.sykdomstidslinje.Sykdomshistorikk
-import no.nav.helse.sykdomstidslinje.SykdomshistorikkHendelse
+import no.nav.helse.hendelser.SykdomshistorikkHendelse
 import no.nav.helse.sykdomstidslinje.Sykdomstidslinje
-import no.nav.helse.sykdomstidslinje.SykdomstidslinjeHendelse
+import no.nav.helse.hendelser.SykdomstidslinjeHendelse
 import no.nav.helse.sykdomstidslinje.merge
 import no.nav.helse.utbetalingslinjer.Arbeidsgiverferiepengegrunnlag
 import no.nav.helse.utbetalingslinjer.Feriepengeutbetaling
@@ -147,7 +147,7 @@ internal class Arbeidsgiver private constructor(
 
         internal fun List<Arbeidsgiver>.igangsettOverstyring(revurdering: Revurderingseventyr) {
             forEach { arbeidsgiver ->
-                arbeidsgiver.håndter(revurdering) { igangsettOverstyring(revurdering) }
+                arbeidsgiver.håndter(revurdering.hendelse) { igangsettOverstyring(revurdering) }
             }
         }
 
@@ -537,7 +537,7 @@ internal class Arbeidsgiver private constructor(
 
     internal fun håndter(påminnelse: Påminnelse): Boolean {
         påminnelse.kontekst(this)
-        return énHarHåndtert(påminnelse) { håndter(it) }
+        return énHarHåndtert(påminnelse) { håndter(påminnelse) }
     }
 
     override fun utbetalingUtbetalt(

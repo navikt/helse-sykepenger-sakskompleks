@@ -17,9 +17,9 @@ import no.nav.helse.sykdomstidslinje.Dag.Permisjonsdag
 import no.nav.helse.sykdomstidslinje.Dag.ProblemDag
 import no.nav.helse.sykdomstidslinje.Dag.SykHelgedag
 import no.nav.helse.sykdomstidslinje.Dag.Sykedag
-import no.nav.helse.sykdomstidslinje.SykdomshistorikkHendelse
-import no.nav.helse.sykdomstidslinje.SykdomshistorikkHendelse.Hendelseskilde
-import no.nav.helse.sykdomstidslinje.SykdomshistorikkHendelse.Hendelseskilde.Companion.INGEN
+import no.nav.helse.hendelser.SykdomshistorikkHendelse
+import no.nav.helse.hendelser.SykdomshistorikkHendelse.Hendelseskilde
+import no.nav.helse.hendelser.SykdomshistorikkHendelse.Hendelseskilde.Companion.INGEN
 import no.nav.helse.sykdomstidslinje.Sykdomstidslinje
 import no.nav.helse.tournament.Turneringsnøkkel.Arbeidsdag_IM
 import no.nav.helse.tournament.Turneringsnøkkel.Arbeidsdag_SØ
@@ -81,10 +81,6 @@ internal class TurneringsnøkkelTest {
         object Sykmelding : TestHendelse()
         object Søknad : TestHendelse()
         object Aareg : TestHendelse() // Dette er ren spekulasjon omkring AAreg som kilde
-
-        override fun dokumentsporing(): Dokumentsporing {
-            error("ikke i bruk")
-        }
 
         override fun oppdaterFom(other: Periode): Periode {
             error("ikke i bruk")

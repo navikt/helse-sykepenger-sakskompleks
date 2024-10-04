@@ -427,6 +427,7 @@ private fun DokumentsporingDto.tilPersonData() = PersonData.ArbeidsgiverData.Ved
         DokumenttypeDto.Sykmelding -> PersonData.ArbeidsgiverData.VedtaksperiodeData.DokumentTypeData.Sykmelding
         DokumenttypeDto.Søknad -> PersonData.ArbeidsgiverData.VedtaksperiodeData.DokumentTypeData.Søknad
         DokumenttypeDto.AndreYtelser -> PersonData.ArbeidsgiverData.VedtaksperiodeData.DokumentTypeData.AndreYtelser
+        DokumenttypeDto.System -> PersonData.ArbeidsgiverData.VedtaksperiodeData.DokumentTypeData.System
     }
 )
 private fun UtbetalingUtDto.tilPersonData() = PersonData.UtbetalingData(

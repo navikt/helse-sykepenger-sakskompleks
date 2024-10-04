@@ -1,9 +1,7 @@
-package no.nav.helse.hendelser.utbetaling
+package no.nav.helse.hendelser
 
 import java.time.LocalDateTime
 import java.util.UUID
-import no.nav.helse.hendelser.AnnullerUtbetalingHendelse
-import no.nav.helse.hendelser.ArbeidstakerHendelse
 import no.nav.helse.hendelser.Avsender.SAKSBEHANDLER
 import no.nav.helse.person.aktivitetslogg.Aktivitetslogg
 import no.nav.helse.utbetalingslinjer.Utbetaling
