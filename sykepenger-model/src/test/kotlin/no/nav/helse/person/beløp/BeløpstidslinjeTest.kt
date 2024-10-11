@@ -17,6 +17,7 @@ import no.nav.helse.økonomi.Inntekt
 import no.nav.helse.økonomi.Inntekt.Companion.daglig
 import no.nav.helse.økonomi.Inntekt.Companion.månedlig
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
@@ -147,6 +148,21 @@ internal class BeløpstidslinjeTest {
         assertEquals(UkjentDag, forventet[27.februar])
 
         assertEquals(Systemet oppgir 100.daglig fra 5.januar til 7.januar, (Systemet oppgir 100.daglig kun 6.januar).strekk(5.januar til 7.januar))
+    }
+
+    @Test
+    fun `Finne første endring i beløp`() {
+        assertNull(Beløpstidslinje().førsteEndring(Beløpstidslinje()))
+        assertNull((Saksbehandler oppgir 100.daglig hele januar).førsteEndring(Arbeidsgiver oppgir 100.daglig hele januar))
+        assertEquals(1.januar, (Saksbehandler oppgir 100.daglig hele januar).førsteEndring(Arbeidsgiver oppgir 101.daglig hele januar))
+        assertEquals(15.januar, (Saksbehandler oppgir 100.daglig hele januar).førsteEndring((Arbeidsgiver oppgir 100.daglig fra 1.januar til 14.januar) og (Arbeidsgiver oppgir 101.daglig kun 15.januar)))
+
+        assertEquals(1.januar, (Saksbehandler oppgir 100.daglig hele januar).førsteEndring(Arbeidsgiver oppgir 100.daglig fra 2.januar til 31.januar))
+        assertEquals(31.januar, (Saksbehandler oppgir 100.daglig hele januar).førsteEndring(Arbeidsgiver oppgir 100.daglig fra 1.januar til 30.januar))
+        val hulleteSaksbehandler = (Saksbehandler oppgir 100.daglig kun 1.januar) og (Saksbehandler oppgir 100.daglig kun 31.januar)
+        val hulleteArbeidsgiver = (Saksbehandler oppgir 100.daglig kun 1.januar) og (Saksbehandler oppgir 100.daglig kun 30.januar)
+        assertEquals(30.januar, hulleteSaksbehandler.førsteEndring(hulleteArbeidsgiver))
+        assertEquals(30.januar, hulleteArbeidsgiver.førsteEndring(hulleteSaksbehandler))
     }
 
     @Test

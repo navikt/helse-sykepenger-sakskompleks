@@ -43,6 +43,10 @@ data class Beløpstidslinje(private val dager: SortedMap<LocalDate, Beløpsdag>)
     }
 
     internal operator fun minus(datoer: Iterable<LocalDate>) = Beløpstidslinje(this.dager.filterKeys { it !in datoer })
+    internal operator fun minus(other: Beløpstidslinje): Beløpstidslinje {
+        if (other.periode == null) return this
+        return this - other.periode
+    }
     internal operator fun minus(dato: LocalDate) = Beløpstidslinje(this.dager.filterKeys { it != dato })
 
     internal fun subset(periode: Periode): Beløpstidslinje {
@@ -61,6 +65,18 @@ data class Beløpstidslinje(private val dager: SortedMap<LocalDate, Beløpsdag>)
     }
 
     internal fun strekk(periode: Periode) = snute(periode.start) + this + hale(periode.endInclusive)
+
+    internal fun førsteEndring(other: Beløpstidslinje): LocalDate? {
+        val fom = setOfNotNull(periode?.start, other.periode?.start).minOrNull() ?: return null
+        val tom = setOfNotNull(periode?.endInclusive, other.periode?.endInclusive).max()
+        return (fom til tom).firstOrNull { dato ->
+            val dennes = get(dato)
+            val andres = other[dato]
+            if (dennes is UkjentDag && andres is UkjentDag) false
+            else if (dennes is UkjentDag || andres is UkjentDag) true
+            else dennes.beløp != andres.beløp
+        }
+    }
 
     internal fun dto() = BeløpstidslinjeDto(
         perioder = dager
