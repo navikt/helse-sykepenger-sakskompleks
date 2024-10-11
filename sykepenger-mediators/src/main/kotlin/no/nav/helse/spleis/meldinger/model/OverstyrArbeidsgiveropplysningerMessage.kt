@@ -17,6 +17,9 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDateTime
 import com.github.navikt.tbd_libs.rapids_and_rivers.asOptionalLocalDate
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
+import no.nav.helse.hendelser.Avsender.SAKSBEHANDLER
+import no.nav.helse.person.beløp.Beløpstidslinje
+import no.nav.helse.person.beløp.Kilde
 import no.nav.helse.spleis.IHendelseMediator
 import no.nav.helse.økonomi.Inntekt.Companion.månedlig
 
@@ -26,6 +29,7 @@ internal class OverstyrArbeidsgiveropplysningerMessage(packet: JsonMessage) : He
     private val aktørId = packet["aktørId"].asText()
     private val skjæringstidspunkt = packet["skjæringstidspunkt"].asLocalDate()
     private val arbeidsgiveropplysninger = packet.arbeidsgiveropplysninger(skjæringstidspunkt)
+    private val refusjonstidslinjer = packet.refusjonstidslinjer()
 
     override fun behandle(mediator: IHendelseMediator, context: MessageContext) =
         mediator.behandle(
@@ -35,7 +39,8 @@ internal class OverstyrArbeidsgiveropplysningerMessage(packet: JsonMessage) : He
                 aktørId = aktørId,
                 skjæringstidspunkt = skjæringstidspunkt,
                 arbeidsgiveropplysninger = arbeidsgiveropplysninger,
-                opprettet = opprettet
+                opprettet = opprettet,
+                refusjonstidslinjer = refusjonstidslinjer
             ),
             context
         )
@@ -46,7 +51,7 @@ internal class OverstyrArbeidsgiveropplysningerMessage(packet: JsonMessage) : He
             val arbeidsgivere = get("arbeidsgivere").takeUnless { it.isMissingOrNull() } ?: return emptyList()
             val id = UUID.fromString(get("@id").asText())
             val opprettet = get("@opprettet").asLocalDateTime()
-            return arbeidsgivere.map {arbeidsgiveropplysning ->
+            return arbeidsgivere.map { arbeidsgiveropplysning ->
                 val orgnummer = arbeidsgiveropplysning["organisasjonsnummer"].asText()
                 val månedligInntekt = arbeidsgiveropplysning["månedligInntekt"].asDouble().månedlig
                 val forklaring = arbeidsgiveropplysning["forklaring"].asText()
@@ -80,6 +85,24 @@ internal class OverstyrArbeidsgiveropplysningerMessage(packet: JsonMessage) : He
                     ), opprettet)
             }
         }.build()
+
+        private fun JsonMessage.refusjonstidslinjer(): Map<String, Beløpstidslinje> {
+            val id = UUID.fromString(get("@id").asText())
+            val opprettet = get("@opprettet").asLocalDateTime()
+            return get("arbeidsgivere").associateBy { it.path("organisasjonsnummer").asText() }.mapValues { (_, arbeidsgiver) ->
+                arbeidsgiver.path("refusjonsopplysninger").refusjonstidslinje(id, opprettet)
+            }
+        }
+
+        private fun JsonNode.refusjonstidslinje(meldingsreferanseId: UUID, opprettet: LocalDateTime) : Beløpstidslinje {
+            return this.fold(Beløpstidslinje()) { acc, node ->
+                val fom = node.path("fom").asLocalDate()
+                val tom = node.path("tom").asOptionalLocalDate() ?: fom
+                val beløp = node.path("beløp").asDouble().månedlig
+                val refusjonstidslinje = Beløpstidslinje.fra(fom til tom, beløp, Kilde(meldingsreferanseId, SAKSBEHANDLER, opprettet))
+                refusjonstidslinje + acc
+            }
+        }
     }
 }
 

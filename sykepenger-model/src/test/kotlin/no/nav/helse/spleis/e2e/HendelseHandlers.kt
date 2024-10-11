@@ -13,6 +13,7 @@ import no.nav.helse.etterspurteBehov
 import no.nav.helse.hendelser.ArbeidsgiverInntekt
 import no.nav.helse.hendelser.ArbeidstakerHendelse
 import no.nav.helse.hendelser.AvbruttSøknad
+import no.nav.helse.hendelser.Avsender.SAKSBEHANDLER
 import no.nav.helse.hendelser.Dagtype
 import no.nav.helse.hendelser.GradertPeriode
 import no.nav.helse.hendelser.Hendelse
@@ -57,6 +58,8 @@ import no.nav.helse.person.Person
 import no.nav.helse.person.TilstandType
 import no.nav.helse.person.aktivitetslogg.Aktivitet.Behov.Behovtype
 import no.nav.helse.person.aktivitetslogg.Aktivitetslogg
+import no.nav.helse.person.beløp.Beløpstidslinje
+import no.nav.helse.person.beløp.Kilde
 import no.nav.helse.person.infotrygdhistorikk.Infotrygdperiode
 import no.nav.helse.person.infotrygdhistorikk.Inntektsopplysning
 import no.nav.helse.person.inntekt.ArbeidsgiverInntektsopplysning
@@ -66,6 +69,7 @@ import no.nav.helse.person.inntekt.Saksbehandler
 import no.nav.helse.person.inntekt.SkjønnsmessigFastsatt
 import no.nav.helse.sisteBehov
 import no.nav.helse.spleis.e2e.AbstractEndToEndTest.Companion.INNTEKT
+import no.nav.helse.spleis.e2e.OverstyrtArbeidsgiveropplysning.Companion.refusjonstidslinjer
 import no.nav.helse.spleis.e2e.OverstyrtArbeidsgiveropplysning.Companion.tilOverstyrt
 import no.nav.helse.spleis.e2e.OverstyrtArbeidsgiveropplysning.Companion.tilSkjønnsmessigFastsatt
 import no.nav.helse.testhelpers.Inntektperioder
@@ -863,13 +867,15 @@ internal fun AbstractEndToEndTest.håndterOverstyrArbeidsgiveropplysninger(
     arbeidsgiveropplysninger: List<OverstyrtArbeidsgiveropplysning>,
     meldingsreferanseId: UUID = UUID.randomUUID()
 ): UUID {
+    val opprettet = LocalDateTime.now()
     OverstyrArbeidsgiveropplysninger(
         meldingsreferanseId = meldingsreferanseId,
         fødselsnummer = UNG_PERSON_FNR_2018.toString(),
         aktørId = AKTØRID,
         skjæringstidspunkt = skjæringstidspunkt,
         arbeidsgiveropplysninger = arbeidsgiveropplysninger.tilOverstyrt(meldingsreferanseId, skjæringstidspunkt),
-        opprettet = LocalDateTime.now()
+        refusjonstidslinjer = arbeidsgiveropplysninger.refusjonstidslinjer(meldingsreferanseId, opprettet),
+        opprettet = opprettet
     ).håndter(Person::håndter)
     return meldingsreferanseId
 }
@@ -917,6 +923,12 @@ internal class OverstyrtArbeidsgiveropplysning(
                     it.refusjonsopplysninger.forEach { (fom, tom, refusjonsbeløp) -> leggTil(Refusjonsopplysning(meldingsreferanseId, fom, tom, refusjonsbeløp), LocalDateTime.now())}
                 }.build())
             }
+
+        internal fun List<OverstyrtArbeidsgiveropplysning>.refusjonstidslinjer(meldingsreferanseId: UUID, opprettet: LocalDateTime) = this.associateBy { it.orgnummer }.mapValues { (_, opplysning) ->
+            opplysning.refusjonsopplysninger.fold(Beløpstidslinje()) { acc, (fom, tom, beløp) ->
+                acc + Beløpstidslinje.fra(fom til (tom ?: fom), beløp, Kilde(meldingsreferanseId, SAKSBEHANDLER, opprettet))
+            }
+        }
     }
 }
 

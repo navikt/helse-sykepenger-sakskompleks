@@ -13,7 +13,7 @@ import no.nav.helse.økonomi.Inntekt.Companion.daglig
 data class Beløpstidslinje(private val dager: SortedMap<LocalDate, Beløpsdag>) : Collection<Dag> by dager.values {
     private constructor(dager: Map<LocalDate, Beløpsdag>): this(dager.toSortedMap())
 
-    internal constructor(dager: List<Beløpsdag> = emptyList()): this(dager.associateBy { it.dato }.toSortedMap().also {
+    constructor(dager: List<Beløpsdag> = emptyList()): this(dager.associateBy { it.dato }.toSortedMap().also {
         require(dager.size == it.size) { "Forsøkte å opprette en beløpstidslinje med duplikate datoer. Det blir for rart for meg." }
     })
 
@@ -32,7 +32,7 @@ data class Beløpstidslinje(private val dager: SortedMap<LocalDate, Beløpsdag>)
         }
     }
 
-    internal operator fun plus(other: Beløpstidslinje) = merge(other, BevareEksisterendeOpplysningHvisLikeBeløp)
+    operator fun plus(other: Beløpstidslinje) = merge(other, BevareEksisterendeOpplysningHvisLikeBeløp)
 
     private fun merge(other: Beløpstidslinje, strategi: BesteRefusjonsopplysningstrategi): Beløpstidslinje {
         val results = this.dager.toMutableMap()
@@ -65,6 +65,7 @@ data class Beløpstidslinje(private val dager: SortedMap<LocalDate, Beløpsdag>)
     }
 
     internal fun strekk(periode: Periode) = snute(periode.start) + this + hale(periode.endInclusive)
+    internal fun strekkTil(til: LocalDate) = this + hale(til)
 
     internal fun førsteEndring(other: Beløpstidslinje): LocalDate? {
         val fom = setOfNotNull(periode?.start, other.periode?.start).minOrNull() ?: return null
@@ -101,7 +102,7 @@ data class Beløpstidslinje(private val dager: SortedMap<LocalDate, Beløpsdag>)
             }
     )
 
-    internal companion object {
+    companion object {
         private val BevareEksisterendeOpplysningHvisLikeBeløp: BesteRefusjonsopplysningstrategi = { venstre: Beløpsdag, høyre: Beløpsdag ->
             when {
                 venstre.beløp == høyre.beløp -> venstre
@@ -109,7 +110,7 @@ data class Beløpstidslinje(private val dager: SortedMap<LocalDate, Beløpsdag>)
                 else -> høyre
             }
         }
-        internal fun fra(periode: Periode, beløp: Inntekt, kilde: Kilde) = Beløpstidslinje(periode.map { Beløpsdag(it, beløp, kilde) })
+        fun fra(periode: Periode, beløp: Inntekt, kilde: Kilde) = Beløpstidslinje(periode.map { Beløpsdag(it, beløp, kilde) })
         internal fun gjenopprett(dto: BeløpstidslinjeDto) = Beløpstidslinje(
             dager = dto.perioder
                 .flatMap {

@@ -9,9 +9,7 @@ import no.nav.helse.person.PersonObserver
 import no.nav.helse.person.PersonObserver.Inntektsopplysningstype.SAKSBEHANDLER
 import no.nav.helse.person.aktivitetslogg.Aktivitetslogg
 import no.nav.helse.person.beløp.Beløpstidslinje
-import no.nav.helse.person.beløp.Kilde
 import no.nav.helse.person.inntekt.ArbeidsgiverInntektsopplysning
-import no.nav.helse.person.inntekt.ArbeidsgiverInntektsopplysning.Companion.refusjonstidslinje
 import no.nav.helse.person.inntekt.Inntektsgrunnlag
 
 class OverstyrArbeidsgiveropplysninger(
@@ -21,7 +19,8 @@ class OverstyrArbeidsgiveropplysninger(
     private val skjæringstidspunkt: LocalDate,
     private val arbeidsgiveropplysninger: List<ArbeidsgiverInntektsopplysning>,
     aktivitetslogg: Aktivitetslogg = Aktivitetslogg(),
-    private val opprettet: LocalDateTime
+    private val opprettet: LocalDateTime,
+    private val refusjonstidslinjer: Map<String, Beløpstidslinje>
 ) : PersonHendelse(meldingsreferanseId, fødselsnummer, aktørId, aktivitetslogg), OverstyrInntektsgrunnlag {
     override fun erRelevant(skjæringstidspunkt: LocalDate) = this.skjæringstidspunkt == skjæringstidspunkt
 
@@ -41,7 +40,7 @@ class OverstyrArbeidsgiveropplysninger(
     }
 
     internal fun arbeidsgiveropplysningerKorrigert(person: Person, orgnummer: String, hendelseId: UUID) {
-        if(arbeidsgiveropplysninger.any { it.gjelder(orgnummer) }) {
+        if (arbeidsgiveropplysninger.any { it.gjelder(orgnummer) }) {
             person.arbeidsgiveropplysningerKorrigert(
                 PersonObserver.ArbeidsgiveropplysningerKorrigertEvent(
                     korrigertInntektsmeldingId = hendelseId,
@@ -52,8 +51,6 @@ class OverstyrArbeidsgiveropplysninger(
         }
     }
 
-    internal fun refusjonstidslinje(organisasjonsnummer: String, periode: Periode): Beløpstidslinje {
-        val kilde = Kilde(meldingsreferanseId(), Avsender.SAKSBEHANDLER, opprettet)
-        return arbeidsgiveropplysninger.refusjonstidslinje(kilde, organisasjonsnummer, periode)
-    }
+    internal fun refusjonstidslinje(organisasjonsnummer: String, periode: Periode) =
+        refusjonstidslinjer[organisasjonsnummer]?.strekkTil(periode.endInclusive)?.subset(periode) ?: Beløpstidslinje()
 }

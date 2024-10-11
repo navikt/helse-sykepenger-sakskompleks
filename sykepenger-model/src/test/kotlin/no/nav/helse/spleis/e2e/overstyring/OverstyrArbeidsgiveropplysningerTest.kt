@@ -27,6 +27,8 @@ import no.nav.helse.spleis.e2e.forlengVedtak
 import no.nav.helse.spleis.e2e.håndterInntektsmelding
 import no.nav.helse.spleis.e2e.håndterOverstyrArbeidsgiveropplysninger
 import no.nav.helse.spleis.e2e.håndterSimulering
+import no.nav.helse.spleis.e2e.håndterUtbetalingsgodkjenning
+import no.nav.helse.spleis.e2e.håndterUtbetalt
 import no.nav.helse.spleis.e2e.håndterVilkårsgrunnlag
 import no.nav.helse.spleis.e2e.håndterYtelser
 import no.nav.helse.spleis.e2e.nyPeriode
@@ -44,6 +46,23 @@ import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
 
 internal class OverstyrArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
+
+    @Test
+    fun `Overstyring av refusjon skal gjelde også på forlengelser`() {
+        nyttVedtak(januar)
+        forlengVedtak(februar)
+        håndterOverstyrArbeidsgiveropplysninger(1.januar, listOf(
+            OverstyrtArbeidsgiveropplysning(ORGNUMMER, INNTEKT, "Noo", null, listOf(
+                Triple(1.januar,null, INNTEKT / 2),
+            ))
+        ))
+        håndterYtelser(1.vedtaksperiode)
+        håndterSimulering(1.vedtaksperiode)
+        håndterUtbetalingsgodkjenning(1.vedtaksperiode)
+        håndterUtbetalt()
+        assertEquals(INNTEKT/2, inspektør.vedtaksperioder(2.vedtaksperiode).refusjonstidslinje[1.februar].beløp)
+        håndterYtelser(2.vedtaksperiode)
+    }
 
     @Test
     fun `Kun periodene med endring i refusjon revurderes`() {
