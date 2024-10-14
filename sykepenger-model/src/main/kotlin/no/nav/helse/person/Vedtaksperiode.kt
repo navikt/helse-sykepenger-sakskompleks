@@ -99,6 +99,7 @@ import no.nav.helse.person.aktivitetslogg.Varselkode.Companion.varsel
 import no.nav.helse.person.aktivitetslogg.Varselkode.RV_IM_24
 import no.nav.helse.person.aktivitetslogg.Varselkode.RV_IM_4
 import no.nav.helse.person.aktivitetslogg.Varselkode.RV_IT_38
+import no.nav.helse.person.aktivitetslogg.Varselkode.RV_IV_8
 import no.nav.helse.person.aktivitetslogg.Varselkode.RV_OO_1
 import no.nav.helse.person.aktivitetslogg.Varselkode.RV_RV_1
 import no.nav.helse.person.aktivitetslogg.Varselkode.RV_RV_2
@@ -1877,6 +1878,10 @@ internal class Vedtaksperiode private constructor(
                 hendelse.funksjonellFeil(RV_SV_2)
                 return vedtaksperiode.forkast(hendelse)
             }
+            if (vedtaksperiode.harFlereSkjæringstidspunkt()) {
+                hendelse.funksjonellFeil(RV_IV_8)
+                return vedtaksperiode.forkast(hendelse)
+            }
             if (vedtaksperiode.måInnhenteInntektEllerRefusjon(hendelse)) return
             vedtaksperiode.tilstand(hendelse, AvventerBlokkerendePeriode)
         }
@@ -1983,7 +1988,9 @@ internal class Vedtaksperiode private constructor(
             override fun venterPå() = vedtaksperiode
             override fun venteårsak() = HJELP fordi FLERE_SKJÆRINGSTIDSPUNKT
             override fun gjenopptaBehandling(vedtaksperiode: Vedtaksperiode, hendelse: Hendelse) {
-                hendelse.info("Denne perioden har flere skjæringstidspunkt slik den står nå. Saksbehandler må inn å vurdere om det kan overstyres dager på en slik måte at det kun er ett skjæringstidspunkt. Om ikke må den kastes ut av Speil.")
+                hendelse.info("Denne perioden har flere skjæringstidspunkt slik den står nå.")
+                hendelse.funksjonellFeil(RV_SV_2)
+                return vedtaksperiode.forkast(hendelse)
             }
         }
         private data object AvventerTidligereEllerOverlappendeSøknad: Tilstand {

@@ -1,6 +1,5 @@
 package no.nav.helse.spleis.e2e.inntektsmelding
 
-import java.util.UUID
 import no.nav.helse.august
 import no.nav.helse.dsl.AbstractDslTest
 import no.nav.helse.dsl.nyttVedtak
@@ -13,6 +12,7 @@ import no.nav.helse.mars
 import no.nav.helse.person.TilstandType
 import no.nav.helse.person.TilstandType.AVVENTER_BLOKKERENDE_PERIODE
 import no.nav.helse.person.TilstandType.AVVENTER_GODKJENNING
+import no.nav.helse.person.TilstandType.TIL_INFOTRYGD
 import no.nav.helse.september
 import no.nav.helse.økonomi.Prosentdel.Companion.prosent
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -69,15 +69,8 @@ internal class FlereSkjæringstidspunktTest: AbstractDslTest() {
             }
             nullstillTilstandsendringer()
 
-            assertFlereSkjæringstidspunkt(2.vedtaksperiode) {
-                håndterInntektsmelding(listOf(27.august til 27.august, 4.september til 18.september))
-            }
-
-            inspektør.vedtaksperioder(2.vedtaksperiode).let {
-                assertEquals("AAAARR SAAAARR ASSSSHH SSSSSHH SSSS", it.sykdomstidslinje.toShortString())
-                assertEquals(4.september, it.inspektør.skjæringstidspunkt)
-            }
-            assertTilstander(2.vedtaksperiode, AVVENTER_GODKJENNING, AVVENTER_BLOKKERENDE_PERIODE)
+            håndterInntektsmelding(listOf(27.august til 27.august, 4.september til 18.september))
+            assertForkastetPeriodeTilstander(2.vedtaksperiode, AVVENTER_GODKJENNING, AVVENTER_BLOKKERENDE_PERIODE, TIL_INFOTRYGD)
         }
     }
 
@@ -100,21 +93,11 @@ internal class FlereSkjæringstidspunktTest: AbstractDslTest() {
             håndterYtelser(2.vedtaksperiode)
             håndterSimulering(2.vedtaksperiode)
             assertSisteTilstand(2.vedtaksperiode, AVVENTER_GODKJENNING)
+            nullstillTilstandsendringer()
 
-            assertFlereSkjæringstidspunkt(2.vedtaksperiode) {
-                håndterSøknad(4.september til 9.september)
-            }
-            assertEquals("SSSSHH ??????? SSS", inspektør.vedtaksperioder(2.vedtaksperiode).inspektør.sykdomstidslinje.toShortString())
-            assertEquals(17.september, inspektør.vedtaksperioder(2.vedtaksperiode).skjæringstidspunkt)
+            håndterSøknad(4.september til 9.september)
+            assertForkastetPeriodeTilstander(2.vedtaksperiode, AVVENTER_GODKJENNING, AVVENTER_BLOKKERENDE_PERIODE, TIL_INFOTRYGD)
         }
     }
 
-    private fun assertFlereSkjæringstidspunkt(vedtaksperiodeId: UUID, operasjonenSomForårsakerAtDetBlirFlereSkjæringstidspunkt: () -> Unit) {
-        observatør.vedtaksperiodeVenter.clear()
-        operasjonenSomForårsakerAtDetBlirFlereSkjæringstidspunkt()
-        val venterPå = observatør.vedtaksperiodeVenter.single { it.vedtaksperiodeId == vedtaksperiodeId }.venterPå
-        assertEquals(vedtaksperiodeId, venterPå.vedtaksperiodeId)
-        assertEquals("HJELP", venterPå.venteårsak.hva)
-        assertEquals("FLERE_SKJÆRINGSTIDSPUNKT", venterPå.venteårsak.hvorfor)
-    }
 }
