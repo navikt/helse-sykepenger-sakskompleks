@@ -126,6 +126,7 @@ import no.nav.helse.person.infotrygdhistorikk.Infotrygdperiode
 import no.nav.helse.person.infotrygdhistorikk.PersonUtbetalingsperiode
 import no.nav.helse.person.inntekt.Refusjonshistorikk
 import no.nav.helse.person.inntekt.Refusjonsopplysning.Refusjonsopplysninger
+import no.nav.helse.person.refusjon.Refusjonsservitør
 import no.nav.helse.sykdomstidslinje.Skjæringstidspunkt
 import no.nav.helse.sykdomstidslinje.SykdomshistorikkHendelse
 import no.nav.helse.sykdomstidslinje.Sykdomstidslinje
@@ -309,9 +310,9 @@ internal class Vedtaksperiode private constructor(
         dager.vurdertTilOgMed(periode.endInclusive)
     }
 
+    private val førsteFraværsdag get() = arbeidsgiver.finnSammenhengendeVedtaksperioder(this).periode().start
     internal fun håndterRefusjonsopplysninger(hendelse: Hendelse, refusjon: Refusjonshistorikk.Refusjon) {
         kontekst(hendelse)
-        val førsteFraværsdag = arbeidsgiver.finnSammenhengendeVedtaksperioder(this).periode().start
         val søkevindu = førsteFraværsdag til periode.endInclusive
         if (refusjon.startskuddet !in søkevindu) return
         val refusjonstidslinje = refusjon.beløpstidslinje(periode.endInclusive)
@@ -437,8 +438,8 @@ internal class Vedtaksperiode private constructor(
         return true
     }
 
-    internal fun håndter(hendelse: OverstyrArbeidsgiveropplysninger) {
-        val refusjonstidslinje = hendelse.refusjonstidslinje(organisasjonsnummer, skjæringstidspunkt, periode)
+    internal fun håndter(hendelse: Hendelse, servitør: Refusjonsservitør) {
+        val refusjonstidslinje = servitør.servér(førsteFraværsdag, periode)
         if (refusjonstidslinje.isEmpty()) return
         behandlinger.håndterRefusjonstidslinje(hendelse, refusjonstidslinje)
     }

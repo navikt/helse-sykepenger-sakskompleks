@@ -23,6 +23,7 @@ import no.nav.helse.hendelser.OverstyrInntektsgrunnlag
 import no.nav.helse.hendelser.OverstyrTidslinje
 import no.nav.helse.hendelser.Periode
 import no.nav.helse.hendelser.Periode.Companion.grupperSammenhengendePerioder
+import no.nav.helse.hendelser.Periode.Companion.grupperSammenhengendePerioderMedHensynTilHelg
 import no.nav.helse.hendelser.Påminnelse
 import no.nav.helse.hendelser.Simulering
 import no.nav.helse.hendelser.SykepengegrunnlagForArbeidsgiver
@@ -69,6 +70,7 @@ import no.nav.helse.person.inntekt.Refusjonshistorikk.Refusjon.EndringIRefusjon.
 import no.nav.helse.person.inntekt.Refusjonshistorikk.Refusjon.EndringIRefusjon.Companion.refusjonsopplysninger
 import no.nav.helse.person.inntekt.Refusjonsopplysning
 import no.nav.helse.person.inntekt.SkattSykepengegrunnlag
+import no.nav.helse.person.refusjon.Refusjonsservitør
 import no.nav.helse.person.view.ArbeidsgiverView
 import no.nav.helse.sykdomstidslinje.Dag.Companion.replace
 import no.nav.helse.sykdomstidslinje.Skjæringstidspunkt
@@ -186,9 +188,12 @@ internal class Arbeidsgiver private constructor(
         internal fun List<Arbeidsgiver>.håndter(overstyrInntektsgrunnlag: OverstyrInntektsgrunnlag) =
             any { it.håndter(overstyrInntektsgrunnlag) }
 
+        private fun Arbeidsgiver.førsteFraværsdager(skjæringstidspunkt: LocalDate) =
+            vedtaksperioder.filter(MED_SKJÆRINGSTIDSPUNKT(skjæringstidspunkt)).map { it.periode() }.grupperSammenhengendePerioderMedHensynTilHelg().map { it.start }
         internal fun List<Arbeidsgiver>.håndterOverstyringAvRefusjon(hendelse: OverstyrArbeidsgiveropplysninger) {
             forEach { arbeidsgiver ->
-                arbeidsgiver.håndter(hendelse)
+                val servitør = hendelse.refusjonsservitør(arbeidsgiver.førsteFraværsdager(hendelse.skjæringstidspunkt), arbeidsgiver.organisasjonsnummer) ?: return@forEach
+                arbeidsgiver.håndter(hendelse, servitør)
             }
         }
 
@@ -702,8 +707,9 @@ internal class Arbeidsgiver private constructor(
         return énHarHåndtert(overstyrInntektsgrunnlag) { håndter(it) }
     }
 
-    internal fun håndter(hendelse: OverstyrArbeidsgiveropplysninger) {
-        håndter(hendelse, Vedtaksperiode::håndter)
+    internal fun håndter(hendelse: Hendelse, servitør: Refusjonsservitør) {
+        håndter(hendelse) { håndter(hendelse, servitør) }
+        servitør.donérRester(hendelse)
     }
 
     internal fun oppdaterSykdom(hendelse: SykdomshistorikkHendelse): Sykdomstidslinje {

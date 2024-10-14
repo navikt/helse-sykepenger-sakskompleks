@@ -607,32 +607,44 @@ internal class RefusjonsopplysningerPåBehandlingE2ETest : AbstractDslTest() {
 
     @Test
     fun `Saksbehandler endrer refusjon for førstegangsbehandlingen, og vi feilaktig bruker disse når forlengelsen kommer`() {
-        nyttVedtak(januar)
-        håndterOverstyrArbeidsgiveropplysninger(
-            1.januar,
-            listOf(
-                OverstyrtArbeidsgiveropplysning(
-                    a1,
-                    INNTEKT,
-                    "forklaring",
-                    refusjonsopplysninger = listOf(Triple(1.januar, 31.januar, INNTEKT / 2), Triple(1.februar, null, INNTEKT))
+        a1 {
+            nyttVedtak(januar)
+            håndterOverstyrArbeidsgiveropplysninger(
+                1.januar,
+                listOf(
+                    OverstyrtArbeidsgiveropplysning(
+                        a1,
+                        INNTEKT,
+                        "forklaring",
+                        refusjonsopplysninger = listOf(
+                            Triple(1.januar, 31.januar, INNTEKT / 2),
+                            Triple(1.februar, null, INNTEKT)
+                        )
+                    )
                 )
             )
-        )
-        håndterYtelser(1.vedtaksperiode)
-        håndterSimulering(1.vedtaksperiode)
-        håndterSøknad(februar)
+            håndterYtelser(1.vedtaksperiode)
+            håndterSimulering(1.vedtaksperiode)
+            håndterSøknad(februar)
 
-        assertForventetFeil(
-            forklaring = "Vi bruker feilaktig overstyrt refusjon for januar, også når februar-søknaden kommer",
-            nå = {
-                assertEquals(INNTEKT / 2, inspektør.vedtaksperioder(2.vedtaksperiode).refusjonstidslinje[1.februar].beløp)
-            },
-            ønsket = {
-                assertEquals(INNTEKT, inspektør.vedtaksperioder(2.vedtaksperiode).refusjonstidslinje[1.februar].beløp)
-            }
-        )
-    }
+            assertInfo("Refusjonsservitøren har rester etter servering: 01-02-2018 til 01-02-2018")
+
+            assertForventetFeil(
+                forklaring = "Vi bruker feilaktig overstyrt refusjon for januar, også når februar-søknaden kommer",
+                nå = {
+                    assertEquals(
+                        INNTEKT / 2,
+                        inspektør.vedtaksperioder(2.vedtaksperiode).refusjonstidslinje[1.februar].beløp
+                    )
+                },
+                ønsket = {
+                    assertEquals(
+                        INNTEKT,
+                        inspektør.vedtaksperioder(2.vedtaksperiode).refusjonstidslinje[1.februar].beløp
+                    )
+                }
+            )
+        }    }
 
     @Test
     fun `Endrer refusjon i en lukket periode`() {

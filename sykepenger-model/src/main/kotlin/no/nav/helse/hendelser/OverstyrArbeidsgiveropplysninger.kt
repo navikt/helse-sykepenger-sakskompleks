@@ -11,12 +11,13 @@ import no.nav.helse.person.aktivitetslogg.Aktivitetslogg
 import no.nav.helse.person.beløp.Beløpstidslinje
 import no.nav.helse.person.inntekt.ArbeidsgiverInntektsopplysning
 import no.nav.helse.person.inntekt.Inntektsgrunnlag
+import no.nav.helse.person.refusjon.Refusjonsservitør
 
 class OverstyrArbeidsgiveropplysninger(
     private val meldingsreferanseId: UUID,
     fødselsnummer: String,
     aktørId: String,
-    private val skjæringstidspunkt: LocalDate,
+    internal val skjæringstidspunkt: LocalDate,
     private val arbeidsgiveropplysninger: List<ArbeidsgiverInntektsopplysning>,
     aktivitetslogg: Aktivitetslogg = Aktivitetslogg(),
     private val opprettet: LocalDateTime,
@@ -56,5 +57,14 @@ class OverstyrArbeidsgiveropplysninger(
         val (beløpstidslinje, strekkbar) = refusjonstidslinjer[organisasjonsnummer] ?: return Beløpstidslinje()
         return if (strekkbar) beløpstidslinje.strekkFrem(periode.endInclusive).subset(periode)
         else beløpstidslinje.subset(periode)
+    }
+
+    internal fun refusjonsservitør(førsteFraværsdager: Collection<LocalDate>, orgnummer: String): Refusjonsservitør? {
+        val (beløpstidslinje, strekkbar) = refusjonstidslinjer[orgnummer] ?: return null
+        return Refusjonsservitør.fra(
+            førsteFraværsdager = førsteFraværsdager,
+            refusjonstidslinje = beløpstidslinje,
+            strekkbar = strekkbar
+        )
     }
 }

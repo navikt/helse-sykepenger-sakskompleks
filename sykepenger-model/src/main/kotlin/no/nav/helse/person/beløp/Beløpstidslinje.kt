@@ -54,6 +54,8 @@ data class Beløpstidslinje(private val dager: SortedMap<LocalDate, Beløpsdag>)
         return Beløpstidslinje(dager.subMap(periode.start, periode.endInclusive.nesteDag).toSortedMap())
     }
 
+    internal fun fraOgMed(dato: LocalDate) = Beløpstidslinje(dager.tailMap(dato).toSortedMap())
+
     private fun snute(snute: LocalDate): Beløpstidslinje {
         val førsteBeløpsdag = periode?.start?.let { dager.getValue(it) } ?: return Beløpstidslinje()
         return førsteBeløpsdag.strekkTilbake(snute)
