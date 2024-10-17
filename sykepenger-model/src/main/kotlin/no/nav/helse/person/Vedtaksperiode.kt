@@ -1123,9 +1123,10 @@ internal class Vedtaksperiode private constructor(
 
     private fun utbetalingstidslinje() = behandlinger.utbetalingstidslinje()
 
-    private fun lagUtbetalingstidslinje(inntekt: ArbeidsgiverFaktaavklartInntekt?): Utbetalingstidslinje {
+    private fun lagUtbetalingstidslinje(inntekt: ArbeidsgiverFaktaavklartInntekt?, deaktivertInntekt: ArbeidsgiverFaktaavklartInntekt?): Utbetalingstidslinje {
         /** krever inntekt for vedtaksperioder med samme skjæringstidspunkt som det som beregnes, tillater manglende for AUU'er */
         val inntekt = inntekt
+            ?: deaktivertInntekt
             ?: defaultinntektForAUU() // todo: spleis må legge inn en IkkeRapportert-inntekt for alle auuer som finnes på skjæringstidspunktet når vi vilkårsprøver
             ?: error("Det er en vedtaksperiode som ikke inngår i SP: $organisasjonsnummer - $id - $periode." +
                     "Burde ikke arbeidsgiveren være kjent i sykepengegrunnlaget, enten i form av en skatteinntekt eller en tilkommet?")
@@ -1179,8 +1180,9 @@ internal class Vedtaksperiode private constructor(
 
         val faktaavklarteInntekter = grunnlagsdata.faktaavklarteInntekter()
         val utbetalingstidslinjer = perioderSomMåHensyntasVedBeregning.mapValues { (arbeidsgiver, vedtaksperioder) ->
-            val inntektForArbeidsgiver = faktaavklarteInntekter.forArbeidsgiver(arbeidsgiver)
-            vedtaksperioder.map { it.lagUtbetalingstidslinje(inntektForArbeidsgiver) }
+            val inntektForArbeidsgiver = faktaavklarteInntekter.inntekterForArbeidsgiver(arbeidsgiver)
+            val deaktivertInntektForArbeidsgiver = faktaavklarteInntekter.deaktiverteInntekterForArbeidsgiver(arbeidsgiver)
+            vedtaksperioder.map { it.lagUtbetalingstidslinje(inntektForArbeidsgiver, deaktivertInntektForArbeidsgiver) }
         }
         // nå vi må lage en ghost-tidslinje per arbeidsgiver for de som eksisterer i sykepengegrunnlaget.
         // resultatet er én utbetalingstidslinje per arbeidsgiver som garantert dekker perioden ${vedtaksperiode.periode}, dog kan
@@ -2392,9 +2394,11 @@ internal class Vedtaksperiode private constructor(
         }
 
         private fun forsøkÅLageUtbetalingstidslinje(vedtaksperiode: Vedtaksperiode, hendelse: IAktivitetslogg): Utbetalingstidslinje {
-            val faktaavklarteInntekter = vedtaksperiode.vilkårsgrunnlag?.faktaavklarteInntekter()?.forArbeidsgiver(vedtaksperiode.organisasjonsnummer)
+            val faktaavklartInntekter = vedtaksperiode.vilkårsgrunnlag?.faktaavklarteInntekter()
+            val faktaavklartInntekt = faktaavklartInntekter?.inntekterForArbeidsgiver(vedtaksperiode.organisasjonsnummer)
+            val faktaavklartDeaktivertInntekt = faktaavklartInntekter?.deaktiverteInntekterForArbeidsgiver(vedtaksperiode.organisasjonsnummer)
             return try {
-                vedtaksperiode.lagUtbetalingstidslinje(faktaavklarteInntekter)
+                vedtaksperiode.lagUtbetalingstidslinje(faktaavklartInntekt, faktaavklartDeaktivertInntekt)
             } catch (err: Exception) {
                 sikkerLogg.warn("klarte ikke lage utbetalingstidslinje for auu: ${err.message}, {}", kv("vedtaksperiodeId", vedtaksperiode.id), kv("aktørId", vedtaksperiode.aktørId), err)
                 Utbetalingstidslinje()

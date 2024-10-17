@@ -24,7 +24,8 @@ internal class VilkårsprøvdSkjæringstidspunktTest {
             inntekter = listOf(
                 VilkårsprøvdSkjæringstidspunkt.FaktaavklartInntekt("a1", 1000.daglig, 1.januar til 31.januar, Refusjonsopplysning.Refusjonsopplysninger()),
                 VilkårsprøvdSkjæringstidspunkt.FaktaavklartInntekt("a2", 500.daglig, 25.januar til LocalDate.MAX, Refusjonsopplysning.Refusjonsopplysninger()),
-            )
+            ),
+            deaktiverteInntekter = emptyList()
         )
 
         vilkårsgrunnlag.ghosttidslinjer(mapOf(

@@ -31,7 +31,8 @@ internal sealed class UtbetalingstidslinjeBuilderException(message: String) : Ru
 internal class VilkårsprøvdSkjæringstidspunkt(
     private val skjæringstidspunkt: LocalDate,
     private val `6G`: Inntekt,
-    inntekter: List<FaktaavklartInntekt>
+    inntekter: List<FaktaavklartInntekt>,
+    deaktiverteInntekter: List<FaktaavklartInntekt>
 ) {
     private val inntekter = inntekter.associate { inntekt ->
         inntekt.organisasjonsnummer to ArbeidsgiverFaktaavklartInntekt(
@@ -42,14 +43,29 @@ internal class VilkårsprøvdSkjæringstidspunkt(
             refusjonsopplysninger = inntekt.refusjonsopplysninger
         )
     }
-    internal fun forArbeidsgiver(organisasjonsnummer: String): ArbeidsgiverFaktaavklartInntekt? {
+    private val deaktiverteInntekter = deaktiverteInntekter.associate { inntekt ->
+        inntekt.organisasjonsnummer to ArbeidsgiverFaktaavklartInntekt(
+            skjæringstidspunkt = skjæringstidspunkt,
+            `6G` = `6G`,
+            fastsattÅrsinntekt = inntekt.fastsattÅrsinntekt,
+            gjelder = inntekt.gjelder,
+            refusjonsopplysninger = inntekt.refusjonsopplysninger
+        )
+    }
+
+    internal fun inntekterForArbeidsgiver(organisasjonsnummer: String): ArbeidsgiverFaktaavklartInntekt? {
         return inntekter[organisasjonsnummer]
+    }
+
+    internal fun deaktiverteInntekterForArbeidsgiver(organisasjonsnummer: String): ArbeidsgiverFaktaavklartInntekt? {
+        return deaktiverteInntekter[organisasjonsnummer]
     }
 
     internal fun ghosttidslinjer(utbetalingstidslinjer: Map<String, List<Utbetalingstidslinje>>): Map<String, Utbetalingstidslinje> {
         val beregningsperiode = utbetalingstidslinjer.values.flatten().map { it.periode() }.periode()!!
-        return inntekter
-            .mapValues { (orgnr, v) -> v.ghosttidslinje(beregningsperiode, skjæringstidspunkt, `6G`, utbetalingstidslinjer[orgnr] ?: emptyList()) }
+        return (inntekter + deaktiverteInntekter.filter { it.key in utbetalingstidslinjer })
+            .mapValues { (orgnr, v) -> v.ghosttidslinje(beregningsperiode, skjæringstidspunkt,
+                `6G`, utbetalingstidslinjer[orgnr] ?: emptyList()) }
             .filterValues { it.isNotEmpty() }
     }
 

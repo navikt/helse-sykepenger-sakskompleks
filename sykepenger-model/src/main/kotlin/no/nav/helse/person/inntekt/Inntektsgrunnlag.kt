@@ -231,7 +231,7 @@ internal class Inntektsgrunnlag private constructor(
 
 
     internal fun harNødvendigInntektForVilkårsprøving(organisasjonsnummer: String) =
-        arbeidsgiverInntektsopplysninger.harInntekt(organisasjonsnummer)
+        arbeidsgiverInntektsopplysninger.harInntekt(organisasjonsnummer) || deaktiverteArbeidsforhold.harInntekt(organisasjonsnummer)
 
     internal fun sjekkForNyArbeidsgiver(aktivitetslogg: IAktivitetslogg, opptjening: Opptjening?, orgnummer: String) {
         if (opptjening == null) return
@@ -301,8 +301,11 @@ internal class Inntektsgrunnlag private constructor(
         return kopierSykepengegrunnlagOgValiderMinsteinntekt(resultat, deaktiverteArbeidsforhold, subsumsjonslogg)
     }
 
-    internal fun refusjonsopplysninger(organisasjonsnummer: String): Refusjonsopplysninger =
-        arbeidsgiverInntektsopplysninger.refusjonsopplysninger(organisasjonsnummer)
+    internal fun refusjonsopplysninger(organisasjonsnummer: String): Refusjonsopplysninger{
+        val aktive = arbeidsgiverInntektsopplysninger.refusjonsopplysninger(organisasjonsnummer)
+        val deaktiverte = deaktiverteArbeidsforhold.refusjonsopplysninger(organisasjonsnummer)
+        return if (!aktive.erTom) aktive else deaktiverte
+    }
 
     fun tilkomneInntekterFraSøknaden(søknad: Søknad, subsumsjonslogg: Subsumsjonslogg): Inntektsgrunnlag {
         val builder = ArbeidsgiverInntektsopplysningerOverstyringer(skjæringstidspunkt, arbeidsgiverInntektsopplysninger, null, subsumsjonslogg)
@@ -320,16 +323,22 @@ internal class Inntektsgrunnlag private constructor(
         inntektsmelding: Inntektsmelding,
         subsumsjonslogg: Subsumsjonslogg
     ): Inntektsgrunnlag {
-        val builder = ArbeidsgiverInntektsopplysningerOverstyringer(skjæringstidspunkt, arbeidsgiverInntektsopplysninger, null, subsumsjonslogg)
-        inntektsmelding.nyeArbeidsgiverInntektsopplysninger(builder, skjæringstidspunkt)
-        val (resultat, harTilkommetInntekter) = builder.resultat(Toggle.TilkommenArbeidsgiver.enabled)
+        val aktiveBuilder = ArbeidsgiverInntektsopplysningerOverstyringer(skjæringstidspunkt, arbeidsgiverInntektsopplysninger, null, subsumsjonslogg)
+        inntektsmelding.nyeArbeidsgiverInntektsopplysninger(aktiveBuilder, skjæringstidspunkt)
+        val (aktiveResultat, harTilkommetInntekter) = aktiveBuilder.resultat(Toggle.TilkommenArbeidsgiver.enabled)
         if (harTilkommetInntekter) {
             inntektsmelding.varsel(Varselkode.RV_SV_5) // TODO: Burde ha eget varsel så det ikke forvekles med tilkommen inntekt fra søknaden
         }
-        arbeidsgiverInntektsopplysninger
+
+        val deaktiverteBuilder = ArbeidsgiverInntektsopplysningerOverstyringer(skjæringstidspunkt, deaktiverteArbeidsforhold, null, subsumsjonslogg)
+        inntektsmelding.nyeArbeidsgiverInntektsopplysninger(deaktiverteBuilder, skjæringstidspunkt)
+        val (deaktiverteResultat, _) = deaktiverteBuilder.resultat(Toggle.TilkommenArbeidsgiver.enabled)
+
+        (arbeidsgiverInntektsopplysninger + deaktiverteArbeidsforhold)
             .finn(inntektsmelding.organisasjonsnummer())
             ?.arbeidsgiveropplysningerKorrigert(person, inntektsmelding)
-        return kopierSykepengegrunnlagOgValiderMinsteinntekt(resultat, deaktiverteArbeidsforhold, subsumsjonslogg)
+
+        return kopierSykepengegrunnlagOgValiderMinsteinntekt(aktiveResultat, deaktiverteResultat, subsumsjonslogg)
     }
 
     private fun kopierSykepengegrunnlagOgValiderMinsteinntekt(
@@ -460,7 +469,8 @@ internal class Inntektsgrunnlag private constructor(
     internal fun faktaavklarteInntekter() = VilkårsprøvdSkjæringstidspunkt(
         skjæringstidspunkt = skjæringstidspunkt,
         `6G` = `6G`,
-        inntekter = arbeidsgiverInntektsopplysninger.faktaavklarteInntekter()
+        inntekter = arbeidsgiverInntektsopplysninger.faktaavklarteInntekter(),
+        deaktiverteInntekter = deaktiverteArbeidsforhold.faktaavklarteInntekter()
     )
 }
 
