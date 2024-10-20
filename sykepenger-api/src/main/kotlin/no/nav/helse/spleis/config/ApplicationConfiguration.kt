@@ -8,8 +8,7 @@ import com.github.navikt.tbd_libs.azure.createAzureTokenClientFromEnvironment
 import com.github.navikt.tbd_libs.spurtedu.SpurteDuClient
 import io.ktor.server.auth.jwt.JWTAuthenticationProvider
 import io.ktor.server.auth.jwt.JWTPrincipal
-import io.ktor.server.engine.ApplicationEngineEnvironmentBuilder
-import io.ktor.server.engine.connector
+import io.ktor.server.engine.EngineConnectorBuilder
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URI
@@ -52,10 +51,8 @@ internal class ApplicationConfiguration(env: Map<String, String> = System.getenv
 }
 
 internal class KtorConfig(private val httpPort: Int = 8080) {
-    fun configure(builder: ApplicationEngineEnvironmentBuilder) {
-        builder.connector {
-            port = httpPort
-        }
+    fun configure(builder: EngineConnectorBuilder) {
+        builder.port = httpPort
     }
 }
 

@@ -6,7 +6,6 @@ import io.ktor.http.ContentType
 import io.ktor.http.auth.HttpAuthHeader
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationCall
-import io.ktor.server.application.call
 import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.parseAuthorizationHeader
 import io.ktor.server.plugins.BadRequestException
@@ -14,9 +13,9 @@ import io.ktor.server.plugins.NotFoundException
 import io.ktor.server.request.header
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
+import io.ktor.server.routing.RoutingCall
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
-import io.ktor.util.pipeline.PipelineContext
 import java.util.UUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -32,7 +31,7 @@ internal fun Application.spannerApi(hendelseDao: HendelseDao, personDao: PersonD
         authenticate {
             get("/api/person-json/{maskertId?}") {
                 withContext(Dispatchers.IO) {
-                    val ident = fnr(personDao, spurteDuClient)
+                    val ident = call.fnr(personDao, spurteDuClient)
                     val serialisertPerson = personDao.hentPersonFraFnr(ident) ?: throw NotFoundException("Kunne ikke finne person for fødselsnummer")
                     val dto = serialisertPerson.tilPersonDto { hendelseDao.hentAlleHendelser(ident) }
                     val person = Person.gjenopprett(EmptyLog, dto)
@@ -66,7 +65,7 @@ internal fun Application.sporingApi(hendelseDao: HendelseDao, personDao: PersonD
         authenticate {
             get("/api/vedtaksperioder") {
                 withContext(Dispatchers.IO) {
-                    val fnr =  fnr(personDao)
+                    val fnr =  call.fnr(personDao)
                     val person = personDao.hentPersonFraFnr(fnr) ?: throw NotFoundException("Kunne ikke finne person for fødselsnummer")
                     val dto = person.tilPersonDto { hendelseDao.hentAlleHendelser(fnr) }
                     call.respond(serializePersonForSporing(Person.gjenopprett(EmptyLog, dto)))
@@ -76,9 +75,9 @@ internal fun Application.sporingApi(hendelseDao: HendelseDao, personDao: PersonD
     }
 }
 
-private fun PipelineContext<Unit, ApplicationCall>.fnr(personDao: PersonDao, spurteDuClient: SpurteDuClient? = null): Long {
-    val maskertId = call.parameters["maskertId"]
-    val (fnr, aktorid) = call.identFraSpurteDu(spurteDuClient, maskertId) ?: call.identFraRequest()
+private fun RoutingCall.fnr(personDao: PersonDao, spurteDuClient: SpurteDuClient? = null): Long {
+    val maskertId = this.parameters["maskertId"]
+    val (fnr, aktorid) = this.identFraSpurteDu(spurteDuClient, maskertId) ?: this.identFraRequest()
     return fnr(personDao, fnr, aktorid) ?: throw BadRequestException("Mangler fnr eller aktorId i headers")
 }
 

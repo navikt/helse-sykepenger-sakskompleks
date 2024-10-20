@@ -10,15 +10,15 @@ import io.ktor.http.ContentType
 import io.ktor.serialization.jackson.JacksonConverter
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
-import io.ktor.server.engine.applicationEngineEnvironment
+import io.ktor.server.engine.applicationEnvironment
+import io.ktor.server.engine.connector
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.callid.CallId
 import io.ktor.server.plugins.callid.callIdMdc
-import io.ktor.server.plugins.callloging.CallLogging
+import io.ktor.server.plugins.calllogging.CallLogging
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.request.path
-import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import java.util.UUID
@@ -68,16 +68,18 @@ internal fun createApp(
 ) =
     embeddedServer(
         factory = Netty,
-        environment = applicationEngineEnvironment {
-            ktorConfig.configure(this)
+        environment = applicationEnvironment {
             log = logg
-            module {
-                azureAdAppAuthentication(azureConfig)
-                lagApplikasjonsmodul(spekematClient, spurteDuClient, dataSourceProvider, collectorRegistry)
-            }
         },
         configure = {
             this.responseWriteTimeoutSeconds = 30
+            connector {
+                ktorConfig.configure(this)
+            }
+        },
+        {
+            azureAdAppAuthentication(azureConfig)
+            lagApplikasjonsmodul(spekematClient, spurteDuClient, dataSourceProvider, collectorRegistry)
         }
     )
 

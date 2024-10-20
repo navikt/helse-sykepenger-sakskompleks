@@ -14,7 +14,7 @@ import io.ktor.http.isSuccess
 import io.ktor.serialization.jackson.JacksonConverter
 import io.ktor.server.auth.authentication
 import io.ktor.server.auth.jwt.JWTPrincipal
-import io.ktor.server.engine.connector
+import io.ktor.server.config.MapApplicationConfig
 import io.ktor.server.testing.testApplication
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
@@ -780,10 +780,7 @@ internal class GraphQLApiTest : AbstractObservableTest() {
         private fun lagTestapplikasjon(spekematClient: SpekematClient, port: Int, testDataSource: TestDataSource, testblokk: suspend SpleisApiTestContext.() -> Unit) {
             testApplication {
                 environment {
-                    connector {
-                        this.host = "localhost"
-                        this.port = port
-                    }
+                    config = MapApplicationConfig("ktor.host" to "localhost", "ktor.port" to port.toString())
                 }
                 application {
                     authentication {
