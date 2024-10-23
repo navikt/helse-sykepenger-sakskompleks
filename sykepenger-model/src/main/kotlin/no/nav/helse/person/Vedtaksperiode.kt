@@ -134,8 +134,10 @@ import no.nav.helse.sykdomstidslinje.Sykdomstidslinje
 import no.nav.helse.sykdomstidslinje.Sykdomstidslinje.Companion.slåSammenForkastedeSykdomstidslinjer
 import no.nav.helse.sykdomstidslinje.SykdomstidslinjeHendelse
 import no.nav.helse.utbetalingslinjer.Utbetaling
+import no.nav.helse.utbetalingstidslinje.AndreYtelserPerioder
 import no.nav.helse.utbetalingstidslinje.ArbeidsgiverFaktaavklartInntekt
 import no.nav.helse.utbetalingstidslinje.Arbeidsgiverperiode
+import no.nav.helse.utbetalingstidslinje.AvvisAndreYtelserFilter
 import no.nav.helse.utbetalingstidslinje.AvvisDagerEtterDødsdatofilter
 import no.nav.helse.utbetalingstidslinje.AvvisInngangsvilkårfilter
 import no.nav.helse.utbetalingstidslinje.Maksdatoresultat
@@ -1140,7 +1142,7 @@ internal class Vedtaksperiode private constructor(
         )
     }
 
-    private fun beregnUtbetalinger(hendelse: IAktivitetslogg): Maksdatoresultat {
+    private fun beregnUtbetalinger(hendelse: IAktivitetslogg, andreYtelserPerioder: AndreYtelserPerioder): Maksdatoresultat {
         val perioderDetSkalBeregnesUtbetalingFor = perioderDetSkalBeregnesUtbetalingFor()
 
         check(perioderDetSkalBeregnesUtbetalingFor.all { it.skjæringstidspunkt == this.skjæringstidspunkt }) {
@@ -1150,7 +1152,7 @@ internal class Vedtaksperiode private constructor(
             "krever vilkårsgrunnlag for ${skjæringstidspunkt}, men har ikke. Lages det utbetaling for en periode som ikke skal lage utbetaling?"
         }
 
-        val (maksdatofilter, beregnetTidslinjePerArbeidsgiver) = beregnUtbetalingstidslinjeForOverlappendeVedtaksperioder(hendelse, grunnlagsdata)
+        val (maksdatofilter, beregnetTidslinjePerArbeidsgiver) = beregnUtbetalingstidslinjeForOverlappendeVedtaksperioder(hendelse, grunnlagsdata, andreYtelserPerioder)
         perioderDetSkalBeregnesUtbetalingFor.forEach { other ->
             val utbetalingstidslinje = beregnetTidslinjePerArbeidsgiver.getValue(other.organisasjonsnummer)
             val maksdatoresultat = maksdatofilter.maksdatoresultatForVedtaksperiode(other.periode, other.jurist)
@@ -1159,9 +1161,13 @@ internal class Vedtaksperiode private constructor(
         return maksdatofilter.maksdatoresultatForVedtaksperiode(periode, EmptyLog)
     }
 
-    private fun beregnUtbetalingstidslinjeForOverlappendeVedtaksperioder(hendelse: IAktivitetslogg, grunnlagsdata: VilkårsgrunnlagHistorikk.VilkårsgrunnlagElement): Pair<MaksimumSykepengedagerfilter, Map<String, Utbetalingstidslinje>> {
+    private fun beregnUtbetalingstidslinjeForOverlappendeVedtaksperioder(
+        hendelse: IAktivitetslogg,
+        grunnlagsdata: VilkårsgrunnlagHistorikk.VilkårsgrunnlagElement,
+        andreYtelserPerioder: AndreYtelserPerioder
+    ): Pair<MaksimumSykepengedagerfilter, Map<String, Utbetalingstidslinje>> {
         val uberegnetTidslinjePerArbeidsgiver = utbetalingstidslinjePerArbeidsgiver(grunnlagsdata)
-        return filtrerUtbetalingstidslinjer(hendelse, uberegnetTidslinjePerArbeidsgiver, grunnlagsdata)
+        return filtrerUtbetalingstidslinjer(hendelse, uberegnetTidslinjePerArbeidsgiver, grunnlagsdata, andreYtelserPerioder)
     }
 
     private fun utbetalingstidslinjePerArbeidsgiver(grunnlagsdata: VilkårsgrunnlagHistorikk.VilkårsgrunnlagElement): Map<String, Utbetalingstidslinje> {
@@ -1178,7 +1184,12 @@ internal class Vedtaksperiode private constructor(
         return faktaavklarteInntekter.medGhostOgNyeInntekterUnderveis(utbetalingstidslinjer)
     }
 
-    private fun filtrerUtbetalingstidslinjer(hendelse: IAktivitetslogg, uberegnetTidslinjePerArbeidsgiver: Map<String, Utbetalingstidslinje>, grunnlagsdata: VilkårsgrunnlagHistorikk.VilkårsgrunnlagElement): Pair<MaksimumSykepengedagerfilter, Map<String, Utbetalingstidslinje>> {
+    private fun filtrerUtbetalingstidslinjer(
+        hendelse: IAktivitetslogg,
+        uberegnetTidslinjePerArbeidsgiver: Map<String, Utbetalingstidslinje>,
+        grunnlagsdata: VilkårsgrunnlagHistorikk.VilkårsgrunnlagElement,
+        andreYtelserPerioder: AndreYtelserPerioder
+    ): Pair<MaksimumSykepengedagerfilter, Map<String, Utbetalingstidslinje>> {
         // grunnlaget for maksdatoberegning er alt som har skjedd før, frem til og med vedtaksperioden som
         // beregnes
         val historisktidslinjePerArbeidsgiver = person.vedtaksperioder { it.periode.endInclusive < periode.start }
@@ -1190,6 +1201,7 @@ internal class Vedtaksperiode private constructor(
 
         val maksdatofilter = MaksimumSykepengedagerfilter(person.alder, person.regler, historisktidslinje)
         val filtere = listOf(
+            AvvisAndreYtelserFilter(andreYtelserPerioder),
             Sykdomsgradfilter(person.minimumSykdomsgradsvurdering),
             AvvisDagerEtterDødsdatofilter(person.alder),
             AvvisInngangsvilkårfilter(grunnlagsdata),
@@ -1657,7 +1669,7 @@ internal class Vedtaksperiode private constructor(
         }
 
         override fun beregnUtbetalinger(vedtaksperiode: Vedtaksperiode, ytelser: Ytelser) {
-            val maksdatoresultat = vedtaksperiode.beregnUtbetalinger(ytelser)
+            val maksdatoresultat = vedtaksperiode.beregnUtbetalinger(ytelser, ytelser.andreYtelserPerioder())
             ytelser.valider(vedtaksperiode.periode, vedtaksperiode.skjæringstidspunkt, maksdatoresultat.maksdato, vedtaksperiode.erForlengelse())
             vedtaksperiode.høstingsresultater(ytelser, AvventerSimuleringRevurdering, AvventerGodkjenningRevurdering)
         }
@@ -2082,7 +2094,7 @@ internal class Vedtaksperiode private constructor(
         }
 
         override fun beregnUtbetalinger(vedtaksperiode: Vedtaksperiode, ytelser: Ytelser) {
-            val maksdatoresultat = vedtaksperiode.beregnUtbetalinger(ytelser)
+            val maksdatoresultat = vedtaksperiode.beregnUtbetalinger(ytelser, ytelser.andreYtelserPerioder())
             ytelser.valider(vedtaksperiode.periode, vedtaksperiode.skjæringstidspunkt, maksdatoresultat.maksdato, vedtaksperiode.erForlengelse())
             if (ytelser.harFunksjonelleFeilEllerVerre()) return vedtaksperiode.forkast(ytelser)
             vedtaksperiode.høstingsresultater(ytelser, AvventerSimulering, AvventerGodkjenning)

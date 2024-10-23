@@ -9,6 +9,7 @@ import no.nav.helse.sykdomstidslinje.Dag.Companion.default
 import no.nav.helse.sykdomstidslinje.SykdomshistorikkHendelse
 import no.nav.helse.sykdomstidslinje.Sykdomstidslinje
 import no.nav.helse.sykdomstidslinje.merge
+import no.nav.helse.utbetalingstidslinje.AndreYtelserPerioder
 
 class Ytelser(
     meldingsreferanseId: UUID,
@@ -80,6 +81,26 @@ class Ytelser(
     internal fun avgrensTil(periode: Periode): Ytelser {
         sykdomstidslinje = sykdomstidslinje.fraOgMed(periode.start).fremTilOgMed(periode.endInclusive)
         return this
+    }
+
+    internal fun andreYtelserPerioder(): AndreYtelserPerioder {
+        val foreldrepenger = foreldrepenger.perioder()
+        val svangerskapspenger = svangerskapspenger.perioder()
+        val pleiepenger = pleiepenger.perioder()
+        val omsorgspenger = omsorgspenger.perioder()
+        val opplæringspenger = opplæringspenger.perioder()
+        val arbeidsavklaringspenger = arbeidsavklaringspenger.perioder
+        val dagpenger = dagpenger.perioder
+
+        return AndreYtelserPerioder(
+            foreldrepenger = foreldrepenger,
+            svangerskapspenger = svangerskapspenger,
+            pleiepenger = pleiepenger,
+            dagpenger = dagpenger,
+            arbeidsavklaringspenger = arbeidsavklaringspenger,
+            opplæringspenger = opplæringspenger,
+            omsorgspenger = omsorgspenger
+        )
     }
 }
 

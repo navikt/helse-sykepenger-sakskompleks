@@ -14,15 +14,15 @@ internal class AvvisAndreYtelserFilterTest {
 
     @Test
     fun `Avslår andre ytelser`() {
-        val filter = AvvisAndreYtelserFilter(
+        val filter = AvvisAndreYtelserFilter(AndreYtelserPerioder(
             foreldrepenger = listOf(1.januar.somPeriode()),
             svangerskapspenger = listOf(2.januar.somPeriode()),
             pleiepenger = listOf(3.januar.somPeriode()),
             dagpenger = listOf(4.januar.somPeriode()),
             arbeidsavklaringspenger = listOf(5.januar.somPeriode()),
             opplæringspenger = listOf(8.januar.somPeriode()),
-            omsorgspenger = listOf(9.januar.somPeriode()),
-        )
+            omsorgspenger = listOf(9.januar.somPeriode())
+        ))
 
         val tidslinje = tidslinjeOf(9.NAV)
         val result = filter.filter(listOf(tidslinje), tidslinje.periode(), Aktivitetslogg(), EmptyLog).single().inspektør

@@ -138,7 +138,7 @@ internal class RevurderingOutOfOrderGapTest : AbstractEndToEndTest() {
         håndterSøknad(Sykdom(26.januar, 31.januar, 100.prosent))
         håndterYtelser(3.vedtaksperiode, foreldrepenger = listOf(GradertPeriode(26.januar til 31.januar, 100)))
         assertVarsel(`Overlapper med foreldrepenger`, 3.vedtaksperiode.filter())
-        assertTilstander(3.vedtaksperiode, START, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_HISTORIKK, AVVENTER_SIMULERING)
+        assertTilstander(3.vedtaksperiode, START, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_HISTORIKK, AVVENTER_GODKJENNING)
     }
 
     @Test

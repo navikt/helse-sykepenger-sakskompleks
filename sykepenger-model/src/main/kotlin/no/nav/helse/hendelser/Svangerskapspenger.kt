@@ -17,4 +17,8 @@ class Svangerskapspenger(
             if (!overlapper) aktivitetslogg.info("Bruker har svangerskapsytelser, men det slår ikke ut på overlappssjekken")
         }
     }
+
+    internal fun perioder(): List<Periode> {
+        return svangerskapsytelse.map { it.periode }
+    }
 }

@@ -16,4 +16,8 @@ class Opplæringspenger(
             if (!overlapper) aktivitetslogg.info("Bruker har opplæringspengeytelser, men det slår ikke ut på overlappssjekken")
         }
     }
+
+    internal fun perioder(): List<Periode> {
+        return perioder.map { it.periode }
+    }
 }
