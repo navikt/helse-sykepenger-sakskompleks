@@ -508,7 +508,7 @@ internal class YtelserE2ETest : AbstractEndToEndTest() {
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode, foreldrepenger = listOf(GradertPeriode(januar, 100)))
         assertVarsel(RV_AY_5, 1.vedtaksperiode.filter())
-        assertEquals("YYYYYYY YYYYYYY YYYYYYY YYYYYYY YYY", inspektør.sykdomstidslinje.toShortString())
+        assertEquals("SSSSSHH SSSSSHH SSSSSHH SSSSSHH SSS", inspektør.sykdomstidslinje.toShortString())
     }
 
     @Test
@@ -519,28 +519,6 @@ internal class YtelserE2ETest : AbstractEndToEndTest() {
         håndterYtelser(1.vedtaksperiode, foreldrepenger = listOf(GradertPeriode(30.januar til 31.januar, 50)))
         assertVarsel(RV_AY_5, 1.vedtaksperiode.filter())
         assertEquals("SSSSSHH SSSSSHH SSSSSHH SSSSSHH SSS", inspektør.sykdomstidslinje.toShortString())
-    }
-
-    @Test
-    fun `Overlapp med foreldrepenger i halen og utenfor perioden begrenses av perioden`() {
-        håndterSøknad(januar)
-        håndterInntektsmelding(listOf(1.januar til 16.januar))
-        håndterVilkårsgrunnlag(1.vedtaksperiode)
-        håndterYtelser(1.vedtaksperiode, foreldrepenger = listOf(GradertPeriode(1.januar til 10.februar, 100)))
-        assertVarsel(RV_AY_5, 1.vedtaksperiode.filter())
-        assertEquals("YYYYYYY YYYYYYY YYYYYYY YYYYYYY YYY", inspektør.sykdomstidslinje.toShortString())
-    }
-
-    @Test
-    fun `Overlapp med foreldrepenger i halen og før perioden begrenses av perioden`() {
-        håndterSøknad(februar)
-        håndterInntektsmelding(listOf(1.februar til 16.februar))
-        håndterVilkårsgrunnlag(1.vedtaksperiode)
-        håndterYtelser(1.vedtaksperiode, foreldrepenger = listOf(GradertPeriode(1.januar til 28.februar, 100)))
-        assertVarsel(RV_AY_5, 1.vedtaksperiode.filter())
-        assertEquals(1.februar, inspektør.sykdomstidslinje.førsteDag())
-        assertEquals(28.februar, inspektør.sykdomstidslinje.sisteDag())
-        assertEquals("YYYY YYYYYYY YYYYYYY YYYYYYY YYY", inspektør.sykdomstidslinje.toShortString())
     }
 
     /*

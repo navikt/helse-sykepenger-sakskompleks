@@ -1048,17 +1048,11 @@ internal class Vedtaksperiode private constructor(
             this.kontekst(kopi)
         }
 
-    private fun oppdaterHistorikk(ytelser: Ytelser, infotrygdhistorikk: Infotrygdhistorikk) {
+    private fun valider(ytelser: Ytelser, infotrygdhistorikk: Infotrygdhistorikk) {
         val vilkårsgrunnlag = requireNotNull(vilkårsgrunnlag)
         ytelser.kontekst(vilkårsgrunnlag)
         vilkårsgrunnlag.valider(ytelser, organisasjonsnummer)
         infotrygdhistorikk.valider(ytelser, periode, skjæringstidspunkt, organisasjonsnummer)
-        ytelser.oppdaterHistorikk(periode, skjæringstidspunkt, person.nåværendeVedtaksperioder(OVERLAPPENDE_ELLER_SENERE_MED_SAMME_SKJÆRINGSTIDSPUNKT(this)).firstOrNull()?.periode) {
-            oppdaterHistorikk(
-                ytelser.avgrensTil(periode),
-                validering = {}
-            )
-        }
     }
 
     private fun lagNyUtbetaling(arbeidsgiverSomBeregner: Arbeidsgiver, hendelse: IAktivitetslogg, maksdatoresultat: Maksdatoresultat, utbetalingstidslinje: Utbetalingstidslinje, grunnlagsdata: VilkårsgrunnlagHistorikk.VilkårsgrunnlagElement) {
@@ -1663,7 +1657,7 @@ internal class Vedtaksperiode private constructor(
             infotrygdhistorikk: Infotrygdhistorikk
         ) {
             håndterRevurdering(ytelser) {
-                vedtaksperiode.oppdaterHistorikk(ytelser, infotrygdhistorikk)
+                vedtaksperiode.valider(ytelser, infotrygdhistorikk)
                 vedtaksperiode.tilstand.beregnUtbetalinger(vedtaksperiode, ytelser)
             }
         }
@@ -2087,7 +2081,7 @@ internal class Vedtaksperiode private constructor(
             infotrygdhistorikk: Infotrygdhistorikk
         ) {
             håndterFørstegangsbehandling(ytelser, vedtaksperiode) {
-                vedtaksperiode.oppdaterHistorikk(ytelser, infotrygdhistorikk)
+                vedtaksperiode.valider(ytelser, infotrygdhistorikk)
                 if (ytelser.harFunksjonelleFeilEllerVerre()) return@håndterFørstegangsbehandling vedtaksperiode.forkast(ytelser)
                 vedtaksperiode.tilstand.beregnUtbetalinger(vedtaksperiode, ytelser)
             }

@@ -5,10 +5,6 @@ import java.time.LocalDate
 import java.util.UUID
 import no.nav.helse.person.aktivitetslogg.Aktivitetslogg
 import no.nav.helse.person.aktivitetslogg.Varselkode
-import no.nav.helse.sykdomstidslinje.Dag.Companion.default
-import no.nav.helse.sykdomstidslinje.SykdomshistorikkHendelse
-import no.nav.helse.sykdomstidslinje.Sykdomstidslinje
-import no.nav.helse.sykdomstidslinje.merge
 import no.nav.helse.utbetalingstidslinje.AndreYtelserPerioder
 
 class Ytelser(
@@ -26,12 +22,7 @@ class Ytelser(
     private val arbeidsavklaringspenger: Arbeidsavklaringspenger,
     private val dagpenger: Dagpenger,
     aktivitetslogg: Aktivitetslogg
-) : ArbeidstakerHendelse(meldingsreferanseId, fødselsnummer, aktørId, organisasjonsnummer, aktivitetslogg), SykdomshistorikkHendelse {
-
-    private val YTELSER_SOM_KAN_OPPDATERE_HISTORIKK: List<AnnenYtelseSomKanOppdatereHistorikk> = listOf(
-        foreldrepenger
-    )
-    private lateinit var sykdomstidslinje: Sykdomstidslinje
+) : ArbeidstakerHendelse(meldingsreferanseId, fødselsnummer, aktørId, organisasjonsnummer, aktivitetslogg) {
 
     companion object {
         internal val Periode.familieYtelserPeriode get() = oppdaterFom(start.minusWeeks(4))
@@ -53,34 +44,6 @@ class Ytelser(
         if (institusjonsopphold.overlapper(this, periodeForOverlappsjekk)) funksjonellFeil(Varselkode.`Overlapper med institusjonsopphold`)
 
         return !harFunksjonelleFeilEllerVerre()
-    }
-
-    internal fun oppdaterHistorikk(
-        periode: Periode,
-        skjæringstidspunkt: LocalDate,
-        periodeRettEtter: Periode?,
-        oppdaterHistorikk: () -> Unit
-    ) {
-        val sykdomstidslinjer = YTELSER_SOM_KAN_OPPDATERE_HISTORIKK.mapNotNull { ytelse ->
-            if (!ytelse.skalOppdatereHistorikk(this, ytelse, periode, skjæringstidspunkt, periodeRettEtter)) null
-            else ytelse.sykdomstidslinje(meldingsreferanseId(), registrert())
-        }
-        if (sykdomstidslinjer.isEmpty()) return
-        this.sykdomstidslinje = sykdomstidslinjer.merge(beste = default)
-        oppdaterHistorikk()
-    }
-
-    override fun oppdaterFom(other: Periode): Periode {
-        return other
-    }
-
-    override fun sykdomstidslinje(): Sykdomstidslinje {
-        return sykdomstidslinje
-    }
-
-    internal fun avgrensTil(periode: Periode): Ytelser {
-        sykdomstidslinje = sykdomstidslinje.fraOgMed(periode.start).fremTilOgMed(periode.endInclusive)
-        return this
     }
 
     internal fun andreYtelserPerioder(): AndreYtelserPerioder {
