@@ -435,7 +435,7 @@ internal class InntektsmeldingTest {
     @Test
     fun `førsteFraværsdag kan være null ved lagring av inntekt`() {
         inntektsmelding(listOf(Periode(1.januar, 16.januar)), førsteFraværsdag = null)
-        assertDoesNotThrow { inntektsmelding.addInntekt(Inntektshistorikk(), EmptyLog) }
+        assertDoesNotThrow { inntektsmelding.addInntekt(Inntektshistorikk(), EmptyLog, emptyList()) }
     }
 
     @Test
@@ -461,7 +461,7 @@ internal class InntektsmeldingTest {
             førsteFraværsdag = 1.januar
         )
         val inntektshistorikk = Inntektshistorikk()
-        inntektsmelding.addInntekt(inntektshistorikk, EmptyLog)
+        inntektsmelding.addInntekt(inntektshistorikk, EmptyLog, emptyList())
         assertEquals(2000.månedlig, inntektshistorikk.avklarSykepengegrunnlag(1.januar, 1.januar, null)?.inspektør?.beløp)
     }
 

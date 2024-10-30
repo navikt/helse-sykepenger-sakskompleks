@@ -2,9 +2,9 @@ package no.nav.helse.spleis.e2e.flere_arbeidsgivere
 
 import java.time.LocalDate
 import java.util.UUID
-import no.nav.helse.Toggle
 import no.nav.helse.dsl.lagStandardSykepengegrunnlag
 import no.nav.helse.februar
+import no.nav.helse.hendelser.Inntektsmelding.Avsendersystem.ALTINN
 import no.nav.helse.hendelser.Sykmeldingsperiode
 import no.nav.helse.hendelser.Søknad.Søknadsperiode.Sykdom
 import no.nav.helse.hendelser.Vilkårsgrunnlag
@@ -34,7 +34,6 @@ import no.nav.helse.person.inntekt.Inntektsmelding
 import no.nav.helse.person.inntekt.Refusjonsopplysning
 import no.nav.helse.person.nullstillTilstandsendringer
 import no.nav.helse.spleis.e2e.AbstractEndToEndTest
-import no.nav.helse.spleis.e2e.assertSisteTilstand
 import no.nav.helse.spleis.e2e.assertTilstander
 import no.nav.helse.spleis.e2e.assertVarsel
 import no.nav.helse.spleis.e2e.forlengVedtak
@@ -46,9 +45,7 @@ import no.nav.helse.spleis.e2e.håndterUtbetalingsgodkjenning
 import no.nav.helse.spleis.e2e.håndterUtbetalt
 import no.nav.helse.spleis.e2e.håndterVilkårsgrunnlag
 import no.nav.helse.spleis.e2e.håndterYtelser
-import no.nav.helse.spleis.e2e.nyPeriode
 import no.nav.helse.spleis.e2e.nyeVedtak
-import no.nav.helse.spleis.e2e.nyttVedtak
 import no.nav.helse.økonomi.Inntekt.Companion.daglig
 import no.nav.helse.økonomi.Prosentdel.Companion.prosent
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -70,7 +67,7 @@ internal class FlereUkjenteArbeidsgivereTest : AbstractEndToEndTest() {
         håndterYtelser(1.vedtaksperiode, orgnummer = a1)
         håndterSimulering(1.vedtaksperiode, orgnummer = a1)
 
-        val im2 = håndterInntektsmelding(listOf(1.mars til 16.mars), beregnetInntekt = inntektA2, orgnummer = a2,)
+        val im2 = håndterInntektsmelding(listOf(1.mars til 16.mars), beregnetInntekt = inntektA2, orgnummer = a2, avsendersystem = ALTINN)
         nullstillTilstandsendringer()
         val søknad = UUID.randomUUID()
         håndterSøknad(Sykdom(1.mars, 20.mars, 100.prosent), id = søknad, orgnummer = a2)
@@ -156,6 +153,7 @@ internal class FlereUkjenteArbeidsgivereTest : AbstractEndToEndTest() {
             listOf(1.januar til 16.januar),
             orgnummer = a2,
             begrunnelseForReduksjonEllerIkkeUtbetalt = "ja",
+            avsendersystem = ALTINN
         )
         assertEquals(id, observatør.inntektsmeldingIkkeHåndtert.single())
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar), orgnummer = a2)
@@ -199,6 +197,7 @@ internal class FlereUkjenteArbeidsgivereTest : AbstractEndToEndTest() {
             listOf(1.januar til 16.januar),
             orgnummer = a2,
             begrunnelseForReduksjonEllerIkkeUtbetalt = "ja",
+            avsendersystem = ALTINN
         )
         assertEquals(imId, observatør.inntektsmeldingIkkeHåndtert.single())
         håndterSykmelding(Sykmeldingsperiode(1.januar, 31.januar), orgnummer = a2)
@@ -238,11 +237,12 @@ internal class FlereUkjenteArbeidsgivereTest : AbstractEndToEndTest() {
             listOf(1.januar til 16.januar),
             orgnummer = a2,
             begrunnelseForReduksjonEllerIkkeUtbetalt = "ja",
+            avsendersystem = ALTINN
         )
         assertEquals(imId, observatør.inntektsmeldingIkkeHåndtert.single())
 
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent), orgnummer = a1)
-        håndterInntektsmelding(listOf(1.januar til 16.januar), orgnummer = a1,)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), orgnummer = a1, vedtaksperiodeIdInnhenter = 1.vedtaksperiode)
         håndterVilkårsgrunnlag(1.vedtaksperiode,
             inntektsvurderingForSykepengegrunnlag = lagStandardSykepengegrunnlag(listOf(a1 to INNTEKT, a2 to INNTEKT), 1.januar),
             arbeidsforhold = listOf(

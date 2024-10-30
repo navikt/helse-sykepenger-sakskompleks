@@ -240,7 +240,7 @@ internal class OppdaterteArbeidsgiveropplysningerTest: AbstractEndToEndTest() {
 
         assertEquals(4, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.size)
 
-        val im = håndterInntektsmelding(listOf(1.januar til 16.januar), beregnetInntekt = INNTEKT)
+        val im = håndterInntektsmelding(listOf(1.januar til 16.januar), beregnetInntekt = INNTEKT, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         assertEquals(6, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.size)
 
         håndterVilkårsgrunnlag(2.vedtaksperiode)
@@ -327,12 +327,12 @@ internal class OppdaterteArbeidsgiveropplysningerTest: AbstractEndToEndTest() {
     fun `sender ikke oppdatert forespørsel for en periode som har mottatt inntektsmelding`() {
         nyPeriode(januar)
         nyPeriode(mars)
-        håndterInntektsmelding(listOf(mars))
+        håndterInntektsmelding(listOf(mars), vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
 
         assertTilstand(2.vedtaksperiode, TilstandType.AVVENTER_BLOKKERENDE_PERIODE)
         assertEquals(2, observatør.trengerArbeidsgiveropplysningerVedtaksperioder.size)
 
-        håndterInntektsmelding(listOf(januar))
+        håndterInntektsmelding(listOf(januar), vedtaksperiodeIdInnhenter = 1.vedtaksperiode)
         håndterVilkårsgrunnlag(1.vedtaksperiode)
 
         assertTilstand(2.vedtaksperiode, TilstandType.AVVENTER_BLOKKERENDE_PERIODE)

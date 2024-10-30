@@ -129,7 +129,7 @@ internal class EndaEnGodkjenningsbehovTest : AbstractEndToEndTest() {
     @Test
     fun `ingen ny arbeidsgiverperiode og sykepengegrunnlag under 2g`() {
         nyttVedtak(januar, orgnummer = a1)
-        tilGodkjenning(10.februar til 20.februar, a1, beregnetInntekt = 10000.månedlig)
+        tilGodkjenning(10.februar til 20.februar, a1, beregnetInntekt = 10000.månedlig, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         assertGodkjenningsbehov(
             skjæringstidspunkt = 10.februar,
             periodeFom = 10.februar,
@@ -169,6 +169,7 @@ internal class EndaEnGodkjenningsbehovTest : AbstractEndToEndTest() {
             listOf(1.juni til 16.juni),
             førsteFraværsdag = 1.august,
             begrunnelseForReduksjonEllerIkkeUtbetalt = "FerieEllerAvspasering",
+            vedtaksperiodeIdInnhenter = 2.vedtaksperiode
         )
         håndterVilkårsgrunnlag(2.vedtaksperiode)
         håndterYtelser(2.vedtaksperiode)
@@ -193,7 +194,7 @@ internal class EndaEnGodkjenningsbehovTest : AbstractEndToEndTest() {
         håndterSimulering(1.vedtaksperiode)
         håndterUtbetalingsgodkjenning(1.vedtaksperiode)
         håndterUtbetalt()
-        tilGodkjenning(16.februar til 28.februar, a1)
+        tilGodkjenning(16.februar til 28.februar, a1, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         assertEquals("NNNNNHH NNNNNHH NNSSSHH SSSSSHH SSS???? ??????? ????SHH SSSSSHH SSS", inspektør.sykdomstidslinje.toShortString())
         assertTags(setOf("IngenNyArbeidsgiverperiode"), 2.vedtaksperiode.id(a1))
     }
@@ -238,7 +239,7 @@ internal class EndaEnGodkjenningsbehovTest : AbstractEndToEndTest() {
         assertIngenTag("IngenNyArbeidsgiverperiode", 1.vedtaksperiode.id(a1))
         håndterUtbetalingsgodkjenning()
         håndterUtbetalt()
-        tilGodkjenning(mars, a1)
+        tilGodkjenning(mars, a1, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         assertIngenTag("IngenNyArbeidsgiverperiode", 2.vedtaksperiode.id(a1))
     }
 
@@ -246,7 +247,7 @@ internal class EndaEnGodkjenningsbehovTest : AbstractEndToEndTest() {
     fun `Periode med utbetaling etter kort gap etter kort auu tagges ikke med IngenNyArbeidsgiverperiode`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 10.januar))
         håndterSøknad(1.januar til 10.januar)
-        tilGodkjenning(15.januar til 31.januar, a1)
+        tilGodkjenning(15.januar til 31.januar, a1, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         assertSisteTilstand(1.vedtaksperiode, TilstandType.AVSLUTTET_UTEN_UTBETALING)
         assertSisteTilstand(2.vedtaksperiode, AVVENTER_GODKJENNING)
         assertIngenTag("IngenNyArbeidsgiverperiode", 2.vedtaksperiode.id(a1))

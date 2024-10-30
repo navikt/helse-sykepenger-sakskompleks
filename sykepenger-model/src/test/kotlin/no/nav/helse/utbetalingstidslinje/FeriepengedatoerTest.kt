@@ -20,6 +20,7 @@ import no.nav.helse.juli
 import no.nav.helse.juni
 import no.nav.helse.mai
 import no.nav.helse.mars
+import no.nav.helse.person.IdInnhenter
 import no.nav.helse.spleis.e2e.AbstractEndToEndTest
 import no.nav.helse.spleis.e2e.håndterAnnullerUtbetaling
 import no.nav.helse.spleis.e2e.håndterInntektsmelding
@@ -265,15 +266,18 @@ internal class FeriepengedatoerTest : AbstractEndToEndTest() {
         )
         byggPerson(
             arbeidsgiverperiode = 1.mars(2018) til 16.mars(2018),
-            syktil = 28.mars(2018)
+            syktil = 28.mars(2018),
+            vedtaksperiodeIdInnhenter = 2.vedtaksperiode
         )
         byggPerson(
             arbeidsgiverperiode = 1.mai(2018) til 16.mai(2018),
-            syktil = 12.juni(2018)
+            syktil = 12.juni(2018),
+            vedtaksperiodeIdInnhenter = 3.vedtaksperiode
         )
         byggPerson(
             arbeidsgiverperiode = 1.juli(2018) til 16.juli(2018),
-            syktil = 21.juli(2018)
+            syktil = 21.juli(2018),
+            vedtaksperiodeIdInnhenter = 4.vedtaksperiode
         )
 
         val beregner = feriepengerFor(Year.of(2018), utbetalingshistorikkForFeriepenger())
@@ -289,15 +293,18 @@ internal class FeriepengedatoerTest : AbstractEndToEndTest() {
         )
         byggPerson(
             arbeidsgiverperiode = 1.mars(2018) til 16.mars(2018),
-            syktil = 28.mars(2018)
+            syktil = 28.mars(2018),
+            vedtaksperiodeIdInnhenter = 2.vedtaksperiode
         )
         byggPerson(
             arbeidsgiverperiode = 1.mai(2018) til 16.mai(2018),
-            syktil = 12.juni(2018)
+            syktil = 12.juni(2018),
+            vedtaksperiodeIdInnhenter = 3.vedtaksperiode
         )
         byggPerson(
             arbeidsgiverperiode = 1.juli(2018) til 16.juli(2018),
-            syktil = 23.juli(2018)
+            syktil = 23.juli(2018),
+            vedtaksperiodeIdInnhenter = 4.vedtaksperiode
         )
 
         val beregner = feriepengerFor(Year.of(2018), utbetalingshistorikkForFeriepenger())
@@ -368,14 +375,15 @@ internal class FeriepengedatoerTest : AbstractEndToEndTest() {
     private fun byggPerson(
         arbeidsgiverperiode: Periode = 1.januar til 16.januar,
         syktil: LocalDate = 31.januar,
-        orgnummer: String = ORGNUMMER
+        orgnummer: String = ORGNUMMER,
+        vedtaksperiodeIdInnhenter: IdInnhenter? = 1.vedtaksperiode
     ) {
         håndterSykmelding(Sykmeldingsperiode(arbeidsgiverperiode.start, syktil), orgnummer = orgnummer)
         håndterSøknad(
             Sykdom(arbeidsgiverperiode.start, syktil, 100.prosent),
             orgnummer = orgnummer
         )
-        håndterInntektsmelding(listOf(arbeidsgiverperiode), orgnummer = orgnummer,)
+        håndterInntektsmelding(listOf(arbeidsgiverperiode), orgnummer = orgnummer, vedtaksperiodeIdInnhenter = vedtaksperiodeIdInnhenter)
         håndterVilkårsgrunnlag(observatør.sisteVedtaksperiode(), orgnummer = orgnummer)
         håndterYtelser(observatør.sisteVedtaksperiode(), orgnummer = orgnummer)
         håndterSimulering(observatør.sisteVedtaksperiode(), orgnummer = orgnummer)

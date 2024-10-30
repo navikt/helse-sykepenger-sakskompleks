@@ -47,6 +47,7 @@ internal class DokumentHåndteringTest : AbstractEndToEndTest() {
         val inntektsmelding = håndterInntektsmelding(
             arbeidsgiverperioder = listOf(1.januar til 16.januar),
             førsteFraværsdag = 10.februar,
+            avsendersystem = Inntektsmelding.Avsendersystem.ALTINN
         )
         val søknad = håndterSøknad(Sykdom(10.februar, 28.februar, 100.prosent))
         håndterVilkårsgrunnlag(2.vedtaksperiode)
@@ -57,7 +58,7 @@ internal class DokumentHåndteringTest : AbstractEndToEndTest() {
     @Test
     fun `Inntektsmelding kommer mellom AUU og søknad for førstegangsbehandling`() {
         val søknad1 = håndterSøknad(Sykdom(1.januar, 16.januar, 100.prosent))
-        val inntektsmelding = håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        val inntektsmelding = håndterInntektsmelding(listOf(1.januar til 16.januar))
         val søknad2 = håndterSøknad(Sykdom(17.januar, 31.januar, 100.prosent))
 
         håndterVilkårsgrunnlag(2.vedtaksperiode)
@@ -485,10 +486,11 @@ internal class DokumentHåndteringTest : AbstractEndToEndTest() {
     fun `inntektsmelding med første fraværsdag utenfor sykdom - ett tidligere vedtak - inntektsmelding ikke håndtert fordi inntekt håndteres ikke`() {
         val im1 = UUID.randomUUID()
         nyttVedtak(januar, inntektsmeldingId = im1)
-        val im2 = håndterInntektsmelding(listOf(1.januar til 16.januar), førsteFraværsdag = 1.februar, refusjon = Inntektsmelding.Refusjon(
-            Inntekt.INGEN,
-            null
-        )
+        val im2 = håndterInntektsmelding(
+            listOf(1.januar til 16.januar),
+            førsteFraværsdag = 1.februar,
+            refusjon = Inntektsmelding.Refusjon(Inntekt.INGEN, null),
+            avsendersystem = Inntektsmelding.Avsendersystem.ALTINN
         )
         håndterSøknad(februar)
         assertFalse(im2 in observatør.inntektsmeldingHåndtert.map(Pair<UUID,*>::first))
@@ -499,7 +501,7 @@ internal class DokumentHåndteringTest : AbstractEndToEndTest() {
     fun `inntektsmelding med første fraværsdag utenfor sykdom - ingen tidligere vedtak - inntektsmelding ikke håndtert fordi inntekt håndteres ikke`() {
         håndterSykmelding(Sykmeldingsperiode(3.januar, 26.januar))
         håndterSøknad(Sykdom(3.januar, 26.januar, 100.prosent))
-        val im = håndterInntektsmelding(listOf(Periode(3.januar, 18.januar)), 27.januar)
+        val im = håndterInntektsmelding(listOf(Periode(3.januar, 18.januar)), 27.januar, avsendersystem = Inntektsmelding.Avsendersystem.ALTINN)
         assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING)
         assertFalse(im in observatør.inntektsmeldingHåndtert.map(Pair<UUID,*>::first))
         assertTrue(im in observatør.inntektsmeldingIkkeHåndtert)

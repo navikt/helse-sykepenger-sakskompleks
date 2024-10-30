@@ -3041,6 +3041,9 @@ internal class Vedtaksperiode private constructor(
         internal fun List<Vedtaksperiode>.refusjonstidslinje() = fold(Beløpstidslinje()) { beløpstidslinje, vedtaksperiode ->
             beløpstidslinje + vedtaksperiode.refusjonstidslinje
         }
+        internal fun List<Vedtaksperiode>.finnSkjæringstidspunktFor(vedtaksperiodeId: UUID): LocalDate? {
+            return firstOrNull { it.id == vedtaksperiodeId }?.skjæringstidspunkt
+        }
         internal fun List<Vedtaksperiode>.startdatoerPåSammenhengendeVedtaksperioder(): Set<LocalDate> {
             val startdatoer = mutableMapOf<UUID, LocalDate>()
 

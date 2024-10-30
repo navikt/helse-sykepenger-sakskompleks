@@ -19,6 +19,7 @@ import no.nav.helse.person.ForkastetVedtaksperiode.Companion.overlapperMed
 import no.nav.helse.person.Person
 import no.nav.helse.person.Sykmeldingsperioder
 import no.nav.helse.person.Vedtaksperiode
+import no.nav.helse.person.Vedtaksperiode.Companion.finnSkjæringstidspunktFor
 import no.nav.helse.person.Vedtaksperiode.Companion.inneholder
 import no.nav.helse.person.aktivitetslogg.IAktivitetslogg
 import no.nav.helse.person.beløp.Beløpstidslinje
@@ -104,8 +105,15 @@ class Inntektsmelding(
         aktivitetslogg.info("Lagrer inntekt på alternativ inntektsdato $alternativInntektsdato")
     }
 
-    internal fun addInntekt(inntektshistorikk: Inntektshistorikk, subsumsjonslogg: Subsumsjonslogg): LocalDate {
+    internal fun addInntekt(inntektshistorikk: Inntektshistorikk, subsumsjonslogg: Subsumsjonslogg, vedtaksperioder: List<Vedtaksperiode>): LocalDate {
         subsumsjonslogg.logg(`§ 8-10 ledd 3`(beregnetInntekt.årlig, beregnetInntekt.daglig))
+        if (erPortalinntektsmelding()) {
+            requireNotNull(vedtaksperiodeId) { "En portalinntektsmelding må oppgi vedtaksperiodeId-en den skal gjelde for" }
+            val skjæringstidspunkt = vedtaksperioder.finnSkjæringstidspunktFor(vedtaksperiodeId) ?: return beregnetInntektsdato // TODO tenk litt mer på dette
+            inntektshistorikk.leggTil(Inntektsmelding(skjæringstidspunkt, metadata.meldingsreferanseId, beregnetInntekt))
+            return skjæringstidspunkt
+        }
+
         inntektshistorikk.leggTil(Inntektsmelding(beregnetInntektsdato, metadata.meldingsreferanseId, beregnetInntekt))
         return beregnetInntektsdato
     }

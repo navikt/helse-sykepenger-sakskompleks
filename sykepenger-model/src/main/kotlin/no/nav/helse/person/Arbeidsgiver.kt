@@ -826,7 +826,7 @@ internal class Arbeidsgiver private constructor(
         inntektsmelding.leggTilRefusjon(refusjonshistorikk)
 
         val subsumsjonsloggMedInntektsmeldingkontekst = subsumsjonsloggMedInntektsmeldingkontekst(inntektsmelding)
-        val inntektsdato = inntektsmelding.addInntekt(inntektshistorikk, subsumsjonsloggMedInntektsmeldingkontekst)
+        val inntektsdato = inntektsmelding.addInntekt(inntektshistorikk, subsumsjonsloggMedInntektsmeldingkontekst, vedtaksperioder)
         val sykdomstidslinjeperiode = sykdomstidslinje().periode()
         val skjæringstidspunkt = person.beregnSkjæringstidspunkt()().beregnSkjæringstidspunkt(inntektsdato.somPeriode())
 

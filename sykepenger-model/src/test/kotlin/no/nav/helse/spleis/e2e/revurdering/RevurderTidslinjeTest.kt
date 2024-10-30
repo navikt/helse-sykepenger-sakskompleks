@@ -6,6 +6,7 @@ import no.nav.helse.antallEtterspurteBehov
 import no.nav.helse.februar
 import no.nav.helse.hendelser.Dagtype
 import no.nav.helse.hendelser.GradertPeriode
+import no.nav.helse.hendelser.Inntektsmelding.Avsendersystem.ALTINN
 import no.nav.helse.hendelser.ManuellOverskrivingDag
 import no.nav.helse.hendelser.Periode
 import no.nav.helse.hendelser.Sykmeldingsperiode
@@ -386,7 +387,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
     @Test
     fun `samme fagsystemId og forskjellig skjæringstidspunkt - revurder første periode i siste skjæringstidspunkt`() {
         nyttVedtak(3.januar til 26.januar)
-        nyttVedtak(1.februar til 20.februar)
+        nyttVedtak(1.februar til 20.februar, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         forlengVedtak(21.februar til 10.mars)
         nullstillTilstandsendringer()
         håndterOverstyrTidslinje((5.februar til 15.februar).map { manuellFeriedag(it) })
@@ -404,7 +405,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
     @Test
     fun `samme fagsystemId og forskjellig skjæringstidspunkt - revurder siste periode i siste skjæringstidspunkt`() {
         nyttVedtak(3.januar til 26.januar)
-        nyttVedtak(1.februar til 20.februar)
+        nyttVedtak(1.februar til 20.februar, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         forlengVedtak(21.februar til 10.mars)
 
         håndterOverstyrTidslinje((22.februar til 25.februar).map { manuellFeriedag(it) })
@@ -459,7 +460,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
     @Test
     fun `forsøk på å revurdere eldre fagsystemId med nyere perioder uten utbetaling, og periode med utbetaling etterpå`() {
         nyttVedtak(3.januar til 26.januar)
-        tilGodkjenning(mai, 100.prosent, 1.mai)
+        tilGodkjenning(mai, 100.prosent, 1.mai, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
 
         håndterOverstyrTidslinje((4.januar til 20.januar).map { manuellFeriedag(it) })
         inspektør.sykdomstidslinje.inspektør.also { sykdomstidslinjeInspektør ->
@@ -525,7 +526,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
     @Test
     fun `revurderer siste utbetalte periode med bare ferie og permisjon - med tidligere utbetaling`() {
         nyttVedtak(3.januar til 26.januar)
-        nyttVedtak(3.mars til 26.mars)
+        nyttVedtak(3.mars til 26.mars, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         nullstillTilstandsendringer()
 
         håndterOverstyrTidslinje((3.mars til 20.mars).map { manuellFeriedag(it) } + (21.mars til 26.mars).map { manuellPermisjonsdag(it) })
@@ -568,7 +569,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
     @Test
     fun `Avslag fører til feilet revurdering`() {
         håndterSykmelding(januar)
-        håndterInntektsmelding(listOf(Periode(1.januar, 17.januar)), førsteFraværsdag = 1.januar)
+        håndterInntektsmelding(listOf(Periode(1.januar, 17.januar)), førsteFraværsdag = 1.januar, avsendersystem = ALTINN)
         håndterSøknad(januar)
         håndterVilkårsgrunnlag(1.vedtaksperiode, INNTEKT)
         håndterYtelser(1.vedtaksperiode)
@@ -616,7 +617,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
     @Test
     fun `annullering av feilet revurdering`() {
         håndterSykmelding(januar)
-        håndterInntektsmelding(listOf(Periode(1.januar, 17.januar)), førsteFraværsdag = 1.januar)
+        håndterInntektsmelding(listOf(Periode(1.januar, 17.januar)), førsteFraværsdag = 1.januar, avsendersystem = ALTINN)
         håndterSøknad(januar)
         håndterVilkårsgrunnlag(1.vedtaksperiode, INNTEKT)
         håndterYtelser(1.vedtaksperiode)
@@ -895,7 +896,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
 
         håndterSykmelding(Sykmeldingsperiode(30.januar, 5.februar))
         assertEquals("SSSHH SSSSSHH SFFFFFF FFFFF", inspektør.sykdomshistorikk.sykdomstidslinje().toShortString())
-        håndterInntektsmelding(listOf(1.januar til 16.januar), førsteFraværsdag = 30.januar)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), førsteFraværsdag = 30.januar, avsendersystem = ALTINN)
         assertEquals("UUSSSHH SSSSSHH SFFFFFF FFFFF", inspektør.sykdomshistorikk.sykdomstidslinje().toShortString())
 
         nullstillTilstandsendringer()
@@ -908,24 +909,24 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
         håndterUtbetalingsgodkjenning(1.vedtaksperiode)
         håndterUtbetalt()
 
-            håndterVilkårsgrunnlag(2.vedtaksperiode)
-            håndterYtelser(2.vedtaksperiode)
-            håndterSimulering(2.vedtaksperiode)
-            håndterUtbetalingsgodkjenning(2.vedtaksperiode)
-            håndterUtbetalt()
+        håndterVilkårsgrunnlag(2.vedtaksperiode)
+        håndterYtelser(2.vedtaksperiode)
+        håndterSimulering(2.vedtaksperiode)
+        håndterUtbetalingsgodkjenning(2.vedtaksperiode)
+        håndterUtbetalt()
 
-            assertTilstander(
-                2.vedtaksperiode,
-                START,
-                AVVENTER_INNTEKTSMELDING,
-                AVVENTER_BLOKKERENDE_PERIODE,
-                AVVENTER_VILKÅRSPRØVING,
-                AVVENTER_HISTORIKK,
-                AVVENTER_SIMULERING,
-                AVVENTER_GODKJENNING,
-                TIL_UTBETALING,
-                AVSLUTTET
-            )
+        assertTilstander(
+            2.vedtaksperiode,
+            START,
+            AVVENTER_INNTEKTSMELDING,
+            AVVENTER_BLOKKERENDE_PERIODE,
+            AVVENTER_VILKÅRSPRØVING,
+            AVVENTER_HISTORIKK,
+            AVVENTER_SIMULERING,
+            AVVENTER_GODKJENNING,
+            TIL_UTBETALING,
+            AVSLUTTET
+        )
     }
 
     @Test
@@ -1052,7 +1053,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
     @Test
     fun `revurderer siste utbetalte periode`() {
         håndterSykmelding(Sykmeldingsperiode(3.januar, 26.januar))
-        håndterInntektsmelding(listOf(Periode(2.januar, 18.januar)), førsteFraværsdag = 2.januar)
+        håndterInntektsmelding(listOf(Periode(2.januar, 18.januar)), førsteFraværsdag = 2.januar, avsendersystem = ALTINN)
         håndterSøknad(Sykdom(3.januar, 26.januar, 100.prosent))
         håndterVilkårsgrunnlag(1.vedtaksperiode, INNTEKT)
         håndterYtelser(1.vedtaksperiode)
@@ -1081,7 +1082,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
     @Test
     fun `revurderer siste utbetalte periode i en forlengelse med bare ferie og permisjon`() {
         håndterSykmelding(Sykmeldingsperiode(3.januar, 26.januar))
-        håndterInntektsmelding(listOf(Periode(2.januar, 18.januar)), førsteFraværsdag = 2.januar)
+        håndterInntektsmelding(listOf(Periode(2.januar, 18.januar)), førsteFraværsdag = 2.januar, avsendersystem = ALTINN)
         håndterSøknad(Sykdom(3.januar, 26.januar, 100.prosent))
         håndterVilkårsgrunnlag(1.vedtaksperiode, INNTEKT)
         håndterYtelser(1.vedtaksperiode)
@@ -1116,7 +1117,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
     @Test
     fun `oppdager nye utbetalte dager fra infotrygd i revurderingen`() {
         håndterSykmelding(januar)
-        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)))
+        håndterInntektsmelding(listOf(Periode(1.januar, 16.januar)), avsendersystem = ALTINN)
         håndterSøknad(januar)
         håndterVilkårsgrunnlag(1.vedtaksperiode, INNTEKT)
         håndterYtelser(1.vedtaksperiode)
@@ -1172,7 +1173,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
     @Test
     fun `Kun periode berørt av endringene skal ha hendelseIden`() {
         nyttVedtak(januar)
-        nyttVedtak(2.februar til 28.februar)
+        nyttVedtak(2.februar til 28.februar, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         val hendelseId = UUID.randomUUID()
         håndterOverstyrTidslinje(
             meldingsreferanseId = hendelseId,
@@ -1188,7 +1189,7 @@ internal class RevurderTidslinjeTest : AbstractEndToEndTest() {
     fun `revurder første dag i periode på en sykedag som forlenger tidligere arbeidsgiverperiode med nytt skjæringstidspunkt`() {
         nyttVedtak(1.januar til 20.januar)
         håndterSøknad(Sykdom(25.januar, 25.januar, 100.prosent))
-        håndterInntektsmelding(listOf(1.januar til 16.januar), førsteFraværsdag = 25.januar)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), førsteFraværsdag = 25.januar, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode)
         håndterUtbetalingsgodkjenning(1.vedtaksperiode)
 

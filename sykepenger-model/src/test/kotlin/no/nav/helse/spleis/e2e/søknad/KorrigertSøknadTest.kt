@@ -283,7 +283,7 @@ internal class KorrigertSøknadTest : AbstractEndToEndTest() {
 
         håndterSykmelding(Sykmeldingsperiode(11.januar, 31.januar))
         val søknadId = håndterSøknad(Sykdom(11.januar, 31.januar, 100.prosent))
-        håndterInntektsmelding(listOf(1.januar til 16.januar), førsteFraværsdag = 1.januar,)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), førsteFraværsdag = 1.januar, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         håndterVilkårsgrunnlag(3.vedtaksperiode)
         håndterSøknad(Sykdom(11.januar, 31.januar, 100.prosent), Ferie(31.januar, 31.januar), korrigerer = søknadId, opprinneligSendt = 1.februar)
 
