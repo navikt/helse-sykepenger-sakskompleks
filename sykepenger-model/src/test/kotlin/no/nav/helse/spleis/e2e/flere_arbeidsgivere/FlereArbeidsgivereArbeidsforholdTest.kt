@@ -294,7 +294,7 @@ internal class FlereArbeidsgivereArbeidsforholdTest : AbstractEndToEndTest() {
             listOf(1.januar til 16.januar),
             førsteFraværsdag = 1.januar,
             beregnetInntekt = 11400.månedlig,
-            orgnummer = a1,
+            orgnummer = a1
         )
 
         val arbeidsforhold1 = listOf(
@@ -325,7 +325,7 @@ internal class FlereArbeidsgivereArbeidsforholdTest : AbstractEndToEndTest() {
             listOf(2.februar til 17.februar),
             førsteFraværsdag = 2.februar,
             beregnetInntekt = 45000.månedlig,
-            orgnummer = a2,
+            orgnummer = a2
         )
 
         val inntekter3 = listOf(
@@ -359,6 +359,7 @@ internal class FlereArbeidsgivereArbeidsforholdTest : AbstractEndToEndTest() {
             førsteFraværsdag = 1.mars,
             beregnetInntekt = 11400.månedlig,
             orgnummer = a1,
+            vedtaksperiodeIdInnhenter = 2.vedtaksperiode
         )
         val inntekter2 = listOf(
             grunnlag(a1, finnSkjæringstidspunkt(a1, 2.vedtaksperiode), 11400.månedlig.repeat(2)),

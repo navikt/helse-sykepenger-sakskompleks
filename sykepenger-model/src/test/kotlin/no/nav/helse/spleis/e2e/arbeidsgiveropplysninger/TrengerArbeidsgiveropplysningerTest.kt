@@ -894,7 +894,7 @@ internal class TrengerArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
         )
         assertEquals(20.januar til 31.januar, inspektør.vedtaksperioder(2.vedtaksperiode).inspektør.periode)
 
-        håndterInntektsmeldingPortal(emptyList(), inntektsdato = 20.januar, førsteFraværsdag = 20.januar, vedtaksperiodeId = inspektør.vedtaksperiodeId(2.vedtaksperiode))
+        håndterInntektsmeldingPortal(emptyList(), inntektsdato = 20.januar, førsteFraværsdag = 20.januar, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         håndterVilkårsgrunnlag(2.vedtaksperiode)
         håndterYtelser(2.vedtaksperiode)
 

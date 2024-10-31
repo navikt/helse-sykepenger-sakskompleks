@@ -254,7 +254,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
         nyttVedtak(1.januar(2016) til 31.januar(2016), orgnummer = a1)
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent), andreInntektskilder = true, orgnummer = a2)
         assertSisteForkastetPeriodeTilstand(a2, 1.vedtaksperiode, TIL_INFOTRYGD)
-        håndterInntektsmeldingPortal(listOf(1.januar til 16.januar), inntektsdato = 1.januar, vedtaksperiodeId = inspektør(a2).vedtaksperioder(1.vedtaksperiode).inspektør.id, orgnummer = a2)
+        håndterInntektsmeldingPortal(listOf(1.januar til 16.januar), inntektsdato = 1.januar, vedtaksperiodeIdInnhenter = 2.vedtaksperiode, orgnummer = a2)
         assertSisteTilstand(1.vedtaksperiode, AVSLUTTET, orgnummer = a1)
     }
 
@@ -262,7 +262,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
     fun `Håndterer ikke inntektsmelding fra portal`() {
         nyttVedtak(1.januar(2016) til 31.januar(2016), orgnummer = a1)
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent), orgnummer = a2)
-        håndterInntektsmeldingPortal(listOf(1.januar til 16.januar), inntektsdato = 1.januar, harOpphørAvNaturalytelser = true, vedtaksperiodeId = inspektør(a2).vedtaksperioder(1.vedtaksperiode).inspektør.id, orgnummer = a2)
+        håndterInntektsmeldingPortal(listOf(1.januar til 16.januar), inntektsdato = 1.januar, harOpphørAvNaturalytelser = true, vedtaksperiodeIdInnhenter = 1.vedtaksperiode, orgnummer = a2)
         assertSisteForkastetPeriodeTilstand(a2, 1.vedtaksperiode, TIL_INFOTRYGD)
         assertSisteTilstand(1.vedtaksperiode, AVSLUTTET, orgnummer = a1)
     }
