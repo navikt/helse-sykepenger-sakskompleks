@@ -115,7 +115,7 @@ internal class InntektsmeldingOgFerieE2ETest : AbstractEndToEndTest() {
         nyPeriode(1.januar til 5.januar, a1)
         nyPeriode(10.januar til 16.januar, a1)
         nyPeriode(17.januar til 20.januar, a1)
-        nyttVedtak(21.januar til 31.januar, arbeidsgiverperiode = listOf(1.januar til 5.januar, 10.januar til 20.januar), orgnummer = a1)
+        nyttVedtak(21.januar til 31.januar, arbeidsgiverperiode = listOf(1.januar til 5.januar, 10.januar til 20.januar), orgnummer = a1, vedtaksperiodeIdInnhenter = 4.vedtaksperiode)
         nullstillTilstandsendringer()
         håndterAnnullerUtbetaling(a1)
         assertForkastetPeriodeTilstander(1.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING, TIL_INFOTRYGD, orgnummer = a1)

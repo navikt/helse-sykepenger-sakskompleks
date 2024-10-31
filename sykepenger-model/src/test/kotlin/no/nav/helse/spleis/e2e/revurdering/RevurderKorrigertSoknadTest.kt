@@ -93,7 +93,7 @@ internal class RevurderKorrigertSoknadTest : AbstractEndToEndTest() {
     @Test
     fun `Utbetaling i Infortrygd opphører tidligere utbetalinger innenfor samme arbeidsgiverperiode`() {
         nyttVedtak(1.januar til 28.januar)
-        nyttVedtak(3.februar til 28.februar)
+        nyttVedtak(3.februar til 28.februar, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         forlengVedtak(mars)
         val marsutbetaling = inspektør.utbetaling(2)
         håndterSykmelding(Sykmeldingsperiode(29.januar, 25.februar))
@@ -158,7 +158,7 @@ internal class RevurderKorrigertSoknadTest : AbstractEndToEndTest() {
     @Test
     fun `Korrigerende søknad med ferie`() {
         nyttVedtak(januar)
-        nyttVedtak(mars)
+        nyttVedtak(mars, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         assertEquals(Sykedag::class, inspektør.sykdomstidslinje[17.januar]::class)
         assertEquals(Sykedag::class, inspektør.sykdomstidslinje[18.januar]::class)
 
@@ -193,7 +193,7 @@ internal class RevurderKorrigertSoknadTest : AbstractEndToEndTest() {
     @Test
     fun `Korrigerende søknad setter i gang en revurdering på siste skjæringstidspunkt`() {
         nyttVedtak(januar)
-        nyttVedtak(mars)
+        nyttVedtak(mars, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         håndterSøknad(Sykdom(1.mars, 31.mars, 100.prosent), Ferie(15.mars, 16.mars))
         assertTilstand(1.vedtaksperiode, AVSLUTTET)
         assertTilstand(2.vedtaksperiode, AVVENTER_HISTORIKK_REVURDERING)
@@ -355,7 +355,7 @@ internal class RevurderKorrigertSoknadTest : AbstractEndToEndTest() {
     @Test
     fun `Korrigerende søknad for periode i AvventerRevurdering - setter i gang en overstyring av revurderingen`() {
         nyttVedtak(januar, 100.prosent)
-        nyttVedtak(15.februar til 15.mars, 100.prosent)
+        nyttVedtak(15.februar til 15.mars, 100.prosent, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         håndterOverstyrTidslinje(listOf(ManuellOverskrivingDag(18.januar, Dagtype.Feriedag)))
 
         assertTilstand(2.vedtaksperiode, AVVENTER_REVURDERING)

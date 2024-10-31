@@ -26,7 +26,7 @@ internal class VedtaksperiodeAnnullertEventTest : AbstractEndToEndTest() {
     fun `vi sender vedtaksperiode annullert-hendelser når saksbehandler annullerer en vedtaksperiode i et lengre sykdomsforløp`() {
         nyttVedtak(januar)
         forlengVedtak(februar)
-        nyttVedtak(5.mars til 31.mars)
+        nyttVedtak(5.mars til 31.mars, vedtaksperiodeIdInnhenter = 3.vedtaksperiode)
         håndterAnnullerUtbetaling()
 
         assertEquals(3, observatør.vedtaksperiodeAnnullertEventer.size)
@@ -48,7 +48,7 @@ internal class VedtaksperiodeAnnullertEventTest : AbstractEndToEndTest() {
     fun `vi sender ikke ut vedtaksperiode annullert-hendelse for vedtaksperioder som ikke er utbetalt`() {
         nyttVedtak(januar)
         forlengVedtak(februar)
-        tilGodkjenning(5.mars til 31.mars, ORGNUMMER)
+        tilGodkjenning(5.mars til 31.mars, ORGNUMMER, vedtaksperiodeIdInnhenter = 3.vedtaksperiode)
         håndterAnnullerUtbetaling()
 
         assertEquals(2, observatør.vedtaksperiodeAnnullertEventer.size)
@@ -66,7 +66,7 @@ internal class VedtaksperiodeAnnullertEventTest : AbstractEndToEndTest() {
     fun `også langt gap`() {
         nyttVedtak(januar)
         forlengVedtak(februar)
-        nyttVedtak(april)
+        nyttVedtak(april, vedtaksperiodeIdInnhenter = 3.vedtaksperiode)
         håndterAnnullerUtbetaling()
 
         assertEquals(1, observatør.vedtaksperiodeAnnullertEventer.size)
@@ -85,6 +85,7 @@ internal class VedtaksperiodeAnnullertEventTest : AbstractEndToEndTest() {
             listOf(1.januar til 16.januar),
             førsteFraværsdag = 1.mars,
             begrunnelseForReduksjonEllerIkkeUtbetalt = "FerieEllerAvspasering",
+            vedtaksperiodeIdInnhenter = 2.vedtaksperiode
         )
         håndterVilkårsgrunnlag(2.vedtaksperiode)
         håndterYtelser(2.vedtaksperiode)

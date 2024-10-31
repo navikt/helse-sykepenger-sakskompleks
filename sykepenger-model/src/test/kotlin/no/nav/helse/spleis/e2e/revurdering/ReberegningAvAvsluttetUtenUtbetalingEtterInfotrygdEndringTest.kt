@@ -10,7 +10,6 @@ import no.nav.helse.person.TilstandType.AVSLUTTET
 import no.nav.helse.person.TilstandType.AVSLUTTET_UTEN_UTBETALING
 import no.nav.helse.person.TilstandType.AVVENTER_BLOKKERENDE_PERIODE
 import no.nav.helse.person.TilstandType.AVVENTER_HISTORIKK
-import no.nav.helse.person.TilstandType.AVVENTER_INFOTRYGDHISTORIKK
 import no.nav.helse.person.TilstandType.AVVENTER_INNTEKTSMELDING
 import no.nav.helse.person.TilstandType.AVVENTER_REVURDERING
 import no.nav.helse.person.TilstandType.AVVENTER_VILKÅRSPRØVING
@@ -153,7 +152,7 @@ internal class ReberegningAvAvsluttetUtenUtbetalingEtterInfotrygdEndringTest : A
         håndterSøknad(Sykdom(1.mars, 16.mars, 100.prosent), orgnummer = a2)
         håndterInntektsmelding(listOf(1.mars til 16.mars), orgnummer = a2)
         håndterSøknad(Sykdom(1.mai, 16.mai, 100.prosent), orgnummer = a1)
-        håndterInntektsmelding(listOf(1.mai til 16.mai), orgnummer = a1)
+        håndterInntektsmelding(listOf(1.mai til 16.mai), orgnummer = a1, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
 
         nullstillTilstandsendringer()
 

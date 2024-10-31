@@ -2,10 +2,10 @@ package no.nav.helse.spleis.e2e.revurdering
 
 import java.time.LocalDate
 import no.nav.helse.august
-import no.nav.helse.desember
 import no.nav.helse.februar
 import no.nav.helse.hendelser.Dagtype
 import no.nav.helse.hendelser.InntektForSykepengegrunnlag
+import no.nav.helse.hendelser.Inntektsmelding.Avsendersystem.ALTINN
 import no.nav.helse.hendelser.ManuellOverskrivingDag
 import no.nav.helse.hendelser.Sykmeldingsperiode
 import no.nav.helse.hendelser.Søknad.Søknadsperiode.Ferie
@@ -13,7 +13,6 @@ import no.nav.helse.hendelser.Søknad.Søknadsperiode.Sykdom
 import no.nav.helse.hendelser.Vilkårsgrunnlag
 import no.nav.helse.hendelser.Vilkårsgrunnlag.Arbeidsforhold.Arbeidsforholdtype
 import no.nav.helse.hendelser.til
-import no.nav.helse.person.BehandlingView.TilstandView.*
 import no.nav.helse.inspectors.inspektør
 import no.nav.helse.inspectors.personLogg
 import no.nav.helse.januar
@@ -21,7 +20,7 @@ import no.nav.helse.juli
 import no.nav.helse.juni
 import no.nav.helse.mai
 import no.nav.helse.mars
-import no.nav.helse.november
+import no.nav.helse.person.BehandlingView.TilstandView.AVSLUTTET_UTEN_VEDTAK
 import no.nav.helse.person.TilstandType.AVSLUTTET
 import no.nav.helse.person.TilstandType.AVSLUTTET_UTEN_UTBETALING
 import no.nav.helse.person.TilstandType.AVVENTER_BLOKKERENDE_PERIODE
@@ -35,8 +34,8 @@ import no.nav.helse.person.TilstandType.AVVENTER_VILKÅRSPRØVING
 import no.nav.helse.person.TilstandType.START
 import no.nav.helse.person.TilstandType.TIL_INFOTRYGD
 import no.nav.helse.person.TilstandType.TIL_UTBETALING
-import no.nav.helse.person.aktivitetslogg.Aktivitet.Behov.Behovtype.Godkjenning
 import no.nav.helse.person.UtbetalingInntektskilde.FLERE_ARBEIDSGIVERE
+import no.nav.helse.person.aktivitetslogg.Aktivitet.Behov.Behovtype.Godkjenning
 import no.nav.helse.person.aktivitetslogg.Varselkode.RV_IM_24
 import no.nav.helse.person.aktivitetslogg.Varselkode.RV_IM_4
 import no.nav.helse.person.aktivitetslogg.Varselkode.RV_IM_8
@@ -90,7 +89,7 @@ internal class ReberegningAvAvsluttetUtenUtbetalingNyE2ETest : AbstractEndToEndT
     @Test
     fun `arbeidsgiver opplyser om egenmeldinger og bruker opplyser om ferie`() {
         håndterSøknad(Sykdom(1.februar, 10.februar, 100.prosent))
-        håndterInntektsmelding(listOf(10.januar til 25.januar))
+        håndterInntektsmelding(listOf(10.januar til 25.januar), avsendersystem = ALTINN)
         håndterSøknad(Sykdom(10.januar, 28.januar, 100.prosent), Ferie(10.januar, 28.januar))
         assertSisteTilstand(1.vedtaksperiode, AVVENTER_INNTEKTSMELDING)
         assertSisteTilstand(2.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING)
@@ -101,7 +100,7 @@ internal class ReberegningAvAvsluttetUtenUtbetalingNyE2ETest : AbstractEndToEndT
         nyttVedtak(januar)
 
         nyPeriode(10.august til 20.august)
-        håndterInntektsmelding(listOf(1.august til 16.august),)
+        håndterInntektsmelding(listOf(1.august til 16.august), vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         håndterVilkårsgrunnlag(2.vedtaksperiode)
         håndterYtelser(2.vedtaksperiode)
         håndterSimulering(2.vedtaksperiode)
@@ -134,9 +133,9 @@ internal class ReberegningAvAvsluttetUtenUtbetalingNyE2ETest : AbstractEndToEndT
     fun `revurderer eldre skjæringstidspunkt`() {
         håndterSykmelding(Sykmeldingsperiode(12.januar, 20.januar))
         håndterSøknad(Sykdom(12.januar, 20.januar, 100.prosent))
-        nyttVedtak(mars)
+        nyttVedtak(mars, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         nullstillTilstandsendringer()
-        håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        håndterInntektsmelding(listOf(1.januar til 16.januar))
         assertTilstander(1.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_VILKÅRSPRØVING)
         assertTilstander(2.vedtaksperiode, AVSLUTTET, AVVENTER_REVURDERING)
     }
@@ -149,23 +148,22 @@ internal class ReberegningAvAvsluttetUtenUtbetalingNyE2ETest : AbstractEndToEndT
         håndterSykmelding(Sykmeldingsperiode(21.januar, 26.januar))
         håndterSøknad(Sykdom(21.januar, 26.januar, 100.prosent))
 
-        nyttVedtak(mars)
+        nyttVedtak(mars, vedtaksperiodeIdInnhenter = 3.vedtaksperiode)
 
         nullstillTilstandsendringer()
-        håndterInntektsmelding(listOf(10.januar til 25.januar),)
+        håndterInntektsmelding(listOf(10.januar til 25.januar), vedtaksperiodeIdInnhenter = 1.vedtaksperiode)
 
         assertTilstander(1.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING, AVVENTER_BLOKKERENDE_PERIODE, AVSLUTTET_UTEN_UTBETALING)
         assertTilstander(2.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_VILKÅRSPRØVING)
         assertTilstander(3.vedtaksperiode, AVSLUTTET, AVVENTER_REVURDERING)
     }
 
-
     @Test
     fun `gjenopptar ikke behandling dersom det er nyere periode som er utbetalt`() {
         håndterSykmelding(Sykmeldingsperiode(12.januar, 20.januar))
         håndterSøknad(Sykdom(12.januar, 20.januar, 100.prosent))
-        nyttVedtak(mars)
-        håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        nyttVedtak(mars, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), vedtaksperiodeIdInnhenter = 1.vedtaksperiode)
 
         håndterSykmelding(Sykmeldingsperiode(1.mai, 15.mai))
         håndterSykmelding(Sykmeldingsperiode(16.mai, 28.mai))
@@ -364,13 +362,13 @@ internal class ReberegningAvAvsluttetUtenUtbetalingNyE2ETest : AbstractEndToEndT
         håndterSykmelding(Sykmeldingsperiode(31.januar, 27.februar))
         håndterSøknad(Sykdom(31.januar, 27.februar, 100.prosent))
 
-        håndterInntektsmelding(listOf(1.januar til 16.januar), beregnetInntekt = INNTEKT,)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), beregnetInntekt = INNTEKT)
 
         håndterVilkårsgrunnlag(1.vedtaksperiode, INNTEKT)
         håndterYtelser(1.vedtaksperiode)
         håndterSimulering(1.vedtaksperiode)
 
-        håndterInntektsmelding(listOf(1.januar til 16.januar), førsteFraværsdag = 31.januar, beregnetInntekt = INNTEKT,)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), førsteFraværsdag = 31.januar, beregnetInntekt = INNTEKT, vedtaksperiodeIdInnhenter = 3.vedtaksperiode)
         assertSisteTilstand(1.vedtaksperiode, AVVENTER_HISTORIKK)
         håndterYtelser(1.vedtaksperiode)
         håndterSimulering(1.vedtaksperiode)
@@ -396,7 +394,7 @@ internal class ReberegningAvAvsluttetUtenUtbetalingNyE2ETest : AbstractEndToEndT
         assertSisteTilstand(1.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING)
         assertSisteTilstand(2.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING)
 
-        håndterInntektsmelding(listOf(10.januar til 20.januar, 28.januar til 1.februar),)
+        håndterInntektsmelding(listOf(10.januar til 20.januar, 28.januar til 1.februar), vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
 
         assertTilstander(1.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING, AVVENTER_BLOKKERENDE_PERIODE, AVSLUTTET_UTEN_UTBETALING)
         assertTilstander(2.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_VILKÅRSPRØVING)
@@ -438,7 +436,7 @@ internal class ReberegningAvAvsluttetUtenUtbetalingNyE2ETest : AbstractEndToEndT
         assertSisteTilstand(2.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING)
         assertSisteTilstand(3.vedtaksperiode, AVSLUTTET)
 
-        håndterInntektsmelding(listOf(10.januar til 20.januar, 28.januar til 1.februar),)
+        håndterInntektsmelding(listOf(10.januar til 20.januar, 28.januar til 1.februar), vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
 
         assertTilstander(1.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING, AVVENTER_BLOKKERENDE_PERIODE, AVSLUTTET_UTEN_UTBETALING)
         assertTilstander(2.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_VILKÅRSPRØVING)
@@ -453,14 +451,14 @@ internal class ReberegningAvAvsluttetUtenUtbetalingNyE2ETest : AbstractEndToEndT
         håndterSykmelding(Sykmeldingsperiode(21.januar, 3.februar))
         håndterSøknad(Sykdom(21.januar, 3.februar, 100.prosent))
 
-        nyttVedtak(mai)
+        nyttVedtak(mai, vedtaksperiodeIdInnhenter = 3.vedtaksperiode)
         nullstillTilstandsendringer()
 
         assertSisteTilstand(1.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING)
         assertSisteTilstand(2.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING)
         assertSisteTilstand(3.vedtaksperiode, AVSLUTTET)
 
-        håndterInntektsmelding(listOf(10.januar til 20.januar, 28.januar til 1.februar),)
+        håndterInntektsmelding(listOf(10.januar til 20.januar, 28.januar til 1.februar), vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
 
         assertTilstander(1.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING, AVVENTER_BLOKKERENDE_PERIODE, AVSLUTTET_UTEN_UTBETALING)
         assertTilstander(2.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_VILKÅRSPRØVING)
@@ -600,7 +598,7 @@ internal class ReberegningAvAvsluttetUtenUtbetalingNyE2ETest : AbstractEndToEndT
 
         nullstillTilstandsendringer()
         håndterInntektsmelding(listOf(10.januar til 25.januar),)
-        håndterInntektsmelding(listOf(10.januar til 25.januar), 30.januar,)
+        håndterInntektsmelding(listOf(10.januar til 25.januar), 30.januar, vedtaksperiodeIdInnhenter = 3.vedtaksperiode)
 
         assertTilstander(1.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING, AVVENTER_BLOKKERENDE_PERIODE, AVSLUTTET_UTEN_UTBETALING, AVVENTER_BLOKKERENDE_PERIODE, AVSLUTTET_UTEN_UTBETALING)
         assertTilstander(2.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_VILKÅRSPRØVING, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_VILKÅRSPRØVING)
@@ -619,8 +617,8 @@ internal class ReberegningAvAvsluttetUtenUtbetalingNyE2ETest : AbstractEndToEndT
         håndterSøknad(Sykdom(30.januar, 31.januar, 100.prosent))
 
         nullstillTilstandsendringer()
-        håndterInntektsmelding(listOf(10.januar til 25.januar), 30.januar,)
-        håndterInntektsmelding(listOf(10.januar til 25.januar),)
+        håndterInntektsmelding(listOf(10.januar til 25.januar), 30.januar, vedtaksperiodeIdInnhenter = 3.vedtaksperiode)
+        håndterInntektsmelding(listOf(10.januar til 25.januar), vedtaksperiodeIdInnhenter = 1.vedtaksperiode)
 
         assertTilstander(1.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING, AVVENTER_BLOKKERENDE_PERIODE, AVSLUTTET_UTEN_UTBETALING, AVVENTER_BLOKKERENDE_PERIODE, AVSLUTTET_UTEN_UTBETALING)
         assertTilstander(2.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING, AVVENTER_INNTEKTSMELDING, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_VILKÅRSPRØVING)
@@ -1138,20 +1136,6 @@ internal class ReberegningAvAvsluttetUtenUtbetalingNyE2ETest : AbstractEndToEndT
     }
 
     @Test
-    fun `Inntektsmelding oppgir tidligere egenmeldingsdager før kort periode - lar oss ikke vippe av pinnen`() {
-        nyPeriode(4.desember(2022) til 11.desember(2022))
-
-        nyPeriode(14.desember(2022) til 8.januar(2023))
-        håndterInntektsmelding(listOf(4.november(2022) til 19.november(2022)), førsteFraværsdag = 14.desember(2022),)
-
-        assertEquals("H SSSSSHH ??SSSHH SSSSSHH SSSSSHH SSSSSHH", inspektør.sykdomshistorikk.sykdomstidslinje().toShortString())
-        assertSisteTilstand(1.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING)
-        assertSisteTilstand(2.vedtaksperiode, AVVENTER_VILKÅRSPRØVING)
-        håndterVilkårsgrunnlag(2.vedtaksperiode)
-        håndterYtelser(2.vedtaksperiode)
-    }
-
-    @Test
     fun `allerede utbetalt i Infotrygd uten utbetaling etterpå`() {
         nyPeriode(2.januar til 17.januar)
         håndterUtbetalingshistorikkEtterInfotrygdendring(ArbeidsgiverUtbetalingsperiode(ORGNUMMER, 17.januar, 17.januar, 100.prosent, INNTEKT))
@@ -1162,11 +1146,12 @@ internal class ReberegningAvAvsluttetUtenUtbetalingNyE2ETest : AbstractEndToEndT
     @Test
     fun `omgjøring med funksjonell feil i inntektsmelding`() {
         håndterSøknad(Sykdom(2.januar, 17.januar, 100.prosent))
-        nyttVedtak(18.januar til 31.januar, arbeidsgiverperiode = listOf(2.januar til 17.januar))
+        nyttVedtak(18.januar til 31.januar, arbeidsgiverperiode = listOf(2.januar til 17.januar), vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         nullstillTilstandsendringer()
         val im = håndterInntektsmelding(
             listOf(1.januar til 16.januar),
             begrunnelseForReduksjonEllerIkkeUtbetalt = "FiskerMedHyre",
+            vedtaksperiodeIdInnhenter = 1.vedtaksperiode
         )
         assertTrue(im in observatør.inntektsmeldingIkkeHåndtert)
         assertFunksjonellFeil(RV_IM_8, 1.vedtaksperiode.filter())

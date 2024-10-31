@@ -292,7 +292,7 @@ internal class RevurderingInntektV2E2ETest : AbstractEndToEndTest() {
     @Test
     fun `revurder inntekt tidligere skjæringstidspunkt - med AGP imellom`() {
         nyttVedtak(januar, 100.prosent)
-        nyttVedtak(mars, 100.prosent)
+        nyttVedtak(mars, 100.prosent, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         nullstillTilstandsendringer()
 
         val korrelasjonsIdPåUtbetaling1 = inspektør.sisteAvsluttedeUtbetalingForVedtaksperiode(1.vedtaksperiode).inspektør.korrelasjonsId
@@ -345,7 +345,7 @@ internal class RevurderingInntektV2E2ETest : AbstractEndToEndTest() {
     @Test
     fun `revurder inntekt tidligere skjæringstidspunkt - med samme AGP`() {
         nyttVedtak(januar, 100.prosent)
-        nyttVedtak(2.februar til 28.februar, 100.prosent)
+        nyttVedtak(2.februar til 28.februar, 100.prosent, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         nullstillTilstandsendringer()
 
         håndterOverstyrInntekt(inntekt = 32000.månedlig, skjæringstidspunkt = 1.januar)
@@ -585,7 +585,7 @@ internal class RevurderingInntektV2E2ETest : AbstractEndToEndTest() {
     @Test
     fun `Perioder med aktuelt skjæringstidspunkt skal være stemplet med hendelseId`() {
         nyttVedtak(januar)
-        nyttVedtak(mars)
+        nyttVedtak(mars, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         forlengVedtak(april)
         val overstyrInntektHendelseId = UUID.randomUUID()
         håndterOverstyrInntekt(skjæringstidspunkt = 1.mars, meldingsreferanseId = overstyrInntektHendelseId)

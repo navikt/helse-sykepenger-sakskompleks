@@ -39,7 +39,7 @@ internal class RevurderingFerieTest : AbstractEndToEndTest() {
         håndterInntektsmelding(listOf(5.februar til 21.februar),)
         assertSisteTilstand(1.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING)
 
-        nyttVedtak(1.januar til 17.januar)
+        nyttVedtak(1.januar til 17.januar, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
 
         assertSisteTilstand(1.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING)
         assertVarsel(RV_OO_1, 2.vedtaksperiode.filter())
@@ -50,12 +50,12 @@ internal class RevurderingFerieTest : AbstractEndToEndTest() {
         nyttVedtak(5.februar til 28.februar)
         håndterSykmelding(Sykmeldingsperiode(1.mars, 31.mars))
         håndterSøknad(Søknad.Søknadsperiode.Sykdom(1.mars, 31.mars, 100.prosent), Søknad.Søknadsperiode.Ferie(1.mars, 31.mars))
-        håndterInntektsmelding(listOf(5.mars til 21.mars),)
+        håndterInntektsmelding(listOf(5.mars til 21.mars), vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         håndterYtelser(2.vedtaksperiode)
         håndterUtbetalingsgodkjenning(2.vedtaksperiode)
         assertSisteTilstand(2.vedtaksperiode, AVSLUTTET)
 
-        nyttVedtak(1.januar til 17.januar)
+        nyttVedtak(1.januar til 17.januar, vedtaksperiodeIdInnhenter = 3.vedtaksperiode)
 
         assertSisteTilstand(1.vedtaksperiode, AVVENTER_HISTORIKK_REVURDERING)
         assertSisteTilstand(2.vedtaksperiode, AVVENTER_REVURDERING)

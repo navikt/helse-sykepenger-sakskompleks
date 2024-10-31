@@ -163,7 +163,7 @@ internal class RevurderInntektTest : AbstractEndToEndTest() {
     @Test
     fun `revurder inntekt tidligere skjæringstidspunkt`() {
         nyttVedtak(januar, 100.prosent)
-        nyttVedtak(mars, 100.prosent)
+        nyttVedtak(mars, 100.prosent, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
 
         håndterOverstyrInntekt(inntekt = 32000.månedlig, skjæringstidspunkt = 1.januar)
 

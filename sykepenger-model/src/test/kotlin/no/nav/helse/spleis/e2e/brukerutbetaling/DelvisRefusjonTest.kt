@@ -4,6 +4,7 @@ import java.time.LocalDate
 import no.nav.helse.februar
 import no.nav.helse.hendelser.InntektForSykepengegrunnlag
 import no.nav.helse.hendelser.Inntektsmelding
+import no.nav.helse.hendelser.Inntektsmelding.Avsendersystem.ALTINN
 import no.nav.helse.hendelser.Inntektsmelding.Refusjon.EndringIRefusjon
 import no.nav.helse.hendelser.Sykmeldingsperiode
 import no.nav.helse.hendelser.Søknad.Søknadsperiode.Ferie
@@ -30,6 +31,7 @@ import no.nav.helse.person.inntekt.Refusjonsopplysning
 import no.nav.helse.spleis.e2e.AbstractEndToEndTest
 import no.nav.helse.spleis.e2e.assertIngenVarsel
 import no.nav.helse.spleis.e2e.assertIngenVarsler
+import no.nav.helse.spleis.e2e.assertInntektshistorikkForDato
 import no.nav.helse.spleis.e2e.assertSisteTilstand
 import no.nav.helse.spleis.e2e.assertTilstander
 import no.nav.helse.spleis.e2e.assertUtbetalingsbeløp
@@ -168,6 +170,7 @@ internal class DelvisRefusjonTest : AbstractEndToEndTest() {
         håndterSøknad(mars)
         håndterInntektsmelding(
             listOf(1.mars til 16.mars),
+            vedtaksperiodeIdInnhenter = 2.vedtaksperiode
         )
         håndterVilkårsgrunnlag(2.vedtaksperiode)
         håndterYtelser(2.vedtaksperiode)
@@ -668,7 +671,10 @@ internal class DelvisRefusjonTest : AbstractEndToEndTest() {
     fun `Første utbetalte dag er før første fraværsdag`() {
         håndterSykmelding(januar)
         håndterSøknad(januar)
-        val inntektsmeldingId = håndterInntektsmelding(listOf(), førsteFraværsdag = 17.januar)
+        val inntektsmeldingId = håndterInntektsmelding(listOf(), førsteFraværsdag = 17.januar, avsendersystem = ALTINN)
+
+        assertInntektshistorikkForDato(INNTEKT, 1.januar, inspektør)
+
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode)
         håndterSimulering(1.vedtaksperiode)

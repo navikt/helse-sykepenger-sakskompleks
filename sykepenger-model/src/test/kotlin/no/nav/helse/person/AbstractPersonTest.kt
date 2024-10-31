@@ -88,7 +88,8 @@ internal abstract class AbstractPersonTest {
     lateinit var jurist: SubsumsjonsListLog
     val inspektør get() = inspektør(ORGNUMMER)
 
-    val Int.vedtaksperiode: IdInnhenter get() = IdInnhenter { orgnummer -> this@vedtaksperiode.vedtaksperiode(orgnummer) }
+    val Int.vedtaksperiode: IdInnhenter get() = IdInnhenter { orgnummer -> this@vedtaksperiode.vedtaksperiodeId(orgnummer) }
+    fun Int.vedtaksperiode(orgnummer: String): IdInnhenter = IdInnhenter { this@vedtaksperiode.vedtaksperiodeId(orgnummer) }
     fun IdInnhenter.filter(orgnummer: String = ORGNUMMER) = AktivitetsloggFilter.vedtaksperiode(this, orgnummer)
 
     @BeforeEach
@@ -131,7 +132,7 @@ internal abstract class AbstractPersonTest {
         }
     }
 
-    private fun Int.vedtaksperiode(orgnummer: String) = observatør.vedtaksperiode(orgnummer, this - 1)
+    private fun Int.vedtaksperiodeId(orgnummer: String) = observatør.vedtaksperiode(orgnummer, this - 1)
     fun Int.utbetaling(orgnummer: String) = inspektør(orgnummer).utbetalingId(this - 1)
     fun inspektør(orgnummer: String) = TestArbeidsgiverInspektør(person, orgnummer)
     fun inspektør(orgnummer: String, block: TestArbeidsgiverInspektør.() -> Unit) = inspektør(orgnummer).run(block)

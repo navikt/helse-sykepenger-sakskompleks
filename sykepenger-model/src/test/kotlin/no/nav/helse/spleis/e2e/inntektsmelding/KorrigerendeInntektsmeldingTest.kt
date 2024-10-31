@@ -204,10 +204,10 @@ internal class KorrigerendeInntektsmeldingTest: AbstractEndToEndTest() {
     @Test
     fun `her er det et gap mellom første og andre vedtaksperiode og mindre enn 10 dager mellom agps`() {
         nyttVedtak(10.januar til 29.januar)
-        nyttVedtak(februar)
+        nyttVedtak(februar, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         assertSisteTilstand(1.vedtaksperiode, AVSLUTTET)
         assertSisteTilstand(2.vedtaksperiode, AVSLUTTET)
-        håndterInntektsmelding(listOf(1.februar til 16.februar),)
+        håndterInntektsmelding(listOf(1.februar til 16.februar), vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         assertEquals("SSSHH SSSSSHH SSSSSHH S??SSHH SSSSSHH SSSSSHH SSSSSHH SSS", inspektør.sykdomshistorikk.sykdomstidslinje().toShortString())
         assertSisteTilstand(1.vedtaksperiode, AVSLUTTET)
         assertSisteTilstand(2.vedtaksperiode, AVVENTER_HISTORIKK_REVURDERING)
@@ -216,10 +216,10 @@ internal class KorrigerendeInntektsmeldingTest: AbstractEndToEndTest() {
     @Test
     fun `her er det et gap mellom første og andre vedtaksperiode og mer enn 10 dager mellom agps, men mindre enn 16 dager mellom periodene`() {
         nyttVedtak(10.januar til 29.januar)
-        nyttVedtak(10.februar til 26.februar, arbeidsgiverperiode = listOf(10.januar til 16.januar))
+        nyttVedtak(10.februar til 26.februar, arbeidsgiverperiode = listOf(10.januar til 16.januar), vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         assertSisteTilstand(1.vedtaksperiode, AVSLUTTET)
         assertSisteTilstand(2.vedtaksperiode, AVSLUTTET)
-        val inntektsmeldingId = håndterInntektsmelding(listOf(10.februar til 26.februar))
+        val inntektsmeldingId = håndterInntektsmelding(listOf(10.februar til 26.februar), vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         assertEquals("SSSHH SSSSSHH SSSSSHH S?????? ?????HH SSSSSHH SSSSSHH S", inspektør.sykdomshistorikk.sykdomstidslinje().toShortString())
         assertSisteTilstand(2.vedtaksperiode, AVVENTER_HISTORIKK_REVURDERING)
         assertVarsel(RV_IM_24, 2.vedtaksperiode.filter())
@@ -319,9 +319,9 @@ internal class KorrigerendeInntektsmeldingTest: AbstractEndToEndTest() {
     @Test
     fun `Endring i siste del av agp`() {
         håndterSøknad(Sykdom(1.januar, 5.januar, 100.prosent))
-        nyttVedtak(10.januar til 31.januar)
+        nyttVedtak(10.januar til 31.januar, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         val agpFør = inspektør.arbeidsgiver.arbeidsgiverperiode(10.januar til 31.januar)
-        håndterInntektsmelding(listOf(12.januar til 28.januar))
+        håndterInntektsmelding(listOf(12.januar til 28.januar), vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         val agpEtter = inspektør.arbeidsgiver.arbeidsgiverperiode(10.januar til 31.januar)
 
         assertEquals(Arbeidsgiverperiode(listOf(1.januar til 5.januar, 10.januar til 26.januar)), agpFør)

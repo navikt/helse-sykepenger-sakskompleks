@@ -78,7 +78,7 @@ internal class AvvisningEtterFylte70ÅrTest : AbstractEndToEndTest() {
 
         håndterSykmelding(Sykmeldingsperiode(11.juli, 31.juli))
         håndterSøknad(11.juli til 31.juli)
-        håndterInntektsmelding(listOf(11.juli til 26.juli),)
+        håndterInntektsmelding(listOf(11.juli til 26.juli), vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         håndterVilkårsgrunnlag(2.vedtaksperiode)
         håndterYtelser(2.vedtaksperiode)
         håndterUtbetalingsgodkjenning(2.vedtaksperiode)
