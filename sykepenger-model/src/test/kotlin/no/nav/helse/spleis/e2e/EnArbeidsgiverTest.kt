@@ -313,7 +313,7 @@ internal class EnArbeidsgiverTest : AbstractEndToEndTest() {
         assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING, AVSLUTTET_UTEN_UTBETALING)
 
         nullstillTilstandsendringer()
-        val im = håndterInntektsmelding(listOf(1.januar til 16.januar))
+        val im = håndterInntektsmelding(listOf(1.januar til 16.januar), avsendersystem = ALTINN)
 
         assertTilstander(1.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING, AVVENTER_BLOKKERENDE_PERIODE, AVSLUTTET_UTEN_UTBETALING)
         assertTrue(im in observatør.inntektsmeldingFørSøknad.map { it.inntektsmeldingId })

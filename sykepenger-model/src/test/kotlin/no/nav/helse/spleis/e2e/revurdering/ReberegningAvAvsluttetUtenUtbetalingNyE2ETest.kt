@@ -1,11 +1,13 @@
 package no.nav.helse.spleis.e2e.revurdering
 
 import java.time.LocalDate
+import no.nav.helse.assertForventetFeil
 import no.nav.helse.august
 import no.nav.helse.februar
 import no.nav.helse.hendelser.Dagtype
 import no.nav.helse.hendelser.InntektForSykepengegrunnlag
 import no.nav.helse.hendelser.Inntektsmelding.Avsendersystem.ALTINN
+import no.nav.helse.hendelser.Inntektsmelding.Avsendersystem.NAV_NO_SELVBESTEMT
 import no.nav.helse.hendelser.ManuellOverskrivingDag
 import no.nav.helse.hendelser.Sykmeldingsperiode
 import no.nav.helse.hendelser.Søknad.Søknadsperiode.Ferie
@@ -55,6 +57,7 @@ import no.nav.helse.spleis.e2e.assertFunksjonellFeil
 import no.nav.helse.spleis.e2e.assertInfo
 import no.nav.helse.spleis.e2e.assertIngenVarsel
 import no.nav.helse.spleis.e2e.assertIngenVarsler
+import no.nav.helse.spleis.e2e.assertInntektshistorikkForDato
 import no.nav.helse.spleis.e2e.assertSisteTilstand
 import no.nav.helse.spleis.e2e.assertTilstander
 import no.nav.helse.spleis.e2e.assertVarsel
@@ -1144,16 +1147,53 @@ internal class ReberegningAvAvsluttetUtenUtbetalingNyE2ETest : AbstractEndToEndT
     }
 
     @Test
-    fun `omgjøring med funksjonell feil i inntektsmelding`() {
+    fun `omgjøring med funksjonell feil i inntektsmelding fra Altinn eller LPS`() {
         håndterSøknad(Sykdom(2.januar, 17.januar, 100.prosent))
         nyttVedtak(18.januar til 31.januar, arbeidsgiverperiode = listOf(2.januar til 17.januar), vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         nullstillTilstandsendringer()
         val im = håndterInntektsmelding(
             listOf(1.januar til 16.januar),
             begrunnelseForReduksjonEllerIkkeUtbetalt = "FiskerMedHyre",
-            vedtaksperiodeIdInnhenter = 1.vedtaksperiode
+            vedtaksperiodeIdInnhenter = 1.vedtaksperiode,
+            avsendersystem = ALTINN
         )
+
+        assertEquals(2.januar, inspektør.skjæringstidspunkt(1.vedtaksperiode))
+        assertInntektshistorikkForDato(INNTEKT, 1.januar, inspektør)
         assertTrue(im in observatør.inntektsmeldingIkkeHåndtert)
+        assertFunksjonellFeil(RV_IM_8, 1.vedtaksperiode.filter())
+        assertTilstander(1.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING, AVVENTER_BLOKKERENDE_PERIODE, AVSLUTTET_UTEN_UTBETALING)
+        inspektør.vedtaksperioder(1.vedtaksperiode).inspektør.behandlinger.let {
+            assertEquals(4, it.size)
+            assertTrue(it.all { behalding -> behalding.tilstand == AVSLUTTET_UTEN_VEDTAK })
+            assertEquals(im, it[3].kilde.meldingsreferanseId)
+        }
+    }
+
+    @Test
+    fun `omgjøring med funksjonell feil i inntektsmelding fra portalen`() {
+        håndterSøknad(Sykdom(2.januar, 17.januar, 100.prosent))
+        nyttVedtak(18.januar til 31.januar, arbeidsgiverperiode = listOf(2.januar til 17.januar), vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
+        nullstillTilstandsendringer()
+        val im = håndterInntektsmelding(
+            listOf(1.januar til 16.januar),
+            begrunnelseForReduksjonEllerIkkeUtbetalt = "FiskerMedHyre",
+            vedtaksperiodeIdInnhenter = 1.vedtaksperiode,
+            avsendersystem = NAV_NO_SELVBESTEMT
+        )
+        assertEquals(2.januar, inspektør.skjæringstidspunkt(1.vedtaksperiode))
+        assertInntektshistorikkForDato(INNTEKT, 2.januar, inspektør)
+
+        assertForventetFeil(
+            forklaring = "Støtter ikke denne inntektsmeldingen",
+            nå = {
+                assertTrue(im in observatør.inntektsmeldingHåndtert.map { it.first })
+            },
+            ønsket = {
+                assertTrue(im in observatør.inntektsmeldingIkkeHåndtert)
+            }
+        )
+
         assertFunksjonellFeil(RV_IM_8, 1.vedtaksperiode.filter())
         assertTilstander(1.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING, AVVENTER_BLOKKERENDE_PERIODE, AVSLUTTET_UTEN_UTBETALING)
         inspektør.vedtaksperioder(1.vedtaksperiode).inspektør.behandlinger.let {

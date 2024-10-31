@@ -3,6 +3,7 @@ package no.nav.helse.spleis.e2e.oppgaver
 import java.util.UUID
 import no.nav.helse.februar
 import no.nav.helse.hendelser.Inntektsmelding
+import no.nav.helse.hendelser.Inntektsmelding.Avsendersystem.ALTINN
 import no.nav.helse.hendelser.Periode
 import no.nav.helse.hendelser.Sykmeldingsperiode
 import no.nav.helse.hendelser.Søknad
@@ -47,7 +48,7 @@ internal class DokumentHåndteringTest : AbstractEndToEndTest() {
         val inntektsmelding = håndterInntektsmelding(
             arbeidsgiverperioder = listOf(1.januar til 16.januar),
             førsteFraværsdag = 10.februar,
-            avsendersystem = Inntektsmelding.Avsendersystem.ALTINN
+            avsendersystem = ALTINN
         )
         val søknad = håndterSøknad(Sykdom(10.februar, 28.februar, 100.prosent))
         håndterVilkårsgrunnlag(2.vedtaksperiode)
@@ -58,7 +59,7 @@ internal class DokumentHåndteringTest : AbstractEndToEndTest() {
     @Test
     fun `Inntektsmelding kommer mellom AUU og søknad for førstegangsbehandling`() {
         val søknad1 = håndterSøknad(Sykdom(1.januar, 16.januar, 100.prosent))
-        val inntektsmelding = håndterInntektsmelding(listOf(1.januar til 16.januar))
+        val inntektsmelding = håndterInntektsmelding(listOf(1.januar til 16.januar), avsendersystem = ALTINN)
         val søknad2 = håndterSøknad(Sykdom(17.januar, 31.januar, 100.prosent))
 
         håndterVilkårsgrunnlag(2.vedtaksperiode)
@@ -73,8 +74,8 @@ internal class DokumentHåndteringTest : AbstractEndToEndTest() {
         val søknad1A1 = håndterSøknad(Sykdom(1.januar, 16.januar, 100.prosent), orgnummer = a1)
         val søknad1A2 = håndterSøknad(Sykdom(1.januar, 16.januar, 100.prosent), orgnummer = a2)
 
-        val inntektsmeldingA1 = håndterInntektsmelding(listOf(1.januar til 16.januar), orgnummer = a1,)
-        val inntektsmeldingA2 = håndterInntektsmelding(listOf(1.januar til 16.januar), orgnummer = a2,)
+        val inntektsmeldingA1 = håndterInntektsmelding(listOf(1.januar til 16.januar), orgnummer = a1, avsendersystem = ALTINN)
+        val inntektsmeldingA2 = håndterInntektsmelding(listOf(1.januar til 16.januar), orgnummer = a2, avsendersystem = ALTINN)
 
         val søknad2A1 = håndterSøknad(Sykdom(17.januar, 31.januar, 100.prosent), orgnummer = a1)
         val søknad2A2 = håndterSøknad(Sykdom(17.januar, 31.januar, 100.prosent), orgnummer = a2)
@@ -117,7 +118,7 @@ internal class DokumentHåndteringTest : AbstractEndToEndTest() {
     @Test
     fun `Inntektsmelding før søknad`() {
         håndterSykmelding(januar)
-        val id = håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        val id = håndterInntektsmelding(listOf(1.januar til 16.januar), avsendersystem = ALTINN)
         val inntektsmeldingFørSøknadEvent = observatør.inntektsmeldingFørSøknad.single()
         inntektsmeldingFørSøknadEvent.let {
             assertEquals(id, it.inntektsmeldingId)
@@ -175,7 +176,7 @@ internal class DokumentHåndteringTest : AbstractEndToEndTest() {
 
     @Test
     fun `Inntektsmelding ikke håndtert`() {
-        val id = håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        val id = håndterInntektsmelding(listOf(1.januar til 16.januar), avsendersystem = ALTINN)
         val inntektsmelding = observatør.inntektsmeldingIkkeHåndtert.single()
         assertEquals(id, inntektsmelding)
     }
@@ -193,7 +194,7 @@ internal class DokumentHåndteringTest : AbstractEndToEndTest() {
     @Test
     fun `Inntektsmelding bare håndtert inntekt`() {
         håndterSøknad(januar)
-        val im1 = håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        val im1 = håndterInntektsmelding(listOf(1.januar til 16.januar))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode)
         håndterSimulering(1.vedtaksperiode)
@@ -205,7 +206,7 @@ internal class DokumentHåndteringTest : AbstractEndToEndTest() {
         ), observatør.inntektsmeldingHåndtert)
         assertEquals(emptyList<UUID>(), observatør.inntektsmeldingIkkeHåndtert)
         val søknad = håndterSøknad(Sykdom(10.februar, 28.februar, 100.prosent))
-        val im = håndterInntektsmelding(listOf(1.januar til 16.januar), førsteFraværsdag = 10.februar,)
+        val im = håndterInntektsmelding(listOf(1.januar til 16.januar), førsteFraværsdag = 10.februar, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         assertEquals(emptyList<UUID>(), observatør.inntektsmeldingIkkeHåndtert)
         assertEquals(hendelserHåndtertFør, inspektør.hendelser(1.vedtaksperiode))
         assertEquals(setOf(
@@ -490,7 +491,7 @@ internal class DokumentHåndteringTest : AbstractEndToEndTest() {
             listOf(1.januar til 16.januar),
             førsteFraværsdag = 1.februar,
             refusjon = Inntektsmelding.Refusjon(Inntekt.INGEN, null),
-            avsendersystem = Inntektsmelding.Avsendersystem.ALTINN
+            avsendersystem = ALTINN
         )
         håndterSøknad(februar)
         assertFalse(im2 in observatør.inntektsmeldingHåndtert.map(Pair<UUID,*>::first))
@@ -501,7 +502,7 @@ internal class DokumentHåndteringTest : AbstractEndToEndTest() {
     fun `inntektsmelding med første fraværsdag utenfor sykdom - ingen tidligere vedtak - inntektsmelding ikke håndtert fordi inntekt håndteres ikke`() {
         håndterSykmelding(Sykmeldingsperiode(3.januar, 26.januar))
         håndterSøknad(Sykdom(3.januar, 26.januar, 100.prosent))
-        val im = håndterInntektsmelding(listOf(Periode(3.januar, 18.januar)), 27.januar, avsendersystem = Inntektsmelding.Avsendersystem.ALTINN)
+        val im = håndterInntektsmelding(listOf(Periode(3.januar, 18.januar)), 27.januar, avsendersystem = ALTINN)
         assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING)
         assertFalse(im in observatør.inntektsmeldingHåndtert.map(Pair<UUID,*>::first))
         assertTrue(im in observatør.inntektsmeldingIkkeHåndtert)
@@ -510,7 +511,7 @@ internal class DokumentHåndteringTest : AbstractEndToEndTest() {
     @Test
     fun `inntektsmelding med første fraværsdag utenfor sykdom - ingen tidligere vedtak - IM før søknad - inntektsmelding ikke håndtert fordi inntekt håndteres ikke`() {
         håndterSykmelding(Sykmeldingsperiode(3.januar, 26.januar))
-        håndterInntektsmelding(listOf(Periode(3.januar, 18.januar)), 27.januar)
+        håndterInntektsmelding(listOf(Periode(3.januar, 18.januar)), 27.januar, avsendersystem = ALTINN)
         håndterSøknad(Sykdom(3.januar, 26.januar, 100.prosent))
         assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING)
     }
