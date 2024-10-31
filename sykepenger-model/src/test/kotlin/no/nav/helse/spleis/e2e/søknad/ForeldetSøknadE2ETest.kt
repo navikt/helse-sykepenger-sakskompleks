@@ -6,7 +6,6 @@ import no.nav.helse.hendelser.Sykmeldingsperiode
 import no.nav.helse.hendelser.Søknad.Søknadsperiode.Ferie
 import no.nav.helse.hendelser.Søknad.Søknadsperiode.Sykdom
 import no.nav.helse.hendelser.til
-import no.nav.helse.inspectors.inspektør
 import no.nav.helse.januar
 import no.nav.helse.juli
 import no.nav.helse.juni
@@ -165,14 +164,14 @@ internal class ForeldetSøknadE2ETest : AbstractEndToEndTest() {
 
         // foreldet søknad :(
         håndterSøknad(Sykdom(1.januar, 19.januar, 100.prosent), sendtTilNAVEllerArbeidsgiver = 1.mai)
-        håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        håndterInntektsmelding(listOf(1.januar til 16.januar))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode)
         håndterUtbetalingsgodkjenning(1.vedtaksperiode)
 
         // foreldet søknad :(
         håndterSøknad(Sykdom(24.januar, 31.januar, 100.prosent), sendtTilNAVEllerArbeidsgiver = 1.mai)
-        håndterInntektsmelding(listOf(1.januar til 16.januar), førsteFraværsdag = 24.januar,)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), førsteFraværsdag = 24.januar, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
 
         håndterYtelser(1.vedtaksperiode)
         håndterUtbetalingsgodkjenning(1.vedtaksperiode)
@@ -205,14 +204,14 @@ internal class ForeldetSøknadE2ETest : AbstractEndToEndTest() {
 
         // foreldet søknad :(
         håndterSøknad(Sykdom(1.januar, 19.januar, 100.prosent), sendtTilNAVEllerArbeidsgiver = 1.juni)
-        håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        håndterInntektsmelding(listOf(1.januar til 16.januar))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode)
         håndterUtbetalingsgodkjenning(1.vedtaksperiode)
 
         // foreldet søknad :(
         håndterSøknad(Sykdom(19.februar, 12.mars, 100.prosent), sendtTilNAVEllerArbeidsgiver = 1.juli)
-        håndterInntektsmelding(listOf(19.februar til 6.mars),)
+        håndterInntektsmelding(listOf(19.februar til 6.mars), vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         håndterVilkårsgrunnlag(2.vedtaksperiode)
         håndterYtelser(2.vedtaksperiode)
         håndterUtbetalingsgodkjenning(2.vedtaksperiode)

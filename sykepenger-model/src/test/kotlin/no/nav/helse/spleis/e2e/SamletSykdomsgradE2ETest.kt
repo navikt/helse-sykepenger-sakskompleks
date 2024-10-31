@@ -145,7 +145,7 @@ internal class SamletSykdomsgradE2ETest: AbstractEndToEndTest() {
 
         håndterSykmelding(Sykmeldingsperiode(1.mars, 20.mars))
         håndterSøknad(1.mars til 20.mars)
-        håndterInntektsmelding(listOf(Periode(1.mars, 16.mars)),)
+        håndterInntektsmelding(listOf(Periode(1.mars, 16.mars)), vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         håndterVilkårsgrunnlag(2.vedtaksperiode, INNTEKT)
         håndterYtelser(2.vedtaksperiode)
         håndterSimulering(2.vedtaksperiode)

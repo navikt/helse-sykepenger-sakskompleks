@@ -6,7 +6,6 @@ import no.nav.helse.hendelser.Sykmeldingsperiode
 import no.nav.helse.hendelser.Søknad
 import no.nav.helse.hendelser.Søknad.Søknadsperiode.Sykdom
 import no.nav.helse.hendelser.til
-import no.nav.helse.inspectors.inspektør
 import no.nav.helse.januar
 import no.nav.helse.november
 import no.nav.helse.person.TilstandType.AVSLUTTET_UTEN_UTBETALING
@@ -92,7 +91,7 @@ internal class UtbetalingTest : AbstractEndToEndTest() {
 
         håndterSøknad(Sykdom(1.desember, 31.desember, 10.prosent))
 
-        håndterInntektsmelding(listOf(13.november til 14.november, 1.desember til 14.desember))
+        håndterInntektsmelding(listOf(13.november til 14.november, 1.desember til 14.desember), vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         håndterVilkårsgrunnlag(2.vedtaksperiode)
         håndterYtelser(2.vedtaksperiode)
 

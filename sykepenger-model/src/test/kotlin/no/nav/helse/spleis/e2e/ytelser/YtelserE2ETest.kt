@@ -200,7 +200,7 @@ internal class YtelserE2ETest : AbstractEndToEndTest() {
         nyttVedtak(januar)
 
         håndterSøknad(mars)
-        håndterInntektsmelding(listOf(1.mars til 16.mars))
+        håndterInntektsmelding(listOf(1.mars til 16.mars), vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         håndterVilkårsgrunnlag(2.vedtaksperiode)
         håndterYtelser(2.vedtaksperiode, foreldrepenger = listOf(GradertPeriode(mars, 100)))
 

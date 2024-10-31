@@ -134,13 +134,13 @@ internal class FlereArbeidsgivereFlytTest : AbstractEndToEndTest() {
 
         håndterSykmelding(Sykmeldingsperiode(1.mars, 31.mars), orgnummer = a1)
         håndterSøknad(Sykdom(1.mars, 31.mars, 100.prosent), orgnummer = a1)
-        håndterInntektsmelding(listOf(1.mars til 16.mars), orgnummer = a1,)
+        håndterInntektsmelding(listOf(1.mars til 16.mars), orgnummer = a1, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
 
         håndterSykmelding(Sykmeldingsperiode(1.mars, 31.mars), orgnummer = a2)
         håndterSøknad(Sykdom(1.mars, 31.mars, 100.prosent), orgnummer = a2)
-        håndterInntektsmelding(listOf(1.mars til 16.mars), orgnummer = a2,)
+        håndterInntektsmelding(listOf(1.mars til 16.mars), orgnummer = a2, vedtaksperiodeIdInnhenter = 1.vedtaksperiode)
 
-        håndterInntektsmelding(listOf(1.januar til 16.januar), orgnummer = a1,)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), orgnummer = a1, vedtaksperiodeIdInnhenter = 1.vedtaksperiode)
         håndterVilkårsgrunnlag(1.vedtaksperiode, orgnummer = a1)
         håndterYtelser(1.vedtaksperiode, orgnummer = a1)
         håndterSimulering(1.vedtaksperiode, orgnummer = a1)
@@ -465,7 +465,7 @@ internal class FlereArbeidsgivereFlytTest : AbstractEndToEndTest() {
 
         håndterSøknad(Sykdom(1.januar, 22.januar, 100.prosent), orgnummer = a1)
 
-        håndterInntektsmelding(listOf(1.januar til 16.januar), orgnummer = a1,)
+        håndterInntektsmelding(listOf(1.januar til 16.januar), orgnummer = a1, vedtaksperiodeIdInnhenter = 1.vedtaksperiode)
         assertTilstand(1.vedtaksperiode, AVVENTER_VILKÅRSPRØVING, orgnummer = a1)
 
         håndterSøknad(Sykdom(25.januar, 17.februar, 100.prosent), orgnummer = a1)
@@ -474,8 +474,8 @@ internal class FlereArbeidsgivereFlytTest : AbstractEndToEndTest() {
         håndterSøknad(Sykdom(25.januar, 17.februar, 100.prosent), orgnummer = a2)
         assertTilstand(1.vedtaksperiode, AVVENTER_INNTEKTSMELDING, orgnummer = a2)
 
-        håndterInntektsmelding(listOf(25.januar til 9.februar), orgnummer = a1,)
-        håndterInntektsmelding(listOf(25.januar til 9.februar), orgnummer = a2,)
+        håndterInntektsmelding(listOf(25.januar til 9.februar), orgnummer = a1, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
+        håndterInntektsmelding(listOf(25.januar til 9.februar), orgnummer = a2, vedtaksperiodeIdInnhenter = 1.vedtaksperiode)
         assertTilstand(1.vedtaksperiode, AVVENTER_VILKÅRSPRØVING, orgnummer = a1)
         assertTilstand(2.vedtaksperiode, AVVENTER_BLOKKERENDE_PERIODE, orgnummer = a1)
         assertTilstand(1.vedtaksperiode, AVVENTER_BLOKKERENDE_PERIODE, orgnummer = a2)

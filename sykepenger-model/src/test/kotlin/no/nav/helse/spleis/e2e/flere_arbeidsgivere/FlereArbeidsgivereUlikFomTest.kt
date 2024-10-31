@@ -331,7 +331,7 @@ internal class FlereArbeidsgivereUlikFomTest : AbstractEndToEndTest() {
         håndterSøknad(Sykdom(28.februar, 31.mars, 100.prosent), orgnummer = a1)
         håndterSøknad(Sykdom(5.mars, 31.mars, 100.prosent), orgnummer = a2)
 
-        håndterInntektsmelding(listOf(28.februar til 15.mars), førsteFraværsdag = 28.februar, orgnummer = a1,)
+        håndterInntektsmelding(listOf(28.februar til 15.mars), førsteFraværsdag = 28.februar, orgnummer = a1)
         håndterInntektsmelding(
             listOf(5.mars til 20.mars),
             førsteFraværsdag = 5.mars,

@@ -1012,7 +1012,7 @@ internal class FeriepengeE2ETest : AbstractEndToEndTest() {
     fun `Rekjøring etter annullert oppdrag skal sende feriepenger med ny fagsystemId`() {
         håndterSykmelding(Sykmeldingsperiode(1.juni(2020), 14.august(2020)))
         håndterSøknad(1.juni(2020) til 14.august(2020)) // 43 dager
-        håndterInntektsmelding(listOf(1.juni(2020) til 16.juni(2020)),)
+        håndterInntektsmelding(listOf(1.juni(2020) til 16.juni(2020)))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode)
         håndterSimulering(1.vedtaksperiode)
@@ -1031,7 +1031,7 @@ internal class FeriepengeE2ETest : AbstractEndToEndTest() {
 
         håndterSykmelding(Sykmeldingsperiode(1.oktober(2020), 14.desember(2020)))
         håndterSøknad(1.oktober(2020) til 14.desember(2020)) // 41 dager
-        håndterInntektsmelding(listOf(1.oktober(2020) til 16.oktober(2020)),)
+        håndterInntektsmelding(listOf(1.oktober(2020) til 16.oktober(2020)), vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         håndterVilkårsgrunnlag(2.vedtaksperiode)
         håndterYtelser(2.vedtaksperiode)
         håndterSimulering(2.vedtaksperiode)

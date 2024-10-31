@@ -43,7 +43,7 @@ internal class UtbetalingOgAnnulleringTest : AbstractEndToEndTest() {
     @Test
     fun `annullere senere periode enn perioden til godkjenning`() {
         nyttVedtak(mars)
-        tilGodkjenning(januar, ORGNUMMER)
+        tilGodkjenning(januar, ORGNUMMER, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         håndterAnnullerUtbetaling(utbetalingId = inspektør.sisteUtbetalingId(1.vedtaksperiode))
         håndterUtbetalt()
         assertSisteTilstand(1.vedtaksperiode, TIL_INFOTRYGD)
@@ -53,7 +53,7 @@ internal class UtbetalingOgAnnulleringTest : AbstractEndToEndTest() {
     @Test
     fun `annullere senere periode enn perioden til revurdering`() {
         nyttVedtak(januar)
-        nyttVedtak(mars)
+        nyttVedtak(mars, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         håndterOverstyrTidslinje(listOf(ManuellOverskrivingDag(31.januar, Dagtype.Feriedag)))
         håndterYtelser(1.vedtaksperiode)
         håndterSimulering(1.vedtaksperiode)
@@ -66,7 +66,7 @@ internal class UtbetalingOgAnnulleringTest : AbstractEndToEndTest() {
     @Test
     fun `annullere førstegangsbehandling uten utbetaling`() {
         nyPeriode(1.januar til 20.januar, grad = 19.prosent)
-        håndterInntektsmelding(listOf(1.januar til 16.januar),)
+        håndterInntektsmelding(listOf(1.januar til 16.januar))
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode)
         håndterUtbetalingsgodkjenning(1.vedtaksperiode)
@@ -113,7 +113,7 @@ internal class UtbetalingOgAnnulleringTest : AbstractEndToEndTest() {
     fun `annullerer første periode før andre periode starter i en ikke-sammenhengende utbetaling med mer enn 16 dager gap`() {
         håndterSykmelding(Sykmeldingsperiode(3.januar, 26.januar))
         håndterSøknad(3.januar til 26.januar)
-        håndterInntektsmelding(listOf(Periode(3.januar, 18.januar)),)
+        håndterInntektsmelding(listOf(Periode(3.januar, 18.januar)))
         håndterVilkårsgrunnlag(1.vedtaksperiode, INNTEKT)
         håndterYtelser(1.vedtaksperiode)
         håndterSimulering(1.vedtaksperiode)
@@ -125,7 +125,7 @@ internal class UtbetalingOgAnnulleringTest : AbstractEndToEndTest() {
 
         håndterSykmelding(Sykmeldingsperiode(20.februar, 20.mars))
         håndterSøknad(20.februar til 20.mars)
-        håndterInntektsmelding(listOf(Periode(20.februar, 7.mars)), førsteFraværsdag = 20.februar,)
+        håndterInntektsmelding(listOf(Periode(20.februar, 7.mars)), førsteFraværsdag = 20.februar, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         håndterVilkårsgrunnlag(2.vedtaksperiode, INNTEKT)
         håndterYtelser(2.vedtaksperiode)
         håndterSimulering(2.vedtaksperiode)
@@ -140,7 +140,7 @@ internal class UtbetalingOgAnnulleringTest : AbstractEndToEndTest() {
     fun `annullering kaster alle etterfølgende perioder`() {
         håndterSykmelding(Sykmeldingsperiode(3.januar, 26.januar))
         håndterSøknad(3.januar til 26.januar)
-        håndterInntektsmelding(listOf(Periode(3.januar, 18.januar)),)
+        håndterInntektsmelding(listOf(Periode(3.januar, 18.januar)))
         håndterVilkårsgrunnlag(1.vedtaksperiode, INNTEKT)
         håndterYtelser(1.vedtaksperiode)
         håndterSimulering(1.vedtaksperiode)
@@ -149,7 +149,7 @@ internal class UtbetalingOgAnnulleringTest : AbstractEndToEndTest() {
 
         håndterSykmelding(Sykmeldingsperiode(20.februar, 25.mars))
         håndterSøknad(20.februar til 25.mars)
-        håndterInntektsmelding(listOf(Periode(20.februar, 7.mars)), førsteFraværsdag = 20.februar,)
+        håndterInntektsmelding(listOf(Periode(20.februar, 7.mars)), førsteFraværsdag = 20.februar, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         håndterVilkårsgrunnlag(2.vedtaksperiode, INNTEKT)
 
         val utbetalingId = inspektør.sisteUtbetaling().utbetalingId
@@ -186,7 +186,7 @@ internal class UtbetalingOgAnnulleringTest : AbstractEndToEndTest() {
     fun `kan annullere selv om vi har en etterfølgende periode som har gått til infotrygd etter simulering`() {
         håndterSykmelding(Sykmeldingsperiode(3.januar, 26.januar))
         håndterSøknad(3.januar til 26.januar)
-        håndterInntektsmelding(listOf(Periode(3.januar, 18.januar)),)
+        håndterInntektsmelding(listOf(Periode(3.januar, 18.januar)))
         håndterVilkårsgrunnlag(1.vedtaksperiode, INNTEKT)
         håndterYtelser(1.vedtaksperiode)
         håndterSimulering(1.vedtaksperiode)
@@ -195,7 +195,7 @@ internal class UtbetalingOgAnnulleringTest : AbstractEndToEndTest() {
 
         håndterSykmelding(Sykmeldingsperiode(3.mars, 26.mars))
         håndterSøknad(3.mars til 26.mars)
-        håndterInntektsmelding(listOf(Periode(3.mars, 18.mars)),)
+        håndterInntektsmelding(listOf(Periode(3.mars, 18.mars)), vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         håndterVilkårsgrunnlag(2.vedtaksperiode, INNTEKT)
         håndterYtelser(2.vedtaksperiode)
         håndterSimulering(2.vedtaksperiode)

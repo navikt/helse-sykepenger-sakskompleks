@@ -20,6 +20,8 @@ import no.nav.helse.hendelser.Infotrygdendring
 import no.nav.helse.hendelser.InntektForSykepengegrunnlag
 import no.nav.helse.hendelser.InntekterForOpptjeningsvurdering
 import no.nav.helse.hendelser.Inntektsmelding
+import no.nav.helse.hendelser.Inntektsmelding.Avsendersystem.ALTINN
+import no.nav.helse.hendelser.Inntektsmelding.Avsendersystem.NAV_NO
 import no.nav.helse.hendelser.InntektsmeldingerReplay
 import no.nav.helse.hendelser.Institusjonsopphold
 import no.nav.helse.hendelser.ManuellOverskrivingDag
@@ -190,33 +192,35 @@ internal fun AbstractEndToEndTest.nyeVedtak(
 
 internal fun AbstractEndToEndTest.førstegangTilGodkjenning(
     periode: Periode,
-    vararg organisasjonsnummere: String
+    vararg arbeidsgivere: Pair<String, IdInnhenter?>,
 ) {
-    require(organisasjonsnummere.isNotEmpty()) { "Må inneholde minst ett organisasjonsnummer" }
-    organisasjonsnummere.forEach {
-        håndterSykmelding(Sykmeldingsperiode(periode.start, periode.endInclusive), orgnummer = it)
+    require(arbeidsgivere.isNotEmpty()) { "Må inneholde minst ett organisasjonsnummer" }
+    arbeidsgivere.forEach {
+        håndterSykmelding(Sykmeldingsperiode(periode.start, periode.endInclusive), orgnummer = it.first)
     }
-    organisasjonsnummere.forEach {
-        håndterSøknad(Søknadsperiode.Sykdom(periode.start, periode.endInclusive, 100.prosent), orgnummer = it)
+    arbeidsgivere.forEach {
+        håndterSøknad(Søknadsperiode.Sykdom(periode.start, periode.endInclusive, 100.prosent), orgnummer = it.first)
 
     }
-    organisasjonsnummere.forEach {
+    arbeidsgivere.forEach {
         håndterInntektsmelding(
             arbeidsgiverperioder = listOf(Periode(periode.start, periode.start.plusDays(15))),
             beregnetInntekt = 20000.månedlig,
-            orgnummer = it,
+            orgnummer = it.first,
+            vedtaksperiodeIdInnhenter = it.second,
+            avsendersystem = if (it.second == null) ALTINN else NAV_NO
         )
     }
 
     val vedtaksperiode = observatør.sisteVedtaksperiode()
 
-    organisasjonsnummere.first().let { organisasjonsnummer ->
+    arbeidsgivere.first().let { arbeidsgiver ->
         håndterVilkårsgrunnlag(
             vedtaksperiodeIdInnhenter = vedtaksperiode,
-            orgnummer = organisasjonsnummer
+            orgnummer = arbeidsgiver.first
         )
-        håndterYtelser(vedtaksperiode, orgnummer = organisasjonsnummer)
-        håndterSimulering(vedtaksperiode, orgnummer = organisasjonsnummer)
+        håndterYtelser(vedtaksperiode, orgnummer = arbeidsgiver.first)
+        håndterSimulering(vedtaksperiode, orgnummer = arbeidsgiver.first)
     }
 }
 
@@ -509,11 +513,11 @@ internal fun AbstractEndToEndTest.håndterInntektsmelding(
     fnr: Personidentifikator = UNG_PERSON_FNR_2018,
     begrunnelseForReduksjonEllerIkkeUtbetalt: String? = null,
     harFlereInntektsmeldinger: Boolean = false,
-    avsendersystem: Inntektsmelding.Avsendersystem = Inntektsmelding.Avsendersystem.NAV_NO,
+    avsendersystem: Inntektsmelding.Avsendersystem = NAV_NO,
     vedtaksperiodeIdInnhenter: IdInnhenter? = 1.vedtaksperiode,
     førReplay: () -> Unit = {}
 ): UUID {
-    if (avsendersystem == Inntektsmelding.Avsendersystem.NAV_NO || avsendersystem == Inntektsmelding.Avsendersystem.NAV_NO_SELVBESTEMT) {
+    if (avsendersystem == NAV_NO || avsendersystem == Inntektsmelding.Avsendersystem.NAV_NO_SELVBESTEMT) {
         requireNotNull(vedtaksperiodeIdInnhenter) { "Portalinntektsmelding må knyttes til en vedtaksperiode" }
         return håndterInntektsmelding(inntektsmeldingPortal(
             id,

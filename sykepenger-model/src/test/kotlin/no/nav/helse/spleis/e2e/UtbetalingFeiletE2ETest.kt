@@ -171,7 +171,7 @@ internal class UtbetalingFeiletE2ETest : AbstractEndToEndTest() {
     fun `nyere perioder må vente til periode med feilet utbetaling er ok`() {
         nyttVedtak(januar, status = Oppdragstatus.AVVIST)
         nyPeriode(mars)
-        håndterInntektsmelding(listOf(1.mars til 16.mars))
+        håndterInntektsmelding(listOf(1.mars til 16.mars), vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
 
         assertTilstander(1.vedtaksperiode, START, AVVENTER_INFOTRYGDHISTORIKK, AVVENTER_INNTEKTSMELDING, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_VILKÅRSPRØVING, AVVENTER_HISTORIKK, AVVENTER_SIMULERING, AVVENTER_GODKJENNING, TIL_UTBETALING)
         assertTilstander(2.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, AVVENTER_BLOKKERENDE_PERIODE)

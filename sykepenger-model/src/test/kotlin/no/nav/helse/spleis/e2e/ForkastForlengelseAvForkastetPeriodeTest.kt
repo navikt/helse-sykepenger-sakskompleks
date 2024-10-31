@@ -173,9 +173,9 @@ internal class ForkastForlengelseAvForkastetPeriodeTest : AbstractEndToEndTest()
         nyPeriode(januar)
         forkastAlle()
 
-        nyttVedtak(mars)
+        nyttVedtak(mars, vedtaksperiodeIdInnhenter = 2.vedtaksperiode)
         forlengVedtak(april)
-        nyttVedtak(juni)
+        nyttVedtak(juni, vedtaksperiodeIdInnhenter = 4.vedtaksperiode)
 
         nyPeriode(februar)
 

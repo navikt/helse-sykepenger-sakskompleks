@@ -204,7 +204,7 @@ internal class RevurderingseventyrEventTest : AbstractEndToEndTest() {
     fun `tidligere skjæringstidspunkt -- revurderer inntekt`() {
         nyttVedtak(januar)
         forlengVedtak(1.februar til 15.februar)
-        nyttVedtak(mars)
+        nyttVedtak(mars, vedtaksperiodeIdInnhenter = 3.vedtaksperiode)
         forlengVedtak(april)
 
         val januar = observatør.utbetalteVedtaksperioder[0]
@@ -235,7 +235,7 @@ internal class RevurderingseventyrEventTest : AbstractEndToEndTest() {
     fun `tidligere skjæringstidspunkt -- revurderer tidslinje`() {
         nyttVedtak(januar)
         forlengVedtak(1.februar til 15.februar)
-        nyttVedtak(mars)
+        nyttVedtak(mars, vedtaksperiodeIdInnhenter = 3.vedtaksperiode)
         forlengVedtak(april)
 
         val februar = observatør.utbetalteVedtaksperioder[1]
