@@ -733,8 +733,7 @@ internal class OverstyrArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
         assertIngenVarsler()
 
         assertEquals(listOf(
-            Refusjonsopplysning(inntektsmeldingId, 5.februar, 6.februar, INNTEKT),
-            Refusjonsopplysning(inntektsmeldingId, 7.februar, null, INNTEKT),
+            Refusjonsopplysning(inntektsmeldingId, 5.februar, null, INNTEKT),
         ), inspektør.refusjonsopplysningerISykepengegrunnlaget(5.februar, a1))
 
         val overstyringId = UUID.randomUUID()

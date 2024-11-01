@@ -823,7 +823,7 @@ internal class Arbeidsgiver private constructor(
     }
 
     private fun addInntektsmelding(inntektsmelding: Inntektsmelding, aktivitetslogg: IAktivitetslogg, overstyring: Revurderingseventyr?) {
-        inntektsmelding.leggTilRefusjon(refusjonshistorikk)
+        inntektsmelding.leggTilRefusjon(refusjonshistorikk, vedtaksperioder, ::finnFørsteFraværsdag)
 
         val subsumsjonsloggMedInntektsmeldingkontekst = subsumsjonsloggMedInntektsmeldingkontekst(inntektsmelding)
         val inntektsdato = inntektsmelding.addInntekt(inntektshistorikk, subsumsjonsloggMedInntektsmeldingkontekst, vedtaksperioder)

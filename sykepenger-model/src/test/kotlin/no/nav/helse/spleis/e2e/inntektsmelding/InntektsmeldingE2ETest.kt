@@ -2208,15 +2208,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
 
         val refusjonsopplysninger = inspektør.arbeidsgiver.refusjonsopplysninger(5.februar)
 
-        assertForventetFeil(
-            forklaring = "Skal lagre på første fraværsdag utledet av vedtaksperioden",
-            nå = {
-                assertTrue(refusjonsopplysninger.erTom)
-            },
-            ønsket = {
-                assertFalse(refusjonsopplysninger.erTom)
-            }
-        )
+        assertFalse(refusjonsopplysninger.erTom)
     }
 
 }

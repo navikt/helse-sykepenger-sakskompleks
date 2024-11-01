@@ -122,20 +122,39 @@ class Inntektsmelding(
     }
 
     private val refusjonsElement = Refusjonshistorikk.Refusjon(
-        meldingsreferanseId = meldingsreferanseId,
+        meldingsreferanseId = metadata.meldingsreferanseId,
         førsteFraværsdag = førsteFraværsdag,
         arbeidsgiverperioder = arbeidsgiverperioder,
         beløp = refusjon.beløp,
         sisteRefusjonsdag = refusjon.opphørsdato,
         endringerIRefusjon = refusjon.endringerIRefusjon.map { it.tilEndring() },
-        tidsstempel = mottatt
+        tidsstempel = metadata.registrert
     )
+
+    private fun refusjonsElement(vedtaksperioder: List<Vedtaksperiode>, finnFørsteFraværsdag: (LocalDate) -> LocalDate?): Refusjonshistorikk.Refusjon {
+        val utledetFørsteFraværsdag = if (erPortalinntektsmelding()) {
+            val skjæringstidspunkt = vedtaksperioder.finnSkjæringstidspunktFor(requireNotNull(vedtaksperiodeId))
+            finnFørsteFraværsdag(skjæringstidspunkt ?: beregnetInntektsdato) ?: beregnetInntektsdato
+        } else {
+            førsteFraværsdag
+        }
+        return Refusjonshistorikk.Refusjon(
+            meldingsreferanseId = metadata.meldingsreferanseId,
+            førsteFraværsdag = utledetFørsteFraværsdag,
+            arbeidsgiverperioder = arbeidsgiverperioder,
+            beløp = refusjon.beløp,
+            sisteRefusjonsdag = refusjon.opphørsdato,
+            endringerIRefusjon = refusjon.endringerIRefusjon.map { it.tilEndring() },
+            tidsstempel = metadata.registrert
+        )
+    }
 
     internal val refusjonsservitør = checkNotNull(Refusjonsservitør.fra(refusjon.refusjonstidslinje(førsteFraværsdag, arbeidsgiverperioder, meldingsreferanseId, mottatt))) {
         "Det har kommet en inntektsmelding uten refusjonsopplysninger, det takler vi særdeles dårlig"
     }
 
-    internal fun leggTilRefusjon(refusjonshistorikk: Refusjonshistorikk) {
+    internal fun leggTilRefusjon(refusjonshistorikk: Refusjonshistorikk, vedtaksperioder: List<Vedtaksperiode>, finnFørsteFraværsdag: (LocalDate) -> LocalDate?) {
+        val refusjonsElement = refusjonsElement(vedtaksperioder, finnFørsteFraværsdag)
         refusjonshistorikk.leggTilRefusjon(refusjonsElement)
     }
 
