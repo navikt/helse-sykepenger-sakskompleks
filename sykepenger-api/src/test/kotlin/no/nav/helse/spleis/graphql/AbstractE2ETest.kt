@@ -151,12 +151,12 @@ internal abstract class AbstractE2ETest {
     ): UUID {
         return håndterInntektsmelding(
             arbeidsgiverperioder = listOf(fom til fom.plusDays(15)),
-            beregnetInntekt = beregnetInntekt,
-            refusjon = Inntektsmelding.Refusjon(beregnetInntekt, null),
-            begrunnelseForReduksjonEllerIkkeUtbetalt = begrunnelseForReduksjonEllerIkkeUtbetalt,
-            meldingsreferanseId = meldingsreferanseId,
             orgnummer = orgnummer,
-            vedtaksperiode = vedtaksperiode
+            vedtaksperiode = vedtaksperiode,
+            beregnetInntekt = beregnetInntekt,
+            begrunnelseForReduksjonEllerIkkeUtbetalt = begrunnelseForReduksjonEllerIkkeUtbetalt,
+            refusjon = Inntektsmelding.Refusjon(beregnetInntekt, null),
+            meldingsreferanseId = meldingsreferanseId
         )
     }
 
@@ -164,39 +164,41 @@ internal abstract class AbstractE2ETest {
         fom: LocalDate,
         begrunnelseForReduksjonEllerIkkeUtbetalt: String? = null,
         meldingsreferanseId: UUID = UUID.randomUUID(),
-        orgnummer: String = a1
+        orgnummer: String = a1,
+        vedtaksperiode: Int,
+
     ): UUID {
         return håndterInntektsmelding(
             arbeidsgiverperioder = listOf(fom til fom.plusDays(15)),
+            orgnummer = orgnummer,
             beregnetInntekt = INNTEKT,
-            refusjon = Inntektsmelding.Refusjon(INGEN, null),
             begrunnelseForReduksjonEllerIkkeUtbetalt = begrunnelseForReduksjonEllerIkkeUtbetalt,
+            refusjon = Inntektsmelding.Refusjon(INGEN, null),
             meldingsreferanseId = meldingsreferanseId,
-            orgnummer = orgnummer
+            vedtaksperiode = vedtaksperiode
         )
     }
 
     protected fun håndterInntektsmeldingUtenRefusjon(
         arbeidsgiverperioder: List<Periode>,
-        inntektdato: LocalDate,
+        vedtaksperiode: Int,
         begrunnelseForReduksjonEllerIkkeUtbetalt: String? = null,
         meldingsreferanseId: UUID = UUID.randomUUID(),
         orgnummer: String = a1
     ): UUID {
         return håndterInntektsmelding(
             arbeidsgiverperioder = arbeidsgiverperioder,
-            førsteFraværsdag = inntektdato,
+            orgnummer = orgnummer,
             beregnetInntekt = INNTEKT,
-            refusjon = Inntektsmelding.Refusjon(INGEN, null),
             begrunnelseForReduksjonEllerIkkeUtbetalt = begrunnelseForReduksjonEllerIkkeUtbetalt,
+            refusjon = Inntektsmelding.Refusjon(INGEN, null),
             meldingsreferanseId = meldingsreferanseId,
-            orgnummer = orgnummer
+            vedtaksperiode = vedtaksperiode
         )
     }
 
     protected fun håndterInntektsmelding(
         arbeidsgiverperioder: List<Periode>,
-        førsteFraværsdag: LocalDate = arbeidsgiverperioder.maxOf { it.start },
         orgnummer: String = a1,
         vedtaksperiode: Int = 1,
         beregnetInntekt: Inntekt = INNTEKT,
@@ -204,15 +206,14 @@ internal abstract class AbstractE2ETest {
         refusjon: Inntektsmelding.Refusjon = Inntektsmelding.Refusjon(beregnetInntekt, null),
         meldingsreferanseId: UUID = UUID.randomUUID(),
     ): UUID {
-        (fabrikker.getValue(orgnummer).lagPortalinntektsmelding(
+        fabrikker.getValue(orgnummer).lagPortalinntektsmelding(
             arbeidsgiverperioder = arbeidsgiverperioder,
             beregnetInntekt = beregnetInntekt,
-            førsteFraværsdag = førsteFraværsdag,
             vedtaksperiodeId = vedtaksperiode.vedtaksperiode(orgnummer),
             refusjon = refusjon,
             begrunnelseForReduksjonEllerIkkeUtbetalt = begrunnelseForReduksjonEllerIkkeUtbetalt,
             id = meldingsreferanseId,
-        )).håndter(Person::håndter)
+        ).håndter(Person::håndter)
         return meldingsreferanseId
     }
 

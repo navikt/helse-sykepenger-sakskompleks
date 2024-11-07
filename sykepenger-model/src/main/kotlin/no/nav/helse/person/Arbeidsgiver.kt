@@ -477,7 +477,7 @@ internal class Arbeidsgiver private constructor(
 
         if (aktivitetslogg.harFunksjonelleFeilEllerVerre()) {
             aktivitetslogg.info("Inntektsmelding ikke håndtert")
-            return person.emitInntektsmeldingIkkeHåndtert(inntektsmelding, organisasjonsnummer, dager.harPeriodeInnenfor16Dager(vedtaksperioder))
+            return person.emitInntektsmeldingIkkeHåndtert(inntektsmelding.metadata.meldingsreferanseId, organisasjonsnummer, dager.harPeriodeInnenfor16Dager(vedtaksperioder))
         }
 
         håndter(inntektsmelding) { håndter(dager, aktivitetslogg) }
@@ -490,14 +490,8 @@ internal class Arbeidsgiver private constructor(
         inntektsmelding.ikkeHåndert(aktivitetslogg, person, vedtaksperioder, forkastede, sykmeldingsperioder, dager)
     }
 
-    internal fun buildPortalinntektsmelding(portalInntektsmeldingBuilder: Inntektsmelding.PortalinntektsmledingBuilder, aktivitetslogg: IAktivitetslogg): Inntektsmelding? {
-        val inntektsmelding = portalInntektsmeldingBuilder.build(vedtaksperioder, aktivitetslogg)
-        if (aktivitetslogg.harFunksjonelleFeilEllerVerre()) {
-            aktivitetslogg.info("Inntektsmelding ikke håndtert")
-            //person.emitInntektsmeldingIkkeHåndtert(inntektsmelding, organisasjonsnummer, dager.harPeriodeInnenfor16Dager(vedtaksperioder))
-        }
-        return null
-    }
+    internal fun buildPortalinntektsmelding(portalInntektsmeldingBuilder: Inntektsmelding.PortalinntektsmeldingBuilder, aktivitetslogg: IAktivitetslogg) =
+        portalInntektsmeldingBuilder.build(vedtaksperioder, person, aktivitetslogg)
 
     internal fun refusjonstidslinje(vedtaksperiode: Vedtaksperiode): Beløpstidslinje {
         val startdatoPåSammenhengendeVedtaksperioder = startdatoPåSammenhengendeVedtaksperioder(vedtaksperiode)

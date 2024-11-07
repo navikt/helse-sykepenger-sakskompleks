@@ -229,11 +229,15 @@ class Person private constructor(
         håndterGjenoppta(inntektsmelding, aktivitetslogg)
     }
 
-    fun håndter(portalInntektsmeldingBuilder: Inntektsmelding.PortalinntektsmledingBuilder, aktivitetslogg: IAktivitetslogg) {
+    fun håndter(portalInntektsmeldingBuilder: Inntektsmelding.PortalinntektsmeldingBuilder, aktivitetslogg: IAktivitetslogg) {
         registrer(aktivitetslogg, "Behandler portalinntektsmelding")
         val arbeidsgiver = finnEllerOpprettArbeidsgiver(portalInntektsmeldingBuilder.behandlingsporing, aktivitetslogg)
         val inntektsmelding = arbeidsgiver.buildPortalinntektsmelding(portalInntektsmeldingBuilder, aktivitetslogg)
-
+        inntektsmelding?.let {
+            arbeidsgiver.håndter(it, aktivitetslogg)
+            arbeidsgiver.inntektsmeldingFerdigbehandlet(it, aktivitetslogg)
+            håndterGjenoppta(it, aktivitetslogg)
+        }
     }
 
     fun håndter(replays: InntektsmeldingerReplay, aktivitetslogg: IAktivitetslogg) {
@@ -701,9 +705,9 @@ class Person private constructor(
         }
     }
 
-    internal fun emitInntektsmeldingIkkeHåndtert(hendelse: Inntektsmelding, organisasjonsnummer: String, harPeriodeInnenfor16Dager: Boolean) {
+    internal fun emitInntektsmeldingIkkeHåndtert(meldingsreferanseId: UUID, organisasjonsnummer: String, harPeriodeInnenfor16Dager: Boolean) {
         observers.forEach {
-            it.inntektsmeldingIkkeHåndtert(hendelse.metadata.meldingsreferanseId, organisasjonsnummer, harPeriodeInnenfor16Dager)
+            it.inntektsmeldingIkkeHåndtert(meldingsreferanseId, organisasjonsnummer, harPeriodeInnenfor16Dager)
         }
     }
 

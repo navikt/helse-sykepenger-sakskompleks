@@ -1,7 +1,9 @@
 package no.nav.helse.spleis.mediator
 
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import no.nav.helse.Personidentifikator
 import no.nav.helse.hendelser.AnmodningOmForkasting
+import no.nav.helse.hendelser.AnnullerUtbetaling
 import no.nav.helse.hendelser.AvbruttSøknad
 import no.nav.helse.hendelser.Dødsmelding
 import no.nav.helse.hendelser.ForkastSykmeldingsperioder
@@ -20,19 +22,17 @@ import no.nav.helse.hendelser.PersonPåminnelse
 import no.nav.helse.hendelser.Påminnelse
 import no.nav.helse.hendelser.Simulering
 import no.nav.helse.hendelser.SkjønnsmessigFastsettelse
+import no.nav.helse.hendelser.SykepengegrunnlagForArbeidsgiver
 import no.nav.helse.hendelser.Sykmelding
 import no.nav.helse.hendelser.Søknad
+import no.nav.helse.hendelser.UtbetalingHendelse
+import no.nav.helse.hendelser.Utbetalingpåminnelse
+import no.nav.helse.hendelser.Utbetalingsgodkjenning
 import no.nav.helse.hendelser.Utbetalingshistorikk
 import no.nav.helse.hendelser.UtbetalingshistorikkEtterInfotrygdendring
 import no.nav.helse.hendelser.UtbetalingshistorikkForFeriepenger
 import no.nav.helse.hendelser.Vilkårsgrunnlag
 import no.nav.helse.hendelser.Ytelser
-import no.nav.helse.hendelser.AnnullerUtbetaling
-import no.nav.helse.hendelser.UtbetalingHendelse
-import no.nav.helse.hendelser.Utbetalingpåminnelse
-import no.nav.helse.hendelser.Utbetalingsgodkjenning
-import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
-import no.nav.helse.hendelser.SykepengegrunnlagForArbeidsgiver
 import no.nav.helse.spleis.IHendelseMediator
 import no.nav.helse.spleis.Personopplysninger
 import no.nav.helse.spleis.meldinger.model.AnmodningOmForkastingMessage
@@ -41,9 +41,9 @@ import no.nav.helse.spleis.meldinger.model.AvbruttArbeidsledigSøknadMessage
 import no.nav.helse.spleis.meldinger.model.AvbruttSøknadMessage
 import no.nav.helse.spleis.meldinger.model.AvstemmingMessage
 import no.nav.helse.spleis.meldinger.model.DødsmeldingMessage
-import no.nav.helse.spleis.meldinger.model.GrunnbeløpsreguleringMessage
 import no.nav.helse.spleis.meldinger.model.ForkastSykmeldingsperioderMessage
 import no.nav.helse.spleis.meldinger.model.GjenopplivVilkårsgrunnlagMessage
+import no.nav.helse.spleis.meldinger.model.GrunnbeløpsreguleringMessage
 import no.nav.helse.spleis.meldinger.model.HendelseMessage
 import no.nav.helse.spleis.meldinger.model.IdentOpphørtMessage
 import no.nav.helse.spleis.meldinger.model.InfotrygdendringMessage
@@ -124,6 +124,7 @@ internal class TestHendelseMediator : IHendelseMediator {
     private val lestSendtSøknadSelvstendigVerdi = ThreadLocal.withInitial { false }
     private val lestSendtSøknadArbeidsledigVerdi = ThreadLocal.withInitial { false }
     private val lestInntektsmeldingVerdi = ThreadLocal.withInitial { false }
+    private val lestPortalinntektsmeldingVerdi = ThreadLocal.withInitial { false }
     private val lestInntektsmeldingReplayVerdi = ThreadLocal.withInitial { false }
     private val lestDødsmeldingVerdi = ThreadLocal.withInitial { false }
     private val lestPåminnelseVerdi = ThreadLocal.withInitial { false }
@@ -285,6 +286,10 @@ internal class TestHendelseMediator : IHendelseMediator {
 
     override fun behandle(personopplysninger: Personopplysninger, message: InntektsmeldingMessage, inntektsmelding: Inntektsmelding, context: MessageContext) {
         lestInntektsmeldingVerdi.set(true)
+    }
+
+    override fun behandle(personopplysninger: Personopplysninger, message: InntektsmeldingMessage, inntektsmelding: Inntektsmelding.PortalinntektsmeldingBuilder, context: MessageContext) {
+        lestPortalinntektsmeldingVerdi.set(true)
     }
 
     override fun behandle(

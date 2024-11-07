@@ -17,47 +17,47 @@ import no.nav.helse.etterlevelse.KontekstType
 import no.nav.helse.etterlevelse.Subsumsjonskontekst
 import no.nav.helse.etterlevelse.Subsumsjonslogg
 import no.nav.helse.hendelser.AnmodningOmForkasting
-import no.nav.helse.hendelser.Avsender
-import no.nav.helse.hendelser.Grunnbeløpsregulering
-import no.nav.helse.hendelser.Hendelse
-import no.nav.helse.hendelser.Inntektsmelding
-import no.nav.helse.hendelser.OverstyrArbeidsforhold
-import no.nav.helse.hendelser.OverstyrArbeidsgiveropplysninger
-import no.nav.helse.hendelser.OverstyrTidslinje
-import no.nav.helse.hendelser.Periode
-import no.nav.helse.hendelser.Simulering
-import no.nav.helse.hendelser.SkjønnsmessigFastsettelse
-import no.nav.helse.hendelser.SykepengegrunnlagForArbeidsgiver
-import no.nav.helse.hendelser.Søknad
-import no.nav.helse.hendelser.UtbetalingsavgjørelseHendelse
-import no.nav.helse.hendelser.Ytelser
-import no.nav.helse.hendelser.avvist
-import no.nav.helse.hendelser.DagerFraInntektsmelding
-import no.nav.helse.hendelser.til
 import no.nav.helse.hendelser.AnnullerUtbetaling
 import no.nav.helse.hendelser.AvbruttSøknad
+import no.nav.helse.hendelser.Avsender
+import no.nav.helse.hendelser.DagerFraInntektsmelding
 import no.nav.helse.hendelser.Dødsmelding
 import no.nav.helse.hendelser.ForkastSykmeldingsperioder
 import no.nav.helse.hendelser.GjenopplivVilkårsgrunnlag
+import no.nav.helse.hendelser.Grunnbeløpsregulering
+import no.nav.helse.hendelser.Hendelse
 import no.nav.helse.hendelser.HendelseMetadata
 import no.nav.helse.hendelser.IdentOpphørt
 import no.nav.helse.hendelser.Infotrygdendring
+import no.nav.helse.hendelser.Inntektsmelding
 import no.nav.helse.hendelser.InntektsmeldingerReplay
 import no.nav.helse.hendelser.KanIkkeBehandlesHer
 import no.nav.helse.hendelser.Migrate
 import no.nav.helse.hendelser.MinimumSykdomsgradsvurderingMelding
+import no.nav.helse.hendelser.OverstyrArbeidsforhold
+import no.nav.helse.hendelser.OverstyrArbeidsgiveropplysninger
+import no.nav.helse.hendelser.OverstyrTidslinje
+import no.nav.helse.hendelser.Periode
 import no.nav.helse.hendelser.PersonPåminnelse
 import no.nav.helse.hendelser.Påminnelse
+import no.nav.helse.hendelser.Simulering
+import no.nav.helse.hendelser.SkjønnsmessigFastsettelse
 import no.nav.helse.hendelser.SykdomshistorikkHendelse
+import no.nav.helse.hendelser.SykepengegrunnlagForArbeidsgiver
 import no.nav.helse.hendelser.Sykmelding
+import no.nav.helse.hendelser.Søknad
 import no.nav.helse.hendelser.UtbetalingHendelse
 import no.nav.helse.hendelser.Utbetalingpåminnelse
+import no.nav.helse.hendelser.UtbetalingsavgjørelseHendelse
 import no.nav.helse.hendelser.Utbetalingsgodkjenning
 import no.nav.helse.hendelser.Utbetalingshistorikk
 import no.nav.helse.hendelser.UtbetalingshistorikkEtterInfotrygdendring
 import no.nav.helse.hendelser.UtbetalingshistorikkForFeriepenger
 import no.nav.helse.hendelser.VedtakFattet
 import no.nav.helse.hendelser.Vilkårsgrunnlag
+import no.nav.helse.hendelser.Ytelser
+import no.nav.helse.hendelser.avvist
+import no.nav.helse.hendelser.til
 import no.nav.helse.person.Behandlinger.Behandling.Companion.berik
 import no.nav.helse.person.Behandlinger.Behandling.Companion.dokumentsporing
 import no.nav.helse.person.Behandlinger.Behandling.Companion.endretSykdomshistorikkFra
@@ -610,6 +610,7 @@ internal class Behandlinger private constructor(behandlinger: List<Behandling>) 
                         is Utbetalingshistorikk,
                         is VedtakFattet,
                         is Vilkårsgrunnlag -> null
+                        is Inntektsmelding.PortalinntektsmeldingBuilder -> error("Forventer ikke å få en portalinntektsmelding")
                     }
                 }
 

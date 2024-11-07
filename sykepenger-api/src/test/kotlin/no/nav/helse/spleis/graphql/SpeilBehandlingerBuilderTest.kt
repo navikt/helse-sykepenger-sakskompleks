@@ -165,7 +165,11 @@ internal class SpeilBehandlingerBuilderTest : AbstractE2ETest() {
         val søknad1 = håndterSøknad(Sykdom(1.januar, 24.januar, 100.prosent))
         val inntektsmeldingbeløp1 = INNTEKT
         val søknad2 = håndterSøknad(Sykdom(25.januar, søndag den 11.februar, 100.prosent))
-        val inntektsmelding1 = håndterInntektsmelding(listOf(25.januar til fredag den 9.februar), beregnetInntekt = inntektsmeldingbeløp1, vedtaksperiode = 2)
+        val inntektsmelding1 = håndterInntektsmelding(
+            listOf(25.januar til fredag den 9.februar),
+            vedtaksperiode = 2,
+            beregnetInntekt = inntektsmeldingbeløp1
+        )
         val inntektsmeldingbeløp2 = INNTEKT*1.1
         val inntektsmelding2 = håndterInntektsmelding(1.januar, beregnetInntekt = inntektsmeldingbeløp2, vedtaksperiode = 1)
         håndterVilkårsgrunnlag()
@@ -946,7 +950,7 @@ internal class SpeilBehandlingerBuilderTest : AbstractE2ETest() {
     @Test
     fun `ta med personoppdrag`() {
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent))
-        håndterInntektsmeldingUtenRefusjon(1.januar)
+        håndterInntektsmeldingUtenRefusjon(1.januar, vedtaksperiode = 1)
         håndterVilkårsgrunnlagTilGodkjenning()
         håndterUtbetalingsgodkjenning()
         håndterUtbetalt()

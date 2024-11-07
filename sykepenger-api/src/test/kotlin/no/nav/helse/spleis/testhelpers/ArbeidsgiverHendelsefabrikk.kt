@@ -55,7 +55,7 @@ internal class ArbeidsgiverHendelsefabrikk(
 
     private val sykmeldinger = mutableListOf<Sykmelding>()
     private val søknader = mutableListOf<Søknad>()
-    private val inntektsmeldinger = mutableMapOf<UUID, () -> Inntektsmelding>()
+    //private val inntektsmeldinger = mutableMapOf<UUID, () -> Inntektsmelding>()
 
     internal fun lagSykmelding(
         vararg sykeperioder: Sykmeldingsperiode,
@@ -145,14 +145,13 @@ internal class ArbeidsgiverHendelsefabrikk(
                 mottatt = mottatt
             )
         }
-        inntektsmeldinger[id] = inntektsmeldinggenerator
+        //inntektsmeldinger[id] = inntektsmeldinggenerator
         return inntektsmeldinggenerator()
     }
 
     internal fun lagPortalinntektsmelding(
         arbeidsgiverperioder: List<Periode>,
         beregnetInntekt: Inntekt,
-        førsteFraværsdag: LocalDate? = arbeidsgiverperioder.maxOf { it.start },
         vedtaksperiodeId: UUID,
         refusjon: Inntektsmelding.Refusjon = Inntektsmelding.Refusjon(beregnetInntekt, null, emptyList()),
         harOpphørAvNaturalytelser: Boolean = false,
@@ -161,14 +160,13 @@ internal class ArbeidsgiverHendelsefabrikk(
         id: UUID = UUID.randomUUID(),
         harFlereInntektsmeldinger: Boolean = false,
         mottatt: LocalDateTime = LocalDateTime.now()
-    ): Inntektsmelding {
+    ): Inntektsmelding.PortalinntektsmeldingBuilder {
         val inntektsmeldinggenerator = {
-            Inntektsmelding(
+            Inntektsmelding.PortalinntektsmeldingBuilder(
                 meldingsreferanseId = id,
                 refusjon = refusjon,
                 orgnummer = organisasjonsnummer,
                 aktørId = aktørId,
-                førsteFraværsdag = førsteFraværsdag,
                 inntektsdato = null,
                 beregnetInntekt = beregnetInntekt,
                 arbeidsgiverperioder = arbeidsgiverperioder,
@@ -181,7 +179,7 @@ internal class ArbeidsgiverHendelsefabrikk(
                 mottatt = mottatt
             )
         }
-        inntektsmeldinger[id] = inntektsmeldinggenerator
+        //inntektsmeldinger[id] = inntektsmeldinggenerator
         return inntektsmeldinggenerator()
     }
 

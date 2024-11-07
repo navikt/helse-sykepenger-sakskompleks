@@ -32,12 +32,12 @@ import no.nav.helse.person.beløp.Kilde
 import no.nav.helse.person.inntekt.ArbeidsgiverInntektsopplysning
 import no.nav.helse.person.inntekt.Inntektsgrunnlag.ArbeidsgiverInntektsopplysningerOverstyringer
 import no.nav.helse.person.inntekt.Inntektshistorikk
-import no.nav.helse.person.inntekt.Inntektsmelding as InntektsmeldingInntekt
 import no.nav.helse.person.inntekt.Refusjonshistorikk
 import no.nav.helse.person.inntekt.Refusjonshistorikk.Refusjon.EndringIRefusjon.Companion.refusjonsopplysninger
 import no.nav.helse.person.refusjon.Refusjonsservitør
 import no.nav.helse.økonomi.Inntekt
 import org.slf4j.LoggerFactory
+import no.nav.helse.person.inntekt.Inntektsmelding as InntektsmeldingInntekt
 
 class Inntektsmelding(
     meldingsreferanseId: UUID,
@@ -76,7 +76,7 @@ class Inntektsmelding(
     )
     override val metadata = HendelseMetadata(
         meldingsreferanseId = meldingsreferanseId,
-        avsender = Avsender.ARBEIDSGIVER,
+        avsender = ARBEIDSGIVER,
         innsendt = mottatt,
         registrert = mottatt,
         automatiskBehandling = false
@@ -276,7 +276,7 @@ class Inntektsmelding(
             person.emitInntektsmeldingFørSøknadEvent(metadata.meldingsreferanseId, relevanteSykmeldingsperioder, behandlingsporing.organisasjonsnummer)
             return aktivitetslogg.info("Inntektsmelding er relevant for sykmeldingsperioder $relevanteSykmeldingsperioder")
         }
-        person.emitInntektsmeldingIkkeHåndtert(this, behandlingsporing.organisasjonsnummer, dager.harPeriodeInnenfor16Dager(vedtaksperioder))
+        person.emitInntektsmeldingIkkeHåndtert(this.metadata.meldingsreferanseId, behandlingsporing.organisasjonsnummer, dager.harPeriodeInnenfor16Dager(vedtaksperioder))
     }
     private fun håndtertNå() = håndtertInntekt
     internal fun subsumsjonskontekst() = Subsumsjonskontekst(
@@ -305,13 +305,11 @@ class Inntektsmelding(
             aktivitetslogg.funksjonellFeil(Varselkode.RV_IM_26)
         }
     }
-    data class PortalinntektsmledingBuilder(
+    data class PortalinntektsmeldingBuilder(
         private val meldingsreferanseId: UUID,
         private val refusjon: Refusjon,
         private val orgnummer: String,
-        private val fødselsnummer: String,
         private val aktørId: String,
-        private val førsteFraværsdag: LocalDate?,
         private val inntektsdato: LocalDate?,
         private val beregnetInntekt: Inntekt,
         private val arbeidsgiverperioder: List<Periode>,
@@ -322,34 +320,42 @@ class Inntektsmelding(
         private val avsendersystem: Avsendersystem?,
         private val vedtaksperiodeId: UUID?,
         private val mottatt: LocalDateTime
-    ) {
-        internal fun build(vedtaksperioder: List<Vedtaksperiode>, aktivitetslogg: IAktivitetslogg): Inntektsmelding? {
+    ) : Hendelse {
+        internal fun build(vedtaksperioder: List<Vedtaksperiode>, person: Person, aktivitetslogg: IAktivitetslogg): Inntektsmelding? {
             check(avsendersystem.erPortalinntektsmelding()) { "Din tøysefant, denne er jo ikke en portalinntektsmelding!" }
             val vedtaksperioden = vedtaksperioder.finn(checkNotNull(vedtaksperiodeId) { "Fikk en portalinntektsmelding uten vedtaksperiodeId!" })
+            val førsteFraværsdag = vedtaksperioden?.periode()?.start ?: arbeidsgiverperioder.lastOrNull()?.start
+            val inntektsmelding = førsteFraværsdag?.let {
+                Inntektsmelding(
+                    meldingsreferanseId = meldingsreferanseId,
+                    refusjon = refusjon,
+                    orgnummer = orgnummer,
+                    aktørId = aktørId,
+                    førsteFraværsdag = it,
+                    inntektsdato = inntektsdato,
+                    beregnetInntekt = beregnetInntekt,
+                    arbeidsgiverperioder = arbeidsgiverperioder,
+                    arbeidsforholdId = arbeidsforholdId,
+                    begrunnelseForReduksjonEllerIkkeUtbetalt = begrunnelseForReduksjonEllerIkkeUtbetalt,
+                    harOpphørAvNaturalytelser = harOpphørAvNaturalytelser,
+                    harFlereInntektsmeldinger = harFlereInntektsmeldinger,
+                    avsendersystem = avsendersystem,
+                    vedtaksperiodeId = vedtaksperiodeId,
+                    mottatt = mottatt
+                )
+            }
             if (vedtaksperioden == null) {
                 aktivitetslogg.funksjonellFeil(Varselkode.RV_IM_26)
+                aktivitetslogg.info("Inntektsmelding ikke håndtert")
+                if (inntektsmelding == null) aktivitetslogg.info("Portalinntektsmelding som treffer forkastet periode uten arbeidsgiverperiode oppgitt. Antar at vi har periode innenfor 16 dager")
+
+                person.emitInntektsmeldingIkkeHåndtert(meldingsreferanseId, orgnummer, inntektsmelding?.dager()?.harPeriodeInnenfor16Dager(vedtaksperioder) ?: true)
                 return null
             }
-
-            return Inntektsmelding(
-                meldingsreferanseId = meldingsreferanseId,
-                refusjon = refusjon,
-                orgnummer = orgnummer,
-                aktørId = aktørId,
-                førsteFraværsdag = vedtaksperioden.periode().start,
-                inntektsdato = inntektsdato,
-                beregnetInntekt = beregnetInntekt,
-                arbeidsgiverperioder = arbeidsgiverperioder,
-                arbeidsforholdId = arbeidsforholdId,
-                begrunnelseForReduksjonEllerIkkeUtbetalt = begrunnelseForReduksjonEllerIkkeUtbetalt,
-                harOpphørAvNaturalytelser = harOpphørAvNaturalytelser,
-                harFlereInntektsmeldinger = harFlereInntektsmeldinger,
-                avsendersystem = avsendersystem,
-                vedtaksperiodeId = vedtaksperiodeId,
-                mottatt = mottatt
-            )
-
+            return inntektsmelding
         }
-        internal val behandlingsporing = Behandlingsporing.Arbeidsgiver(orgnummer)
+        override val behandlingsporing = Behandlingsporing.Arbeidsgiver(orgnummer)
+
+        override val metadata = HendelseMetadata(meldingsreferanseId, ARBEIDSGIVER, mottatt, mottatt, false)
     }
 }

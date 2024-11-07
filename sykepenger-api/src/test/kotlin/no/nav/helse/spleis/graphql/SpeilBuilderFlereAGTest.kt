@@ -76,7 +76,7 @@ internal class SpeilBuilderFlereAGTest : AbstractE2ETest() {
         håndterSøknad(Sykdom(4.januar, 31.januar, 100.prosent), orgnummer = a2)
 
         håndterInntektsmelding(1.januar, orgnummer = a1)
-        håndterInntektsmelding(listOf(4.januar til 19.januar), beregnetInntekt = 5000.månedlig, orgnummer = a2)
+        håndterInntektsmelding(listOf(4.januar til 19.januar), orgnummer = a2, beregnetInntekt = 5000.månedlig)
 
         håndterVilkårsgrunnlag(
             inntekter = listOf(a1 to INNTEKT, a2 to 5000.månedlig, a3 to 10000.månedlig),
