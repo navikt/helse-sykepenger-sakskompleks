@@ -229,6 +229,13 @@ class Person private constructor(
         håndterGjenoppta(inntektsmelding, aktivitetslogg)
     }
 
+    fun håndter(portalInntektsmeldingBuilder: Inntektsmelding.PortalinntektsmledingBuilder, aktivitetslogg: IAktivitetslogg) {
+        registrer(aktivitetslogg, "Behandler portalinntektsmelding")
+        val arbeidsgiver = finnEllerOpprettArbeidsgiver(portalInntektsmeldingBuilder.behandlingsporing, aktivitetslogg)
+        val inntektsmelding = arbeidsgiver.buildPortalinntektsmelding(portalInntektsmeldingBuilder, aktivitetslogg)
+
+    }
+
     fun håndter(replays: InntektsmeldingerReplay, aktivitetslogg: IAktivitetslogg) {
         registrer(aktivitetslogg, "Behandler replay av inntektsmeldinger")
         finnArbeidsgiver(replays.behandlingsporing, aktivitetslogg).håndter(replays, aktivitetslogg)

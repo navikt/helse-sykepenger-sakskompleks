@@ -9,6 +9,7 @@ import no.nav.helse.etterlevelse.Subsumsjonslogg
 import no.nav.helse.etterlevelse.`§ 8-10 ledd 3`
 import no.nav.helse.forrigeDag
 import no.nav.helse.hendelser.Avsender.ARBEIDSGIVER
+import no.nav.helse.hendelser.Inntektsmelding.Avsendersystem.Companion.erPortalinntektsmelding
 import no.nav.helse.hendelser.Periode.Companion.grupperSammenhengendePerioder
 import no.nav.helse.nesteDag
 import no.nav.helse.person.Arbeidsgiver
@@ -31,7 +32,7 @@ import no.nav.helse.person.beløp.Kilde
 import no.nav.helse.person.inntekt.ArbeidsgiverInntektsopplysning
 import no.nav.helse.person.inntekt.Inntektsgrunnlag.ArbeidsgiverInntektsopplysningerOverstyringer
 import no.nav.helse.person.inntekt.Inntektshistorikk
-import no.nav.helse.person.inntekt.Inntektsmelding
+import no.nav.helse.person.inntekt.Inntektsmelding as InntektsmeldingInntekt
 import no.nav.helse.person.inntekt.Refusjonshistorikk
 import no.nav.helse.person.inntekt.Refusjonshistorikk.Refusjon.EndringIRefusjon.Companion.refusjonsopplysninger
 import no.nav.helse.person.refusjon.Refusjonsservitør
@@ -98,7 +99,7 @@ class Inntektsmelding(
 
     internal fun addInntekt(inntektshistorikk: Inntektshistorikk, aktivitetslogg: IAktivitetslogg, alternativInntektsdato: LocalDate) {
         if (alternativInntektsdato == this.beregnetInntektsdato) return
-        if (!inntektshistorikk.leggTil(Inntektsmelding(alternativInntektsdato, metadata.meldingsreferanseId, beregnetInntekt))) return
+        if (!inntektshistorikk.leggTil(InntektsmeldingInntekt(alternativInntektsdato, metadata.meldingsreferanseId, beregnetInntekt))) return
         aktivitetslogg.info("Lagrer inntekt på alternativ inntektsdato $alternativInntektsdato")
     }
 
@@ -114,11 +115,11 @@ class Inntektsmelding(
                         sikkerlogg.info("$it. For aktørId $aktørId.")
                     }
             }
-            inntektshistorikk.leggTil(Inntektsmelding(skjæringstidspunkt, metadata.meldingsreferanseId, beregnetInntekt))
+            inntektshistorikk.leggTil(InntektsmeldingInntekt(skjæringstidspunkt, metadata.meldingsreferanseId, beregnetInntekt))
             return skjæringstidspunkt
         }
 
-        inntektshistorikk.leggTil(Inntektsmelding(beregnetInntektsdato, metadata.meldingsreferanseId, beregnetInntekt))
+        inntektshistorikk.leggTil(InntektsmeldingInntekt(beregnetInntektsdato, metadata.meldingsreferanseId, beregnetInntekt))
         return beregnetInntektsdato
     }
 
@@ -182,7 +183,7 @@ class Inntektsmelding(
             ArbeidsgiverInntektsopplysning(
                 behandlingsporing.organisasjonsnummer,
                 inntektGjelder,
-                Inntektsmelding(beregnetInntektsdato, metadata.meldingsreferanseId, beregnetInntekt),
+                InntektsmeldingInntekt(beregnetInntektsdato, metadata.meldingsreferanseId, beregnetInntekt),
                 refusjonshistorikk.refusjonsopplysninger(startskudd)
             )
         )
@@ -193,7 +194,16 @@ class Inntektsmelding(
         NAV_NO,
         NAV_NO_SELVBESTEMT,
         ALTINN,
-        LPS
+        LPS;
+        companion object {
+            fun Avsendersystem?.erPortalinntektsmelding() = when (this) {
+                NAV_NO,
+                NAV_NO_SELVBESTEMT -> true
+                ALTINN,
+                LPS,
+                null -> false
+            }
+        }
     }
 
     class Refusjon(
@@ -287,12 +297,59 @@ class Inntektsmelding(
         return beregnetInntektsdato in sykdomstidslinjeperiode
     }
 
-    private fun erPortalinntektsmelding() = avsendersystem == Avsendersystem.NAV_NO || avsendersystem == Avsendersystem.NAV_NO_SELVBESTEMT
+    private fun erPortalinntektsmelding() = avsendersystem.erPortalinntektsmelding()
     internal fun validerPortalinntektsmelding(vedtaksperioder: List<Vedtaksperiode>, aktivitetslogg: IAktivitetslogg) {
         if (!erPortalinntektsmelding()) return
 
         if (!vedtaksperioder.inneholder(checkNotNull(vedtaksperiodeId) { "Fikk en portalinntektsmelding uten vedtaksperiodeId!" })) {
             aktivitetslogg.funksjonellFeil(Varselkode.RV_IM_26)
         }
+    }
+    data class PortalinntektsmledingBuilder(
+        private val meldingsreferanseId: UUID,
+        private val refusjon: Refusjon,
+        private val orgnummer: String,
+        private val fødselsnummer: String,
+        private val aktørId: String,
+        private val førsteFraværsdag: LocalDate?,
+        private val inntektsdato: LocalDate?,
+        private val beregnetInntekt: Inntekt,
+        private val arbeidsgiverperioder: List<Periode>,
+        private val arbeidsforholdId: String?,
+        private val begrunnelseForReduksjonEllerIkkeUtbetalt: String?,
+        private val harOpphørAvNaturalytelser: Boolean = false,
+        private val harFlereInntektsmeldinger: Boolean,
+        private val avsendersystem: Avsendersystem?,
+        private val vedtaksperiodeId: UUID?,
+        private val mottatt: LocalDateTime
+    ) {
+        internal fun build(vedtaksperioder: List<Vedtaksperiode>, aktivitetslogg: IAktivitetslogg): Inntektsmelding? {
+            check(avsendersystem.erPortalinntektsmelding()) { "Din tøysefant, denne er jo ikke en portalinntektsmelding!" }
+            val vedtaksperioden = vedtaksperioder.finn(checkNotNull(vedtaksperiodeId) { "Fikk en portalinntektsmelding uten vedtaksperiodeId!" })
+            if (vedtaksperioden == null) {
+                aktivitetslogg.funksjonellFeil(Varselkode.RV_IM_26)
+                return null
+            }
+
+            return Inntektsmelding(
+                meldingsreferanseId = meldingsreferanseId,
+                refusjon = refusjon,
+                orgnummer = orgnummer,
+                aktørId = aktørId,
+                førsteFraværsdag = vedtaksperioden.periode().start,
+                inntektsdato = inntektsdato,
+                beregnetInntekt = beregnetInntekt,
+                arbeidsgiverperioder = arbeidsgiverperioder,
+                arbeidsforholdId = arbeidsforholdId,
+                begrunnelseForReduksjonEllerIkkeUtbetalt = begrunnelseForReduksjonEllerIkkeUtbetalt,
+                harOpphørAvNaturalytelser = harOpphørAvNaturalytelser,
+                harFlereInntektsmeldinger = harFlereInntektsmeldinger,
+                avsendersystem = avsendersystem,
+                vedtaksperiodeId = vedtaksperiodeId,
+                mottatt = mottatt
+            )
+
+        }
+        internal val behandlingsporing = Behandlingsporing.Arbeidsgiver(orgnummer)
     }
 }
