@@ -4,6 +4,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
+import no.nav.helse.dto.BeløpstidslinjeDto
 import no.nav.helse.person.UtbetalingInntektskilde
 import no.nav.helse.spleis.speil.builders.ISpleisGrunnlag
 import no.nav.helse.spleis.speil.builders.IVilkårsgrunnlagHistorikk
@@ -150,10 +151,12 @@ data class BeregnetPeriode(
     val beregningId: UUID,
     val utbetaling: Utbetaling,
     val periodevilkår: Vilkår,
-    val vilkårsgrunnlagId: UUID
+    val vilkårsgrunnlagId: UUID,
+    val refusjonstidslinje: BeløpstidslinjeDto
 ) : SpeilTidslinjeperiode() {
     override fun registrerBruk(vilkårsgrunnlaghistorikk: IVilkårsgrunnlagHistorikk, organisasjonsnummer: String): BeregnetPeriode {
         val vilkårsgrunnlag = vilkårsgrunnlagId.let { vilkårsgrunnlaghistorikk.leggIBøtta(it) }
+        vilkårsgrunnlaghistorikk.medRefusjonstidslinje(vilkårsgrunnlagId, refusjonstidslinje, organisasjonsnummer)
         if (vilkårsgrunnlag !is ISpleisGrunnlag) return this
         return this.copy(hendelser = this.hendelser + vilkårsgrunnlag.overstyringer)
     }

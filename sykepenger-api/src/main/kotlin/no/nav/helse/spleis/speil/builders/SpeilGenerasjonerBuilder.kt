@@ -142,7 +142,8 @@ internal class SpeilGenerasjonerBuilder(
             beregningId = utbetaling.id,
             utbetaling = utbetaling,
             periodevilkår = periodevilkår(sisteSykepengedag, utbetaling, alder, skjæringstidspunkt),
-            vilkårsgrunnlagId = sisteEndring.vilkårsgrunnlagId!!
+            vilkårsgrunnlagId = sisteEndring.vilkårsgrunnlagId!!,
+            refusjonstidslinje = sisteEndring.refusjonstidslinje
         )
     }
 

@@ -2,6 +2,7 @@ package no.nav.helse.spleis.speil.builders
 
 import java.time.LocalDate
 import java.time.YearMonth
+import no.nav.helse.dto.BeløpstidslinjeDto
 import no.nav.helse.spleis.speil.dto.Arbeidsgiverinntekt
 import no.nav.helse.spleis.speil.dto.Arbeidsgiverrefusjon
 import no.nav.helse.spleis.speil.dto.Inntekt
@@ -9,6 +10,7 @@ import no.nav.helse.spleis.speil.dto.InntekterFraAOrdningen
 import no.nav.helse.spleis.speil.dto.Inntektkilde
 import no.nav.helse.spleis.speil.dto.Refusjonselement
 import no.nav.helse.spleis.speil.dto.SkjønnsmessigFastsattDTO
+import no.nav.helse.økonomi.Inntekt.Companion.daglig
 
 internal data class INyInntektUnderveis(
     val arbeidsgiver: String,
@@ -50,6 +52,32 @@ internal data class IArbeidsgiverrefusjon(
             arbeidsgiver = arbeidsgiver,
             refusjonsopplysninger = refusjonsopplysninger
         )
+    }
+
+    companion object {
+        internal fun List<IArbeidsgiverrefusjon>.hackInnRefusjonFraBehandlinger(refujonstidslinjer: MutableList<Pair<String, BeløpstidslinjeDto>>?): List<IArbeidsgiverrefusjon> {
+            if (refujonstidslinjer == null) return this
+            val orgnummerToTidslinjer = refujonstidslinjer.groupBy ({ it.first }, { it.second })
+            val refusjonsopplysninger = this.map {
+                IArbeidsgiverrefusjon(
+                    it.arbeidsgiver,
+                    refusjonsopplysninger = orgnummerToTidslinjer[it.arbeidsgiver]?.toRefusjonsopplysninger() ?: emptyList()
+                )
+            }
+            return refusjonsopplysninger
+        }
+
+        private fun List<BeløpstidslinjeDto>.toRefusjonsopplysninger(): List<Refusjonselement> {
+            return flatMap { it.perioder.map { periode ->
+                    Refusjonselement(
+                        fom = periode.fom,
+                        tom = periode.tom,
+                        beløp = periode.dagligBeløp.daglig.månedlig,
+                        meldingsreferanseId = periode.kilde.meldingsreferanseId
+                    )
+                }
+            }
+        }
     }
 }
 
