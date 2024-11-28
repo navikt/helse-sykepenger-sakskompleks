@@ -133,6 +133,7 @@ internal class IInfotrygdGrunnlag(
 internal class IVilkårsgrunnlagHistorikk(private val tilgjengeligeVilkårsgrunnlag: List<Map<UUID, IVilkårsgrunnlag>>) {
     private val vilkårsgrunnlagIBruk = mutableMapOf<UUID, IVilkårsgrunnlag>()
     private val refusjonstidslinjerIBruk = mutableMapOf<UUID, MutableList<Pair<String, BeløpstidslinjeDto>>>()
+    private val refusjonstidslinjerIkkeIBruk = mutableMapOf<String, MutableList<BeløpstidslinjeDto>>()
 
     internal fun inngårIkkeISammenligningsgrunnlag(organisasjonsnummer: String) =
         vilkårsgrunnlagIBruk.all { (_, a) -> a.inngårIkkeISammenligningsgrunnlag(organisasjonsnummer) }
@@ -178,6 +179,20 @@ internal class IVilkårsgrunnlagHistorikk(private val tilgjengeligeVilkårsgrunn
         orgnummer: String
     ) {
         refusjonstidslinjerIBruk.getOrPut(vilkårsgrunnlagId) { mutableListOf() }.add(orgnummer to refusjonstidslinje)
+    }
+
+    internal fun medUbruktRefusjonstidslinje(
+        refusjonstidslinjer: Collection<BeløpstidslinjeDto>,
+        orgnummer: String
+    ) {
+        refusjonstidslinjerIkkeIBruk.getOrPut(orgnummer) { mutableListOf() }.addAll(refusjonstidslinjer)
+        // la oss hacke den inn
+        refusjonstidslinjerIBruk.forEach { _, v ->
+            val arbeidsgiverExists = v.firstOrNull { it.first == orgnummer } ?: return@forEach
+            refusjonstidslinjer.forEach { tidslinje ->
+                v.add(orgnummer to tidslinje)
+            }
+        }
     }
 }
 
