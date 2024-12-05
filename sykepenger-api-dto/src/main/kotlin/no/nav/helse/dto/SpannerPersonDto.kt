@@ -742,6 +742,11 @@ private fun InntektDto.tilPersonData() = SpannerPersonDto.InntektDto(
     dagligInt = this.dagligInt.beløp
 )
 
+private fun InntektskildeDto.tilPersonData() = when(this) {
+    InntektskildeDto.AOrdningen -> SpannerPersonDto.ArbeidsgiverData.InntektsmeldingData.KildeData.AOrdningen
+    InntektskildeDto.Arbeidsgiver -> SpannerPersonDto.ArbeidsgiverData.InntektsmeldingData.KildeData.Arbeidsgiver
+}
+
 private fun InntektsopplysningUtDto.InntektsmeldingDto.tilPersonData() =
     SpannerPersonDto.ArbeidsgiverData.InntektsmeldingData(
         id = this.id,
@@ -749,10 +754,7 @@ private fun InntektsopplysningUtDto.InntektsmeldingDto.tilPersonData() =
         hendelseId = this.hendelseId,
         beløp = this.beløp.tilPersonData(),
         tidsstempel = this.tidsstempel,
-        kilde = when (this.kilde) {
-            InntektsopplysningUtDto.InntektsmeldingDto.KildeDto.Arbeidsgiver -> SpannerPersonDto.ArbeidsgiverData.InntektsmeldingData.KildeData.Arbeidsgiver
-            InntektsopplysningUtDto.InntektsmeldingDto.KildeDto.AOrdningen -> SpannerPersonDto.ArbeidsgiverData.InntektsmeldingData.KildeData.AOrdningen
-        }
+        kilde = this.kilde.tilPersonData()
     )
 
 private fun SykdomshistorikkElementDto.tilPersonData() = SpannerPersonDto.SykdomshistorikkData(
@@ -1580,8 +1582,8 @@ private fun InntektsopplysningUtDto.tilPersonData() =
         },
         inntektsmeldingkilde = when (this) {
             is InntektsopplysningUtDto.InntektsmeldingDto -> when (this.kilde) {
-                InntektsopplysningUtDto.InntektsmeldingDto.KildeDto.Arbeidsgiver -> SpannerPersonDto.ArbeidsgiverData.InntektsmeldingData.KildeData.Arbeidsgiver
-                InntektsopplysningUtDto.InntektsmeldingDto.KildeDto.AOrdningen -> SpannerPersonDto.ArbeidsgiverData.InntektsmeldingData.KildeData.AOrdningen
+                InntektskildeDto.Arbeidsgiver -> SpannerPersonDto.ArbeidsgiverData.InntektsmeldingData.KildeData.Arbeidsgiver
+                InntektskildeDto.AOrdningen -> SpannerPersonDto.ArbeidsgiverData.InntektsmeldingData.KildeData.AOrdningen
             }
             else -> null
         }

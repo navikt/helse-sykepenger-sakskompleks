@@ -13,7 +13,7 @@ internal class Infotrygd(
     hendelseId: UUID,
     beløp: Inntekt,
     tidsstempel: LocalDateTime
-) : Inntektsopplysning(id, hendelseId, dato, beløp, tidsstempel) {
+) : Inntektsopplysning(id, hendelseId, dato, beløp, tidsstempel, Inntektskilde.Arbeidsgiver) {
 
     override fun kanOverstyresAv(ny: Inntektsopplysning) = false
     override fun blirOverstyrtAv(ny: Inntektsopplysning): Inntektsopplysning {

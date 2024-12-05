@@ -84,7 +84,13 @@ internal class InfotrygdTest : AbstractEndToEndTest() {
         createOvergangFraInfotrygdPerson()
         val antallInnslagFør = inspektør.vilkårsgrunnlagHistorikkInnslag().size
 
-        håndterOverstyrArbeidsgiveropplysninger(1.januar, listOf(OverstyrtArbeidsgiveropplysning(a1, 15000.månedlig, "foo", null, emptyList())))
+        håndterOverstyrArbeidsgiveropplysninger(1.januar, listOf(OverstyrtArbeidsgiveropplysning(
+            a1,
+            15000.månedlig,
+            "foo",
+            null,
+            emptyList()
+        )))
         assertEquals(antallInnslagFør, inspektør.vilkårsgrunnlagHistorikkInnslag().size)
         assertTrue(inntektsopplysning(1.vedtaksperiode) is Infotrygd)
         assertEquals(31000.månedlig, inntektsopplysning(1.vedtaksperiode).inspektør.beløp)
@@ -96,7 +102,13 @@ internal class InfotrygdTest : AbstractEndToEndTest() {
         val antallInnslagFør = inspektør.vilkårsgrunnlagHistorikkInnslag().size
 
         val meldingsreferanse = UUID.randomUUID()
-        håndterOverstyrArbeidsgiveropplysninger(1.januar, listOf(OverstyrtArbeidsgiveropplysning(a1, 15000.månedlig, "foo", null, listOf(Triple(1.januar, null, 15000.månedlig)))), meldingsreferanseId = meldingsreferanse)
+        håndterOverstyrArbeidsgiveropplysninger(1.januar, listOf(OverstyrtArbeidsgiveropplysning(
+            a1,
+            15000.månedlig,
+            "foo",
+            null,
+            listOf(Triple(1.januar, null, 15000.månedlig))
+        )), meldingsreferanseId = meldingsreferanse)
         assertEquals(antallInnslagFør + 1, inspektør.vilkårsgrunnlagHistorikkInnslag().size)
         assertLikeRefusjonsopplysninger(listOf(Refusjonsopplysning(meldingsreferanse, 1.januar, null, 15000.månedlig, SAKSBEHANDLER)), refusjonsopplysninger(1.vedtaksperiode))
         assertTrue(inntektsopplysning(1.vedtaksperiode) is Infotrygd)

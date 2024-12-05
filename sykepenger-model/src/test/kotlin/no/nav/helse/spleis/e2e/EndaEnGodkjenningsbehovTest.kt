@@ -19,10 +19,10 @@ import no.nav.helse.juli
 import no.nav.helse.juni
 import no.nav.helse.mars
 import no.nav.helse.person.IdInnhenter
-import no.nav.helse.person.PersonObserver.UtkastTilVedtakEvent.Inntektskilde
 import no.nav.helse.person.TilstandType
 import no.nav.helse.person.TilstandType.AVVENTER_GODKJENNING
 import no.nav.helse.person.aktivitetslogg.Aktivitet
+import no.nav.helse.person.inntekt.Inntektsopplysning.Inntektskilde
 import no.nav.helse.person.nullstillTilstandsendringer
 import no.nav.helse.økonomi.Inntekt.Companion.INGEN
 import no.nav.helse.økonomi.Inntekt.Companion.månedlig
@@ -520,13 +520,13 @@ internal class EndaEnGodkjenningsbehovTest : AbstractEndToEndTest() {
                     mapOf(
                         "arbeidsgiver" to a1,
                         "omregnetÅrsinntekt" to 240000.0,
-                        "inntektskilde" to Inntektskilde.Saksbehandler,
+                        "inntektskilde" to Inntektskilde.Arbeidsgiver,
                         "skjønnsfastsatt" to 492000.0
                     ),
                     mapOf(
                         "arbeidsgiver" to a2,
                         "omregnetÅrsinntekt" to 240000.0,
-                        "inntektskilde" to Inntektskilde.Saksbehandler,
+                        "inntektskilde" to Inntektskilde.Arbeidsgiver,
                         "skjønnsfastsatt" to 360000.0
                     )
                 ),

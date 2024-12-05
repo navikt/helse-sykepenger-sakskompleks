@@ -5,6 +5,7 @@ import java.util.LinkedList
 import java.util.UUID
 import no.nav.helse.Grunnbeløp
 import no.nav.helse.dto.InntektDto
+import no.nav.helse.dto.InntektskildeDto
 import no.nav.helse.dto.MedlemskapsvurderingDto
 import no.nav.helse.dto.serialisering.ArbeidsgiverInntektsopplysningUtDto
 import no.nav.helse.dto.serialisering.InntektsgrunnlagUtDto
@@ -251,7 +252,7 @@ internal class VilkårsgrunnlagBuilder(vilkårsgrunnlagHistorikk: Vilkårsgrunnl
             is InntektsopplysningUtDto.IkkeRapportertDto -> IOmregnetÅrsinntekt(IInntektkilde.IkkeRapportert, 0.0, 0.0, null)
             is InntektsopplysningUtDto.InfotrygdDto -> IOmregnetÅrsinntekt(IInntektkilde.Infotrygd, io.beløp.årlig.beløp, io.beløp.månedligDouble.beløp, null)
             is InntektsopplysningUtDto.InntektsmeldingDto -> {
-                val kilde = if (io.kilde == InntektsopplysningUtDto.InntektsmeldingDto.KildeDto.AOrdningen) IInntektkilde.AOrdningen else IInntektkilde.Inntektsmelding
+                val kilde = if (io.kilde == InntektskildeDto.AOrdningen) IInntektkilde.AOrdningen else IInntektkilde.Inntektsmelding
                 IOmregnetÅrsinntekt(
                     kilde,
                     io.beløp.årlig.beløp,

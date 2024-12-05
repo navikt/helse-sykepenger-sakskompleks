@@ -11,6 +11,4 @@ sealed class SkatteopplysningSykepengegrunnlag(
     dato: LocalDate,
     beløp: Inntekt,
     tidsstempel: LocalDateTime
-) : Inntektsopplysning(id, hendelseId, dato, beløp, tidsstempel) {
-
-}
+) : Inntektsopplysning(id, hendelseId, dato, beløp, tidsstempel, Inntektskilde.AOrdningen)

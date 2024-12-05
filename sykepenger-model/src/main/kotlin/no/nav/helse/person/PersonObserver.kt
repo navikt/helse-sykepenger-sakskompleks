@@ -9,6 +9,7 @@ import no.nav.helse.hendelser.Avsender
 import no.nav.helse.hendelser.Periode
 import no.nav.helse.hendelser.Påminnelse
 import no.nav.helse.person.PersonObserver.ForespurtOpplysning.Companion.toJsonMap
+import no.nav.helse.person.inntekt.Inntektsopplysning
 import no.nav.helse.utbetalingslinjer.Oppdrag
 import no.nav.helse.utbetalingslinjer.OppdragDetaljer
 import no.nav.helse.utbetalingstidslinje.Begrunnelse
@@ -53,7 +54,7 @@ interface PersonObserver {
         )
 
         data class Venteårsak(
-            val hva: String,
+            val hva : String,
             val hvorfor: String?
         )
     }
@@ -91,7 +92,6 @@ interface PersonObserver {
                 }
             )
     }
-
     data class InntektsmeldingFørSøknadEvent(
         val inntektsmeldingId: UUID,
         val relevanteSykmeldingsperioder: List<Periode>,
@@ -191,7 +191,6 @@ interface PersonObserver {
         val organisasjonsnummer: String,
         val førsteFraværsdag: LocalDate
     )
-
     sealed class ForespurtOpplysning {
 
         companion object {
@@ -235,11 +234,10 @@ interface PersonObserver {
     }
 
     data class Inntektsdata(val skjæringstidspunkt: LocalDate, val kilde: Inntektsopplysningstype, val beløp: Double)
-    enum class Inntektsopplysningstype {
+    enum class Inntektsopplysningstype{
         INNTEKTSMELDING,
         SAKSBEHANDLER
     }
-
     data class Inntekt(val forslag: Inntektsdata?) : ForespurtOpplysning()
     data class FastsattInntekt(val fastsattInntekt: no.nav.helse.økonomi.Inntekt) : ForespurtOpplysning()
     object Arbeidsgiverperiode : ForespurtOpplysning()
@@ -259,7 +257,6 @@ interface PersonObserver {
         val saksbehandlerEpost: String,
         val saksbehandlerIdent: String
     )
-
     data class UtbetalingEndretEvent(
         val organisasjonsnummer: String,
         val utbetalingId: UUID,
@@ -526,7 +523,6 @@ interface PersonObserver {
             Omgjøring,
             Revurdering
         }
-
         data class Kilde(
             val meldingsreferanseId: UUID,
             val innsendt: LocalDateTime,
@@ -546,29 +542,17 @@ interface PersonObserver {
             val fastsatt: String
             val omregnetÅrsinntekt: Double
         }
-
         data class FastsattIInfotrygd(override val omregnetÅrsinntekt: Double) : Sykepengegrunnlagsfakta {
             override val fastsatt = "IInfotrygd"
         }
-
         data class FastsattEtterHovedregel(override val omregnetÅrsinntekt: Double, val sykepengegrunnlag: Double, val `6G`: Double, val arbeidsgivere: List<Arbeidsgiver>) : Sykepengegrunnlagsfakta {
             override val fastsatt = "EtterHovedregel"
-
-            data class Arbeidsgiver(val arbeidsgiver: String, val omregnetÅrsinntekt: Double, val inntektskilde: Inntektskilde)
+            data class Arbeidsgiver(val arbeidsgiver: String, val omregnetÅrsinntekt: Double, val inntektskilde: Inntektsopplysning.Inntektskilde?)
         }
-
         data class FastsattEtterSkjønn(override val omregnetÅrsinntekt: Double, val sykepengegrunnlag: Double, val `6G`: Double, val arbeidsgivere: List<Arbeidsgiver>) : Sykepengegrunnlagsfakta {
             override val fastsatt = "EtterSkjønn"
             val skjønnsfastsatt = arbeidsgivere.sumOf { it.skjønnsfastsatt }
-
-            data class Arbeidsgiver(val arbeidsgiver: String, val omregnetÅrsinntekt: Double, val skjønnsfastsatt: Double, val inntektskilde: Inntektskilde)
-        }
-
-        enum class Inntektskilde {
-            Arbeidsgiver,
-            AOrdningen,
-            Saksbehandler,
-            Infotrygd
+            data class Arbeidsgiver(val arbeidsgiver: String, val omregnetÅrsinntekt: Double, val skjønnsfastsatt: Double, val inntektskilde: Inntektsopplysning.Inntektskilde?)
         }
     }
 
@@ -633,9 +617,7 @@ interface PersonObserver {
         førsteFraværsdager: List<FørsteFraværsdag>,
         trengerArbeidsgiverperiode: Boolean,
         erPotensiellForespørsel: Boolean
-    ) {
-    }
-
+    ) {}
     fun vedtaksperiodeOpprettet(event: VedtaksperiodeOpprettet) {}
     fun vedtaksperiodePåminnet(vedtaksperiodeId: UUID, organisasjonsnummer: String, påminnelse: Påminnelse) {}
     fun vedtaksperiodeIkkePåminnet(vedtaksperiodeId: UUID, organisasjonsnummer: String, nåværendeTilstand: TilstandType) {}
@@ -662,9 +644,7 @@ interface PersonObserver {
         organisasjonsnummer: String,
         utbetalingId: UUID,
         vedtaksperiodeId: UUID
-    ) {
-    }
-
+    ) {}
     fun overstyringIgangsatt(event: OverstyringIgangsatt) {}
     fun overlappendeInfotrygdperioder(event: OverlappendeInfotrygdperioder) {}
     fun inntektsmeldingFørSøknad(event: InntektsmeldingFørSøknadEvent) {}

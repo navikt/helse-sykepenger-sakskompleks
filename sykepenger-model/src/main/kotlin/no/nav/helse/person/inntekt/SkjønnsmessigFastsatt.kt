@@ -14,7 +14,7 @@ class SkjønnsmessigFastsatt internal constructor(
     beløp: Inntekt,
     val overstyrtInntekt: Inntektsopplysning?,
     tidsstempel: LocalDateTime
-) : Inntektsopplysning(id, hendelseId, dato, beløp, tidsstempel) {
+) : Inntektsopplysning(id, hendelseId, dato, beløp, tidsstempel, overstyrtInntekt?.kilde) {
     constructor(dato: LocalDate, hendelseId: UUID, beløp: Inntekt, tidsstempel: LocalDateTime) : this(UUID.randomUUID(), dato, hendelseId, beløp, null, tidsstempel)
 
     override fun omregnetÅrsinntekt(): Inntektsopplysning {
@@ -46,18 +46,21 @@ class SkjønnsmessigFastsatt internal constructor(
             dato = dato,
             beløp = beløp.dto(),
             tidsstempel = tidsstempel,
-            overstyrtInntekt = overstyrtInntekt!!.dto().id
+            overstyrtInntekt = overstyrtInntekt!!.dto().id,
+            kilde = overstyrtInntekt.dto().kilde
         )
 
     internal companion object {
-        fun gjenopprett(dto: InntektsopplysningInnDto.SkjønnsmessigFastsattDto, inntekter: Map<UUID, Inntektsopplysning>) =
-            SkjønnsmessigFastsatt(
+        fun gjenopprett(dto: InntektsopplysningInnDto.SkjønnsmessigFastsattDto, inntekter: Map<UUID, Inntektsopplysning>): SkjønnsmessigFastsatt {
+            val overstyrtInntekt = inntekter.getValue(dto.overstyrtInntekt)
+            return SkjønnsmessigFastsatt(
                 id = dto.id,
                 hendelseId = dto.hendelseId,
                 dato = dto.dato,
                 beløp = Inntekt.gjenopprett(dto.beløp),
                 tidsstempel = dto.tidsstempel,
-                overstyrtInntekt = inntekter.getValue(dto.overstyrtInntekt)
+                overstyrtInntekt = overstyrtInntekt
             )
+        }
     }
 }

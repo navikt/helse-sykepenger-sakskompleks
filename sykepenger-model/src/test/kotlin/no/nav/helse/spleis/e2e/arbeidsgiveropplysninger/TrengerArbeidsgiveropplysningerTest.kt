@@ -800,7 +800,13 @@ internal class TrengerArbeidsgiveropplysningerTest : AbstractEndToEndTest() {
         val id = håndterOverstyrArbeidsgiveropplysninger(
             skjæringstidspunkt = 1.januar,
             arbeidsgiveropplysninger = listOf(
-                OverstyrtArbeidsgiveropplysning(ORGNUMMER, 32000.månedlig, "", null, listOf(Triple(1.januar, null, 32000.månedlig)))
+                OverstyrtArbeidsgiveropplysning(
+                    ORGNUMMER,
+                    32000.månedlig,
+                    "",
+                    null,
+                    listOf(Triple(1.januar, null, 32000.månedlig))
+                )
             )
         )
         håndterYtelser(1.vedtaksperiode)

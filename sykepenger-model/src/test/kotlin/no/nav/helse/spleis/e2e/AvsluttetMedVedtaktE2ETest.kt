@@ -1,7 +1,6 @@
 package no.nav.helse.spleis.e2e
 
 import java.util.UUID
-import no.nav.helse.Toggle
 import no.nav.helse.februar
 import no.nav.helse.hendelser.Dagtype
 import no.nav.helse.hendelser.Inntektsmelding
@@ -16,11 +15,10 @@ import no.nav.helse.person.PersonObserver
 import no.nav.helse.person.PersonObserver.UtkastTilVedtakEvent.FastsattEtterHovedregel
 import no.nav.helse.person.PersonObserver.UtkastTilVedtakEvent.FastsattEtterSkjønn
 import no.nav.helse.person.PersonObserver.UtkastTilVedtakEvent.FastsattIInfotrygd
-import no.nav.helse.person.PersonObserver.UtkastTilVedtakEvent.Inntektskilde
-import no.nav.helse.person.TilstandType
 import no.nav.helse.person.TilstandType.AVSLUTTET
 import no.nav.helse.person.TilstandType.AVSLUTTET_UTEN_UTBETALING
 import no.nav.helse.person.TilstandType.AVVENTER_HISTORIKK
+import no.nav.helse.person.inntekt.Inntektsopplysning.Inntektskilde
 import no.nav.helse.utbetalingslinjer.Utbetalingstatus
 import no.nav.helse.økonomi.Inntekt.Companion.månedlig
 import no.nav.helse.økonomi.Prosentdel.Companion.prosent
@@ -65,9 +63,7 @@ internal class AvsluttetMedVedtaktE2ETest : AbstractEndToEndTest() {
     fun `sender vedtak fattet for perioder utenfor arbeidsgiverperioden med bare ferie`() {
         håndterSykmelding(Sykmeldingsperiode(1.januar, 20.januar))
         val søknadId = håndterSøknad(Sykdom(1.januar, 20.januar, 100.prosent), Ferie(17.januar, 20.januar))
-        val inntektsmeldingId = håndterInntektsmelding(
-            listOf(1.januar til 16.januar)
-        )
+        val inntektsmeldingId = håndterInntektsmelding(listOf(1.januar til 16.januar))
         assertSisteTilstand(1.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING)
         assertEquals(0, inspektør.antallUtbetalinger)
         assertEquals(0, observatør.utbetalingUtenUtbetalingEventer.size)
@@ -75,7 +71,7 @@ internal class AvsluttetMedVedtaktE2ETest : AbstractEndToEndTest() {
         1.vedtaksperiode.assertIngenVedtakFattet()
         assertEquals(2, 1.vedtaksperiode.avsluttetUtenVedtakEventer.size)
         assertEquals(setOf(søknadId), 1.vedtaksperiode.avsluttetUtenVedtakEventer.first().hendelseIder)
-        assertEquals(setOf(søknadId, inntektsmeldingId), 1.vedtaksperiode.avsluttetUtenVedtakEventer.last().hendelseIder)
+        assertEquals(setOf(søknadId, inntektsmeldingId),1.vedtaksperiode.avsluttetUtenVedtakEventer.last().hendelseIder)
     }
 
     @Test
@@ -108,18 +104,8 @@ internal class AvsluttetMedVedtaktE2ETest : AbstractEndToEndTest() {
         håndterSykmelding(Sykmeldingsperiode(1.januar(2020), 31.januar(2020)), orgnummer = a2)
         håndterSøknad(1.januar(2020) til 31.januar(2020), orgnummer = a1)
         håndterSøknad(1.januar(2020) til 31.januar(2020), orgnummer = a2)
-        håndterInntektsmelding(
-            listOf(1.januar(2020) til 16.januar(2020)),
-            beregnetInntekt = INNTEKT,
-            orgnummer = a1,
-            vedtaksperiodeIdInnhenter = 1.vedtaksperiode
-        )
-        håndterInntektsmelding(
-            listOf(1.januar(2020) til 16.januar(2020)),
-            beregnetInntekt = INNTEKT,
-            orgnummer = a2,
-            vedtaksperiodeIdInnhenter = 1.vedtaksperiode
-        )
+        håndterInntektsmelding(listOf(1.januar(2020) til 16.januar(2020)), beregnetInntekt = INNTEKT, orgnummer = a1)
+        håndterInntektsmelding(listOf(1.januar(2020) til 16.januar(2020)), beregnetInntekt = INNTEKT, orgnummer = a2)
         håndterVilkårsgrunnlag(1.vedtaksperiode, orgnummer = a1)
         håndterYtelser(1.vedtaksperiode, orgnummer = a1)
         håndterSimulering(1.vedtaksperiode, orgnummer = a1)
@@ -158,17 +144,18 @@ internal class AvsluttetMedVedtaktE2ETest : AbstractEndToEndTest() {
             listOf(1.januar(2020) til 16.januar(2020)),
             beregnetInntekt = 45000.månedlig,
             orgnummer = a1,
-            vedtaksperiodeIdInnhenter = 1.vedtaksperiode,
         )
         håndterInntektsmelding(
             listOf(1.januar(2020) til 16.januar(2020)),
             beregnetInntekt = 44000.månedlig,
             orgnummer = a2,
-            vedtaksperiodeIdInnhenter = 1.vedtaksperiode,
         )
         håndterVilkårsgrunnlag(1.vedtaksperiode, orgnummer = a1)
         assertSisteTilstand(1.vedtaksperiode, AVVENTER_HISTORIKK)
-        håndterSkjønnsmessigFastsettelse(1.januar(2020), listOf(OverstyrtArbeidsgiveropplysning(a1, 46000.månedlig), OverstyrtArbeidsgiveropplysning(a2, 45000.månedlig)))
+        håndterSkjønnsmessigFastsettelse(1.januar(2020), listOf(OverstyrtArbeidsgiveropplysning(a1, 46000.månedlig), OverstyrtArbeidsgiveropplysning(
+            a2,
+            45000.månedlig
+        )))
         håndterYtelser(1.vedtaksperiode, orgnummer = a1)
         håndterSimulering(1.vedtaksperiode, orgnummer = a1)
         håndterUtbetalingsgodkjenning(1.vedtaksperiode, orgnummer = a1)
@@ -189,8 +176,8 @@ internal class AvsluttetMedVedtaktE2ETest : AbstractEndToEndTest() {
             `6G` = 599_148.0,
             sykepengegrunnlag = 599_148.0,
             arbeidsgivere = listOf(
-                FastsattEtterSkjønn.Arbeidsgiver(a1, 540_000.0, 552_000.0, Inntektskilde.Saksbehandler),
-                FastsattEtterSkjønn.Arbeidsgiver(a2, 528_000.0, 540_000.0, Inntektskilde.Saksbehandler),
+                FastsattEtterSkjønn.Arbeidsgiver(a1, 540_000.0, 552_000.0, Inntektskilde.Arbeidsgiver),
+                FastsattEtterSkjønn.Arbeidsgiver(a2, 528_000.0, 540_000.0, Inntektskilde.Arbeidsgiver),
             )
         )
         assertEquals(forventetSykepengegrunnlagsfakta, a1Sykepengegrunnlagsfakta)
@@ -207,30 +194,30 @@ internal class AvsluttetMedVedtaktE2ETest : AbstractEndToEndTest() {
     }
 
     @Test
-    fun `sender ikke avsluttet uten vedtak fordi saksbehandler ikke overstyrer perioden inn i AvsluttetUtenUtbetaling`() = Toggle.FatteVedtakPåTidligereBeregnetPerioder.enable {
+    fun `sender avsluttet uten vedtak når saksbehandler overstyrer perioden inn i AvsluttetUtenUtbetaling`(){
         val søknadId = håndterSøknad(1.januar til 16.januar)
         assertSisteTilstand(1.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING)
         val inntektsmeldingId = håndterInntektsmelding(
             listOf(1.januar til 16.januar),
             refusjon = Inntektsmelding.Refusjon(beløp = INNTEKT, null, emptyList()),
-            begrunnelseForReduksjonEllerIkkeUtbetalt = "noe"
+            begrunnelseForReduksjonEllerIkkeUtbetalt = "noe",
         )
         håndterVilkårsgrunnlag(1.vedtaksperiode)
         håndterYtelser(1.vedtaksperiode)
         håndterSimulering(1.vedtaksperiode)
 
-        val liste = (1..16).map {
+        val liste = (1..16).map{
             ManuellOverskrivingDag(it.januar, Dagtype.Feriedag)
         }
         val overstyringId = UUID.randomUUID()
         håndterOverstyrTidslinje(liste, meldingsreferanseId = overstyringId)
-        håndterYtelser(1.vedtaksperiode)
-        assertSisteTilstand(1.vedtaksperiode, TilstandType.AVVENTER_GODKJENNING)
+        assertSisteTilstand(1.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING)
         val utbetaling = inspektør.utbetaling(0)
         assertEquals(Utbetalingstatus.FORKASTET, utbetaling.tilstand)
         1.vedtaksperiode.assertIngenVedtakFattet()
-        assertEquals(1, 1.vedtaksperiode.avsluttetUtenVedtakEventer.size)
-        assertEquals(setOf(søknadId), 1.vedtaksperiode.avsluttetUtenVedtakEventer.single().hendelseIder)
+        assertEquals(2, 1.vedtaksperiode.avsluttetUtenVedtakEventer.size)
+        assertEquals(setOf(søknadId), 1.vedtaksperiode.avsluttetUtenVedtakEventer.first().hendelseIder)
+        assertEquals(setOf(søknadId, inntektsmeldingId, overstyringId),1.vedtaksperiode.avsluttetUtenVedtakEventer.last().hendelseIder)
     }
 
 

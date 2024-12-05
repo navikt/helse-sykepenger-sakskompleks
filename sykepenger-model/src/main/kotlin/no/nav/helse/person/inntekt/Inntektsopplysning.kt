@@ -3,6 +3,7 @@ package no.nav.helse.person.inntekt
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
+import no.nav.helse.dto.InntektskildeDto
 import no.nav.helse.dto.deserialisering.InntektsopplysningInnDto
 import no.nav.helse.dto.serialisering.InntektsopplysningUtDto
 import no.nav.helse.etterlevelse.Subsumsjonslogg
@@ -21,7 +22,8 @@ sealed class Inntektsopplysning(
     val hendelseId: UUID,
     val dato: LocalDate,
     val beløp: Inntekt,
-    val tidsstempel: LocalDateTime
+    val tidsstempel: LocalDateTime,
+    internal open val kilde: Inntektskilde?
 ) {
     internal fun fastsattÅrsinntekt() = beløp
     internal open fun omregnetÅrsinntekt() = this
@@ -131,6 +133,22 @@ sealed class Inntektsopplysning(
     ) {
     }
 
+    enum class Inntektskilde {
+        Arbeidsgiver,
+        AOrdningen;
+
+        fun dto() = when(this) {
+            Arbeidsgiver -> InntektskildeDto.Arbeidsgiver
+            AOrdningen -> InntektskildeDto.AOrdningen
+        }
+
+        companion object {
+            fun gjenopprett(dto: InntektskildeDto) = when (dto) {
+                InntektskildeDto.Arbeidsgiver -> Arbeidsgiver
+                InntektskildeDto.AOrdningen -> AOrdningen
+            }
+        }
+    }
 
     internal companion object {
         internal fun erOmregnetÅrsinntektEndret(før: Inntektsopplysning, etter: Inntektsopplysning) =

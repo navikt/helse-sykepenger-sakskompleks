@@ -24,8 +24,17 @@ class Saksbehandler internal constructor(
     val subsumsjon: Subsumsjon?,
     val overstyrtInntekt: Inntektsopplysning?,
     tidsstempel: LocalDateTime
-) : Inntektsopplysning(id, hendelseId, dato, beløp, tidsstempel) {
-    constructor(dato: LocalDate, hendelseId: UUID, beløp: Inntekt, forklaring: String, subsumsjon: Subsumsjon?, tidsstempel: LocalDateTime) : this(UUID.randomUUID(), dato, hendelseId, beløp, forklaring, subsumsjon, null, tidsstempel)
+) : Inntektsopplysning(id, hendelseId, dato, beløp, tidsstempel, overstyrtInntekt?.kilde) {
+    constructor(dato: LocalDate, hendelseId: UUID, beløp: Inntekt, forklaring: String, subsumsjon: Subsumsjon?, tidsstempel: LocalDateTime) : this(
+        UUID.randomUUID(),
+        dato,
+        hendelseId,
+        beløp,
+        forklaring,
+        subsumsjon,
+        null,
+        tidsstempel
+    )
 
     override fun gjenbrukbarInntekt(beløp: Inntekt?) = overstyrtInntekt?.gjenbrukbarInntekt(beløp ?: this.beløp)
 
@@ -101,20 +110,23 @@ class Saksbehandler internal constructor(
             tidsstempel = tidsstempel,
             forklaring = forklaring,
             subsumsjon = subsumsjon?.dto(),
-            overstyrtInntekt = overstyrtInntekt!!.dto().id
+            overstyrtInntekt = overstyrtInntekt!!.dto().id,
+            kilde = overstyrtInntekt.dto().kilde
         )
 
     internal companion object {
-        fun gjenopprett(dto: InntektsopplysningInnDto.SaksbehandlerDto, inntekter: Map<UUID, Inntektsopplysning>) =
-            Saksbehandler(
+        fun gjenopprett(dto: InntektsopplysningInnDto.SaksbehandlerDto, inntekter: Map<UUID, Inntektsopplysning>): Saksbehandler {
+            val overstyrtInntekt = inntekter.getValue(dto.overstyrtInntekt)
+            return Saksbehandler(
                 id = dto.id,
-                hendelseId = dto.hendelseId,
                 dato = dto.dato,
+                hendelseId = dto.hendelseId,
                 beløp = Inntekt.gjenopprett(dto.beløp),
-                tidsstempel = dto.tidsstempel,
                 forklaring = dto.forklaring,
                 subsumsjon = dto.subsumsjon?.let { Subsumsjon.gjenopprett(it) },
-                overstyrtInntekt = inntekter.getValue(dto.overstyrtInntekt)
+                overstyrtInntekt = overstyrtInntekt,
+                tidsstempel = dto.tidsstempel
             )
+        }
     }
 }

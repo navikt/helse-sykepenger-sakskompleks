@@ -8,6 +8,7 @@ import no.nav.helse.februar
 import no.nav.helse.januar
 import no.nav.helse.person.inntekt.Inntektsmelding.Companion.avklarSykepengegrunnlag
 import no.nav.helse.person.inntekt.Inntektsmelding.Companion.finnInntektsmeldingForSkjæringstidspunkt
+import no.nav.helse.person.inntekt.Inntektsopplysning.Inntektskilde
 import no.nav.helse.person.inntekt.Skatteopplysning.Inntekttype.LØNNSINNTEKT
 import no.nav.helse.yearMonth
 import no.nav.helse.økonomi.Inntekt.Companion.INGEN
@@ -94,8 +95,8 @@ internal class InntektsopplysningTest {
 
     @Test
     fun `turnering - inntektsmelding vs inntektsmelding`() {
-        val im1 = Inntektsmelding(1.januar, UUID.randomUUID(), INNTEKT, Inntektsmelding.Kilde.Arbeidsgiver, LocalDateTime.now())
-        val im2 = Inntektsmelding(1.januar, UUID.randomUUID(), INNTEKT, Inntektsmelding.Kilde.Arbeidsgiver, LocalDateTime.now().plusSeconds(1))
+        val im1 = Inntektsmelding(1.januar, UUID.randomUUID(), INNTEKT, Inntektskilde.Arbeidsgiver, LocalDateTime.now())
+        val im2 = Inntektsmelding(1.januar, UUID.randomUUID(), INNTEKT, Inntektskilde.Arbeidsgiver, LocalDateTime.now().plusSeconds(1))
 
         assertEquals(im2, listOf(im1, im2).finnInntektsmeldingForSkjæringstidspunkt(1.januar, null))
     }
