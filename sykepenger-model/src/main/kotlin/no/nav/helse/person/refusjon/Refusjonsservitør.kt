@@ -19,11 +19,16 @@ internal class Refusjonsservitør(input: Map<LocalDate, Beløpstidslinje> = empt
         refusjonsrester[dato] = refusjonsrester.getOrDefault(dato, Beløpstidslinje()) + beløpstidslinje
     }
 
-    // Serverer refusjonstidslinjer til perioder
-    internal fun servér(startdato: LocalDate, periode: Periode): Beløpstidslinje {
+    // jeg vil bare se på menyen jeg, har ikke bestemt meg helt enda
+    internal fun meny(startdato: LocalDate, periode: Periode): Beløpstidslinje {
         val søkevindu = startdato til periode.endInclusive
         val aktuelle = refusjonstidslinjer.filterKeys { it in søkevindu }
-        val refusjonstidslinje = aktuelle.values.map { it.fyll(periode.endInclusive) }.fold(Beløpstidslinje(), Beløpstidslinje::plus)
+        return aktuelle.values.map { it.fyll(periode.endInclusive) }.fold(Beløpstidslinje(), Beløpstidslinje::plus)
+    }
+
+    // Serverer refusjonstidslinjer til perioder
+    internal fun servér(startdato: LocalDate, periode: Periode): Beløpstidslinje {
+        val refusjonstidslinje = meny(startdato, periode)
         refusjonstidslinjer.keys.forEach { dato ->
             if (!refusjonsrester.containsKey(dato)) return@forEach
             val nyVerdi = refusjonsrester.getValue(dato) - periode

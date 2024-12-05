@@ -8,6 +8,7 @@ import no.nav.helse.Personidentifikator
 import no.nav.helse.Toggle
 import no.nav.helse.dto.deserialisering.ArbeidsgiverInnDto
 import no.nav.helse.dto.serialisering.ArbeidsgiverUtDto
+import no.nav.helse.dto.serialisering.UbrukteRefusjonsopplysningerUtDto
 import no.nav.helse.etterlevelse.BehandlingSubsumsjonslogg
 import no.nav.helse.etterlevelse.KontekstType
 import no.nav.helse.etterlevelse.Subsumsjonskontekst
@@ -1026,17 +1027,29 @@ internal class Arbeidsgiver private constructor(
 
     internal fun vedtaksperioderEtter(dato: LocalDate) = vedtaksperioder.filter { it.slutterEtter(dato) }
 
-    internal fun dto(nestemann: Vedtaksperiode?) = ArbeidsgiverUtDto(
-        id = id,
-        organisasjonsnummer = organisasjonsnummer,
-        inntektshistorikk = inntektshistorikk.dto(),
-        sykdomshistorikk = sykdomshistorikk.dto(),
-        sykmeldingsperioder = sykmeldingsperioder.dto(),
-        vedtaksperioder = vedtaksperioder.map { it.dto(nestemann) },
-        forkastede = forkastede.map { it.dto() },
-        utbetalinger = utbetalinger.map { it.dto() },
-        feriepengeutbetalinger = feriepengeutbetalinger.map { it.dto() },
-        refusjonshistorikk = refusjonshistorikk.dto(),
-        ubrukteRefusjonsopplysninger = ubrukteRefusjonsopplysninger.dto()
-    )
+    internal fun dto(nestemann: Vedtaksperiode?): ArbeidsgiverUtDto {
+        val vedtaksperioderDto = vedtaksperioder.map { it.dto(nestemann) }
+        val refusjonsopplysningerPåSisteBehandling = vedtaksperioder.lastOrNull()?.let { sisteVedtaksperiode ->
+            val sisteBehandlingId = vedtaksperioderDto.last().behandlinger.behandlinger.last().id
+            val sisteRefusjonstidslinje = sisteVedtaksperiode.hensyntattUbrukteRefusjonsopplysninger(ubrukteRefusjonsopplysninger)
+            sisteBehandlingId to sisteRefusjonstidslinje
+        }
+        return ArbeidsgiverUtDto(
+            id = id,
+            organisasjonsnummer = organisasjonsnummer,
+            inntektshistorikk = inntektshistorikk.dto(),
+            sykdomshistorikk = sykdomshistorikk.dto(),
+            sykmeldingsperioder = sykmeldingsperioder.dto(),
+            vedtaksperioder = vedtaksperioderDto,
+            forkastede = forkastede.map { it.dto() },
+            utbetalinger = utbetalinger.map { it.dto() },
+            feriepengeutbetalinger = feriepengeutbetalinger.map { it.dto() },
+            refusjonshistorikk = refusjonshistorikk.dto(),
+            ubrukteRefusjonsopplysninger = UbrukteRefusjonsopplysningerUtDto(
+                ubrukteRefusjonsopplysninger = ubrukteRefusjonsopplysninger.dto(),
+                sisteRefusjonstidslinje = refusjonsopplysningerPåSisteBehandling?.second?.dto(),
+                sisteBehandlingId = refusjonsopplysningerPåSisteBehandling?.first
+            )
+        )
+    }
 }

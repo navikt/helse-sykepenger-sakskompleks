@@ -722,7 +722,7 @@ private fun ArbeidsgiverUtDto.tilPersonData(vilkårsgrunnlagHistorikk: List<Vilk
         utbetalinger = utbetalingerDto,
         feriepengeutbetalinger = this.feriepengeutbetalinger.map { it.tilPersonData() },
         refusjonshistorikk = this.refusjonshistorikk.refusjoner.map { it.tilPersonData() },
-        ubrukteRefusjonsopplysninger = RefusjonservitørData(this.ubrukteRefusjonsopplysninger.refusjonstidslinjer.mapValues { (_, dto) -> dto.tilPersonData() })
+        ubrukteRefusjonsopplysninger = RefusjonservitørData(this.ubrukteRefusjonsopplysninger.ubrukteRefusjonsopplysninger.refusjonstidslinjer.mapValues { (_, dto) -> dto.tilPersonData() })
     )
 }
 

@@ -91,7 +91,7 @@ private fun ArbeidsgiverUtDto.tilPersonData() = PersonData.ArbeidsgiverData(
     utbetalinger = this.utbetalinger.map { it.tilPersonData() },
     feriepengeutbetalinger = this.feriepengeutbetalinger.map { it.tilPersonData() },
     refusjonshistorikk = this.refusjonshistorikk.refusjoner.map { it.tilPersonData() },
-    ubrukteRefusjonsopplysninger = this.ubrukteRefusjonsopplysninger.tilPersonData(),
+    ubrukteRefusjonsopplysninger = this.ubrukteRefusjonsopplysninger.ubrukteRefusjonsopplysninger.tilPersonData(),
 )
 
 private fun InntektsopplysningUtDto.InntektsmeldingDto.tilPersonData() = PersonData.ArbeidsgiverData.InntektsmeldingData(
