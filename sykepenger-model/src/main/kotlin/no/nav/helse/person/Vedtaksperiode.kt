@@ -49,6 +49,8 @@ import no.nav.helse.person.beløp.Beløpstidslinje
 import no.nav.helse.person.beløp.Kilde
 import no.nav.helse.person.builders.UtkastTilVedtakBuilder
 import no.nav.helse.person.infotrygdhistorikk.*
+import no.nav.helse.person.inntekt.Inntektshistorikk
+import no.nav.helse.person.inntekt.Refusjonshistorikk
 import no.nav.helse.person.inntekt.Refusjonsopplysning.Refusjonsopplysninger
 import no.nav.helse.person.inntekt.Skatteopplysning
 import no.nav.helse.person.refusjon.Refusjonsservitør
@@ -211,6 +213,21 @@ internal class Vedtaksperiode private constructor(
     internal fun inntektsmeldingFerdigbehandlet(hendelse: Hendelse, aktivitetslogg: IAktivitetslogg) {
         registrerKontekst(aktivitetslogg)
         tilstand.inntektsmeldingFerdigbehandlet(this, hendelse, aktivitetslogg)
+    }
+
+    internal fun håndterPortalInntektsmelding(
+        vedtaksperioder: List<Vedtaksperiode>,
+        inntektsmelding: Inntektsmelding,
+        ubrukteRefusjonsopplysninger: Refusjonsservitør,
+        refusjonshistorikk: Refusjonshistorikk,
+        inntektshistorikk: Inntektshistorikk,
+        aktivitetslogg: IAktivitetslogg
+    ): Boolean {
+        check(inntektsmelding.avsendersystem is Inntektsmelding.Avsendersystem.NavPortal)
+        if (this.id != inntektsmelding.avsendersystem.vedtaksperiodeId) return false
+        registrerKontekst(aktivitetslogg)
+        tilstand.håndterPortalinntektsmelding(this, vedtaksperioder, inntektsmelding, ubrukteRefusjonsopplysninger, refusjonshistorikk, inntektshistorikk, aktivitetslogg)
+        return true
     }
 
     internal fun håndter(dager: DagerFraInntektsmelding, aktivitetslogg: IAktivitetslogg) {
@@ -1275,8 +1292,21 @@ internal class Vedtaksperiode private constructor(
             aktivitetslogg: IAktivitetslogg
         ) =
             dager.skalHåndteresAv(vedtaksperiode.periode)
+
         fun håndter(vedtaksperiode: Vedtaksperiode, dager: DagerFraInntektsmelding, aktivitetslogg: IAktivitetslogg) {
             vedtaksperiode.håndterKorrigerendeInntektsmelding(dager, aktivitetslogg)
+        }
+
+        fun håndterPortalinntektsmelding(
+            vedtaksperiode: Vedtaksperiode,
+            vedtaksperioder: List<Vedtaksperiode>,
+            inntektsmelding: Inntektsmelding,
+            ubrukteRefusjonsopplysninger: Refusjonsservitør,
+            refusjonshistorikk: Refusjonshistorikk,
+            inntektshistorikk: Inntektshistorikk,
+            aktivitetslogg: IAktivitetslogg
+        ) {
+            aktivitetslogg.info("Forventet ikke portalinntektsmelding i %s".format(type.name))
         }
 
         fun håndtertInntektPåSkjæringstidspunktet(
@@ -1811,6 +1841,59 @@ internal class Vedtaksperiode private constructor(
             check(vedtaksperiode.behandlinger.harIkkeUtbetaling()) {
                 "hæ?! vedtaksperiodens behandling er ikke uberegnet!"
             }
+        }
+
+        override fun håndterPortalinntektsmelding(
+            vedtaksperiode: Vedtaksperiode,
+            vedtaksperioder: List<Vedtaksperiode>,
+            inntektsmelding: Inntektsmelding,
+            ubrukteRefusjonsopplysninger: Refusjonsservitør,
+            refusjonshistorikk: Refusjonshistorikk,
+            inntektshistorikk: Inntektshistorikk,
+            aktivitetslogg: IAktivitetslogg
+        ) {
+            check(inntektsmelding.avsendersystem is Inntektsmelding.Avsendersystem.NavPortal)
+
+            // 1. håndterer dager
+            val dager = inntektsmelding.dager()
+            vedtaksperioder
+                .forEach { it ->
+                    it.registrerKontekst(aktivitetslogg)
+                    // hvem skal håndtere dagene?
+                    // jo, iallfall denne vedtaksperioden, men muligens et par til.
+                    // forutsetningen er vel at de står i auu!
+                    val auuSomSkalHåndtereDager = it.tilstand == AvsluttetUtenUtbetaling && dager.skalHåndteresAv(it.periode)
+                    val periodenSomHarForespurtIM = it === vedtaksperiode
+                    when {
+                        auuSomSkalHåndtereDager || periodenSomHarForespurtIM -> {
+                            // todo: kalle på egen portal-dager-håndteringsmetode?
+                            it.tilstand.håndter(it, dager, aktivitetslogg)
+                        }
+                    }
+                    dager.vurdertTilOgMed(it.periode.endInclusive)
+                }
+
+            // 2. håndterer refusjonsopplysninger og inntekt
+            // todo: kun håndtere refusjon på sammenhengende vedtaksperioder?
+            val servitør = inntektsmelding.refusjonsservitør(vedtaksperiode.startdatoPåSammenhengendeVedtaksperioder)
+            vedtaksperioder.forEach {
+                it.registrerKontekst(aktivitetslogg)
+                it.håndter(inntektsmelding, aktivitetslogg, servitør)
+            }
+            if (Toggle.LagreUbrukteRefusjonsopplysninger.enabled) {
+                servitør.servér(ubrukteRefusjonsopplysninger, aktivitetslogg)
+            }
+
+            val dagoverstyring = dager.revurderingseventyr()
+            val refusjonsoverstyring = vedtaksperioder.refusjonseventyr(inntektsmelding)
+            val eventyr = Revurderingseventyr.tidligsteEventyr(dagoverstyring, refusjonsoverstyring)
+            checkNotNull(eventyr) { "gir ikke mening at denne skal returnere null" }
+
+            inntektsmelding.leggTilPortalRefusjon(vedtaksperiode.startdatoPåSammenhengendeVedtaksperioder, refusjonshistorikk)
+            inntektsmelding.addPortalInntekt(vedtaksperiode.skjæringstidspunkt, inntektshistorikk, vedtaksperiode.jurist)
+            vedtaksperiode.inntektsmeldingHåndtert(inntektsmelding)
+
+            vedtaksperiode.person.igangsettOverstyring(eventyr, aktivitetslogg)
         }
 
         override fun skalHåndtereDager(

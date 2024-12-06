@@ -68,6 +68,7 @@ import no.nav.helse.person.Yrkesaktivitet.Companion.tilYrkesaktivitet
 import no.nav.helse.person.aktivitetslogg.Aktivitetskontekst
 import no.nav.helse.person.aktivitetslogg.IAktivitetslogg
 import no.nav.helse.person.aktivitetslogg.SpesifikkKontekst
+import no.nav.helse.person.aktivitetslogg.Varselkode
 import no.nav.helse.person.beløp.Beløpstidslinje
 import no.nav.helse.person.builders.UtbetalingsdagerBuilder
 import no.nav.helse.person.infotrygdhistorikk.Infotrygdhistorikk
@@ -513,20 +514,48 @@ internal class Arbeidsgiver private constructor(
 
     internal fun håndter(inntektsmelding: Inntektsmelding, aktivitetslogg: IAktivitetslogg, vedtaksperiodeIdForReplay: UUID? = null) {
         aktivitetslogg.kontekst(this)
+        when (inntektsmelding.avsendersystem) {
+            is Inntektsmelding.Avsendersystem.Altinn,
+            is Inntektsmelding.Avsendersystem.LPS -> håndterKlassiskInntektsmelding(inntektsmelding, aktivitetslogg, vedtaksperiodeIdForReplay)
+            is Inntektsmelding.Avsendersystem.NavPortal -> håndterPortalInntektsmelding(inntektsmelding, aktivitetslogg)
+        }
+    }
+
+    private fun håndterKlassiskInntektsmelding(inntektsmelding: Inntektsmelding, aktivitetslogg: IAktivitetslogg, vedtaksperiodeIdForReplay: UUID?) {
+        check(inntektsmelding.avsendersystem !is Inntektsmelding.Avsendersystem.NavPortal)
         if (vedtaksperiodeIdForReplay != null) aktivitetslogg.info("Replayer inntektsmelding.")
 
-        if (!inntektsmelding.valider(vedtaksperioder, aktivitetslogg, person::emitInntektsmeldingIkkeHåndtert)) return
+        if (!inntektsmelding.valider()) return
         val dager = inntektsmelding.dager()
-        håndter(inntektsmelding) { håndter(dager, aktivitetslogg) }
-        if (!inntektsmelding.valider(vedtaksperioder, aktivitetslogg, person::emitInntektsmeldingIkkeHåndtert)) return
 
-        if (vedtaksperiodeIdForReplay == null) håndter(inntektsmelding, aktivitetslogg, inntektsmelding.refusjonsservitør)
+        håndter(inntektsmelding) { håndter(dager, aktivitetslogg) }
+
+        if (vedtaksperiodeIdForReplay == null) håndter(inntektsmelding, aktivitetslogg, inntektsmelding.refusjonsservitør())
 
         val dagoverstyring = dager.revurderingseventyr()
         val refusjonsoverstyring = vedtaksperioder.refusjonseventyr(inntektsmelding)
         addInntektsmelding(inntektsmelding, aktivitetslogg, Revurderingseventyr.tidligsteEventyr(dagoverstyring, refusjonsoverstyring))
+        inntektsmelding.ferdigstillKlassiskIM(aktivitetslogg, person, vedtaksperioder, forkastede, sykmeldingsperioder, dager)
+    }
 
-        inntektsmelding.ferdigstill(aktivitetslogg, person, vedtaksperioder, forkastede, sykmeldingsperioder)
+    private fun håndterPortalInntektsmelding(inntektsmelding: Inntektsmelding, aktivitetslogg: IAktivitetslogg) {
+        check(inntektsmelding.avsendersystem is Inntektsmelding.Avsendersystem.NavPortal)
+
+        if (énHarHåndtert(inntektsmelding) {
+            håndterPortalInntektsmelding(
+                vedtaksperioder = vedtaksperioder.toList(),
+                inntektsmelding = inntektsmelding,
+                ubrukteRefusjonsopplysninger = ubrukteRefusjonsopplysninger,
+                refusjonshistorikk = refusjonshistorikk,
+                inntektshistorikk = inntektshistorikk,
+                aktivitetslogg = aktivitetslogg
+            )
+        }) {
+            return inntektsmelding.ferdigstillPortalIM()
+        }
+
+        // portalinntektsmelding traff ingen aktive vedtaksperiode
+        aktivitetslogg.funksjonellFeil(Varselkode.RV_IM_26)
     }
 
     internal fun refusjonstidslinje(vedtaksperiode: Vedtaksperiode): Beløpstidslinje {

@@ -12,4 +12,4 @@ val LPS: Avsenderutleder = { _, _, førsteFraværsdag -> Inntektsmelding.Avsende
 val ALTINN: Avsenderutleder = { _, _, førsteFraværsdag ->  Inntektsmelding.Avsendersystem.Altinn(førsteFraværsdag) }
 
 fun erNavPortal(avsenderutleder: Avsenderutleder) = avsenderutleder(UUID.randomUUID(), LocalDate.EPOCH, null) is Inntektsmelding.Avsendersystem.NavPortal
-fun Inntektsmelding.validert() = apply { valider(emptyList(), Aktivitetslogg()) { _, _, _ -> } }
+fun Inntektsmelding.validert() = apply { valider() }
