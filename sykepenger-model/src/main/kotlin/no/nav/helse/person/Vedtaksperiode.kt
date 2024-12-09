@@ -394,6 +394,16 @@ internal class Vedtaksperiode private constructor(
         }
     }
 
+    private fun håndterPortalDager(dager: DagerFraInntektsmelding, aktivitetslogg: IAktivitetslogg) {
+        val hendelse = dager.bitAvInntektsmelding(aktivitetslogg, periode) ?: dager.tomBitAvInntektsmelding(
+            aktivitetslogg,
+            periode
+        )
+        håndterDager(hendelse, aktivitetslogg) {
+            /* ingen validering, det skjer etterpå */
+        }
+    }
+
     private fun håndterDagerUtenEndring(dager: DagerFraInntektsmelding, aktivitetslogg: IAktivitetslogg) {
         val hendelse = dager.tomBitAvInntektsmelding(aktivitetslogg, periode)
         håndterDager(hendelse, aktivitetslogg) {
@@ -1574,6 +1584,12 @@ internal class Vedtaksperiode private constructor(
                 dager.vurdertTilOgMed(it.periode.endInclusive)
             }
 
+        this.registrerKontekst(aktivitetslogg)
+
+        // validerer
+        dager.validerPortal(aktivitetslogg)
+        dager.validerArbeidsgiverperiodePortal(aktivitetslogg, periode, finnArbeidsgiverperiode())
+
         // 2. håndterer refusjonsopplysninger og inntekt
         // todo: kun håndtere refusjon på sammenhengende vedtaksperioder fremfor å loope gjennom alt?
         val servitør = inntektsmelding.refusjonsservitør(startdatoPåSammenhengendeVedtaksperioder)
@@ -1581,6 +1597,8 @@ internal class Vedtaksperiode private constructor(
             it.registrerKontekst(aktivitetslogg)
             it.håndter(inntektsmelding, aktivitetslogg, servitør)
         }
+
+        this.registrerKontekst(aktivitetslogg)
         servitør.servér(ubrukteRefusjonsopplysninger, aktivitetslogg)
 
         val dagoverstyring = dager.revurderingseventyr()
@@ -1603,6 +1621,11 @@ internal class Vedtaksperiode private constructor(
 
         inntektsmeldingHåndtert(inntektsmelding)
 
+        if (aktivitetslogg.harFunksjonelleFeilEllerVerre()) {
+            // forkaster, men returnerer ikke,
+            // sånn at vi sender ut overstyring likevel
+            forkast(dager.hendelse, aktivitetslogg)
+        }
         person.igangsettOverstyring(Revurderingseventyr.tidligsteEventyr(eventyr, overstyringseventyr)!!, aktivitetslogg)
     }
 
@@ -2434,7 +2457,7 @@ internal class Vedtaksperiode private constructor(
             aktivitetslogg: IAktivitetslogg,
             dager: DagerFraInntektsmelding
         ) {
-            håndter(vedtaksperiode, dager, aktivitetslogg)
+            vedtaksperiode.håndterPortalDager(dager, aktivitetslogg)
         }
 
         override fun skalHåndtereDager(
@@ -2722,8 +2745,7 @@ internal class Vedtaksperiode private constructor(
             if (vedtaksperiode.skalFatteVedtak()) return super.håndterPortalinntektsmeldingdager(vedtaksperiode, aktivitetslogg, dager)
             // behandler kun portalinntektsmelding dersom perioden var/er en auu,
             // siden auu'er sender ut en forespørsel og går via AvBl tilbake til Auu ved overstyringer
-            vedtaksperiode.håndterDager(dager, aktivitetslogg)
-            if (aktivitetslogg.harFunksjonelleFeilEllerVerre()) return vedtaksperiode.forkast(dager.hendelse, aktivitetslogg)
+            vedtaksperiode.håndterPortalDager(dager, aktivitetslogg)
         }
 
         override fun håndter(
@@ -3555,7 +3577,7 @@ internal class Vedtaksperiode private constructor(
             aktivitetslogg: IAktivitetslogg,
             dager: DagerFraInntektsmelding
         ) {
-            håndter(vedtaksperiode, dager, aktivitetslogg)
+            vedtaksperiode.håndterPortalDager(dager, aktivitetslogg)
         }
 
         override fun håndter(
@@ -3564,18 +3586,12 @@ internal class Vedtaksperiode private constructor(
             aktivitetslogg: IAktivitetslogg
         ) {
             vedtaksperiode.håndterDager(dager, aktivitetslogg)
-            if (aktivitetslogg.harFunksjonelleFeilEllerVerre()) {
-                if (vedtaksperiode.arbeidsgiver.kanForkastes(
-                        vedtaksperiode,
-                        aktivitetslogg
-                    )
-                ) return vedtaksperiode.forkast(dager.hendelse, aktivitetslogg)
-                return vedtaksperiode.behandlinger.avsluttUtenVedtak(
-                    vedtaksperiode.arbeidsgiver, aktivitetslogg, forsøkÅLageUtbetalingstidslinje(
-                    vedtaksperiode
-                )
-                )
-            }
+            if (!aktivitetslogg.harFunksjonelleFeilEllerVerre()) return
+            if (vedtaksperiode.arbeidsgiver.kanForkastes(vedtaksperiode, aktivitetslogg))
+                return vedtaksperiode.forkast(dager.hendelse, aktivitetslogg)
+            return vedtaksperiode.behandlinger.avsluttUtenVedtak(
+                vedtaksperiode.arbeidsgiver, aktivitetslogg, forsøkÅLageUtbetalingstidslinje(vedtaksperiode)
+            )
         }
 
         override fun håndter(

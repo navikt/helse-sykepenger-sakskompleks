@@ -261,7 +261,6 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
         assertEquals(AVSLUTTET_UTEN_VEDTAK, inspektør.vedtaksperioder(1.vedtaksperiode).inspektør.behandlinger.last().tilstand)
     }
 
-
     @Test
     fun `korrigerer arbeidsgiverperiode etter utbetalt`() {
         nyttVedtak(1.januar til 25.januar)
@@ -300,7 +299,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
         assertSisteTilstand(3.vedtaksperiode, AVVENTER_BLOKKERENDE_PERIODE)
 
         assertVarsel(RV_IM_3, 2.vedtaksperiode.filter())
-        assertVarsel(RV_IM_3, 3.vedtaksperiode.filter())
+        assertIngenVarsel(RV_IM_3, 3.vedtaksperiode.filter())
     }
 
     @Test
@@ -321,17 +320,8 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
 
         assertEquals(listOf(1.januar til 15.januar, 22.januar til 22.januar), inspektør.arbeidsgiverperioder(2.vedtaksperiode))
         assertEquals("PNNNNHH NNNNNHH N", inspektør.utbetalingstidslinjer(2.vedtaksperiode).toString())
-        assertVarsel(RV_IM_3, 3.vedtaksperiode.filter()) // Siste periode som håndterer dager fra IM får varsel (6.feb)
-
-        assertForventetFeil(
-            forklaring = """
-                Vedtaksperiode hvor vi er uenig om arbeidsgiverperioden kan bli automatisert ettersom varsel legges på perioden etter.
-                Slår heller ikke til å på sjekken hvor det er minst én ukedag mellom beregnet agp og vedtaksperioden ettersom det 
-                den her inneholder en agp-dag. Samme ville skjedd om det var kant-i-kant.
-            """,
-            nå = { assertIngenVarsler(2.vedtaksperiode.filter()) },
-            ønsket = { assertVarsel(RV_IM_3, 2.vedtaksperiode.filter()) }
-        )
+        assertVarsel(RV_IM_3, 2.vedtaksperiode.filter()) // Siste periode som håndterer dager fra IM får varsel (6.feb)
+        assertIngenVarsel(RV_IM_3, 3.vedtaksperiode.filter()) // Siste periode som håndterer dager fra IM får varsel (6.feb)
     }
 
     @Test
@@ -1624,7 +1614,6 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
         )
 
         assertInntektForDato(INNTEKT + 1000.månedlig, 1.januar, inspektør = inspektør)
-
     }
 
     @Test
@@ -2198,7 +2187,6 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
         assertIngenVarsler(2.vedtaksperiode.filter())
     }
 
-
     @Test
     fun `arbeidsgiveperiode i forkant av vedtaksperiode med en dags gap`() {
         håndterSykmelding(Sykmeldingsperiode(6.februar, 28.februar))
@@ -2238,7 +2226,6 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
             assertEquals(30000.månedlig, it.inntektsopplysning.fastsattÅrsinntekt())
             assertEquals(no.nav.helse.person.inntekt.Inntektsmelding::class, it.inntektsopplysning::class)
         }
-
     }
 
     @Test
@@ -2356,7 +2343,8 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
         assertTrue(avvistDag is Utbetalingsdag.AvvistDag)
         assertEquals(listOf(Begrunnelse.EgenmeldingUtenforArbeidsgiverperiode), vedtaksperiode.utbetalingstidslinje.inspektør.begrunnelse(8.februar))
 
-        assertForventetFeil("Arbeidsgiver oppgir en egenmeldingsdag som er innenfor 16 dager til forrige periode. Da anser ikke vi det som Arbeidsgiverdag. Spleis bruker feilaktig 8. februar i gap-beregning og tror 2. vedtaksperiode ikke skal få ny AGP.",
+        assertForventetFeil(
+            "Arbeidsgiver oppgir en egenmeldingsdag som er innenfor 16 dager til forrige periode. Da anser ikke vi det som Arbeidsgiverdag. Spleis bruker feilaktig 8. februar i gap-beregning og tror 2. vedtaksperiode ikke skal få ny AGP.",
             nå = {
                 assertTrue((20.februar til 7.mars).all { vedtaksperiode.utbetalingstidslinje[it] is Utbetalingsdag.NavDag || vedtaksperiode.utbetalingstidslinje[it] is Utbetalingsdag.NavHelgDag })
             },
@@ -2409,5 +2397,4 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
 
         assertFalse(refusjonsopplysninger.erTom)
     }
-
 }

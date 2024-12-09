@@ -39,6 +39,7 @@ import no.nav.helse.person.TilstandType.AVVENTER_SIMULERING
 import no.nav.helse.person.TilstandType.AVVENTER_SIMULERING_REVURDERING
 import no.nav.helse.person.TilstandType.AVVENTER_VILKÅRSPRØVING
 import no.nav.helse.person.TilstandType.TIL_UTBETALING
+import no.nav.helse.person.aktivitetslogg.Varselkode
 import no.nav.helse.person.beløp.Beløpstidslinje
 import no.nav.helse.person.beløp.BeløpstidslinjeTest.Companion.assertBeløpstidslinje
 import no.nav.helse.person.beløp.BeløpstidslinjeTest.Companion.beløpstidslinje
@@ -65,7 +66,8 @@ internal class RefusjonsopplysningerPåBehandlingE2ETest : AbstractDslTest() {
             håndterSøknad(17.januar til 21.januar)
             håndterInntektsmeldingPortal(listOf(tirsdag(23.januar) til 7.februar), vedtaksperiodeId = 2.vedtaksperiode)
             assertSisteTilstand(2.vedtaksperiode, AVVENTER_VILKÅRSPRØVING)
-            assertIngenVarsler(2.vedtaksperiode.filter()) // Ingen har jo håndtert disse dagene, så ikke noe varsel
+            assertIngenVarsler(1.vedtaksperiode.filter())
+            assertVarsel(Varselkode.RV_IM_3, 2.vedtaksperiode.filter())
         }
     }
 
@@ -227,7 +229,6 @@ internal class RefusjonsopplysningerPåBehandlingE2ETest : AbstractDslTest() {
             assertEquals(forventetBruktForMars, inspektør.vedtaksperioder(3.vedtaksperiode).refusjonstidslinje)
         }
     }
-
 
     @Test
     fun `saksbehandler opplyser om endring i refusjon frem i tid`() {
@@ -692,7 +693,6 @@ internal class RefusjonsopplysningerPåBehandlingE2ETest : AbstractDslTest() {
             assertEquals(Beløpstidslinje.fra(februar, INNTEKT, kilde), refusjonstidslinjeVedtaksperiode2)
         }
     }
-
 
     @Test
     fun `Må kunne videreføre refusjonsopplysninger når det kommer søknad som bridger gap'et som før var der`() {

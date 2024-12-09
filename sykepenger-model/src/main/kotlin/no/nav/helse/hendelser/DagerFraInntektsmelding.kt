@@ -81,7 +81,6 @@ internal class DagerFraInntektsmelding(
             return false
         }
     private var harValidert: Periode? = null
-
     private fun lagSykdomstidslinje(): Sykdomstidslinje {
         return tidslinjeForArbeidsgiverperioden() ?: tidslinjeForFørsteFraværsdag()
     }
@@ -126,9 +125,7 @@ internal class DagerFraInntektsmelding(
 
     private fun arbeidsgiverdager(periode: Periode) = Sykdomstidslinje.arbeidsgiverdager(periode.start, periode.endInclusive, 100.prosent, kilde)
     private fun sykedagerNav(periode: Periode) = Sykdomstidslinje.sykedagerNav(periode.start, periode.endInclusive, 100.prosent, kilde)
-
     internal fun alleredeHåndtert(behandlinger: Behandlinger) = behandlinger.dokumentHåndtert(dokumentsporing)
-
     internal fun vurdertTilOgMed(dato: LocalDate) {
         _gjenståendeDager.removeAll { gjenstående -> gjenstående <= dato }
     }
@@ -143,9 +140,7 @@ internal class DagerFraInntektsmelding(
     }
 
     private fun overlappendeDager(periode: Periode) = periode.intersect(_gjenståendeDager)
-
     private fun periodeRettFør(periode: Periode) = _gjenståendeDager.periodeRettFør(periode.start)
-
     private fun skalHåndtere(periode: Periode): Boolean {
         val overlapperMedVedtaksperiode = overlappendeDager(periode).isNotEmpty()
         val periodeRettFør = periodeRettFør(periode) != null
@@ -179,7 +174,6 @@ internal class DagerFraInntektsmelding(
     }
 
     internal fun harBlittHåndtertAv(periode: Periode) = håndterteDager.any { it in periode }
-
     internal fun bitAvInntektsmelding(aktivitetslogg: IAktivitetslogg, vedtaksperiode: Periode): BitAvInntektsmelding? {
         val sykdomstidslinje = håndterDager(aktivitetslogg, vedtaksperiode) ?: return null
         return BitAvInntektsmelding(hendelse.metadata, sykdomstidslinje)
@@ -223,6 +217,10 @@ internal class DagerFraInntektsmelding(
 
     internal fun valider(aktivitetslogg: IAktivitetslogg, periode: Periode, gammelAgp: Arbeidsgiverperiode? = null) {
         if (!skalValideresAv(periode)) return
+        validerPortal(aktivitetslogg, gammelAgp)
+    }
+
+    internal fun validerPortal(aktivitetslogg: IAktivitetslogg, gammelAgp: Arbeidsgiverperiode? = null) {
         if (harOpphørAvNaturalytelser) aktivitetslogg.funksjonellFeil(Varselkode.RV_IM_7)
         if (harFlereInntektsmeldinger) aktivitetslogg.varsel(Varselkode.RV_IM_22)
         validerBegrunnelseForReduksjonEllerIkkeUtbetalt(aktivitetslogg)
@@ -249,6 +247,10 @@ internal class DagerFraInntektsmelding(
 
     internal fun validerArbeidsgiverperiode(aktivitetslogg: IAktivitetslogg, periode: Periode, beregnetArbeidsgiverperiode: Arbeidsgiverperiode?) {
         if (!skalValideresAv(periode)) return
+        validerArbeidsgiverperiodePortal(aktivitetslogg, periode, beregnetArbeidsgiverperiode)
+    }
+
+    internal fun validerArbeidsgiverperiodePortal(aktivitetslogg: IAktivitetslogg, periode: Periode, beregnetArbeidsgiverperiode: Arbeidsgiverperiode?) {
         if (_gjenståendeDager.isNotEmpty()) return validator.validerFeilaktigNyArbeidsgiverperiode(aktivitetslogg, periode, beregnetArbeidsgiverperiode)
         if (beregnetArbeidsgiverperiode != null) validerArbeidsgiverperiode(aktivitetslogg, beregnetArbeidsgiverperiode)
         if (arbeidsgiverperioder.isEmpty()) aktivitetslogg.info("Inntektsmeldingen mangler arbeidsgiverperiode. Vurder om vilkårene for sykepenger er oppfylt, og om det skal være arbeidsgiverperiode")

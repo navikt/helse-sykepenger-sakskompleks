@@ -234,9 +234,19 @@ class Inntektsmelding(
         )
     }
 
-    internal fun ferdigstillPortalIM() {
-        check(håndtertInntekt) {
-            "portalinntektsmelding er ikke håndtert, selv om vedtaksperioden er aktiv. Er den sendt inn i en annen tilstand enn AvIM?"
+    internal fun ferdigstillPortalIM(person: Person) {
+        check(avsendersystem is Avsendersystem.NavPortal)
+
+        when (avsendersystem.forespurt) {
+            true -> check(håndtertInntekt) {
+                "portalinntektsmelding er ikke håndtert, selv om vedtaksperioden er aktiv. Er den sendt inn i en annen tilstand enn AvIM?"
+            }
+
+            else -> {
+                if (!håndtertInntekt) {
+                    person.emitInntektsmeldingIkkeHåndtert(this, behandlingsporing.organisasjonsnummer, true)
+                }
+            }
         }
     }
 

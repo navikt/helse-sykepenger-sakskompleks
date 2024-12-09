@@ -275,7 +275,6 @@ internal class Arbeidsgiver private constructor(
             }
         }
 
-
         internal fun Iterable<Arbeidsgiver>.avventerSøknad(periode: Periode) = this
             .any { it.sykmeldingsperioder.avventerSøknad(periode) }
 
@@ -371,7 +370,6 @@ internal class Arbeidsgiver private constructor(
         vedtaksperioder.migrerRefusjonsopplysningerPåBehandlinger(aktivitetslogg, organisasjonsnummer)
 
     private fun erSammeYrkesaktivitet(yrkesaktivitet: Yrkesaktivitet) = this.yrkesaktivitet == yrkesaktivitet
-
     internal fun refusjonsopplysninger(skjæringstidspunkt: LocalDate) =
         refusjonshistorikk.refusjonsopplysninger(skjæringstidspunkt)
 
@@ -395,9 +393,7 @@ internal class Arbeidsgiver private constructor(
     }
 
     internal fun organisasjonsnummer() = organisasjonsnummer
-
     internal fun utbetaling() = utbetalinger.lastOrNull()
-
     internal fun grunnlagForFeriepenger() = Arbeidsgiverferiepengegrunnlag(
         orgnummer = organisasjonsnummer,
         utbetalinger = utbetalinger.grunnlagForFeriepenger()
@@ -538,13 +534,13 @@ internal class Arbeidsgiver private constructor(
             aktivitetslogg,
             vedtaksperiode
         )
-                || arbeidsgivere.any {
+            || arbeidsgivere.any {
             it !== this && it.harForkastetVedtaksperiodeSomBlokkererBehandling(
                 aktivitetslogg,
                 vedtaksperiode
             )
         }
-                || ForkastetVedtaksperiode.harKortGapTilForkastet(forkastede, aktivitetslogg, vedtaksperiode)
+            || ForkastetVedtaksperiode.harKortGapTilForkastet(forkastede, aktivitetslogg, vedtaksperiode)
     }
 
     private fun harForkastetVedtaksperiodeSomBlokkererBehandling(
@@ -552,8 +548,8 @@ internal class Arbeidsgiver private constructor(
         vedtaksperiode: Vedtaksperiode
     ): Boolean {
         return ForkastetVedtaksperiode.forlengerForkastet(forkastede, aktivitetslogg, vedtaksperiode)
-                || ForkastetVedtaksperiode.harOverlappendeForkastetPeriode(forkastede, vedtaksperiode, aktivitetslogg)
-                || ForkastetVedtaksperiode.harNyereForkastetPeriode(forkastede, vedtaksperiode, aktivitetslogg)
+            || ForkastetVedtaksperiode.harOverlappendeForkastetPeriode(forkastede, vedtaksperiode, aktivitetslogg)
+            || ForkastetVedtaksperiode.harNyereForkastetPeriode(forkastede, vedtaksperiode, aktivitetslogg)
     }
 
     internal fun håndter(
@@ -599,6 +595,7 @@ internal class Arbeidsgiver private constructor(
         when (inntektsmelding.avsendersystem) {
             is Inntektsmelding.Avsendersystem.Altinn,
             is Inntektsmelding.Avsendersystem.LPS -> håndterKlassiskInntektsmelding(inntektsmelding, aktivitetslogg, vedtaksperiodeIdForReplay)
+
             is Inntektsmelding.Avsendersystem.NavPortal -> håndterPortalInntektsmelding(inntektsmelding, aktivitetslogg)
         }
     }
@@ -616,7 +613,8 @@ internal class Arbeidsgiver private constructor(
             inntektsmelding,
             aktivitetslogg,
             inntektsmelding.refusjonsservitør
-        ())
+            ()
+        )
 
         val dagoverstyring = dager.revurderingseventyr()
         val refusjonsoverstyring = vedtaksperioder.refusjonseventyr(inntektsmelding)
@@ -641,7 +639,7 @@ internal class Arbeidsgiver private constructor(
                     aktivitetslogg = aktivitetslogg
                 )
             }) {
-            return inntektsmelding.ferdigstillPortalIM()
+            return inntektsmelding.ferdigstillPortalIM(person)
         }
 
         // portalinntektsmelding traff ingen aktive vedtaksperiode
@@ -1079,9 +1077,9 @@ internal class Arbeidsgiver private constructor(
     private fun subsumsjonsloggMedInntektsmeldingkontekst(inntektsmelding: Inntektsmelding) =
         BehandlingSubsumsjonslogg(
             subsumsjonslogg, listOf(
-                Subsumsjonskontekst(KontekstType.Fødselsnummer, person.personidentifikator.toString()),
-                Subsumsjonskontekst(KontekstType.Organisasjonsnummer, organisasjonsnummer)
-            ) + inntektsmelding.subsumsjonskontekst()
+            Subsumsjonskontekst(KontekstType.Fødselsnummer, person.personidentifikator.toString()),
+            Subsumsjonskontekst(KontekstType.Organisasjonsnummer, organisasjonsnummer)
+        ) + inntektsmelding.subsumsjonskontekst()
         )
 
     internal fun lagreTidsnærInntektsmelding(
@@ -1239,7 +1237,6 @@ internal class Arbeidsgiver private constructor(
     }
 
     internal fun vedtaksperioderEtter(dato: LocalDate) = vedtaksperioder.filter { it.slutterEtter(dato) }
-
     internal fun dto(nestemann: Vedtaksperiode?): ArbeidsgiverUtDto {
         val vedtaksperioderDto = vedtaksperioder.map { it.dto(nestemann) }
         val refusjonsopplysningerPåSisteBehandling = vedtaksperioder.lastOrNull()?.let { sisteVedtaksperiode ->

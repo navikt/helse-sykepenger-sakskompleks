@@ -624,7 +624,7 @@ internal class SubsumsjonE2ETest : AbstractEndToEndTest() {
     fun `§ 8-10 ledd 3 - årlig inntekt omregnet til daglig`() {
         val inntekt = 260000.årlig
         håndterSykmelding(januar)
-        håndterSøknad(januar)
+        val søknad = håndterSøknad(januar)
         val im = håndterInntektsmelding(
             listOf(1.januar til 16.januar),
             beregnetInntekt = inntekt,
@@ -638,6 +638,9 @@ internal class SubsumsjonE2ETest : AbstractEndToEndTest() {
             sporing = listOf(
                 Subsumsjonskontekst(KontekstType.Fødselsnummer, UNG_PERSON_FNR_2018.toString()),
                 Subsumsjonskontekst(KontekstType.Organisasjonsnummer, ORGNUMMER),
+                Subsumsjonskontekst(KontekstType.Vedtaksperiode, 1.vedtaksperiode.id(ORGNUMMER).toString()),
+                Subsumsjonskontekst(KontekstType.Søknad, søknad.toString()),
+                Subsumsjonskontekst(KontekstType.Inntektsmelding, im.toString()),
                 Subsumsjonskontekst(KontekstType.Inntektsmelding, im.toString())
             ),
             input = mapOf("årligInntekt" to 260000.0),
