@@ -62,11 +62,10 @@ class Inntektsmelding(
     private val arbeidsgiverperioder = arbeidsgiverperioder.grupperSammenhengendePerioder()
     private var håndtertInntekt = false
     val dokumentsporing = Dokumentsporing.inntektsmeldingInntekt(meldingsreferanseId)
-
-    fun korrigertInntekt(refusjonsdato: LocalDate = type.refusjonsdato(this)) = KorrigertInntektOgRefusjon(
+    fun korrigertInntekt(inntektsdato: LocalDate = type.inntektsdato(this), refusjonsdato: LocalDate = type.refusjonsdato(this)) = KorrigertInntektOgRefusjon(
         hendelse = this,
         organisasjonsnummer = orgnummer,
-        inntekt = InntektsmeldingInntekt(type.inntektsdato(this), metadata.meldingsreferanseId, beregnetInntekt),
+        inntekt = InntektsmeldingInntekt(inntektsdato, metadata.meldingsreferanseId, beregnetInntekt),
         refusjonsopplysninger = Refusjonshistorikk().apply {
             leggTilRefusjon(refusjonsElement(refusjonsdato))
         }.refusjonsopplysninger(refusjonsdato)
@@ -86,6 +85,7 @@ class Inntektsmelding(
         inntektshistorikk.leggTil(InntektsmeldingInntekt(inntektsdato, metadata.meldingsreferanseId, beregnetInntekt))
         return inntektsdato
     }
+
     internal fun addPortalInntekt(inntektsdato: LocalDate, inntektshistorikk: Inntektshistorikk, subsumsjonslogg: Subsumsjonslogg): LocalDate {
         check(avsendersystem is Avsendersystem.NavPortal)
         subsumsjonslogg.logg(`§ 8-10 ledd 3`(beregnetInntekt.årlig, beregnetInntekt.daglig))
@@ -94,31 +94,34 @@ class Inntektsmelding(
     }
 
     internal fun skjæringstidspunkt(person: Person) = type.skjæringstidspunkt(this, person)
-
     private fun refusjonsElement(refusjonsdato: LocalDate? = null) = Refusjonshistorikk.Refusjon(
-                meldingsreferanseId = metadata.meldingsreferanseId,
-                førsteFraværsdag = when (avsendersystem) {
+        meldingsreferanseId = metadata.meldingsreferanseId,
+        førsteFraværsdag = when (avsendersystem) {
             is Avsendersystem.Altinn,
             is Avsendersystem.LPS -> type.refusjonsdato(this)
+
             is Avsendersystem.NavPortal -> checkNotNull(refusjonsdato)
         },
-                arbeidsgiverperioder = arbeidsgiverperioder,
-                beløp = refusjon.beløp,
-                sisteRefusjonsdag = refusjon.opphørsdato,
-                endringerIRefusjon = refusjon.endringerIRefusjon.map { it.tilEndring() },
-                tidsstempel = metadata.registrert
-        )
+        arbeidsgiverperioder = arbeidsgiverperioder,
+        beløp = refusjon.beløp,
+        sisteRefusjonsdag = refusjon.opphørsdato,
+        endringerIRefusjon = refusjon.endringerIRefusjon.map { it.tilEndring() },
+        tidsstempel = metadata.registrert
+    )
 
     internal fun refusjonsservitør(refusjonsdato: LocalDate? = null): Refusjonsservitør {
-        return Refusjonsservitør.fra(refusjon.refusjonstidslinje(
-            refusjonsdato = when (avsendersystem) {
-                is Avsendersystem.Altinn,
-                is Avsendersystem.LPS -> type.refusjonsdato(this)
-                is Avsendersystem.NavPortal -> checkNotNull(refusjonsdato)
-            },
-            meldingsreferanseId = metadata.meldingsreferanseId,
-            tidsstempel = metadata.innsendt
-        ))
+        return Refusjonsservitør.fra(
+            refusjon.refusjonstidslinje(
+                refusjonsdato = when (avsendersystem) {
+                    is Avsendersystem.Altinn,
+                    is Avsendersystem.LPS -> type.refusjonsdato(this)
+
+                    is Avsendersystem.NavPortal -> checkNotNull(refusjonsdato)
+                },
+                meldingsreferanseId = metadata.meldingsreferanseId,
+                tidsstempel = metadata.innsendt
+            )
+        )
     }
 
     internal fun leggTilRefusjon(refusjonshistorikk: Refusjonshistorikk) {
@@ -198,6 +201,7 @@ class Inntektsmelding(
                 harOpphørAvNaturalytelser = harOpphørAvNaturalytelser,
                 hendelse = this
             )
+
             is Avsendersystem.NavPortal -> DagerFraInntektsmelding(
                 arbeidsgiverperioder = this.arbeidsgiverperioder,
                 førsteFraværsdag = null,
@@ -242,9 +246,7 @@ class Inntektsmelding(
     )
 
     internal fun skalOppdatereVilkårsgrunnlag(sykdomstidslinjeperiode: Periode?) = type.skalOppdatereVilkårsgrunnlag(this, sykdomstidslinjeperiode)
-
     private lateinit var type: Type
-
     internal fun valider(vedtaksperioder: List<Vedtaksperiode>, aktivitetslogg: IAktivitetslogg, inntektsmeldingIkkeHåndtert: (inntektsmelding: Inntektsmelding, orgnr: String, harPeriodeInnenfor16Dager: Boolean) -> Unit): Boolean {
         val førsteValidering = !::type.isInitialized
         this.type = when (avsendersystem) {

@@ -1590,9 +1590,20 @@ internal class Vedtaksperiode private constructor(
 
         inntektsmelding.leggTilPortalRefusjon(startdatoPåSammenhengendeVedtaksperioder, refusjonshistorikk)
         inntektsmelding.addPortalInntekt(skjæringstidspunkt, inntektshistorikk, jurist)
+
+        val overstyringseventyr = person.nyeArbeidsgiverInntektsopplysninger(
+            skjæringstidspunkt = skjæringstidspunkt,
+            korrigertInntektsmelding = inntektsmelding.korrigertInntekt(
+                inntektsdato = skjæringstidspunkt,
+                refusjonsdato = startdatoPåSammenhengendeVedtaksperioder
+            ),
+            aktivitetslogg = aktivitetslogg,
+            subsumsjonslogg = subsumsjonslogg
+        )
+
         inntektsmeldingHåndtert(inntektsmelding)
 
-        person.igangsettOverstyring(eventyr, aktivitetslogg)
+        person.igangsettOverstyring(Revurderingseventyr.tidligsteEventyr(eventyr, overstyringseventyr)!!, aktivitetslogg)
     }
 
     internal sealed class ArbeidsgiveropplysningerStrategi {
@@ -4082,38 +4093,38 @@ internal class Vedtaksperiode private constructor(
         return result.copy(
             overlappendeInfotrygdperioder = result.overlappendeInfotrygdperioder.plusElement(
                 PersonObserver.OverlappendeInfotrygdperiodeEtterInfotrygdendring(
-                organisasjonsnummer = arbeidsgiver.organisasjonsnummer,
-                vedtaksperiodeId = this.id,
-                kanForkastes = arbeidsgiver.kanForkastes(this, Aktivitetslogg()),
-                vedtaksperiodeFom = this.periode.start,
-                vedtaksperiodeTom = this.periode.endInclusive,
-                vedtaksperiodetilstand = tilstand.type.name,
-                infotrygdperioder = overlappende.map {
-                    when (it) {
-                        is Friperiode -> PersonObserver.OverlappendeInfotrygdperiodeEtterInfotrygdendring.Infotrygdperiode(
-                            fom = it.periode.start,
-                            tom = it.periode.endInclusive,
-                            type = "FRIPERIODE",
-                            orgnummer = null
-                        )
+                    organisasjonsnummer = arbeidsgiver.organisasjonsnummer,
+                    vedtaksperiodeId = this.id,
+                    kanForkastes = arbeidsgiver.kanForkastes(this, Aktivitetslogg()),
+                    vedtaksperiodeFom = this.periode.start,
+                    vedtaksperiodeTom = this.periode.endInclusive,
+                    vedtaksperiodetilstand = tilstand.type.name,
+                    infotrygdperioder = overlappende.map {
+                        when (it) {
+                            is Friperiode -> PersonObserver.OverlappendeInfotrygdperiodeEtterInfotrygdendring.Infotrygdperiode(
+                                fom = it.periode.start,
+                                tom = it.periode.endInclusive,
+                                type = "FRIPERIODE",
+                                orgnummer = null
+                            )
 
-                        is ArbeidsgiverUtbetalingsperiode -> PersonObserver.OverlappendeInfotrygdperiodeEtterInfotrygdendring.Infotrygdperiode(
-                            fom = it.periode.start,
-                            tom = it.periode.endInclusive,
-                            type = "ARBEIDSGIVERUTBETALING",
-                            orgnummer = it.orgnr
-                        )
+                            is ArbeidsgiverUtbetalingsperiode -> PersonObserver.OverlappendeInfotrygdperiodeEtterInfotrygdendring.Infotrygdperiode(
+                                fom = it.periode.start,
+                                tom = it.periode.endInclusive,
+                                type = "ARBEIDSGIVERUTBETALING",
+                                orgnummer = it.orgnr
+                            )
 
-                        is PersonUtbetalingsperiode -> PersonObserver.OverlappendeInfotrygdperiodeEtterInfotrygdendring.Infotrygdperiode(
-                            fom = it.periode.start,
-                            tom = it.periode.endInclusive,
-                            type = "PERSONUTBETALING",
-                            orgnummer = it.orgnr
-                        )
+                            is PersonUtbetalingsperiode -> PersonObserver.OverlappendeInfotrygdperiodeEtterInfotrygdendring.Infotrygdperiode(
+                                fom = it.periode.start,
+                                tom = it.periode.endInclusive,
+                                type = "PERSONUTBETALING",
+                                orgnummer = it.orgnr
+                            )
+                        }
                     }
-                }
-            )
-        ))
+                )
+            ))
     }
 
     internal fun dto(nestemann: Vedtaksperiode?) = VedtaksperiodeUtDto(
