@@ -17,6 +17,7 @@ import no.nav.helse.etterlevelse.BehandlingSubsumsjonslogg
 import no.nav.helse.etterlevelse.KontekstType
 import no.nav.helse.etterlevelse.Subsumsjonskontekst
 import no.nav.helse.etterlevelse.Subsumsjonslogg
+import no.nav.helse.forrigeDag
 import no.nav.helse.hendelser.AnmodningOmForkasting
 import no.nav.helse.hendelser.AnnullerUtbetaling
 import no.nav.helse.hendelser.AvbruttSøknad
@@ -38,6 +39,7 @@ import no.nav.helse.hendelser.OverstyrArbeidsforhold
 import no.nav.helse.hendelser.OverstyrArbeidsgiveropplysninger
 import no.nav.helse.hendelser.OverstyrTidslinje
 import no.nav.helse.hendelser.Periode
+import no.nav.helse.hendelser.Periode.Companion.periode
 import no.nav.helse.hendelser.PersonPåminnelse
 import no.nav.helse.hendelser.Påminnelse
 import no.nav.helse.hendelser.Simulering
@@ -58,6 +60,7 @@ import no.nav.helse.hendelser.Vilkårsgrunnlag
 import no.nav.helse.hendelser.Ytelser
 import no.nav.helse.hendelser.avvist
 import no.nav.helse.hendelser.til
+import no.nav.helse.nesteDag
 import no.nav.helse.person.Behandlinger.Behandling.Companion.berik
 import no.nav.helse.person.Behandlinger.Behandling.Companion.dokumentsporing
 import no.nav.helse.person.Behandlinger.Behandling.Companion.erUtbetaltPåForskjelligeUtbetalinger
@@ -163,6 +166,7 @@ internal class Behandlinger private constructor(behandlinger: List<Behandling>) 
     internal fun kanForkastes(aktivitetslogg: IAktivitetslogg, arbeidsgiverUtbetalinger: List<Utbetaling>) =
         behandlinger.last().kanForkastes(aktivitetslogg, arbeidsgiverUtbetalinger)
 
+    internal fun harFlereSkjæringstidspunkt() = behandlinger.last().harFlereSkjæringstidspunkt()
     internal fun håndterUtbetalinghendelse(hendelse: UtbetalingHendelse, aktivitetslogg: IAktivitetslogg) = behandlinger.any { it.håndterUtbetalinghendelse(hendelse, aktivitetslogg) }
     internal fun behandlingVenter(builder: VedtaksperiodeVenter.Builder) {
         behandlinger.last().behandlingVenter(builder)
@@ -1138,6 +1142,39 @@ internal class Behandlinger private constructor(behandlinger: List<Behandling>) 
 
         fun kanForkastes(aktivitetslogg: IAktivitetslogg, arbeidsgiverUtbetalinger: List<Utbetaling>): Boolean {
             return tilstand.kanForkastes(this, aktivitetslogg, arbeidsgiverUtbetalinger)
+        }
+
+        fun harFlereSkjæringstidspunkt(): Boolean {
+            // ett eller færre skjæringstidspunkter er ok
+            if (skjæringstidspunkter.size <= 1) return false
+            val arbeidsgiverperioden = arbeidsgiverperiode.periode()
+            if (arbeidsgiverperioden == null) return false
+            val skjæringstidspunkterEtterAgp = skjæringstidspunkter.filter {
+                it > arbeidsgiverperioden.endInclusive
+            }
+
+            // hvis perioden har flere skjæringstidspunkter, men ingen er utenfor agp så er det greit
+            if (skjæringstidspunkterEtterAgp.isEmpty()) return false
+            // hvis perioden har flere skjæringstidspunkter etter agp så er det noe muffins
+            if (skjæringstidspunkterEtterAgp.size > 1) return true
+
+            // hvis perioden har ett skjæringstidspunkt utenfor agp må vi sjekke
+            // om det er sykedager mellom agp og skjæringstidspunktet. Perioden kan jo
+            // ha blitt strukket tilbake for å hensynta agp-dagene, og da vil perioden ha
+            // skjæringstidspunkt utenfor agp (men det er helt ok!)
+            val ekstraSkjæringstidspunkt = skjæringstidspunkterEtterAgp.single()
+            if (ekstraSkjæringstidspunkt == periode.start) return false
+            val mellomliggendePeriode = arbeidsgiverperioden
+                .periodeMellom(ekstraSkjæringstidspunkt)
+                ?.subset(periode)
+                ?: return false
+
+            // sjekker om det finnes en dagtype som gir rett på utbetaling mellom agp og det ekstra skjæringstidspunktet
+            val harSykdomMellomAGPOgSkjæringstidspunktet = sykdomstidslinje()
+                .subset(mellomliggendePeriode)
+                .any { dag -> dag is Sykedag || dag is SykedagNav }
+
+            return harSykdomMellomAGPOgSkjæringstidspunktet
         }
 
         private fun behandlingLukket(arbeidsgiver: Arbeidsgiver) {

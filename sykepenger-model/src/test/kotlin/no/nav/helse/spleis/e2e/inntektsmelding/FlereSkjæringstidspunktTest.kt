@@ -1,23 +1,31 @@
 package no.nav.helse.spleis.e2e.inntektsmelding
 
 import no.nav.helse.august
+import no.nav.helse.desember
 import no.nav.helse.dsl.AbstractDslTest
+import no.nav.helse.dsl.TestPerson.Companion.INNTEKT
 import no.nav.helse.dsl.UgyldigeSituasjonerObservatør.Companion.assertUgyldigSituasjon
 import no.nav.helse.dsl.nyttVedtak
 import no.nav.helse.februar
+import no.nav.helse.fredag
+import no.nav.helse.til
+import no.nav.helse.den
 import no.nav.helse.hendelser.Søknad.Søknadsperiode.Arbeid
 import no.nav.helse.hendelser.Søknad.Søknadsperiode.Sykdom
 import no.nav.helse.hendelser.til
 import no.nav.helse.inspectors.inspektør
 import no.nav.helse.januar
+import no.nav.helse.mandag
 import no.nav.helse.mars
 import no.nav.helse.person.TilstandType
 import no.nav.helse.person.TilstandType.AVVENTER_BLOKKERENDE_PERIODE
 import no.nav.helse.person.TilstandType.AVVENTER_GODKJENNING
+import no.nav.helse.person.TilstandType.AVVENTER_VILKÅRSPRØVING
 import no.nav.helse.person.TilstandType.TIL_INFOTRYGD
 import no.nav.helse.person.aktivitetslogg.Varselkode
 import no.nav.helse.september
 import no.nav.helse.spleis.e2e.AktivitetsloggFilter.Companion.filter
+import no.nav.helse.torsdag
 import no.nav.helse.økonomi.Prosentdel.Companion.prosent
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
@@ -36,7 +44,24 @@ internal class FlereSkjæringstidspunktTest : AbstractDslTest() {
                 )
             }
 
+            assertEquals(listOf(21.januar, 1.januar), inspektør.skjæringstidspunkter(1.vedtaksperiode))
             assertSisteTilstand(1.vedtaksperiode, TilstandType.AVVENTER_REVURDERING)
+        }
+    }
+
+    @Test
+    fun `inntektsmelding strekkes tilbake til å dekke arbeidsgiverperiode om det er helg mellom`() {
+        a1 {
+            håndterSøknad(mandag den 22.januar til 15.februar)
+            håndterInntektsmelding(
+                førsteFraværsdag = 22.januar,
+                arbeidsgiverperioder = listOf(torsdag den 4.januar til fredag den 19.januar),
+                beregnetInntekt = INNTEKT
+            )
+            assertEquals(22.januar, inspektør.skjæringstidspunkt(1.vedtaksperiode))
+            assertEquals(listOf(22.januar, 4.januar), inspektør.skjæringstidspunkter(1.vedtaksperiode))
+            assertEquals(4.januar til 15.februar, inspektør.vedtaksperioder(1.vedtaksperiode).periode)
+            assertSisteTilstand(1.vedtaksperiode, AVVENTER_VILKÅRSPRØVING)
         }
     }
 

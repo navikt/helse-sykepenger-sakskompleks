@@ -275,21 +275,6 @@ internal class KunEnArbeidsgiverTest : AbstractDslTest() {
     }
 
     @Test
-    fun `vedtaksperioder som avventer inntektsmelding strekkes tilbake til å dekke arbeidsgiverperiode om det er helg mellom`() {
-        nyPeriode(januar, a1)
-        assertSisteTilstand(1.vedtaksperiode, AVVENTER_INNTEKTSMELDING)
-        assertEquals(januar, inspektør.vedtaksperioder(1.vedtaksperiode).periode)
-        håndterInntektsmelding(
-            førsteFraværsdag = 1.januar,
-            arbeidsgiverperioder = listOf(14.desember(2017) til 29.desember(2017)),
-            beregnetInntekt = INNTEKT
-        )
-        assertSisteTilstand(1.vedtaksperiode, AVVENTER_VILKÅRSPRØVING)
-        assertEquals(1.januar, inspektør.skjæringstidspunkt(1.vedtaksperiode))
-        assertEquals(14.desember(2017) til 31.januar, inspektør.vedtaksperioder(1.vedtaksperiode).periode)
-    }
-
-    @Test
     fun `inntektsmeldingen padder ikke senere vedtaksperioder med arbeidsdager`() {
         håndterSykmelding(Sykmeldingsperiode(4.januar, 22.januar))
         håndterSøknad(Sykdom(4.januar, 22.januar, 100.prosent))

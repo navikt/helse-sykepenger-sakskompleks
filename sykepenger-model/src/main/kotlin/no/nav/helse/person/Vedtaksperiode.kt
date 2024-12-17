@@ -583,6 +583,8 @@ internal class Vedtaksperiode private constructor(
     }
 
     private fun harFlereSkjæringstidspunkt(): Boolean {
+        return behandlinger.harFlereSkjæringstidspunkt()
+
         val arbeidsgiverperiode = finnArbeidsgiverperiode() ?: return false
         if (!arbeidsgiverperiode.forventerInntekt(periode)) return false
         val utbetalingsdagerFørSkjæringstidspunkt =
