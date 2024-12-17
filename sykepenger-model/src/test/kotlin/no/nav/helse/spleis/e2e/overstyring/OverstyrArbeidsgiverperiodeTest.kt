@@ -2,7 +2,6 @@ package no.nav.helse.spleis.e2e.overstyring
 
 import no.nav.helse.april
 import no.nav.helse.dsl.AbstractDslTest
-import no.nav.helse.dsl.UgyldigeSituasjonerObservatør.Companion.assertUgyldigSituasjon
 import no.nav.helse.februar
 import no.nav.helse.hendelser.Dagtype
 import no.nav.helse.hendelser.ManuellOverskrivingDag
@@ -15,12 +14,10 @@ import no.nav.helse.person.TilstandType.AVSLUTTET_UTEN_UTBETALING
 import no.nav.helse.person.TilstandType.AVVENTER_BLOKKERENDE_PERIODE
 import no.nav.helse.person.TilstandType.AVVENTER_GODKJENNING
 import no.nav.helse.person.TilstandType.AVVENTER_HISTORIKK
+import no.nav.helse.person.TilstandType.AVVENTER_HISTORIKK_REVURDERING
 import no.nav.helse.person.TilstandType.AVVENTER_REVURDERING
 import no.nav.helse.person.TilstandType.AVVENTER_SIMULERING
 import no.nav.helse.person.TilstandType.AVVENTER_VILKÅRSPRØVING
-import no.nav.helse.person.Venteårsak.Hva.HJELP
-import no.nav.helse.person.Venteårsak.Hvorfor.FLERE_SKJÆRINGSTIDSPUNKT
-import no.nav.helse.spleis.e2e.VedtaksperiodeVenterTest.Companion.assertVenter
 import no.nav.helse.økonomi.Prosentdel.Companion.prosent
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -47,16 +44,13 @@ internal class OverstyrArbeidsgiverperiodeTest : AbstractDslTest() {
             assertEquals(17.januar til 15.februar, inspektør.periode(1.vedtaksperiode))
             // drar agp tilbake to dager, men glemmer å omgjøre 1. februar til sykdom
             observatør.vedtaksperiodeVenter.clear()
-            assertUgyldigSituasjon("En vedtaksperiode i AVVENTER_REVURDERING trenger hjelp fordi FLERE_SKJÆRINGSTIDSPUNKT!") {
-                håndterOverstyrTidslinje(
-                    listOf(
-                        ManuellOverskrivingDag(15.januar, Dagtype.Sykedag, 100),
-                        ManuellOverskrivingDag(16.januar, Dagtype.Sykedag, 100)
-                    )
+            håndterOverstyrTidslinje(
+                listOf(
+                    ManuellOverskrivingDag(15.januar, Dagtype.Sykedag, 100),
+                    ManuellOverskrivingDag(16.januar, Dagtype.Sykedag, 100)
                 )
-            }
-            observatør.assertVenter(1.vedtaksperiode, venterPåHva = HJELP, fordi = FLERE_SKJÆRINGSTIDSPUNKT)
-            assertTilstander(1.vedtaksperiode, AVSLUTTET, AVVENTER_REVURDERING)
+            )
+            assertTilstander(1.vedtaksperiode, AVSLUTTET, AVVENTER_REVURDERING, AVVENTER_HISTORIKK_REVURDERING)
 
             håndterOverstyrTidslinje(listOf(ManuellOverskrivingDag(1.februar, Dagtype.Sykedag, 100)))
 

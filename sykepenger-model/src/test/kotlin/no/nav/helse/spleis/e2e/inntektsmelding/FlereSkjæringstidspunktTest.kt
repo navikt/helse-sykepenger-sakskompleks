@@ -1,15 +1,12 @@
 package no.nav.helse.spleis.e2e.inntektsmelding
 
 import no.nav.helse.august
-import no.nav.helse.desember
+import no.nav.helse.den
 import no.nav.helse.dsl.AbstractDslTest
 import no.nav.helse.dsl.TestPerson.Companion.INNTEKT
-import no.nav.helse.dsl.UgyldigeSituasjonerObservatør.Companion.assertUgyldigSituasjon
 import no.nav.helse.dsl.nyttVedtak
 import no.nav.helse.februar
 import no.nav.helse.fredag
-import no.nav.helse.til
-import no.nav.helse.den
 import no.nav.helse.hendelser.Søknad.Søknadsperiode.Arbeid
 import no.nav.helse.hendelser.Søknad.Søknadsperiode.Sykdom
 import no.nav.helse.hendelser.til
@@ -20,11 +17,12 @@ import no.nav.helse.mars
 import no.nav.helse.person.TilstandType
 import no.nav.helse.person.TilstandType.AVVENTER_BLOKKERENDE_PERIODE
 import no.nav.helse.person.TilstandType.AVVENTER_GODKJENNING
+import no.nav.helse.person.TilstandType.AVVENTER_HISTORIKK
 import no.nav.helse.person.TilstandType.AVVENTER_VILKÅRSPRØVING
-import no.nav.helse.person.TilstandType.TIL_INFOTRYGD
 import no.nav.helse.person.aktivitetslogg.Varselkode
 import no.nav.helse.september
 import no.nav.helse.spleis.e2e.AktivitetsloggFilter.Companion.filter
+import no.nav.helse.til
 import no.nav.helse.torsdag
 import no.nav.helse.økonomi.Prosentdel.Companion.prosent
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -37,15 +35,13 @@ internal class FlereSkjæringstidspunktTest : AbstractDslTest() {
     fun `korrigert søknad som dekker deler av perioden`() {
         a1 {
             nyttVedtak(januar)
-            assertUgyldigSituasjon("FLERE_SKJÆRINGSTIDSPUNKT") {
-                håndterSøknad(
-                    Sykdom(20.januar, 20.januar, 100.prosent),
-                    Arbeid(20.januar, 20.januar)
-                )
-            }
-
+            håndterSøknad(
+                Sykdom(20.januar, 20.januar, 100.prosent),
+                Arbeid(20.januar, 20.januar)
+            )
             assertEquals(listOf(21.januar, 1.januar), inspektør.skjæringstidspunkter(1.vedtaksperiode))
-            assertSisteTilstand(1.vedtaksperiode, TilstandType.AVVENTER_REVURDERING)
+            assertVarsel(Varselkode.RV_IV_11)
+            assertSisteTilstand(1.vedtaksperiode, TilstandType.AVVENTER_VILKÅRSPRØVING_REVURDERING)
         }
     }
 
@@ -114,8 +110,8 @@ internal class FlereSkjæringstidspunktTest : AbstractDslTest() {
             nullstillTilstandsendringer()
 
             håndterInntektsmelding(listOf(27.august til 27.august, 4.september til 18.september))
-            assertFunksjonellFeil(Varselkode.RV_IV_11, 2.vedtaksperiode.filter())
-            assertForkastetPeriodeTilstander(2.vedtaksperiode, AVVENTER_GODKJENNING, AVVENTER_BLOKKERENDE_PERIODE, TIL_INFOTRYGD)
+            assertVarsel(Varselkode.RV_IV_11, 2.vedtaksperiode.filter())
+            assertTilstander(2.vedtaksperiode, AVVENTER_GODKJENNING, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_VILKÅRSPRØVING)
         }
     }
 
@@ -141,8 +137,9 @@ internal class FlereSkjæringstidspunktTest : AbstractDslTest() {
             nullstillTilstandsendringer()
 
             håndterSøknad(4.september til 9.september)
-            assertFunksjonellFeil(Varselkode.RV_IV_11, 2.vedtaksperiode.filter())
-            assertForkastetPeriodeTilstander(2.vedtaksperiode, AVVENTER_GODKJENNING, AVVENTER_BLOKKERENDE_PERIODE, TIL_INFOTRYGD)
+            assertVarsel(Varselkode.RV_IV_11, 2.vedtaksperiode.filter())
+            assertEquals(listOf(17.september, 20.august), inspektør.skjæringstidspunkter(2.vedtaksperiode))
+            assertTilstander(2.vedtaksperiode, AVVENTER_GODKJENNING, AVVENTER_BLOKKERENDE_PERIODE, AVVENTER_HISTORIKK)
         }
     }
 }

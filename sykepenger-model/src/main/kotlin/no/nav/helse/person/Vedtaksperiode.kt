@@ -78,7 +78,6 @@ import no.nav.helse.person.Venteårsak.Hva.HJELP
 import no.nav.helse.person.Venteårsak.Hva.INNTEKTSMELDING
 import no.nav.helse.person.Venteårsak.Hva.SØKNAD
 import no.nav.helse.person.Venteårsak.Hva.UTBETALING
-import no.nav.helse.person.Venteårsak.Hvorfor.FLERE_SKJÆRINGSTIDSPUNKT
 import no.nav.helse.person.Venteårsak.Hvorfor.OVERSTYRING_IGANGSATT
 import no.nav.helse.person.Venteårsak.Hvorfor.SKJÆRINGSTIDSPUNKT_FLYTTET_REVURDERING
 import no.nav.helse.person.Venteårsak.Hvorfor.VIL_OMGJØRES
@@ -582,28 +581,6 @@ internal class Vedtaksperiode private constructor(
         return true
     }
 
-    private fun harFlereSkjæringstidspunkt(): Boolean {
-        return behandlinger.harFlereSkjæringstidspunkt()
-
-        val arbeidsgiverperiode = finnArbeidsgiverperiode() ?: return false
-        if (!arbeidsgiverperiode.forventerInntekt(periode)) return false
-        val utbetalingsdagerFørSkjæringstidspunkt =
-            Arbeidsgiverperiode.utbetalingsdagerFørSkjæringstidspunkt(skjæringstidspunkt, periode, arbeidsgiverperiode)
-        if (utbetalingsdagerFørSkjæringstidspunkt.isEmpty()) return false
-        sikkerlogg.warn(
-            "Har flere skjæringstidspunkt:\n\n (${
-                id.toString().take(5).uppercase()
-            }) $periode\nSkjæringstidspunkt: ${skjæringstidspunkt.format(datoformat)}\nArbeidsgiver: ${arbeidsgiver.organisasjonsnummer}\nUtbetalingsdager før skjæringstidspunkt: ${
-                utbetalingsdagerFørSkjæringstidspunkt.joinToString {
-                    it.format(
-                        datoformat
-                    )
-                }
-            }\nSykdomstidslinje: ${sykdomstidslinje.toShortString()}"
-        )
-        return true
-    }
-
     private fun harTilkomneInntekter(): Boolean {
         return vilkårsgrunnlag?.harTilkommendeInntekter() ?: false
     }
@@ -743,6 +720,7 @@ internal class Vedtaksperiode private constructor(
         aktivitetslogg: IAktivitetslogg,
         validering: () -> Unit
     ) {
+        val haddeFlereSkjæringstidspunkt = behandlinger.harFlereSkjæringstidspunkt()
         behandlinger.håndterEndring(
             person,
             arbeidsgiver,
@@ -752,6 +730,9 @@ internal class Vedtaksperiode private constructor(
             arbeidsgiver.beregnArbeidsgiverperiode(),
             validering
         )
+        if (!haddeFlereSkjæringstidspunkt && behandlinger.harFlereSkjæringstidspunkt()) {
+            aktivitetslogg.varsel(RV_IV_11)
+        }
     }
 
     private fun håndterEgenmeldingsperioderFraOverlappendeSøknad(søknad: Søknad, aktivitetslogg: IAktivitetslogg) {
@@ -2180,7 +2161,6 @@ internal class Vedtaksperiode private constructor(
 
         private fun tilstand(vedtaksperiode: Vedtaksperiode, aktivitetslogg: IAktivitetslogg): Tilstand {
             if (vedtaksperiode.behandlinger.utbetales()) return HarPågåendeUtbetaling
-            if (vedtaksperiode.harFlereSkjæringstidspunkt()) return HarFlereSkjæringstidspunkt(vedtaksperiode)
             val førstePeriodeSomTrengerInntektsmelding = vedtaksperiode.førstePeriodeSomTrengerInntektsmelding()
             if (førstePeriodeSomTrengerInntektsmelding != null) {
                 if (førstePeriodeSomTrengerInntektsmelding === vedtaksperiode)
@@ -2215,17 +2195,6 @@ internal class Vedtaksperiode private constructor(
 
             override fun gjenopptaBehandling(vedtaksperiode: Vedtaksperiode, aktivitetslogg: IAktivitetslogg) {
                 aktivitetslogg.info("Stopper gjenoppta behandling pga. pågående utbetaling")
-            }
-        }
-
-        private data class HarFlereSkjæringstidspunkt(private val vedtaksperiode: Vedtaksperiode) : Tilstand {
-            override fun venterPå() = vedtaksperiode
-            override fun venteårsak() = HJELP fordi FLERE_SKJÆRINGSTIDSPUNKT
-            override fun gjenopptaBehandling(
-                vedtaksperiode: Vedtaksperiode,
-                aktivitetslogg: IAktivitetslogg
-            ) {
-                aktivitetslogg.info("Denne perioden har flere skjæringstidspunkt slik den står nå. Saksbehandler må inn å vurdere om det kan overstyres dager på en slik måte at det kun er ett skjæringstidspunkt. Om ikke må den kastes ut av Speil.")
             }
         }
 
@@ -2419,8 +2388,7 @@ internal class Vedtaksperiode private constructor(
             vedtaksperiode.revurderTidslinje(hendelse, aktivitetslogg)
         }
 
-        override fun venteårsak(vedtaksperiode: Vedtaksperiode) =
-            if (vedtaksperiode.harFlereSkjæringstidspunkt()) HJELP fordi FLERE_SKJÆRINGSTIDSPUNKT else INNTEKTSMELDING.utenBegrunnelse
+        override fun venteårsak(vedtaksperiode: Vedtaksperiode) = INNTEKTSMELDING.utenBegrunnelse
 
         override fun venter(
             vedtaksperiode: Vedtaksperiode,
@@ -2557,10 +2525,6 @@ internal class Vedtaksperiode private constructor(
         }
 
         override fun håndter(vedtaksperiode: Vedtaksperiode, påminnelse: Påminnelse, aktivitetslogg: IAktivitetslogg) {
-            if (vedtaksperiode.harFlereSkjæringstidspunkt()) {
-                aktivitetslogg.funksjonellFeil(RV_IV_11)
-                return vedtaksperiode.forkast(påminnelse, aktivitetslogg)
-            }
             if (påminnelse.skalReberegnes()) {
                 vedtaksperiode.behandlinger.forkastUtbetaling(aktivitetslogg)
                 vedtaksperiode.videreførEksisterendeRefusjonsopplysninger(hendelse = null, aktivitetslogg)
@@ -2624,10 +2588,6 @@ internal class Vedtaksperiode private constructor(
                 aktivitetslogg,
                 AvsluttetUtenUtbetaling
             )
-            if (vedtaksperiode.harFlereSkjæringstidspunkt()) {
-                aktivitetslogg.funksjonellFeil(RV_IV_11)
-                return vedtaksperiode.forkast(hendelse, aktivitetslogg)
-            }
             if (vedtaksperiode.måInnhenteInntektEllerRefusjon(aktivitetslogg)) return
             vedtaksperiode.tilstand(aktivitetslogg, AvventerBlokkerendePeriode)
         }
@@ -2714,10 +2674,6 @@ internal class Vedtaksperiode private constructor(
                 }
                 return
             }
-            if (vedtaksperiode.harFlereSkjæringstidspunkt()) {
-                aktivitetslogg.funksjonellFeil(RV_IV_11)
-                return vedtaksperiode.forkast(påminnelse, aktivitetslogg)
-            }
             vedtaksperiode.person.gjenopptaBehandling(aktivitetslogg)
         }
 
@@ -2778,7 +2734,6 @@ internal class Vedtaksperiode private constructor(
             return when {
                 !vedtaksperiode.skalBehandlesISpeil() -> ForventerIkkeInntekt
                 vedtaksperiode.manglerNødvendigInntektVedTidligereBeregnetSykepengegrunnlag() -> ManglerNødvendigInntektVedTidligereBeregnetSykepengegrunnlag
-                vedtaksperiode.harFlereSkjæringstidspunkt() -> HarFlereSkjæringstidspunkt(vedtaksperiode)
                 vedtaksperiode.person.avventerSøknad(vedtaksperiode.periode) -> AvventerTidligereEllerOverlappendeSøknad
                 førstePeriodeSomTrengerInntektsmelding != null -> when (førstePeriodeSomTrengerInntektsmelding) {
                     vedtaksperiode -> TrengerInntektsmelding(førstePeriodeSomTrengerInntektsmelding)
@@ -2794,20 +2749,6 @@ internal class Vedtaksperiode private constructor(
             fun venteårsak(): Venteårsak? = null
             fun venterPå(): Vedtaksperiode? = null
             fun gjenopptaBehandling(vedtaksperiode: Vedtaksperiode, hendelse: Hendelse, aktivitetslogg: IAktivitetslogg)
-        }
-
-        private data class HarFlereSkjæringstidspunkt(private val vedtaksperiode: Vedtaksperiode) : Tilstand {
-            override fun venterPå() = vedtaksperiode
-            override fun venteårsak() = HJELP fordi FLERE_SKJÆRINGSTIDSPUNKT
-            override fun gjenopptaBehandling(
-                vedtaksperiode: Vedtaksperiode,
-                hendelse: Hendelse,
-                aktivitetslogg: IAktivitetslogg
-            ) {
-                aktivitetslogg.info("Denne perioden har flere skjæringstidspunkt slik den står nå.")
-                aktivitetslogg.funksjonellFeil(RV_IV_11)
-                return vedtaksperiode.forkast(hendelse, aktivitetslogg)
-            }
         }
 
         private data object AvventerTidligereEllerOverlappendeSøknad : Tilstand {
