@@ -143,6 +143,7 @@ import no.nav.helse.person.inntekt.Skatteopplysning
 import no.nav.helse.person.inntekt.SkatteopplysningSykepengegrunnlag
 import no.nav.helse.person.inntekt.SkatteopplysningerForSykepengegrunnlag
 import no.nav.helse.person.refusjon.Refusjonsservitør
+import no.nav.helse.sykdomstidslinje.Dag
 import no.nav.helse.sykdomstidslinje.Skjæringstidspunkt
 import no.nav.helse.sykdomstidslinje.Sykdomstidslinje
 import no.nav.helse.sykdomstidslinje.Sykdomstidslinje.Companion.slåSammenForkastedeSykdomstidslinjer
@@ -1114,7 +1115,7 @@ internal class Vedtaksperiode private constructor(
         periode: Periode,
         dokumentsporing: Set<UUID>
     ) {
-        if (finnArbeidsgiverperiode()?.dekkesAvArbeidsgiver(periode) != false) {
+        if (innenforArbeidsgiverperioden()) {
             jurist.logg(`§ 8-17 ledd 1 bokstav a - arbeidsgiversøknad`(periode, sykdomstidslinje.subsumsjonsformat()))
         }
         person.avsluttetUtenVedtak(
@@ -1241,8 +1242,30 @@ internal class Vedtaksperiode private constructor(
         return behandlinger.harVærtBeregnet() || forventerInntekt()
     }
 
+    private fun innenforArbeidsgiverperioden(): Boolean {
+        // vi regner perioden som innenfor arbeidsgiverperioden så lenge arbeidsgiver
+        // har hatt ansvar for hele perioden, dvs. ingen dager nav eventuelt skal dekke.
+        val agp = behandlinger.arbeidsgiverperiode().arbeidsgiverperioder.periode()
+        when (agp) {
+            null -> {
+                // tom agp kan være at:
+                // a) arbeidsgiverperioden er "utført" i infotrygd, dvs. at vi ikke kjenner til hvilke dager det er
+                // b) perioden består kun av arbeidsdager/fridager som har medført at ingen agp-telling har blitt påstartet
+
+                // hvis arbeidsgiverperioden er tom, og tidslinjen har sykedager, da kan vi anta at disse dagene skal utbetales
+                return sykdomstidslinje.none { dag -> dag is Dag.Sykedag }
+            }
+
+            else -> {
+                if (periode.endInclusive > agp.endInclusive) return false
+                // perioden er innenfor agp, men vurder om det foreligger syknav dager
+                return sykdomstidslinje.none { dag -> dag is Dag.SykedagNav }
+            }
+        }
+    }
+
     private fun forventerInntekt(): Boolean {
-        return Arbeidsgiverperiode.forventerInntekt(finnArbeidsgiverperiode(), periode)
+        return finnArbeidsgiverperiode()?.forventerInntekt(periode) == true
     }
 
     private fun trengerGodkjenning(aktivitetslogg: IAktivitetslogg) {
@@ -2530,7 +2553,7 @@ internal class Vedtaksperiode private constructor(
                 return true
             }
             arbeidsgiveropplysningerStrategi.videreførEksisterendeOpplysninger(vedtaksperiode, aktivitetslogg)
-            if (!vedtaksperiode.skalBehandlesISpeil()) {
+            if (vedtaksperiode.innenforArbeidsgiverperioden() || !vedtaksperiode.forventerInntekt()) {
                 vedtaksperiode.tilstand(aktivitetslogg, AvsluttetUtenUtbetaling)
                 return true
             }
