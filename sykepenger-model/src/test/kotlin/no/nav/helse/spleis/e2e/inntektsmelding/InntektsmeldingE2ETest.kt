@@ -2488,19 +2488,4 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
         assertTrue(inntektsopplysningVilkårsgrunnlagA2 is no.nav.helse.person.inntekt.Inntektsmeldinginntekt)
         assertEquals(INNTEKT, inntektsopplysningVilkårsgrunnlagA2?.inspektør?.beløp)
     }
-
-    @Test
-    fun `Lagrer refusjon på arbeidsgiverens første fraværsdag, ikke dato fra IM`() {
-        nyttVedtak(januar)
-        håndterSøknad(5.februar til 28.februar)
-        håndterInntektsmelding(
-            arbeidsgiverperioder = emptyList(),
-            refusjon = Refusjon(INNTEKT / 2, null, emptyList()),
-            vedtaksperiodeIdInnhenter = 2.vedtaksperiode
-        )
-
-        val refusjonsopplysninger = inspektør.arbeidsgiver.refusjonsopplysninger(5.februar)
-
-        assertFalse(refusjonsopplysninger.erTom)
-    }
 }

@@ -21,8 +21,6 @@ import no.nav.helse.person.beløp.Beløpstidslinje
 import no.nav.helse.person.beløp.Kilde
 import no.nav.helse.person.inntekt.ArbeidsgiverInntektsopplysning
 import no.nav.helse.person.inntekt.Inntektsopplysning
-import no.nav.helse.person.inntekt.Refusjonsopplysning
-import no.nav.helse.person.inntekt.Refusjonsopplysning.Refusjonsopplysninger.RefusjonsopplysningerBuilder
 import no.nav.helse.person.inntekt.Saksbehandler
 import no.nav.helse.person.inntekt.SkjønnsmessigFastsatt
 import no.nav.helse.økonomi.Inntekt
@@ -97,8 +95,7 @@ internal class OverstyrtArbeidsgiveropplysning(
                 ArbeidsgiverInntektsopplysning(
                     orgnummer = it.orgnummer,
                     gjelder = gjelder,
-                    inntektsopplysning = inntektsopplysning(it),
-                    refusjonsopplysninger = RefusjonsopplysningerBuilder().apply { it.refusjonsopplysninger(gjelder.start).forEach { (fom, tom, refusjonsbeløp) -> leggTil(Refusjonsopplysning(meldingsreferanseId, fom, tom, refusjonsbeløp, SAKSBEHANDLER, tidsstempel), tidsstempel) } }.build()
+                    inntektsopplysning = inntektsopplysning(it)
                 )
             }
 
@@ -122,8 +119,7 @@ internal class OverstyrtArbeidsgiveropplysning(
                 ArbeidsgiverInntektsopplysning(
                     orgnummer = it.orgnummer,
                     gjelder = gjelder,
-                    inntektsopplysning = SkjønnsmessigFastsatt(skjæringstidspunkt, meldingsreferanseId, it.inntekt, LocalDateTime.now()),
-                    refusjonsopplysninger = Refusjonsopplysning.Refusjonsopplysninger()
+                    inntektsopplysning = SkjønnsmessigFastsatt(skjæringstidspunkt, meldingsreferanseId, it.inntekt, LocalDateTime.now())
                 )
             }
         }

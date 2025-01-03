@@ -30,7 +30,6 @@ import no.nav.helse.dto.serialisering.OppdragUtDto
 import no.nav.helse.dto.serialisering.OpptjeningUtDto
 import no.nav.helse.dto.serialisering.PersonUtDto
 import no.nav.helse.dto.serialisering.RefusjonUtDto
-import no.nav.helse.dto.serialisering.RefusjonsopplysningUtDto
 import no.nav.helse.dto.serialisering.UtbetalingUtDto
 import no.nav.helse.dto.serialisering.UtbetalingsdagUtDto
 import no.nav.helse.dto.serialisering.UtbetalingslinjeUtDto
@@ -135,8 +134,7 @@ data class SpannerPersonDto(
             val orgnummer: String,
             val fom: LocalDate,
             val tom: LocalDate,
-            val inntektsopplysning: InntektsopplysningData,
-            val refusjonsopplysninger: List<ArbeidsgiverData.RefusjonsopplysningData>
+            val inntektsopplysning: InntektsopplysningData
         ) {
             data class SkatteopplysningData(
                 val hendelseId: UUID,
@@ -226,15 +224,6 @@ data class SpannerPersonDto(
                 Arbeidsgiver, AOrdningen
             }
         }
-
-        data class RefusjonsopplysningData(
-            val meldingsreferanseId: UUID,
-            val fom: LocalDate,
-            val tom: LocalDate?,
-            val beløp: InntektDto,
-            val avsender: AvsenderData,
-            val tidsstempel: LocalDateTime
-        )
 
         data class PeriodeData(val fom: LocalDate, val tom: LocalDate)
         data class SykdomstidslinjeData(
@@ -1573,10 +1562,7 @@ private fun ArbeidsgiverInntektsopplysningUtDto.tilPersonData() =
         orgnummer = this.orgnummer,
         fom = this.gjelder.fom,
         tom = this.gjelder.tom,
-        inntektsopplysning = this.inntektsopplysning.tilPersonData(),
-        refusjonsopplysninger = this.refusjonsopplysninger.opplysninger.map {
-            it.tilPersonData()
-        }
+        inntektsopplysning = this.inntektsopplysning.tilPersonData()
     )
 
 private fun NyInntektUnderveisDto.tilPersonData() = VilkårsgrunnlagElementData.NyInntektUnderveisData(
@@ -1638,16 +1624,6 @@ private fun InntektsopplysningUtDto.tilPersonData() =
 
             else -> null
         }
-    )
-
-private fun RefusjonsopplysningUtDto.tilPersonData() =
-    SpannerPersonDto.ArbeidsgiverData.RefusjonsopplysningData(
-        meldingsreferanseId = this.meldingsreferanseId,
-        fom = this.fom,
-        tom = this.tom,
-        beløp = this.beløp.tilPersonData(),
-        avsender = this.avsender.tilPersonData(),
-        tidsstempel = this.tidsstempel
     )
 
 private fun SkatteopplysningDto.tilPersonDataSkattopplysning() =

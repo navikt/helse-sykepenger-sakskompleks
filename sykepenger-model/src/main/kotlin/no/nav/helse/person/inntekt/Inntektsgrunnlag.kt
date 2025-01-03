@@ -38,12 +38,10 @@ import no.nav.helse.person.inntekt.ArbeidsgiverInntektsopplysning.Companion.finn
 import no.nav.helse.person.inntekt.ArbeidsgiverInntektsopplysning.Companion.fastsattInntekt
 import no.nav.helse.person.inntekt.ArbeidsgiverInntektsopplysning.Companion.harGjenbrukbarInntekt
 import no.nav.helse.person.inntekt.ArbeidsgiverInntektsopplysning.Companion.harInntekt
-import no.nav.helse.person.inntekt.ArbeidsgiverInntektsopplysning.Companion.ingenRefusjonsopplysninger
 import no.nav.helse.person.inntekt.ArbeidsgiverInntektsopplysning.Companion.lagreTidsnæreInntekter
 import no.nav.helse.person.inntekt.ArbeidsgiverInntektsopplysning.Companion.markerFlereArbeidsgivere
 import no.nav.helse.person.inntekt.ArbeidsgiverInntektsopplysning.Companion.måHaRegistrertOpptjeningForArbeidsgivere
 import no.nav.helse.person.inntekt.ArbeidsgiverInntektsopplysning.Companion.overstyrInntekter
-import no.nav.helse.person.inntekt.ArbeidsgiverInntektsopplysning.Companion.refusjonsopplysninger
 import no.nav.helse.person.inntekt.ArbeidsgiverInntektsopplysning.Companion.sjekkForNyArbeidsgiver
 import no.nav.helse.person.inntekt.ArbeidsgiverInntektsopplysning.Companion.subsummer
 import no.nav.helse.person.inntekt.ArbeidsgiverInntektsopplysning.Companion.totalOmregnetÅrsinntekt
@@ -54,7 +52,6 @@ import no.nav.helse.person.inntekt.Inntektsgrunnlag.Begrensning.VURDERT_I_INFOTR
 import no.nav.helse.person.inntekt.NyInntektUnderveis.Companion.finnEndringsdato
 import no.nav.helse.person.inntekt.NyInntektUnderveis.Companion.merge
 import no.nav.helse.person.inntekt.NyInntektUnderveis.Companion.overstyr
-import no.nav.helse.person.inntekt.Refusjonsopplysning.Refusjonsopplysninger
 import no.nav.helse.utbetalingstidslinje.Begrunnelse
 import no.nav.helse.utbetalingstidslinje.Utbetalingstidslinje
 import no.nav.helse.utbetalingstidslinje.VilkårsprøvdSkjæringstidspunkt
@@ -295,9 +292,6 @@ internal class Inntektsgrunnlag private constructor(
         )
     }
 
-    internal fun refusjonsopplysninger(organisasjonsnummer: String): Refusjonsopplysninger =
-        arbeidsgiverInntektsopplysninger.refusjonsopplysninger(organisasjonsnummer)
-
     internal fun tilkomneInntekterFraSøknaden(søknad: IAktivitetslogg, periode: Periode, nyeInntekter: List<NyInntektUnderveis>, subsumsjonslogg: Subsumsjonslogg): Inntektsgrunnlag? {
         if (this.tilkommendeInntekter.isEmpty() && nyeInntekter.isEmpty()) return null
         return kopierSykepengegrunnlag(arbeidsgiverInntektsopplysninger, deaktiverteArbeidsforhold, tilkommendeInntekter = this.tilkommendeInntekter.merge(periode, nyeInntekter))
@@ -310,12 +304,7 @@ internal class Inntektsgrunnlag private constructor(
         subsumsjonslogg: Subsumsjonslogg
     ): Inntektsgrunnlag {
         val builder = ArbeidsgiverInntektsopplysningerOverstyringer(skjæringstidspunkt, arbeidsgiverInntektsopplysninger, null, subsumsjonslogg)
-        builder.leggTilInntekt(
-            korrigertInntektsmelding.arbeidsgiverInntektsopplysning(
-                skjæringstidspunkt = skjæringstidspunkt,
-                strekkTilSkjæringstidspunkt = builder.ingenRefusjonsopplysninger(korrigertInntektsmelding.organisasjonsnummer)
-            )
-        )
+        builder.leggTilInntekt(korrigertInntektsmelding.arbeidsgiverInntektsopplysning(skjæringstidspunkt))
         val resultat = builder.resultat()
         when (val inntektFraFør = arbeidsgiverInntektsopplysninger.finn(korrigertInntektsmelding.organisasjonsnummer)?.inntektsopplysning) {
             is Inntektsmeldinginntekt -> {
@@ -445,7 +434,6 @@ internal class Inntektsgrunnlag private constructor(
             nyeInntektsopplysninger.add(arbeidsgiverInntektsopplysning)
         }
 
-        internal fun ingenRefusjonsopplysninger(organisasjonsnummer: String) = opprinneligArbeidsgiverInntektsopplysninger.ingenRefusjonsopplysninger(organisasjonsnummer)
         internal fun resultat(): List<ArbeidsgiverInntektsopplysning> {
             return opprinneligArbeidsgiverInntektsopplysninger.overstyrInntekter(skjæringstidspunkt, opptjening, nyeInntektsopplysninger, subsumsjonslogg)
         }

@@ -630,8 +630,7 @@ internal class Behandlinger private constructor(behandlinger: List<Behandling>) 
                                     skjæringstidspunkt = dto.skjæringstidspunkt,
                                     `6G` = Grunnbeløp.`6G`.beløp(dto.skjæringstidspunkt),
                                     fastsattÅrsinntekt = Inntekt.INGEN,
-                                    gjelder = dto.skjæringstidspunkt til LocalDate.MAX,
-                                    refusjonsopplysninger = Refusjonsopplysninger()
+                                    gjelder = dto.skjæringstidspunkt til LocalDate.MAX
                                 ),
                                 regler = ArbeidsgiverRegler.Companion.NormalArbeidstaker,
                                 arbeidsgiverperiode = dto.arbeidsgiverperiode.map { Periode.gjenopprett(it) },

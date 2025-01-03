@@ -10,9 +10,6 @@ import no.nav.helse.hendelser.til
 import no.nav.helse.person.inntekt.ArbeidsgiverInntektsopplysning
 import no.nav.helse.person.inntekt.Inntektsgrunnlag
 import no.nav.helse.person.inntekt.Inntektsmeldinginntekt
-import no.nav.helse.person.inntekt.Refusjonsopplysning
-import no.nav.helse.person.inntekt.Refusjonsopplysning.Refusjonsopplysninger
-import no.nav.helse.person.inntekt.Refusjonsopplysning.Refusjonsopplysninger.Companion.refusjonsopplysninger
 import no.nav.helse.økonomi.Inntekt
 
 internal val Inntekt.sykepengegrunnlag get() = inntektsgrunnlag(a1)
@@ -22,15 +19,14 @@ internal fun Inntekt.inntektsgrunnlag(alder: Alder) = inntektsgrunnlag(alder, a1
 internal fun Inntekt.inntektsgrunnlag(skjæringstidspunkt: LocalDate) =
     inntektsgrunnlag(UNG_PERSON_FØDSELSDATO.alder, a1, skjæringstidspunkt)
 
-internal fun Inntekt.inntektsgrunnlag(alder: Alder, orgnr: String, skjæringstidspunkt: LocalDate, subsumsjonslogg: Subsumsjonslogg = Subsumsjonslogg.EmptyLog, refusjonsopplysninger: Refusjonsopplysninger = Refusjonsopplysninger()) =
+internal fun Inntekt.inntektsgrunnlag(alder: Alder, orgnr: String, skjæringstidspunkt: LocalDate, subsumsjonslogg: Subsumsjonslogg = Subsumsjonslogg.EmptyLog) =
     Inntektsgrunnlag(
         alder = alder,
         arbeidsgiverInntektsopplysninger = listOf(
             ArbeidsgiverInntektsopplysning(
                 orgnr,
                 skjæringstidspunkt til LocalDate.MAX,
-                Inntektsmeldinginntekt(skjæringstidspunkt, UUID.randomUUID(), this),
-                refusjonsopplysninger
+                Inntektsmeldinginntekt(skjæringstidspunkt, UUID.randomUUID(), this)
             )
         ),
         skjæringstidspunkt = skjæringstidspunkt,
@@ -45,8 +41,7 @@ internal fun Inntekt.inntektsgrunnlag(orgnr: String, skjæringstidspunkt: LocalD
             ArbeidsgiverInntektsopplysning(
                 orgnr,
                 skjæringstidspunkt til LocalDate.MAX,
-                Inntektsmeldinginntekt(skjæringstidspunkt, UUID.randomUUID(), this),
-                Refusjonsopplysning(UUID.randomUUID(), skjæringstidspunkt, null, this).refusjonsopplysninger
+                Inntektsmeldinginntekt(skjæringstidspunkt, UUID.randomUUID(), this)
             )
         ),
         deaktiverteArbeidsforhold = emptyList(),

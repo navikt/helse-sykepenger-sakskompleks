@@ -30,8 +30,7 @@ import no.nav.helse.økonomi.Inntekt.Companion.INGEN
 data class ArbeidsgiverInntektsopplysning(
     val orgnummer: String,
     val gjelder: Periode,
-    val inntektsopplysning: Inntektsopplysning,
-    val refusjonsopplysninger: Refusjonsopplysninger
+    val inntektsopplysning: Inntektsopplysning
 ) {
     private fun gjelderPåSkjæringstidspunktet(skjæringstidspunkt: LocalDate) =
         skjæringstidspunkt == gjelder.start
@@ -80,16 +79,14 @@ data class ArbeidsgiverInntektsopplysning(
         return ArbeidsgiverInntektsopplysning(
             orgnummer = this.orgnummer,
             gjelder = nyGjelder,
-            inntektsopplysning = gammel.inntektsopplysning.overstyresAv(this.inntektsopplysning),
-            refusjonsopplysninger = gammel.refusjonsopplysninger.merge(this.refusjonsopplysninger)
+            inntektsopplysning = gammel.inntektsopplysning.overstyresAv(this.inntektsopplysning)
         )
     }
 
     private fun rullTilbake() = ArbeidsgiverInntektsopplysning(
         this.orgnummer,
         gjelder = this.gjelder,
-        this.inntektsopplysning.omregnetÅrsinntekt(),
-        refusjonsopplysninger
+        this.inntektsopplysning.omregnetÅrsinntekt()
     )
 
     private fun subsummer(subsumsjonslogg: Subsumsjonslogg, opptjening: Opptjening?) {
@@ -118,8 +115,7 @@ data class ArbeidsgiverInntektsopplysning(
                 VilkårsprøvdSkjæringstidspunkt.FaktaavklartInntekt(
                     organisasjonsnummer = it.orgnummer,
                     fastsattÅrsinntekt = it.inntektsopplysning.fastsattÅrsinntekt(),
-                    gjelder = it.gjelder,
-                    refusjonsopplysninger = it.refusjonsopplysninger
+                    gjelder = it.gjelder
                 )
             }
 
@@ -149,8 +145,7 @@ data class ArbeidsgiverInntektsopplysning(
                 ArbeidsgiverInntektsopplysning(
                     it.orgnummer,
                     it.gjelder,
-                    it.inntektsopplysning.omregnetÅrsinntekt(),
-                    it.refusjonsopplysninger
+                    it.inntektsopplysning.omregnetÅrsinntekt()
                 )
             }
         }
@@ -242,9 +237,6 @@ data class ArbeidsgiverInntektsopplysning(
             return map { it.inntektsopplysning }.markerFlereArbeidsgivere(aktivitetslogg)
         }
 
-        internal fun List<ArbeidsgiverInntektsopplysning>.refusjonsopplysninger(organisasjonsnummer: String) =
-            singleOrNull { it.gjelder(organisasjonsnummer) }?.refusjonsopplysninger ?: Refusjonsopplysninger()
-
         internal fun List<ArbeidsgiverInntektsopplysning>.fastsattInntekt(
             skjæringstidspunkt: LocalDate,
             organisasjonsnummer: String
@@ -291,12 +283,6 @@ data class ArbeidsgiverInntektsopplysning(
 
         internal fun List<ArbeidsgiverInntektsopplysning>.harInntekt(organisasjonsnummer: String) =
             singleOrNull { it.orgnummer == organisasjonsnummer } != null
-
-        internal fun List<ArbeidsgiverInntektsopplysning>.ingenRefusjonsopplysninger(organisasjonsnummer: String): Boolean {
-            val refusjonsopplysninger =
-                singleOrNull { it.orgnummer == organisasjonsnummer }?.refusjonsopplysninger ?: Refusjonsopplysninger()
-            return refusjonsopplysninger.erTom
-        }
 
         internal fun List<ArbeidsgiverInntektsopplysning>.fastsattÅrsinntekt(skjæringstidspunkt: LocalDate) =
             fold(INGEN) { acc, item -> item.fastsattÅrsinntekt(acc, skjæringstidspunkt) }
@@ -345,8 +331,7 @@ data class ArbeidsgiverInntektsopplysning(
             return ArbeidsgiverInntektsopplysning(
                 orgnummer = dto.orgnummer,
                 gjelder = Periode.gjenopprett(dto.gjelder),
-                inntektsopplysning = Inntektsopplysning.gjenopprett(dto.inntektsopplysning, inntekter),
-                refusjonsopplysninger = Refusjonsopplysninger.gjenopprett(dto.refusjonsopplysninger)
+                inntektsopplysning = Inntektsopplysning.gjenopprett(dto.inntektsopplysning, inntekter)
             )
         }
     }
@@ -354,7 +339,6 @@ data class ArbeidsgiverInntektsopplysning(
     internal fun dto() = ArbeidsgiverInntektsopplysningUtDto(
         orgnummer = this.orgnummer,
         gjelder = this.gjelder.dto(),
-        inntektsopplysning = this.inntektsopplysning.dto(),
-        refusjonsopplysninger = this.refusjonsopplysninger.dto()
+        inntektsopplysning = this.inntektsopplysning.dto()
     )
 }

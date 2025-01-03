@@ -1,7 +1,6 @@
 package no.nav.helse.utbetalingstidslinje
 
 import java.time.LocalDate
-import java.util.UUID
 import no.nav.helse.Grunnbeløp
 import no.nav.helse.februar
 import no.nav.helse.hendelser.Avsender.ARBEIDSGIVER
@@ -15,8 +14,6 @@ import no.nav.helse.januar
 import no.nav.helse.mars
 import no.nav.helse.person.beløp.Beløpstidslinje
 import no.nav.helse.person.beløp.BeløpstidslinjeTest.Companion.beløpstidslinje
-import no.nav.helse.person.inntekt.Refusjonsopplysning
-import no.nav.helse.person.inntekt.Refusjonsopplysning.Refusjonsopplysninger.Companion.refusjonsopplysninger
 import no.nav.helse.sykdomstidslinje.Sykdomstidslinje
 import no.nav.helse.testhelpers.A
 import no.nav.helse.testhelpers.AIG
@@ -1039,8 +1036,7 @@ internal class UtbetalingstidslinjeBuilderTest {
                 skjæringstidspunkt = 1.januar,
                 `6G` = Grunnbeløp.`6G`.beløp(1.januar),
                 fastsattÅrsinntekt = 31000.månedlig,
-                gjelder = 1.januar til LocalDate.MAX,
-                refusjonsopplysninger = Refusjonsopplysning(UUID.randomUUID(), 1.januar, null, 31000.månedlig).refusjonsopplysninger
+                gjelder = 1.januar til LocalDate.MAX
             ),
             regler = ArbeidsgiverRegler.Companion.NormalArbeidstaker,
             arbeidsgiverperiode = arbeidsgiverperioder.flatMap { it.arbeidsgiverperiode }.grupperSammenhengendePerioder(),

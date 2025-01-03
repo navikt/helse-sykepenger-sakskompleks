@@ -68,8 +68,6 @@ import no.nav.helse.dto.deserialisering.OpptjeningInnDto
 import no.nav.helse.dto.deserialisering.PersonInnDto
 import no.nav.helse.dto.deserialisering.RefusjonInnDto
 import no.nav.helse.dto.deserialisering.RefusjonshistorikkInnDto
-import no.nav.helse.dto.deserialisering.RefusjonsopplysningInnDto
-import no.nav.helse.dto.deserialisering.RefusjonsopplysningerInnDto
 import no.nav.helse.dto.deserialisering.UtbetalingInnDto
 import no.nav.helse.dto.deserialisering.UtbetalingsdagInnDto
 import no.nav.helse.dto.deserialisering.UtbetalingslinjeInnDto
@@ -277,14 +275,12 @@ data class PersonData(
             val orgnummer: String,
             val fom: LocalDate,
             val tom: LocalDate,
-            val inntektsopplysning: InntektsopplysningData,
-            val refusjonsopplysninger: List<ArbeidsgiverData.RefusjonsopplysningData>
+            val inntektsopplysning: InntektsopplysningData
         ) {
             fun tilDto() = ArbeidsgiverInntektsopplysningInnDto(
                 orgnummer = this.orgnummer,
                 gjelder = PeriodeDto(fom = this.fom, tom = this.tom),
-                inntektsopplysning = this.inntektsopplysning.tilDto(),
-                refusjonsopplysninger = RefusjonsopplysningerInnDto(opplysninger = this.refusjonsopplysninger.map { it.tilDto() })
+                inntektsopplysning = this.inntektsopplysning.tilDto()
             )
 
             data class SkatteopplysningData(
@@ -488,24 +484,6 @@ data class PersonData(
                     }
                 } ?: InntektsopplysningInnDto.InntektsmeldingDto.KildeDto.Arbeidsgiver,
                 tidsstempel = this.tidsstempel
-            )
-        }
-
-        data class RefusjonsopplysningData(
-            val meldingsreferanseId: UUID,
-            val fom: LocalDate,
-            val tom: LocalDate?,
-            val beløp: Double,
-            val avsender: AvsenderData,
-            val tidsstempel: LocalDateTime
-        ) {
-            fun tilDto() = RefusjonsopplysningInnDto(
-                meldingsreferanseId = this.meldingsreferanseId,
-                fom = this.fom,
-                tom = this.tom,
-                beløp = InntektbeløpDto.MånedligDouble(beløp),
-                avsender = avsender.tilDto(),
-                tidsstempel = tidsstempel
             )
         }
 

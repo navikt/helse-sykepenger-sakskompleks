@@ -71,7 +71,6 @@ import no.nav.helse.person.infotrygdhistorikk.Infotrygdhistorikk
 import no.nav.helse.person.inntekt.Inntektshistorikk
 import no.nav.helse.person.inntekt.Inntektsmeldinginntekt
 import no.nav.helse.person.inntekt.Refusjonshistorikk
-import no.nav.helse.person.inntekt.Refusjonshistorikk.Refusjon.EndringIRefusjon.Companion.refusjonsopplysninger
 import no.nav.helse.person.refusjon.Refusjonsservitør
 import no.nav.helse.person.view.ArbeidsgiverView
 import no.nav.helse.sykdomstidslinje.Dag.Companion.replace
@@ -343,8 +342,6 @@ internal class Arbeidsgiver private constructor(
     }
 
     private fun erSammeYrkesaktivitet(yrkesaktivitet: Yrkesaktivitet) = this.yrkesaktivitet == yrkesaktivitet
-    internal fun refusjonsopplysninger(skjæringstidspunkt: LocalDate) =
-        refusjonshistorikk.refusjonsopplysninger(skjæringstidspunkt)
 
     internal fun kanBeregneSykepengegrunnlag(skjæringstidspunkt: LocalDate, vedtaksperioder: List<Vedtaksperiode>): Boolean {
         return avklarInntekt(skjæringstidspunkt, vedtaksperioder) != null
@@ -1191,8 +1188,7 @@ internal class Arbeidsgiver private constructor(
         aktivitetslogg: IAktivitetslogg
     ) {
         vedtaksperioder.sendOppdatertForespørselOmArbeidsgiveropplysningerForNestePeriode(
-            vedtaksperiode,
-            aktivitetslogg
+            vedtaksperiode
         )
     }
 

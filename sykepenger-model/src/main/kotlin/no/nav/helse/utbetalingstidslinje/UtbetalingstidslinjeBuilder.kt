@@ -9,13 +9,11 @@ import no.nav.helse.person.beløp.Beløpsdag
 import no.nav.helse.person.beløp.Beløpstidslinje
 import no.nav.helse.person.beløp.Dag as Beløpstidslinjedag
 import no.nav.helse.person.beløp.UkjentDag
-import no.nav.helse.person.inntekt.Refusjonsopplysning
 import no.nav.helse.sykdomstidslinje.Dag
 import no.nav.helse.sykdomstidslinje.Sykdomstidslinje
 import no.nav.helse.økonomi.Inntekt
 import no.nav.helse.økonomi.Inntekt.Companion.INGEN
 import no.nav.helse.økonomi.Økonomi
-import org.slf4j.LoggerFactory
 
 internal class VilkårsprøvdSkjæringstidspunkt(
     private val skjæringstidspunkt: LocalDate,
@@ -29,8 +27,7 @@ internal class VilkårsprøvdSkjæringstidspunkt(
             skjæringstidspunkt = skjæringstidspunkt,
             `6G` = `6G`,
             fastsattÅrsinntekt = inntekt.fastsattÅrsinntekt,
-            gjelder = inntekt.gjelder,
-            refusjonsopplysninger = inntekt.refusjonsopplysninger
+            gjelder = inntekt.gjelder
         )
     }
 
@@ -82,8 +79,7 @@ internal class VilkårsprøvdSkjæringstidspunkt(
     data class FaktaavklartInntekt(
         val organisasjonsnummer: String,
         val fastsattÅrsinntekt: Inntekt,
-        val gjelder: Periode,
-        val refusjonsopplysninger: Refusjonsopplysning.Refusjonsopplysninger
+        val gjelder: Periode
     )
 
     data class NyInntektUnderveis(
@@ -96,8 +92,7 @@ internal class ArbeidsgiverFaktaavklartInntekt(
     private val skjæringstidspunkt: LocalDate,
     private val `6G`: Inntekt,
     private val fastsattÅrsinntekt: Inntekt,
-    private val gjelder: Periode,
-    private val refusjonsopplysninger: Refusjonsopplysning.Refusjonsopplysninger
+    private val gjelder: Periode
 ) {
     private val lagDefaultRefusjonsbeløpHvisMangler = { _: LocalDate, aktuellDagsinntekt: Inntekt -> aktuellDagsinntekt }
     private val krevRefusjonsbeløpHvisMangler = { dato: LocalDate, _: Inntekt ->
@@ -121,17 +116,16 @@ internal class ArbeidsgiverFaktaavklartInntekt(
         regler: ArbeidsgiverRegler,
         refusjon: Beløpstidslinjedag
     ): Økonomi {
-        return medInntekt(dato, økonomi, regler, refusjon, lagDefaultRefusjonsbeløpHvisMangler, mutableListOf())
+        return medInntekt(dato, økonomi, regler, refusjon, lagDefaultRefusjonsbeløpHvisMangler)
     }
 
     internal fun medInntektOrThrow(
         dato: LocalDate,
         økonomi: Økonomi,
         regler: ArbeidsgiverRegler,
-        refusjon: Beløpstidslinjedag,
-        forskjeller: MutableList<String>,
+        refusjon: Beløpstidslinjedag
     ): Økonomi {
-        return medInntekt(dato, økonomi, regler, refusjon, krevRefusjonsbeløpHvisMangler, forskjeller)
+        return medInntekt(dato, økonomi, regler, refusjon, krevRefusjonsbeløpHvisMangler)
     }
 
     private fun medInntekt(
@@ -139,8 +133,7 @@ internal class ArbeidsgiverFaktaavklartInntekt(
         økonomi: Økonomi,
         regler: ArbeidsgiverRegler,
         refusjon: Beløpstidslinjedag,
-        refusjonsopplysningFinnesIkkeStrategi: (LocalDate, Inntekt) -> Inntekt,
-        forskjeller: MutableList<String>
+        refusjonsopplysningFinnesIkkeStrategi: (LocalDate, Inntekt) -> Inntekt
     ): Økonomi {
         val aktuellDagsinntekt = fastsattÅrsinntekt(dato)
         return økonomi.inntekt(
@@ -148,16 +141,13 @@ internal class ArbeidsgiverFaktaavklartInntekt(
             beregningsgrunnlag = beregningsgrunnlag(skjæringstidspunkt),
             dekningsgrunnlag = aktuellDagsinntekt * regler.dekningsgrad(),
             `6G` = if (dato < skjæringstidspunkt) INGEN else `6G`,
-            refusjonsbeløp = refusjonsbeløp(dato, refusjon, aktuellDagsinntekt, refusjonsopplysningFinnesIkkeStrategi, forskjeller)
+            refusjonsbeløp = refusjonsbeløp(dato, refusjon, aktuellDagsinntekt, refusjonsopplysningFinnesIkkeStrategi)
         )
     }
 
-    private fun refusjonsbeløp(dato: LocalDate, refusjon: Beløpstidslinjedag, aktuellDagsinntekt: Inntekt, refusjonsopplysningFinnesIkkeStrategi: (LocalDate, Inntekt) -> Inntekt, forskjeller: MutableList<String>): Inntekt {
-        val refusjonFraInntektsgrunnlag = refusjonsopplysninger.refusjonsbeløpOrNull(dato)
+    private fun refusjonsbeløp(dato: LocalDate, refusjon: Beløpstidslinjedag, aktuellDagsinntekt: Inntekt, refusjonsopplysningFinnesIkkeStrategi: (LocalDate, Inntekt) -> Inntekt): Inntekt {
         val refusjonFraBehandling = refusjon.takeIf { it is Beløpsdag }?.beløp
-        return (refusjonFraBehandling ?: refusjonsopplysningFinnesIkkeStrategi(dato, aktuellDagsinntekt)).also {
-            if (it.dagligInt != refusjonFraInntektsgrunnlag?.dagligInt) forskjeller.add("$dato: Brukte ${it.dagligInt} fra behandlingen. Hadde ${refusjonFraInntektsgrunnlag?.dagligInt} fra inntektsgrunnlaget.")
-        }
+        return (refusjonFraBehandling ?: refusjonsopplysningFinnesIkkeStrategi(dato, aktuellDagsinntekt))
     }
 
     internal fun ghosttidslinje(beregningsperiode: Periode, skjæringstidspunkt: LocalDate, `6G`: Inntekt, arbeidsgiverlinjer: List<Utbetalingstidslinje>): Utbetalingstidslinje {
@@ -202,8 +192,6 @@ internal class UtbetalingstidslinjeBuilderVedtaksperiode(
     private val arbeidsgiverperiode: List<Periode>,
     private val refusjonstidslinje: Beløpstidslinje
 ) {
-    val forskjeller = mutableListOf<String>()
-
     internal fun result(sykdomstidslinje: Sykdomstidslinje): Utbetalingstidslinje {
         val builder = Utbetalingstidslinje.Builder()
         sykdomstidslinje.forEach { dag ->
@@ -230,7 +218,7 @@ internal class UtbetalingstidslinjeBuilderVedtaksperiode(
                 }
 
                 is Dag.SykedagNav -> {
-                    if (erAGP(dag.dato)) builder.addArbeidsgiverperiodedagNav(dag.dato, faktaavklarteInntekter.medInntektOrThrow(dag.dato, dag.økonomi, regler, refusjonstidslinje[dag.dato], forskjeller))
+                    if (erAGP(dag.dato)) builder.addArbeidsgiverperiodedagNav(dag.dato, faktaavklarteInntekter.medInntektOrThrow(dag.dato, dag.økonomi, regler, refusjonstidslinje[dag.dato]))
                     else when (dag.dato.erHelg()) {
                         true -> helg(builder, dag.dato, dag.økonomi)
                         false -> navDag(builder, dag.dato, dag.økonomi)
@@ -293,9 +281,6 @@ internal class UtbetalingstidslinjeBuilderVedtaksperiode(
                 }
             }
         }
-        if (forskjeller.isNotEmpty()) {
-            sikkerlogger.info("Refusjonsoppsummering:\n\t${forskjeller.joinToString("\n\t")}")
-        }
         return builder.build()
     }
 
@@ -313,7 +298,7 @@ internal class UtbetalingstidslinjeBuilderVedtaksperiode(
     }
 
     private fun navDag(builder: Utbetalingstidslinje.Builder, dato: LocalDate, økonomi: Økonomi) {
-        builder.addNAVdag(dato, faktaavklarteInntekter.medInntektOrThrow(dato, økonomi, regler, refusjonstidslinje[dato], forskjeller))
+        builder.addNAVdag(dato, faktaavklarteInntekter.medInntektOrThrow(dato, økonomi, regler, refusjonstidslinje[dato]))
     }
 
     private fun fridag(builder: Utbetalingstidslinje.Builder, dato: LocalDate) {
@@ -322,9 +307,5 @@ internal class UtbetalingstidslinjeBuilderVedtaksperiode(
 
     private fun arbeidsdag(builder: Utbetalingstidslinje.Builder, dato: LocalDate) {
         builder.addArbeidsdag(dato, faktaavklarteInntekter.medInntektHvisFinnes(dato, Økonomi.ikkeBetalt(), regler, refusjonstidslinje[dato]))
-    }
-
-    private companion object {
-        private val sikkerlogger = LoggerFactory.getLogger("tjenestekall")
     }
 }

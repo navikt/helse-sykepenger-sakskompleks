@@ -15,7 +15,6 @@ import no.nav.helse.inspectors.inspektør
 import no.nav.helse.januar
 import no.nav.helse.person.inntekt.ArbeidsgiverInntektsopplysning
 import no.nav.helse.person.inntekt.Inntektsgrunnlag
-import no.nav.helse.person.inntekt.Refusjonsopplysning.Refusjonsopplysninger
 import no.nav.helse.person.inntekt.Saksbehandler
 import no.nav.helse.testhelpers.NAV
 import no.nav.helse.testhelpers.assertNotNull
@@ -128,8 +127,7 @@ internal class VilkårsgrunnlagHistorikkInnslagTest {
                         "",
                         null,
                         LocalDateTime.now()
-                    ),
-                    Refusjonsopplysninger()
+                    )
                 )
             ), skjæringstidspunkt, jurist
             ),

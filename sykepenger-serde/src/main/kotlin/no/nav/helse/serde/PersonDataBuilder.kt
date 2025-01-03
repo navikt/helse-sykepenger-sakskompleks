@@ -50,7 +50,6 @@ import no.nav.helse.dto.serialisering.OppdragUtDto
 import no.nav.helse.dto.serialisering.OpptjeningUtDto
 import no.nav.helse.dto.serialisering.PersonUtDto
 import no.nav.helse.dto.serialisering.RefusjonUtDto
-import no.nav.helse.dto.serialisering.RefusjonsopplysningUtDto
 import no.nav.helse.dto.serialisering.UtbetalingUtDto
 import no.nav.helse.dto.serialisering.UtbetalingsdagUtDto
 import no.nav.helse.dto.serialisering.UtbetalingslinjeUtDto
@@ -814,10 +813,7 @@ private fun ArbeidsgiverInntektsopplysningUtDto.tilPersonData() = PersonData.Vil
     orgnummer = this.orgnummer,
     fom = this.gjelder.fom,
     tom = this.gjelder.tom,
-    inntektsopplysning = this.inntektsopplysning.tilPersonData(),
-    refusjonsopplysninger = this.refusjonsopplysninger.opplysninger.map {
-        it.tilPersonData()
-    }
+    inntektsopplysning = this.inntektsopplysning.tilPersonData()
 )
 
 private fun NyInntektUnderveisDto.tilPersonData() = PersonData.VilkårsgrunnlagElementData.NyInntektUnderveisData(
@@ -878,15 +874,6 @@ private fun InntektsopplysningUtDto.tilPersonData() = PersonData.Vilkårsgrunnla
 
         else -> null
     }
-)
-
-private fun RefusjonsopplysningUtDto.tilPersonData() = PersonData.ArbeidsgiverData.RefusjonsopplysningData(
-    meldingsreferanseId = this.meldingsreferanseId,
-    fom = this.fom,
-    tom = this.tom,
-    beløp = this.beløp.månedligDouble.beløp,
-    avsender = this.avsender.tilPersonData(),
-    tidsstempel = this.tidsstempel
 )
 
 private fun SkatteopplysningDto.tilPersonDataSkattopplysning() = SkatteopplysningData(

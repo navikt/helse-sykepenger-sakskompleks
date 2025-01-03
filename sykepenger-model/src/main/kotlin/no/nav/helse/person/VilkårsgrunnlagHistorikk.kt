@@ -274,9 +274,6 @@ internal class VilkårsgrunnlagHistorikk private constructor(private val histori
 
         internal fun harTilkommendeInntekter() = inntektsgrunnlag.harTilkommendeInntekter()
 
-        internal fun refusjonsopplysninger(organisasjonsnummer: String) =
-            inntektsgrunnlag.refusjonsopplysninger(organisasjonsnummer)
-
         internal fun harGjenbrukbarInntekt(organisasjonsnummer: String) =
             inntektsgrunnlag.harGjenbrukbarInntekt(organisasjonsnummer)
 

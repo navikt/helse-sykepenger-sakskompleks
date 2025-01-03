@@ -8,7 +8,6 @@ import no.nav.helse.dsl.BeløpstidslinjeDsl.oppgir
 import no.nav.helse.februar
 import no.nav.helse.hendelser.til
 import no.nav.helse.januar
-import no.nav.helse.person.inntekt.Refusjonsopplysning
 import no.nav.helse.testhelpers.AP
 import no.nav.helse.testhelpers.NAV
 import no.nav.helse.testhelpers.UTELATE
@@ -25,8 +24,8 @@ internal class VilkårsprøvdSkjæringstidspunktTest {
             skjæringstidspunkt = 1.januar,
             `6G` = Grunnbeløp.`6G`.beløp(1.januar),
             inntekter = listOf(
-                VilkårsprøvdSkjæringstidspunkt.FaktaavklartInntekt("a1", 1000.daglig, 1.januar til 31.januar, Refusjonsopplysning.Refusjonsopplysninger()),
-                VilkårsprøvdSkjæringstidspunkt.FaktaavklartInntekt("a2", 500.daglig, 25.januar til LocalDate.MAX, Refusjonsopplysning.Refusjonsopplysninger()),
+                VilkårsprøvdSkjæringstidspunkt.FaktaavklartInntekt("a1", 1000.daglig, 1.januar til 31.januar),
+                VilkårsprøvdSkjæringstidspunkt.FaktaavklartInntekt("a2", 500.daglig, 25.januar til LocalDate.MAX),
             ),
             tilkommendeInntekter = emptyList(),
             deaktiverteArbeidsforhold = emptyList()
@@ -71,7 +70,7 @@ internal class VilkårsprøvdSkjæringstidspunktTest {
             skjæringstidspunkt = 1.januar,
             `6G` = Grunnbeløp.`6G`.beløp(1.januar),
             inntekter = listOf(
-                VilkårsprøvdSkjæringstidspunkt.FaktaavklartInntekt("a1", 1000.daglig, 1.januar til 31.januar, Refusjonsopplysning.Refusjonsopplysninger())
+                VilkårsprøvdSkjæringstidspunkt.FaktaavklartInntekt("a1", 1000.daglig, 1.januar til 31.januar)
             ),
             tilkommendeInntekter = listOf(
                 VilkårsprøvdSkjæringstidspunkt.NyInntektUnderveis("a2", Arbeidsgiver oppgir 500.daglig hele januar)
