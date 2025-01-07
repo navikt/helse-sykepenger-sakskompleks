@@ -80,10 +80,6 @@ class Ytelser(
         oppdaterHistorikk()
     }
 
-    override fun oppdaterFom(other: Periode): Periode {
-        return other
-    }
-
     override fun sykdomstidslinje(): Sykdomstidslinje {
         return sykdomstidslinje
     }

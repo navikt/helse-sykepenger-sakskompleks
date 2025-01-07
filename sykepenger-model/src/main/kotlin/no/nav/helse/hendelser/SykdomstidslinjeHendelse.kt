@@ -9,12 +9,6 @@ sealed class SykdomstidslinjeHendelse : Hendelse, SykdomshistorikkHendelse {
     private val håndtertAv = mutableSetOf<UUID>()
     private var nesteFraOgMed: LocalDate = LocalDate.MIN
 
-    override fun oppdaterFom(other: Periode): Periode {
-        // strekker vedtaksperioden tilbake til å måte første dag
-        val førsteDag = sykdomstidslinje().førsteDag()
-        return other.oppdaterFom(førsteDag)
-    }
-
     internal fun noenHarHåndtert() = håndtertAv.isNotEmpty()
 
     internal abstract fun erRelevant(other: Periode): Boolean

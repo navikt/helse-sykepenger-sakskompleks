@@ -10,7 +10,6 @@ import no.nav.helse.sykdomstidslinje.Sykdomstidslinje
 internal typealias Melding = KClass<out SykdomshistorikkHendelse>
 
 interface SykdomshistorikkHendelse {
-    fun oppdaterFom(other: Periode): Periode
     fun sykdomstidslinje(): Sykdomstidslinje
 
     class Hendelseskilde(

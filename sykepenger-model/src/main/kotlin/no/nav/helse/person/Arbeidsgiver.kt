@@ -892,8 +892,8 @@ internal class Arbeidsgiver private constructor(
         return revurderingseventyr
     }
 
-    internal fun oppdaterSykdom(hendelse: SykdomshistorikkHendelse, aktivitetslogg: IAktivitetslogg): Sykdomstidslinje {
-        return sykdomshistorikk.håndter(hendelse, aktivitetslogg)
+    internal fun oppdaterSykdom(meldingsreferanseId: UUID, sykdomstidslinje: Sykdomstidslinje): Sykdomstidslinje {
+        return sykdomshistorikk.håndter(meldingsreferanseId, sykdomstidslinje)
     }
 
     private fun sykdomstidslinje(): Sykdomstidslinje {

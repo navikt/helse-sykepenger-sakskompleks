@@ -207,6 +207,5 @@ internal val Int.FORELDET
 
 
 internal class TestHendelse(private val tidslinje: Sykdomstidslinje = Sykdomstidslinje()) : SykdomshistorikkHendelse {
-    override fun oppdaterFom(other: Periode) = other
     override fun sykdomstidslinje() = tidslinje
 }

@@ -75,10 +75,6 @@ internal class TurneringsnøkkelTest {
         object Inntektsmelding : TestHendelse()
         object Søknad : TestHendelse()
 
-        override fun oppdaterFom(other: Periode): Periode {
-            error("ikke i bruk")
-        }
-
         override fun sykdomstidslinje(): Sykdomstidslinje {
             error("ikke i bruk")
         }

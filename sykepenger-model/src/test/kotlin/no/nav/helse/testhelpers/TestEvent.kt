@@ -24,10 +24,6 @@ internal sealed class TestEvent(opprettet: LocalDateTime) : SykdomshistorikkHend
     class Søknad(opprettet: LocalDateTime) : TestEvent(opprettet)
     class TestHendelse(opprettet: LocalDateTime) : TestEvent(opprettet)
 
-    override fun oppdaterFom(other: Periode): Periode {
-        error("ikke i bruk")
-    }
-
     override fun sykdomstidslinje(): Sykdomstidslinje {
         error("ikke i bruk")
     }

@@ -61,7 +61,7 @@ internal enum class Turneringsnøkkel {
             dag is SykHelgedag && dag.kommerFra(Søknad::class) -> SykHelgedag_SØ
             dag is Dag.AndreYtelser -> AndreYtelserDag
             dag is Dag.UkjentDag -> UkjentDag
-            else -> throw IllegalArgumentException("Ingen turneringsnøkkel definert for ${dag::class.simpleName}")
+            else -> throw IllegalArgumentException("Ingen turneringsnøkkel definert for ${dag::class.simpleName} med kilde ${dag.kilde}")
         }
     }
 }

@@ -1,12 +1,12 @@
 package no.nav.helse.sykdomstidslinje
 
 import java.time.LocalDate
+import java.util.UUID
 import no.nav.helse.desember
 import no.nav.helse.dsl.ArbeidsgiverHendelsefabrikk
 import no.nav.helse.erRettFør
 import no.nav.helse.februar
 import no.nav.helse.hendelser.BitAvArbeidsgiverperiode
-import no.nav.helse.hendelser.DagerFraInntektsmelding
 import no.nav.helse.hendelser.Inntektsmelding
 import no.nav.helse.hendelser.Periode
 import no.nav.helse.hendelser.Periode.Companion.periode
@@ -456,7 +456,7 @@ internal class SkjæringstidspunktTest {
         vararg hendelse: SykdomshistorikkHendelse
     ) {
         val a = Sykdomshistorikk()
-        hendelse.forEach { a.håndter(it, Aktivitetslogg()) }
+        hendelse.forEach { a.håndter(UUID.randomUUID(), it.sykdomstidslinje()) }
 
         val tidslinje = a.sykdomstidslinje()
 
