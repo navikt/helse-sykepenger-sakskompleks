@@ -7,6 +7,7 @@ import no.nav.helse.hendelser.Revurderingseventyr.RevurderingÅrsak.Arbeidsforho
 import no.nav.helse.hendelser.Revurderingseventyr.RevurderingÅrsak.Arbeidsgiveropplysninger
 import no.nav.helse.hendelser.Revurderingseventyr.RevurderingÅrsak.Arbeidsgiverperiode
 import no.nav.helse.hendelser.Revurderingseventyr.RevurderingÅrsak.Grunnbeløpsregulering
+import no.nav.helse.hendelser.Revurderingseventyr.RevurderingÅrsak.Infotrygd
 import no.nav.helse.hendelser.Revurderingseventyr.RevurderingÅrsak.KorrigertInntektsmeldingInntektsopplysninger
 import no.nav.helse.hendelser.Revurderingseventyr.RevurderingÅrsak.KorrigertSøknad
 import no.nav.helse.hendelser.Revurderingseventyr.RevurderingÅrsak.MinimumSykdomsgradVurdert
@@ -46,6 +47,7 @@ class Revurderingseventyr private constructor(
         fun grunnbeløpsregulering(hendelse: Hendelse, skjæringstidspunkt: LocalDate) = Revurderingseventyr(Grunnbeløpsregulering, skjæringstidspunkt, skjæringstidspunkt.somPeriode(), hendelse)
         fun annullering(hendelse: Hendelse, periode: Periode) = Revurderingseventyr(Annullering, periode.start, periode, hendelse)
         fun minimumSykdomsgradVurdert(hendelse: Hendelse, periode: Periode) = Revurderingseventyr(MinimumSykdomsgradVurdert, periode.start, periode, hendelse)
+        fun infotrygd(hendelse: Hendelse, periode: Periode) = Revurderingseventyr(Infotrygd, periode.start, periode, hendelse)
 
         fun tidligsteEventyr(a: Revurderingseventyr?, b: Revurderingseventyr?) = when {
             b == null || (a != null && a.periodeForEndring.start <= b.periodeForEndring.start) -> a
@@ -156,6 +158,10 @@ class Revurderingseventyr private constructor(
 
         data object MinimumSykdomsgradVurdert : RevurderingÅrsak {
             override fun navn(): String = "MINIMUM_SYKDOMSGRAD_VURDERT"
+        }
+
+        data object Infotrygd : RevurderingÅrsak {
+            override fun navn(): String = "INFOTRYGD"
         }
 
         data object Reberegning : RevurderingÅrsak {
