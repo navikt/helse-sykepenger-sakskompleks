@@ -62,6 +62,17 @@ sealed class Inntektsopplysning(
         is SkjønnsmessigFastsatt -> this.omregnetÅrsinntekt!!
     }
 
+    fun erUlik(other: Inntektsopplysning): Boolean {
+        if (this.id != other.id) return true
+        return when (this) {
+            is Saksbehandler -> overstyrtInntekt.id != (other as Saksbehandler).overstyrtInntekt.id
+            is SkjønnsmessigFastsatt -> overstyrtInntekt.id != (other as SkjønnsmessigFastsatt).overstyrtInntekt.id
+            is SkattSykepengegrunnlag,
+            is Infotrygd,
+            is Arbeidsgiverinntekt -> false
+        }
+    }
+
     fun funksjoneltLik(other: Inntektsopplysning) =
         this::class == other::class && this.inntektsdata.funksjoneltLik(other.inntektsdata)
 

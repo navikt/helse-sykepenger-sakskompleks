@@ -307,7 +307,7 @@ internal data class ArbeidsgiverInntektsopplysning(
                 val gammel = other.singleOrNull { it.orgnummer == ny.orgnummer }
                 when {
                     gammel == null -> ny.gjelder.start
-                    !ny.inntektsopplysning.funksjoneltLik(gammel.inntektsopplysning) || ny.gjelder != gammel.gjelder -> minOf(ny.gjelder.start, gammel.gjelder.start)
+                    ny.inntektsopplysning.erUlik(gammel.inntektsopplysning) || ny.gjelder != gammel.gjelder -> minOf(ny.gjelder.start, gammel.gjelder.start)
                     else -> null
                 }
             }
