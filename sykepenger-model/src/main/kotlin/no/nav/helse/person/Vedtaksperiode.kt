@@ -1365,6 +1365,7 @@ internal class Vedtaksperiode private constructor(
             orgnummer = arbeidsgiver.organisasjonsnummer,
             gjelder = skjæringstidspunkt til LocalDate.MAX,
             inntektsopplysning = faktaavklartInntekt,
+            korrigertInntekt = null,
             skjønnsmessigFastsatt = null
         )
     }
@@ -1428,6 +1429,7 @@ internal class Vedtaksperiode private constructor(
                     orgnummer = skatteopplysning.arbeidsgiver,
                     gjelder = skjæringstidspunkt til LocalDate.MAX,
                     inntektsopplysning = ghostopplysning,
+                    korrigertInntekt = null,
                     skjønnsmessigFastsatt = null
                 )
             }

@@ -24,7 +24,6 @@ import no.nav.helse.person.TilstandType.AVVENTER_SIMULERING
 import no.nav.helse.person.TilstandType.AVVENTER_SIMULERING_REVURDERING
 import no.nav.helse.person.TilstandType.TIL_UTBETALING
 import no.nav.helse.person.aktivitetslogg.Varselkode
-import no.nav.helse.person.inntekt.Saksbehandler
 import no.nav.helse.spleis.e2e.AktivitetsloggFilter
 import no.nav.helse.spleis.e2e.AktivitetsloggFilter.Companion.filter
 import no.nav.helse.utbetalingslinjer.Endringskode
@@ -534,8 +533,7 @@ internal class RevurderInntektFlereArbeidsgivereTest : AbstractDslTest() {
             assertEquals(300000.årlig, sykepengegrunnlagInspektør.sykepengegrunnlag)
             assertEquals(1, sykepengegrunnlagInspektør.arbeidsgiverInntektsopplysninger.size)
             sykepengegrunnlagInspektør.arbeidsgiverInntektsopplysningerPerArbeidsgiver.getValue(a1).inspektør.also {
-                assertEquals(25000.månedlig, it.inntektsopplysning.inspektør.beløp)
-                assertEquals(Saksbehandler::class, it.inntektsopplysning::class)
+                assertEquals(25000.månedlig, it.fastsattÅrsinntekt)
             }
         }
     }

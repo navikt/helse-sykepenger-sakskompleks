@@ -351,8 +351,8 @@ internal class InntektsgrunnlagTest {
         val a1Inntekt = 25000.månedlig
         val a2Inntekt = 5000.månedlig
         val inntekter = listOf(
-            ArbeidsgiverInntektsopplysning("a1", a1Fom til LocalDate.MAX, arbeidsgiverinntekt(a1Fom, a1Inntekt), null),
-            ArbeidsgiverInntektsopplysning("a2", a2Fom til LocalDate.MAX, arbeidsgiverinntekt(a2Fom, a2Inntekt), null),
+            ArbeidsgiverInntektsopplysning("a1", a1Fom til LocalDate.MAX, arbeidsgiverinntekt(a1Fom, a1Inntekt), null, null),
+            ArbeidsgiverInntektsopplysning("a2", a2Fom til LocalDate.MAX, arbeidsgiverinntekt(a2Fom, a2Inntekt), null, null),
         )
 
         val inntektsgrunnlag = Inntektsgrunnlag(
@@ -382,6 +382,7 @@ internal class InntektsgrunnlagTest {
                         dato = skjæringstidspunkt,
                         beløp = 25000.månedlig
                     ),
+                    korrigertInntekt = null,
                     skjønnsmessigFastsatt = null
                 ),
                 ArbeidsgiverInntektsopplysning(
@@ -402,6 +403,7 @@ internal class InntektsgrunnlagTest {
                             )
                         )
                     ),
+                    korrigertInntekt = null,
                     skjønnsmessigFastsatt = null
                 )
             ),
@@ -458,6 +460,7 @@ internal class InntektsgrunnlagTest {
                         dato = førsteFraværsdagAG1,
                         beløp = 25000.månedlig
                     ),
+                    korrigertInntekt = null,
                     skjønnsmessigFastsatt = null
                 ),
                 ArbeidsgiverInntektsopplysning(
@@ -478,6 +481,7 @@ internal class InntektsgrunnlagTest {
                             )
                         )
                     ),
+                    korrigertInntekt = null,
                     skjønnsmessigFastsatt = null
                 )
             ),
@@ -508,6 +512,7 @@ internal class InntektsgrunnlagTest {
                         dato = førsteFraværsdagAG1,
                         beløp = 25000.månedlig
                     ),
+                    korrigertInntekt = null,
                     skjønnsmessigFastsatt = null
                 ),
                 ArbeidsgiverInntektsopplysning(
@@ -517,6 +522,7 @@ internal class InntektsgrunnlagTest {
                         dato = førsteFraværsdagAG2,
                         beløp = 25000.månedlig
                     ),
+                    korrigertInntekt = null,
                     skjønnsmessigFastsatt = null
                 )
             ),
@@ -545,6 +551,7 @@ internal class InntektsgrunnlagTest {
                         dato = skjæringstidspunkt,
                         beløp = 25000.månedlig
                     ),
+                    korrigertInntekt = null,
                     skjønnsmessigFastsatt = null
                 ),
                 ArbeidsgiverInntektsopplysning(
@@ -554,6 +561,7 @@ internal class InntektsgrunnlagTest {
                         dato = skjæringstidspunkt,
                         beløp = 25000.månedlig
                     ),
+                    korrigertInntekt = null,
                     skjønnsmessigFastsatt = null
                 )
             ),
@@ -624,6 +632,7 @@ internal class InntektsgrunnlagTest {
                         dato = førsteFraværsdagAG1,
                         beløp = 25000.månedlig
                     ),
+                    korrigertInntekt = null,
                     skjønnsmessigFastsatt = null
                 ),
                 ArbeidsgiverInntektsopplysning(
@@ -633,6 +642,7 @@ internal class InntektsgrunnlagTest {
                         dato = førsteFraværsdagAG2,
                         beløp = 25000.månedlig
                     ),
+                    korrigertInntekt = null,
                     skjønnsmessigFastsatt = null
                 )
             ),

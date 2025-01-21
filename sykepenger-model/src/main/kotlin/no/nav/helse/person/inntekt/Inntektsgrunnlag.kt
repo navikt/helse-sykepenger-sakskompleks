@@ -269,7 +269,7 @@ internal class Inntektsgrunnlag private constructor(
     }
 
     internal fun overstyrArbeidsgiveropplysninger(hendelse: OverstyrArbeidsgiveropplysninger, subsumsjonslogg: Subsumsjonslogg): EndretInntektsgrunnlag? {
-        val resultat = this.arbeidsgiverInntektsopplysninger.overstyrMedSaksbehandler(skjæringstidspunkt, hendelse.arbeidsgiveropplysninger)
+        val resultat = this.arbeidsgiverInntektsopplysninger.overstyrMedSaksbehandler(hendelse.arbeidsgiveropplysninger)
         val kilde = Kilde(hendelse.metadata.meldingsreferanseId, Avsender.SAKSBEHANDLER, hendelse.metadata.registrert)
         return lagEndring(resultat, subsumsjonslogg, tilkommendeInntekter.overstyrMedSaksbehandler(kilde, skjæringstidspunkt, hendelse.arbeidsgiveropplysninger))
     }
@@ -291,7 +291,7 @@ internal class Inntektsgrunnlag private constructor(
         inntekt: Arbeidsgiverinntekt,
         subsumsjonslogg: Subsumsjonslogg
     ): EndretInntektsgrunnlag? {
-        val resultat = arbeidsgiverInntektsopplysninger.overstyrMedInntektsmelding(skjæringstidspunkt, organisasjonsnummer, inntekt)
+        val resultat = arbeidsgiverInntektsopplysninger.overstyrMedInntektsmelding(organisasjonsnummer, inntekt)
         return lagEndring(resultat, subsumsjonslogg)
     }
 
@@ -302,7 +302,7 @@ internal class Inntektsgrunnlag private constructor(
             inntekter = nyeInntekter.mapNotNull { potensiellEndret ->
                 val eksisterende = arbeidsgiverInntektsopplysninger.single { eksisterende -> potensiellEndret.orgnummer == eksisterende.orgnummer }
 
-                if (eksisterende.inntektsopplysning.id == potensiellEndret.inntektsopplysning.id) null
+                if (eksisterende.inntektsopplysning.id == potensiellEndret.inntektsopplysning.id && eksisterende.korrigertInntekt == potensiellEndret.korrigertInntekt) null
                 else EndretInntektsgrunnlag.EndretInntekt(
                     inntektFør = eksisterende,
                     inntektEtter = potensiellEndret

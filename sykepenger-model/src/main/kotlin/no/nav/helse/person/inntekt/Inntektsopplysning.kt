@@ -9,7 +9,6 @@ import no.nav.helse.dto.serialisering.InntektsdataUtDto
 import no.nav.helse.dto.serialisering.InntektsopplysningUtDto
 import no.nav.helse.etterlevelse.Subsumsjonslogg
 import no.nav.helse.etterlevelse.`§ 8-15`
-import no.nav.helse.person.Arbeidsgiver
 import no.nav.helse.person.aktivitetslogg.IAktivitetslogg
 import no.nav.helse.person.aktivitetslogg.Varselkode
 import no.nav.helse.person.inntekt.Skatteopplysning.Companion.subsumsjonsformat
@@ -86,35 +85,7 @@ internal sealed class Inntektsopplysning(
         is SkattSykepengegrunnlag -> null
     }
 
-    internal fun lagreTidsnærInntekt(
-        skjæringstidspunkt: LocalDate,
-        arbeidsgiver: Arbeidsgiver,
-        aktivitetslogg: IAktivitetslogg,
-        nyArbeidsgiverperiode: Boolean,
-        orgnummer: String,
-        beløp: Inntekt? = null
-    ) {
-        val gjenbrukbarInntekt = gjenbrukbarInntekt(beløp) ?: return
-        arbeidsgiver.lagreTidsnærInntektsmelding(
-            skjæringstidspunkt = skjæringstidspunkt,
-            orgnummer = orgnummer,
-            arbeidsgiverinntekt = gjenbrukbarInntekt,
-            aktivitetslogg = aktivitetslogg,
-            nyArbeidsgiverperiode = nyArbeidsgiverperiode
-        )
-    }
-
     internal companion object {
-        internal fun erOmregnetÅrsinntektEndret(før: Inntektsopplysning, etter: Inntektsopplysning) =
-            erOmregnetÅrsinntektEndret(listOf(før), listOf(etter))
-
-        internal fun erOmregnetÅrsinntektEndret(før: List<Inntektsopplysning>, etter: List<Inntektsopplysning>) =
-            omregnetÅrsinntekt(før) != omregnetÅrsinntekt(etter)
-
-        private fun omregnetÅrsinntekt(liste: List<Inntektsopplysning>) = liste
-            .map { it.inntektsdata.beløp }
-            .map { it.årlig.toInt() }
-
         internal fun List<Inntektsopplysning>.markerFlereArbeidsgivere(aktivitetslogg: IAktivitetslogg) {
             if (distinctBy { it.inntektsdata.dato }.size <= 1 && none { it is SkattSykepengegrunnlag }) return
             aktivitetslogg.varsel(Varselkode.RV_VV_2)

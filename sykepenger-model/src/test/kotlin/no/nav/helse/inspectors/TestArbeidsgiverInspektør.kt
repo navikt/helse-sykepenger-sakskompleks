@@ -172,11 +172,23 @@ internal class TestArbeidsgiverInspektør(
 
     private fun VilkårsgrunnlagHistorikk.VilkårsgrunnlagElement.arbeidsgiveropplysning() = inspektør.inntektsgrunnlag.inspektør.arbeidsgiverInntektsopplysningerPerArbeidsgiver.getValue(orgnummer)
     private fun VilkårsgrunnlagHistorikk.VilkårsgrunnlagElement.inntekt() = arbeidsgiveropplysning().inntektsopplysning
+
     internal fun inntekt(skjæringstidspunkt: LocalDate) = vilkårsgrunnlag(skjæringstidspunkt)!!.inntekt()
     internal fun inntekt(vedtaksperiodeIdInnhenter: IdInnhenter) = vilkårsgrunnlag(vedtaksperiodeIdInnhenter)!!.inntekt()
     internal fun inntekt(vedtaksperiodeId: UUID) = vilkårsgrunnlag(vedtaksperiodeId)!!.inntekt()
+
+    internal fun korrigertInntekt(vedtaksperiodeId: UUID) = vilkårsgrunnlag(vedtaksperiodeId)!!.arbeidsgiveropplysning().korrigertInntekt
+    internal fun korrigertInntekt(skjæringstidspunkt: LocalDate) = vilkårsgrunnlag(skjæringstidspunkt)!!.arbeidsgiveropplysning().korrigertInntekt
+
     internal fun skjønnsfastsatt(vedtaksperiodeId: UUID) = vilkårsgrunnlag(vedtaksperiodeId)!!.arbeidsgiveropplysning().skjønnsmessigFastsatt
     internal fun skjønnsfastsatt(skjæringstidspunkt: LocalDate) = vilkårsgrunnlag(skjæringstidspunkt)!!.arbeidsgiveropplysning().skjønnsmessigFastsatt
+
+    internal fun omregnetÅrsinntekt(vedtaksperiodeId: UUID) = vilkårsgrunnlag(vedtaksperiodeId)!!.arbeidsgiveropplysning().omregnetÅrsinntekt.beløp
+    internal fun omregnetÅrsinntekt(skjæringstidspunkt: LocalDate) = vilkårsgrunnlag(skjæringstidspunkt)!!.arbeidsgiveropplysning().omregnetÅrsinntekt.beløp
+
+    internal fun fastsattInntekt(idInnhenter: IdInnhenter) = fastsattInntekt(idInnhenter.id(orgnummer))
+    internal fun fastsattInntekt(vedtaksperiodeId: UUID) = vilkårsgrunnlag(vedtaksperiodeId)!!.arbeidsgiveropplysning().fastsattÅrsinntekt
+    internal fun fastsattInntekt(skjæringstidspunkt: LocalDate) = vilkårsgrunnlag(skjæringstidspunkt)!!.arbeidsgiveropplysning().fastsattÅrsinntekt
 
     internal fun harFunksjonelleFeilEllerVerre(): Boolean = personInspektør.aktivitetslogg.harFunksjonelleFeilEllerVerre()
 }

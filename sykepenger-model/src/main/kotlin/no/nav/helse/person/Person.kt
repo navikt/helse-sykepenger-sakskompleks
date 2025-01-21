@@ -712,21 +712,22 @@ class Person private constructor(
         }
         val (nyttGrunnlag, endretInntektsgrunnlag) = grunnlag.nyeArbeidsgiverInntektsopplysninger(organisasjonsnummer, inntekt, aktivitetslogg, subsumsjonslogg) ?: return null
 
-        val endretInntektForArbeidsgiver = endretInntektsgrunnlag.inntekter.firstNotNullOf { før ->
-            før.inntektFør.inntektsopplysning.takeIf { før.inntektFør.orgnummer == organisasjonsnummer }
-        }
-        when (val inntektFraFør = endretInntektForArbeidsgiver) {
-            is Arbeidsgiverinntekt -> {
-                arbeidsgiveropplysningerKorrigert(
-                    PersonObserver.ArbeidsgiveropplysningerKorrigertEvent(
-                        korrigertInntektsmeldingId = inntektFraFør.inntektsdata.hendelseId,
-                        korrigerendeInntektektsopplysningstype = INNTEKTSMELDING,
-                        korrigerendeInntektsopplysningId = inntekt.inntektsdata.hendelseId
-                    )
-                )
-            }
+        val endretInntektForArbeidsgiver = endretInntektsgrunnlag.inntekter.first { før -> før.inntektFør.orgnummer == organisasjonsnummer }
 
-            else -> { /* gjør ingenting */ }
+        if (endretInntektForArbeidsgiver.inntektFør.korrigertInntekt == null) {
+            when (val inntektFraFør = endretInntektForArbeidsgiver.inntektFør.inntektsopplysning) {
+                is Arbeidsgiverinntekt -> {
+                    arbeidsgiveropplysningerKorrigert(
+                        PersonObserver.ArbeidsgiveropplysningerKorrigertEvent(
+                            korrigertInntektsmeldingId = inntektFraFør.inntektsdata.hendelseId,
+                            korrigerendeInntektektsopplysningstype = INNTEKTSMELDING,
+                            korrigerendeInntektsopplysningId = inntekt.inntektsdata.hendelseId
+                        )
+                    )
+                }
+
+                else -> { /* gjør ingenting */ }
+            }
         }
 
         val eventyr = Revurderingseventyr.korrigertInntektsmeldingInntektsopplysninger(hendelse, skjæringstidspunkt, endretInntektsgrunnlag.endringFom)

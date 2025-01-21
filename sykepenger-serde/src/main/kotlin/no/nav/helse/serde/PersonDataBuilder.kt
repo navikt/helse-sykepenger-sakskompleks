@@ -800,6 +800,7 @@ private fun ArbeidsgiverInntektsopplysningUtDto.tilPersonData() = PersonData.Vil
     fom = this.gjelder.fom,
     tom = this.gjelder.tom,
     inntektsopplysning = this.inntektsopplysning.tilPersonData(),
+    korrigertInntekt = this.korrigertInntekt?.tilPersonData(),
     skjønnsmessigFastsatt = this.skjønnsmessigFastsatt?.tilPersonData()
 )
 
@@ -836,6 +837,15 @@ private fun InntektsopplysningUtDto.tilPersonData() = PersonData.Vilkårsgrunnla
 
         else -> null
     }
+)
+
+private fun InntektsopplysningUtDto.SaksbehandlerDto.tilPersonData() = PersonData.VilkårsgrunnlagElementData.ArbeidsgiverInntektsopplysningData.KorrigertInntektsopplysningData(
+    id = this.id,
+    dato = this.inntektsdata.dato,
+    hendelseId = this.inntektsdata.hendelseId,
+    beløp = this.inntektsdata.beløp.månedligDouble.beløp,
+    tidsstempel = this.inntektsdata.tidsstempel,
+    overstyrtInntektId = this.overstyrtInntekt
 )
 private fun SkjønnsmessigFastsattUtDto.tilPersonData() = PersonData.VilkårsgrunnlagElementData.ArbeidsgiverInntektsopplysningData.SkjønnsmessigFastsattData(
     id = this.id,

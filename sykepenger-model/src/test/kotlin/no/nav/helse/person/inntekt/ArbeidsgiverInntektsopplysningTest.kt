@@ -19,6 +19,7 @@ import no.nav.helse.person.inntekt.ArbeidsgiverInntektsopplysning.Companion.over
 import no.nav.helse.person.inntekt.ArbeidsgiverInntektsopplysning.Companion.overstyrMedSaksbehandler
 import no.nav.helse.person.inntekt.Skatteopplysning.Inntekttype.LØNNSINNTEKT
 import no.nav.helse.testhelpers.assertInstanceOf
+import no.nav.helse.testhelpers.assertNotNull
 import no.nav.helse.yearMonth
 import no.nav.helse.økonomi.Inntekt.Companion.månedlig
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -41,8 +42,8 @@ internal class ArbeidsgiverInntektsopplysningTest {
     @Test
     fun `overstyr inntekter`() {
         val skjæringstidspunkt = 1.januar
-        val a1Opplysning = ArbeidsgiverInntektsopplysning("a1", skjæringstidspunkt til LocalDate.MAX, arbeidsgiverinntekt(skjæringstidspunkt, 1000.månedlig), null)
-        val a2Opplysning = ArbeidsgiverInntektsopplysning("a2", skjæringstidspunkt til LocalDate.MAX, arbeidsgiverinntekt(skjæringstidspunkt, 2000.månedlig), null)
+        val a1Opplysning = ArbeidsgiverInntektsopplysning("a1", skjæringstidspunkt til LocalDate.MAX, arbeidsgiverinntekt(skjæringstidspunkt, 1000.månedlig), null, null)
+        val a2Opplysning = ArbeidsgiverInntektsopplysning("a2", skjæringstidspunkt til LocalDate.MAX, arbeidsgiverinntekt(skjæringstidspunkt, 2000.månedlig), null, null)
         val a1Overstyrt = OverstyrArbeidsgiveropplysninger.KorrigertArbeidsgiverInntektsopplysning("a1", skjæringstidspunkt til LocalDate.MAX, Inntektsdata(UUID.randomUUID(), skjæringstidspunkt, 3000.månedlig, LocalDateTime.now()), OverstyrArbeidsgiveropplysninger.Overstyringbegrunnelse("", null))
         val a3Overstyrt = OverstyrArbeidsgiveropplysninger.KorrigertArbeidsgiverInntektsopplysning("a3", skjæringstidspunkt til LocalDate.MAX, Inntektsdata(UUID.randomUUID(), skjæringstidspunkt, 4000.månedlig, LocalDateTime.now()), OverstyrArbeidsgiveropplysninger.Overstyringbegrunnelse("", null))
 
@@ -50,17 +51,21 @@ internal class ArbeidsgiverInntektsopplysningTest {
         val expected = listOf(a1Opplysning, a2Opplysning)
         val new = listOf(a1Overstyrt)
 
-        assertEquals(expected, original.overstyrMedSaksbehandler(skjæringstidspunkt, listOf(a1Overstyrt, a1Overstyrt)))
+        assertEquals(expected, original.overstyrMedSaksbehandler(listOf(a1Overstyrt, a1Overstyrt)))
 
-        original.overstyrMedSaksbehandler(skjæringstidspunkt, new).also {
+        original.overstyrMedSaksbehandler(new).also {
             assertEquals(2, it.size)
-            assertInstanceOf<Saksbehandler>(it[0].inntektsopplysning)
+            assertEquals(3000.månedlig, it[0].fastsattÅrsinntekt)
+            assertEquals(2000.månedlig, it[1].fastsattÅrsinntekt)
+            assertNotNull(it[0].korrigertInntekt)
             assertInstanceOf<Arbeidsgiverinntekt>(it[1].inntektsopplysning)
         }
         val forMange = listOf(a1Overstyrt, a3Overstyrt)
-        original.overstyrMedSaksbehandler(skjæringstidspunkt, forMange).also {
+        original.overstyrMedSaksbehandler(forMange).also {
             assertEquals(2, it.size)
-            assertInstanceOf<Saksbehandler>(it[0].inntektsopplysning)
+            assertEquals(3000.månedlig, it[0].fastsattÅrsinntekt)
+            assertEquals(2000.månedlig, it[1].fastsattÅrsinntekt)
+            assertNotNull(it[0].korrigertInntekt)
             assertInstanceOf<Arbeidsgiverinntekt>(it[1].inntektsopplysning)
         }
     }
@@ -74,16 +79,16 @@ internal class ArbeidsgiverInntektsopplysningTest {
 
         val arbeidsgiverinntektA1Ny = arbeidsgiverinntekt(skjæringstidspunkt, 1000.månedlig)
         val overstyrtA1Opplysning = arbeidsgiverinntekt(skjæringstidspunkt, 1000.månedlig)
-        val forventetA1Opplysning = ArbeidsgiverInntektsopplysning("a1", skjæringstidspunkt til LocalDate.MAX, arbeidsgiverinntektA1Ny, skjønnsmessigFastsatt(skjæringstidspunkt, 900.månedlig))
+        val forventetA1Opplysning = ArbeidsgiverInntektsopplysning("a1", skjæringstidspunkt til LocalDate.MAX, arbeidsgiverinntektA1Ny, null, skjønnsmessigFastsatt(skjæringstidspunkt, 900.månedlig))
 
-        val a1Opplysning = ArbeidsgiverInntektsopplysning("a1", skjæringstidspunkt til LocalDate.MAX, arbeidsgiverinntektA1, skjønnsmessigFastsatt(skjæringstidspunkt, 900.månedlig))
-        val a2Opplysning = ArbeidsgiverInntektsopplysning("a2", skjæringstidspunkt til LocalDate.MAX, arbeidsgiverinntektA2, skjønnsmessigFastsatt(skjæringstidspunkt, 950.månedlig))
-        val a3Opplysning = ArbeidsgiverInntektsopplysning("a3", skjæringstidspunkt til LocalDate.MAX, arbeidsgiverinntektA3, skjønnsmessigFastsatt(skjæringstidspunkt, 975.månedlig))
+        val a1Opplysning = ArbeidsgiverInntektsopplysning("a1", skjæringstidspunkt til LocalDate.MAX, arbeidsgiverinntektA1, null, skjønnsmessigFastsatt(skjæringstidspunkt, 900.månedlig))
+        val a2Opplysning = ArbeidsgiverInntektsopplysning("a2", skjæringstidspunkt til LocalDate.MAX, arbeidsgiverinntektA2, null, skjønnsmessigFastsatt(skjæringstidspunkt, 950.månedlig))
+        val a3Opplysning = ArbeidsgiverInntektsopplysning("a3", skjæringstidspunkt til LocalDate.MAX, arbeidsgiverinntektA3, null, skjønnsmessigFastsatt(skjæringstidspunkt, 975.månedlig))
 
         val original = listOf(a1Opplysning, a2Opplysning, a3Opplysning)
         val expected = listOf(forventetA1Opplysning, a2Opplysning, a3Opplysning)
 
-        val actual = original.overstyrMedInntektsmelding(skjæringstidspunkt, "a1", overstyrtA1Opplysning)
+        val actual = original.overstyrMedInntektsmelding("a1", overstyrtA1Opplysning)
         assertTrue(expected.funksjoneltLik(actual)) { "kan ikke velge mellom inntekter for samme orgnr" }
     }
 
@@ -102,24 +107,24 @@ internal class ArbeidsgiverInntektsopplysningTest {
 
         val arbeidsgiverinntektA1Ny = arbeidsgiverinntekt(skjæringstidspunkt, 1000.månedlig)
         val overstyrtA1Opplysning = arbeidsgiverinntekt(skjæringstidspunkt, 1000.månedlig)
-        val forventetA1Opplysning = ArbeidsgiverInntektsopplysning("a1", skjæringstidspunkt til LocalDate.MAX, arbeidsgiverinntektA1Ny, skjønnsmessigFastsatt(skjæringstidspunkt, 900.månedlig))
+        val forventetA1Opplysning = ArbeidsgiverInntektsopplysning("a1", skjæringstidspunkt til LocalDate.MAX, arbeidsgiverinntektA1Ny, null, skjønnsmessigFastsatt(skjæringstidspunkt, 900.månedlig))
 
-        val a1Opplysning = ArbeidsgiverInntektsopplysning("a1", skjæringstidspunkt til LocalDate.MAX, skattA1, skjønnsmessigFastsatt(skjæringstidspunkt, 900.månedlig))
-        val a2Opplysning = ArbeidsgiverInntektsopplysning("a2", skjæringstidspunkt til LocalDate.MAX, arbeidsgiverinntektA2, skjønnsmessigFastsatt(skjæringstidspunkt, 950.månedlig))
-        val a3Opplysning = ArbeidsgiverInntektsopplysning("a3", skjæringstidspunkt til LocalDate.MAX, arbeidsgiverinntektA3, skjønnsmessigFastsatt(skjæringstidspunkt, 975.månedlig))
+        val a1Opplysning = ArbeidsgiverInntektsopplysning("a1", skjæringstidspunkt til LocalDate.MAX, skattA1, null, skjønnsmessigFastsatt(skjæringstidspunkt, 900.månedlig))
+        val a2Opplysning = ArbeidsgiverInntektsopplysning("a2", skjæringstidspunkt til LocalDate.MAX, arbeidsgiverinntektA2, null, skjønnsmessigFastsatt(skjæringstidspunkt, 950.månedlig))
+        val a3Opplysning = ArbeidsgiverInntektsopplysning("a3", skjæringstidspunkt til LocalDate.MAX, arbeidsgiverinntektA3, null, skjønnsmessigFastsatt(skjæringstidspunkt, 975.månedlig))
 
         val original = listOf(a1Opplysning, a2Opplysning, a3Opplysning)
         val expected = listOf(forventetA1Opplysning, a2Opplysning, a3Opplysning)
 
-        val actual = original.overstyrMedInntektsmelding(skjæringstidspunkt, "a1", overstyrtA1Opplysning)
+        val actual = original.overstyrMedInntektsmelding("a1", overstyrtA1Opplysning)
         assertTrue(expected.funksjoneltLik(actual))
     }
 
     @Test
     fun `deaktiverer en inntekt`() {
         val skjæringstidspunkt = 1.januar
-        val a1Opplysning = ArbeidsgiverInntektsopplysning("a1", skjæringstidspunkt til LocalDate.MAX, arbeidsgiverinntekt(skjæringstidspunkt, 1000.månedlig), null)
-        val a2Opplysning = ArbeidsgiverInntektsopplysning("a2", skjæringstidspunkt til LocalDate.MAX, SkattSykepengegrunnlag.ikkeRapportert(skjæringstidspunkt, UUID.randomUUID()), null)
+        val a1Opplysning = ArbeidsgiverInntektsopplysning("a1", skjæringstidspunkt til LocalDate.MAX, arbeidsgiverinntekt(skjæringstidspunkt, 1000.månedlig), null, null)
+        val a2Opplysning = ArbeidsgiverInntektsopplysning("a2", skjæringstidspunkt til LocalDate.MAX, SkattSykepengegrunnlag.ikkeRapportert(skjæringstidspunkt, UUID.randomUUID()), null, null)
 
         val opprinnelig = listOf(a1Opplysning, a2Opplysning)
         val (aktive, deaktiverte) = opprinnelig.deaktiver(emptyList(), "a2", "Denne må bort", EmptyLog)
@@ -137,8 +142,8 @@ internal class ArbeidsgiverInntektsopplysningTest {
     @Test
     fun `subsummerer deaktivering`() {
         val skjæringstidspunkt = 1.januar
-        val a1Opplysning = ArbeidsgiverInntektsopplysning("a1", skjæringstidspunkt til LocalDate.MAX, arbeidsgiverinntekt(skjæringstidspunkt, 1000.månedlig), null)
-        val a2Opplysning = ArbeidsgiverInntektsopplysning("a2", skjæringstidspunkt til LocalDate.MAX, SkattSykepengegrunnlag.ikkeRapportert(skjæringstidspunkt, UUID.randomUUID()), null)
+        val a1Opplysning = ArbeidsgiverInntektsopplysning("a1", skjæringstidspunkt til LocalDate.MAX, arbeidsgiverinntekt(skjæringstidspunkt, 1000.månedlig), null, null)
+        val a2Opplysning = ArbeidsgiverInntektsopplysning("a2", skjæringstidspunkt til LocalDate.MAX, SkattSykepengegrunnlag.ikkeRapportert(skjæringstidspunkt, UUID.randomUUID()), null, null)
 
         val opprinnelig = listOf(a1Opplysning, a2Opplysning)
         val (aktive, deaktiverte) = opprinnelig.deaktiver(emptyList(), "a2", "Denne må bort", jurist)
@@ -163,8 +168,8 @@ internal class ArbeidsgiverInntektsopplysningTest {
     @Test
     fun `subsummerer aktivering`() {
         val skjæringstidspunkt = 1.januar
-        val a1Opplysning = ArbeidsgiverInntektsopplysning("a1", skjæringstidspunkt til LocalDate.MAX, arbeidsgiverinntekt(skjæringstidspunkt, 1000.månedlig), null)
-        val a2Opplysning = ArbeidsgiverInntektsopplysning("a2", skjæringstidspunkt til LocalDate.MAX, SkattSykepengegrunnlag.ikkeRapportert(skjæringstidspunkt, UUID.randomUUID()), null)
+        val a1Opplysning = ArbeidsgiverInntektsopplysning("a1", skjæringstidspunkt til LocalDate.MAX, arbeidsgiverinntekt(skjæringstidspunkt, 1000.månedlig), null, null)
+        val a2Opplysning = ArbeidsgiverInntektsopplysning("a2", skjæringstidspunkt til LocalDate.MAX, SkattSykepengegrunnlag.ikkeRapportert(skjæringstidspunkt, UUID.randomUUID()), null, null)
 
         val opprinneligAktive = listOf(a1Opplysning)
         val opprinneligDeaktiverte = listOf(a2Opplysning)
@@ -203,6 +208,7 @@ internal class ArbeidsgiverInntektsopplysningTest {
                 beløp = 25000.månedlig,
                 tidsstempel = tidsstempel
             ),
+            korrigertInntekt = null,
             skjønnsmessigFastsatt = null
         )
         assertTrue(
@@ -217,6 +223,7 @@ internal class ArbeidsgiverInntektsopplysningTest {
                         beløp = 25000.månedlig,
                         tidsstempel = tidsstempel
                     ),
+                    korrigertInntekt = null,
                     skjønnsmessigFastsatt = null
                 )
             )
@@ -233,6 +240,7 @@ internal class ArbeidsgiverInntektsopplysningTest {
                         beløp = 25000.månedlig,
                         tidsstempel = tidsstempel
                     ),
+                    korrigertInntekt = null,
                     skjønnsmessigFastsatt = null
                 )
             )
@@ -249,6 +257,7 @@ internal class ArbeidsgiverInntektsopplysningTest {
                         beløp = 25000.månedlig,
                         tidsstempel = tidsstempel
                     ),
+                    korrigertInntekt = null,
                     skjønnsmessigFastsatt = null
                 )
             )

@@ -273,6 +273,7 @@ data class PersonData(
             val fom: LocalDate,
             val tom: LocalDate,
             val inntektsopplysning: InntektsopplysningData,
+            val korrigertInntekt: KorrigertInntektsopplysningData?,
             val skjønnsmessigFastsatt: SkjønnsmessigFastsattData?
         ) {
             fun tilDto(): ArbeidsgiverInntektsopplysningInnDto {
@@ -283,6 +284,13 @@ data class PersonData(
                     orgnummer = this.orgnummer,
                     gjelder = PeriodeDto(fom = this.fom, tom = this.tom),
                     inntektsopplysning = inntektsopplysningen,
+                    korrigertInntekt = korrigertInntekt?.tilDto() ?: when (inntektsopplysningen) {
+                        is InntektsopplysningInnDto.ArbeidsgiverinntektDto,
+                        is InntektsopplysningInnDto.InfotrygdDto,
+                        is InntektsopplysningInnDto.SkattSykepengegrunnlagDto -> null
+
+                        is InntektsopplysningInnDto.SaksbehandlerDto -> inntektsopplysningen
+                    },
                     skjønnsmessigFastsatt = skjønnsmessigFastsattOpplysning
                 )
             }
@@ -389,6 +397,25 @@ data class PersonData(
                         inntektsopplysninger = this.skatteopplysninger?.map { it.tilDto() } ?: emptyList()
                     )
                 }
+            }
+            data class KorrigertInntektsopplysningData(
+                val id: UUID,
+                val dato: LocalDate,
+                val hendelseId: UUID,
+                val beløp: Double,
+                val tidsstempel: LocalDateTime,
+                val overstyrtInntektId: UUID?,
+            ) {
+                fun tilDto() = InntektsopplysningInnDto.SaksbehandlerDto(
+                    id = this.id,
+                    inntektsdata = InntektsdataInnDto(
+                        hendelseId = this.hendelseId,
+                        dato = this.dato,
+                        beløp = InntektbeløpDto.MånedligDouble(beløp = beløp),
+                        tidsstempel = this.tidsstempel
+                    ),
+                    overstyrtInntekt = this.overstyrtInntektId!!
+                )
             }
             data class SkjønnsmessigFastsattData(
                 val id: UUID,

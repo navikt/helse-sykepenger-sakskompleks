@@ -2,7 +2,6 @@ package no.nav.helse.spleis.e2e.flere_arbeidsgivere
 
 import no.nav.helse.person.inntekt.Arbeidsgiverinntekt
 import java.time.LocalDate
-import kotlin.reflect.KClass
 import no.nav.helse.april
 import no.nav.helse.desember
 import no.nav.helse.dsl.INNTEKT
@@ -46,8 +45,6 @@ import no.nav.helse.person.aktivitetslogg.Varselkode.RV_VV_2
 import no.nav.helse.person.beløp.Beløpstidslinje
 import no.nav.helse.person.beløp.BeløpstidslinjeTest.Companion.arbeidsgiver
 import no.nav.helse.person.beløp.BeløpstidslinjeTest.Companion.assertBeløpstidslinje
-import no.nav.helse.person.inntekt.Inntektsopplysning
-import no.nav.helse.person.inntekt.Saksbehandler
 import no.nav.helse.person.inntekt.SkattSykepengegrunnlag
 import no.nav.helse.person.nullstillTilstandsendringer
 import no.nav.helse.spleis.e2e.AbstractEndToEndTest
@@ -78,6 +75,7 @@ import no.nav.helse.spleis.e2e.nyPeriode
 import no.nav.helse.spleis.e2e.nyeVedtak
 import no.nav.helse.spleis.e2e.tilGodkjenning
 import no.nav.helse.testhelpers.assertInstanceOf
+import no.nav.helse.økonomi.Inntekt
 import no.nav.helse.økonomi.Inntekt.Companion.månedlig
 import no.nav.helse.økonomi.Inntekt.Companion.årlig
 import no.nav.helse.økonomi.Prosentdel.Companion.prosent
@@ -349,7 +347,7 @@ internal class FlereArbeidsgivereGhostTest : AbstractEndToEndTest() {
         håndterUtbetalingsgodkjenning(1.vedtaksperiode, orgnummer = a1)
         håndterUtbetalt(orgnummer = a1)
 
-        assertInntektstype(1.januar, mapOf(a1 to Arbeidsgiverinntekt::class, a2 to Saksbehandler::class))
+        assertInntekt(1.januar, mapOf(a1 to INNTEKT, a2 to INNTEKT * 1.1))
 
         håndterSøknad(Sykdom(1.februar, 28.februar, 100.prosent), orgnummer = a2)
         håndterInntektsmelding(
@@ -358,7 +356,7 @@ internal class FlereArbeidsgivereGhostTest : AbstractEndToEndTest() {
             orgnummer = a2
         )
 
-        assertInntektstype(1.januar, mapOf(a1 to Arbeidsgiverinntekt::class, a2 to Saksbehandler::class))
+        assertInntekt(1.januar, mapOf(a1 to INNTEKT, a2 to INNTEKT * 1.1))
 
         håndterYtelser(1.vedtaksperiode, orgnummer = a2)
         håndterSimulering(1.vedtaksperiode, orgnummer = a2)
@@ -389,7 +387,7 @@ internal class FlereArbeidsgivereGhostTest : AbstractEndToEndTest() {
         håndterUtbetalingsgodkjenning(1.vedtaksperiode, orgnummer = a1)
         håndterUtbetalt(orgnummer = a1)
 
-        assertInntektstype(1.januar, mapOf(a1 to Arbeidsgiverinntekt::class, a2 to Saksbehandler::class))
+        assertInntekt(1.januar, mapOf(a1 to INNTEKT, a2 to INNTEKT * 1.1))
 
         håndterSøknad(Sykdom(1.februar, 28.februar, 100.prosent), orgnummer = a2)
         håndterArbeidsgiveropplysninger(
@@ -399,7 +397,7 @@ internal class FlereArbeidsgivereGhostTest : AbstractEndToEndTest() {
             vedtaksperiodeIdInnhenter = 1.vedtaksperiode
         )
 
-        assertInntektstype(1.januar, mapOf(a1 to Arbeidsgiverinntekt::class, a2 to Arbeidsgiverinntekt::class))
+        assertInntekt(1.januar, mapOf(a1 to INNTEKT, a2 to INNTEKT))
 
         håndterYtelser(1.vedtaksperiode, orgnummer = a1)
         håndterSimulering(1.vedtaksperiode, orgnummer = a1)
@@ -415,7 +413,7 @@ internal class FlereArbeidsgivereGhostTest : AbstractEndToEndTest() {
     @Test
     fun `Korrigerende refusjonsopplysninger på arbeidsgiver med skatteinntekt i sykepengegrunnlaget`()  {
         utbetalPeriodeMedGhost()
-        assertInntektstype(1.januar, mapOf(a1 to Arbeidsgiverinntekt::class, a2 to SkattSykepengegrunnlag::class))
+        assertInntekt(1.januar, mapOf(a1 to INNTEKT, a2 to INNTEKT))
         håndterSøknad(Sykdom(1.februar, 28.februar, 100.prosent), orgnummer = a2)
         // Arbeidsgiver har fylt inn inntekt for skjæringstidspunktet 1.januar så da vinner det over skatteopplysningene
         val inntektsmelding = håndterArbeidsgiveropplysninger(
@@ -430,7 +428,7 @@ internal class FlereArbeidsgivereGhostTest : AbstractEndToEndTest() {
         håndterUtbetalingsgodkjenning(1.vedtaksperiode, orgnummer = a1)
         håndterUtbetalt(orgnummer = a1)
         assertSisteTilstand(1.vedtaksperiode, AVVENTER_HISTORIKK, orgnummer = a2)
-        assertInntektstype(1.januar, mapOf(a1 to Arbeidsgiverinntekt::class, a2 to Arbeidsgiverinntekt::class))
+        assertInntekt(1.januar, mapOf(a1 to INNTEKT, a2 to INNTEKT))
 
         assertBeløpstidslinje(Beløpstidslinje.fra(februar, INNTEKT, inntektsmelding.arbeidsgiver), inspektør(a2).refusjon(1.vedtaksperiode))
 
@@ -440,7 +438,7 @@ internal class FlereArbeidsgivereGhostTest : AbstractEndToEndTest() {
             orgnummer = a2
         )
 
-        assertInntektstype(1.januar, mapOf(a1 to Arbeidsgiverinntekt::class, a2 to Arbeidsgiverinntekt::class))
+        assertInntekt(1.januar, mapOf(a1 to INNTEKT, a2 to INNTEKT))
         assertBeløpstidslinje(
             Beløpstidslinje.fra(1.februar til 19.februar, INNTEKT, inntektsmelding.arbeidsgiver) + Beløpstidslinje.fra(20.februar til 28.februar, INNTEKT, korrigerendeInntektsmelding.arbeidsgiver),
             inspektør(a2).refusjon(1.vedtaksperiode)
@@ -951,7 +949,7 @@ internal class FlereArbeidsgivereGhostTest : AbstractEndToEndTest() {
         håndterUtbetalingsgodkjenning(1.vedtaksperiode, orgnummer = a1)
         håndterUtbetalt(orgnummer = a1)
         assertSisteTilstand(1.vedtaksperiode, AVSLUTTET, a1)
-        assertInntektstype(1.januar, mapOf(a1 to Arbeidsgiverinntekt::class, a2 to SkattSykepengegrunnlag::class))
+        assertInntekt(1.januar, mapOf(a1 to INNTEKT, a2 to INNTEKT))
 
         // IM for tidligere ghost a2 sparker igang revurdering på a1
         håndterInntektsmelding(
@@ -965,7 +963,7 @@ internal class FlereArbeidsgivereGhostTest : AbstractEndToEndTest() {
         assertSisteTilstand(2.vedtaksperiode, AVVENTER_HISTORIKK, a1)
         assertSisteTilstand(1.vedtaksperiode, AVVENTER_BLOKKERENDE_PERIODE, a2)
 
-        assertInntektstype(1.januar, mapOf(a1 to Arbeidsgiverinntekt::class, a2 to SkattSykepengegrunnlag::class))
+        assertInntekt(1.januar, mapOf(a1 to INNTEKT, a2 to INNTEKT))
 
         // Her står saken nå (*NÅ*)
 
@@ -996,7 +994,7 @@ internal class FlereArbeidsgivereGhostTest : AbstractEndToEndTest() {
         håndterUtbetalingsgodkjenning(1.vedtaksperiode, orgnummer = a1)
         håndterUtbetalt(orgnummer = a1)
         assertSisteTilstand(1.vedtaksperiode, AVSLUTTET, a1)
-        assertInntektstype(1.januar, mapOf(a1 to Arbeidsgiverinntekt::class, a2 to SkattSykepengegrunnlag::class))
+        assertInntekt(1.januar, mapOf(a1 to INNTEKT, a2 to INNTEKT))
 
         // IM for tidligere ghost a2 sparker igang revurdering på a1
         håndterArbeidsgiveropplysninger(
@@ -1010,7 +1008,7 @@ internal class FlereArbeidsgivereGhostTest : AbstractEndToEndTest() {
         assertSisteTilstand(1.vedtaksperiode, AVVENTER_BLOKKERENDE_PERIODE, a2)
 
         håndterYtelser(1.vedtaksperiode, orgnummer = a1)
-        assertInntektstype(1.januar, mapOf(a1 to Arbeidsgiverinntekt::class, a2 to Arbeidsgiverinntekt::class))
+        assertInntekt(1.januar, mapOf(a1 to INNTEKT, a2 to INNTEKT))
     }
 
     @Test
@@ -1034,11 +1032,11 @@ internal class FlereArbeidsgivereGhostTest : AbstractEndToEndTest() {
         assertSisteTilstand(1.vedtaksperiode, AVVENTER_HISTORIKK, orgnummer = a1)
     }
 
-    private fun assertInntektstype(skjæringstidspunkt: LocalDate, forventet: Map<String, KClass<out Inntektsopplysning>>) {
+    private fun assertInntekt(skjæringstidspunkt: LocalDate, forventet: Map<String, Inntekt>) {
         val arbeidsgiverInntektsopplysninger = inspektør.vilkårsgrunnlag(skjæringstidspunkt)!!.inspektør.inntektsgrunnlag.inspektør.arbeidsgiverInntektsopplysninger
-        forventet.forEach { (organisasjonsnummer, forventetInntektstype) ->
-            val inntektsopplysning = arbeidsgiverInntektsopplysninger.single { it.gjelder(organisasjonsnummer) }.inspektør.inntektsopplysning
-            assertEquals(forventetInntektstype, inntektsopplysning::class)
+        forventet.forEach { (organisasjonsnummer, forventetInntekt) ->
+            val inntektsopplysning = arbeidsgiverInntektsopplysninger.single { it.gjelder(organisasjonsnummer) }.inspektør
+            assertEquals(forventetInntekt, inntektsopplysning.fastsattÅrsinntekt)
         }
     }
 

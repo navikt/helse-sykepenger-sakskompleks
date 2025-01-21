@@ -13,8 +13,6 @@ import no.nav.helse.person.TilstandType.AVVENTER_HISTORIKK
 import no.nav.helse.person.TilstandType.AVVENTER_SIMULERING
 import no.nav.helse.person.UtbetalingInntektskilde.FLERE_ARBEIDSGIVERE
 import no.nav.helse.person.aktivitetslogg.Varselkode
-import no.nav.helse.person.inntekt.Arbeidsgiverinntekt
-import no.nav.helse.person.inntekt.Saksbehandler
 import no.nav.helse.person.nullstillTilstandsendringer
 import no.nav.helse.spleis.e2e.AbstractEndToEndTest
 import no.nav.helse.spleis.e2e.OverstyrtArbeidsgiveropplysning
@@ -56,14 +54,11 @@ internal class OverstyrGhostInntektTest : AbstractEndToEndTest() {
         assertEquals(FLERE_ARBEIDSGIVERE, inspektør(a1).inntektskilde(1.vedtaksperiode))
         assertEquals(2, sykepengegrunnlagInspektør.arbeidsgiverInntektsopplysninger.size)
         sykepengegrunnlagInspektør.arbeidsgiverInntektsopplysningerPerArbeidsgiver.getValue(a1).inspektør.also {
-            assertEquals(31000.månedlig, it.inntektsopplysning.inspektør.beløp)
-            assertEquals(Arbeidsgiverinntekt::class, it.inntektsopplysning::class)
+            assertEquals(31000.månedlig, it.fastsattÅrsinntekt)
         }
         sykepengegrunnlagInspektør.arbeidsgiverInntektsopplysningerPerArbeidsgiver.getValue(a2).inspektør.also {
-            assertEquals(500.månedlig, it.inntektsopplysning.inspektør.beløp)
-            assertEquals(Saksbehandler::class, it.inntektsopplysning::class)
+            assertEquals(500.månedlig, it.fastsattÅrsinntekt)
         }
-
 
         nullstillTilstandsendringer()
         håndterYtelser(1.vedtaksperiode, orgnummer = a1)
@@ -110,12 +105,10 @@ internal class OverstyrGhostInntektTest : AbstractEndToEndTest() {
         assertEquals(FLERE_ARBEIDSGIVERE, inspektør(a1).inntektskilde(1.vedtaksperiode))
         assertEquals(2, sykepengegrunnlagInspektør.arbeidsgiverInntektsopplysninger.size)
         sykepengegrunnlagInspektør.arbeidsgiverInntektsopplysningerPerArbeidsgiver.getValue(a1).inspektør.also {
-            assertEquals(31000.månedlig, it.inntektsopplysning.inspektør.beløp)
-            assertEquals(Arbeidsgiverinntekt::class, it.inntektsopplysning::class)
+            assertEquals(31000.månedlig, it.fastsattÅrsinntekt)
         }
         sykepengegrunnlagInspektør.arbeidsgiverInntektsopplysningerPerArbeidsgiver.getValue(a2).inspektør.also {
-            assertEquals(500.månedlig, it.inntektsopplysning.inspektør.beløp)
-            assertEquals(Saksbehandler::class, it.inntektsopplysning::class)
+            assertEquals(500.månedlig, it.fastsattÅrsinntekt)
         }
 
         nullstillTilstandsendringer()

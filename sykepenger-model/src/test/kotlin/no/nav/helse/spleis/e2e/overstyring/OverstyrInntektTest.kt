@@ -18,16 +18,14 @@ import no.nav.helse.person.aktivitetslogg.Varselkode
 import no.nav.helse.person.aktivitetslogg.Varselkode.RV_IM_4
 import no.nav.helse.person.aktivitetslogg.Varselkode.RV_VV_2
 import no.nav.helse.person.inntekt.Arbeidsgiverinntekt
-import no.nav.helse.person.inntekt.Saksbehandler
-import no.nav.helse.person.inntekt.SkattSykepengegrunnlag
 import no.nav.helse.person.nullstillTilstandsendringer
 import no.nav.helse.spleis.e2e.AbstractEndToEndTest
 import no.nav.helse.spleis.e2e.OverstyrtArbeidsgiveropplysning
 import no.nav.helse.spleis.e2e.assertInntektForDato
 import no.nav.helse.spleis.e2e.assertTilstander
 import no.nav.helse.spleis.e2e.assertVarsel
-import no.nav.helse.spleis.e2e.håndterInntektsmelding
 import no.nav.helse.spleis.e2e.håndterArbeidsgiveropplysninger
+import no.nav.helse.spleis.e2e.håndterInntektsmelding
 import no.nav.helse.spleis.e2e.håndterOverstyrArbeidsgiveropplysninger
 import no.nav.helse.spleis.e2e.håndterOverstyrInntekt
 import no.nav.helse.spleis.e2e.håndterSimulering
@@ -37,7 +35,6 @@ import no.nav.helse.spleis.e2e.håndterUtbetalingsgodkjenning
 import no.nav.helse.spleis.e2e.håndterVilkårsgrunnlag
 import no.nav.helse.spleis.e2e.håndterYtelser
 import no.nav.helse.spleis.e2e.tilGodkjenning
-import no.nav.helse.testhelpers.assertInstanceOf
 import no.nav.helse.økonomi.Inntekt.Companion.daglig
 import no.nav.helse.økonomi.Inntekt.Companion.månedlig
 import no.nav.helse.økonomi.Inntekt.Companion.årlig
@@ -112,10 +109,7 @@ internal class OverstyrInntektTest : AbstractEndToEndTest() {
         val vilkårsgrunnlagInspektør = inspektør.vilkårsgrunnlag(1.vedtaksperiode)?.inspektør
         val sykepengegrunnlagInspektør = vilkårsgrunnlagInspektør?.inntektsgrunnlag?.inspektør
         val a2Opplysninger = sykepengegrunnlagInspektør?.arbeidsgiverInntektsopplysningerPerArbeidsgiver?.get(a2)?.inspektør ?: fail { "må ha inntekt for a2" }
-        assertEquals(500.daglig, a2Opplysninger.inntektsopplysning.inspektør.beløp)
-        assertEquals(Saksbehandler::class, a2Opplysninger.inntektsopplysning::class)
-        val overstyrtInntekt = a2Opplysninger.inntektsopplysning.inspektør.forrigeInntekt ?: fail { "forventet overstyrt inntekt" }
-        assertInstanceOf<SkattSykepengegrunnlag>(overstyrtInntekt)
+        assertEquals(500.daglig, a2Opplysninger.fastsattÅrsinntekt)
     }
 
     @Test

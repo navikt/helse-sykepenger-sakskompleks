@@ -136,6 +136,7 @@ data class SpannerPersonDto(
             val fom: LocalDate,
             val tom: LocalDate,
             val inntektsopplysning: InntektsopplysningData,
+            val korrigertInntekt: KorrigertInntektsopplysningData?,
             val skjønnsmessigFastsatt: SkjønnsmessigFastsattData?
         ) {
             data class SkatteopplysningData(
@@ -165,6 +166,14 @@ data class SpannerPersonDto(
                 val overstyrtInntektId: UUID?,
                 val skatteopplysninger: List<SkatteopplysningData>?,
                 val inntektsmeldingkilde: ArbeidsgiverData.InntektsmeldingData.KildeData?
+            )
+            data class KorrigertInntektsopplysningData(
+                val id: UUID,
+                val dato: LocalDate,
+                val hendelseId: UUID,
+                val beløp: InntektDto?,
+                val tidsstempel: LocalDateTime,
+                val overstyrtInntektId: UUID?
             )
             data class SkjønnsmessigFastsattData(
                 val id: UUID,
@@ -1526,6 +1535,7 @@ private fun ArbeidsgiverInntektsopplysningUtDto.tilPersonData() =
         fom = this.gjelder.fom,
         tom = this.gjelder.tom,
         inntektsopplysning = this.inntektsopplysning.tilPersonData(),
+        korrigertInntekt = this.korrigertInntekt?.tilPersonData(),
         skjønnsmessigFastsatt = this.skjønnsmessigFastsatt?.tilPersonData()
     )
 
@@ -1563,6 +1573,15 @@ private fun InntektsopplysningUtDto.tilPersonData() =
 
             else -> null
         }
+    )
+private fun InntektsopplysningUtDto.SaksbehandlerDto.tilPersonData() =
+    ArbeidsgiverInntektsopplysningData.KorrigertInntektsopplysningData(
+        id = this.id,
+        dato = this.inntektsdata.dato,
+        hendelseId = this.inntektsdata.hendelseId,
+        beløp = this.inntektsdata.beløp.tilPersonData(),
+        tidsstempel = this.inntektsdata.tidsstempel,
+        overstyrtInntektId = this.overstyrtInntekt
     )
 private fun SkjønnsmessigFastsattUtDto.tilPersonData() =
     ArbeidsgiverInntektsopplysningData.SkjønnsmessigFastsattData(

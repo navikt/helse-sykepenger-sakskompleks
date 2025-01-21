@@ -7,8 +7,15 @@ import no.nav.helse.dto.serialisering.InntektsopplysningUtDto
 internal class Saksbehandler internal constructor(
     id: UUID,
     inntektsdata: Inntektsdata,
+    val omregnetÅrsinntekt: Inntektsopplysning,
     val overstyrtInntekt: Inntektsopplysning
 ) : Inntektsopplysning(id, inntektsdata) {
+
+    init {
+        check(omregnetÅrsinntekt !is Saksbehandler) {
+            "kan ikke være saksbehandler"
+        }
+    }
 
     override fun dto() =
         InntektsopplysningUtDto.SaksbehandlerDto(
@@ -18,11 +25,20 @@ internal class Saksbehandler internal constructor(
         )
 
     internal companion object {
-        fun gjenopprett(dto: InntektsopplysningInnDto.SaksbehandlerDto, inntekter: Map<UUID, Inntektsopplysning>) =
-            Saksbehandler(
+        fun gjenopprett(dto: InntektsopplysningInnDto.SaksbehandlerDto, inntekter: Map<UUID, Inntektsopplysning>): Saksbehandler {
+            val overstyrtInntekt = inntekter.getValue(dto.overstyrtInntekt)
+            return Saksbehandler(
                 id = dto.id,
                 inntektsdata = Inntektsdata.gjenopprett(dto.inntektsdata),
-                overstyrtInntekt = inntekter.getValue(dto.overstyrtInntekt)
+                omregnetÅrsinntekt = when (overstyrtInntekt) {
+                    is Arbeidsgiverinntekt,
+                    is Infotrygd,
+                    is SkattSykepengegrunnlag -> overstyrtInntekt
+
+                    is Saksbehandler -> overstyrtInntekt.omregnetÅrsinntekt
+                },
+                overstyrtInntekt = overstyrtInntekt
             )
+        }
     }
 }

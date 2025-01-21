@@ -1015,8 +1015,8 @@ internal class GjenbrukeTidsnæreOpplysningerTest : AbstractDslTest() {
             håndterUtbetalingsgodkjenning(2.vedtaksperiode)
 
             val sykepengegrunnlag = inspektør.vilkårsgrunnlag(2.vedtaksperiode)!!.inspektør.inntektsgrunnlag.inspektør
-            val arbeidsgiverInntektsopplysning = sykepengegrunnlag.arbeidsgiverInntektsopplysningerPerArbeidsgiver.getValue(a1).inspektør.inntektsopplysning.inspektør
-            assertEquals(INNTEKT - 500.daglig, arbeidsgiverInntektsopplysning.beløp)
+            val arbeidsgiverInntektsopplysning = sykepengegrunnlag.arbeidsgiverInntektsopplysningerPerArbeidsgiver.getValue(a1).inspektør.fastsattÅrsinntekt
+            assertEquals(INNTEKT - 500.daglig, arbeidsgiverInntektsopplysning)
 
             assertEquals(andreOverstyring, inspektør.skjønnsmessigFastsattOverstyrtHendelseId(1.januar))
             assertEquals(inntektsmelding, inspektør.skjønnsmessigFastsattOverstyrtHendelseId(1.februar))
@@ -1171,7 +1171,7 @@ internal class GjenbrukeTidsnæreOpplysningerTest : AbstractDslTest() {
             håndterSimulering(1.vedtaksperiode)
             håndterUtbetalingsgodkjenning(1.vedtaksperiode)
             håndterUtbetalt()
-            inntektsopplysning(8.januar).let {
+            korrigertInntekt(8.januar).let {
                 assertEquals(overstyring1Inntekt, it.inspektør.beløp)
                 assertEquals(overstyring1Id, it.inspektør.hendelseId)
             }
@@ -1184,7 +1184,7 @@ internal class GjenbrukeTidsnæreOpplysningerTest : AbstractDslTest() {
             håndterSimulering(1.vedtaksperiode)
             håndterUtbetalingsgodkjenning(1.vedtaksperiode)
             håndterUtbetalt()
-            inntektsopplysning(8.januar).let {
+            korrigertInntekt(8.januar).let {
                 assertEquals(overstyring2Inntekt, it.inspektør.beløp)
                 assertEquals(overstyring2Id, it.inspektør.hendelseId)
             }
@@ -1231,6 +1231,10 @@ internal class GjenbrukeTidsnæreOpplysningerTest : AbstractDslTest() {
     private fun TestPerson.TestArbeidsgiver.inntektsopplysning(skjæringstidspunkt: LocalDate) =
         inspektør.vilkårsgrunnlag(skjæringstidspunkt)?.inspektør?.inntektsgrunnlag?.inspektør?.arbeidsgiverInntektsopplysninger?.singleOrNull { it.inspektør.orgnummer == this.orgnummer }?.inspektør?.inntektsopplysning ?: error("Forventet å finne inntektsopplysning for ${this.orgnummer} på $skjæringstidspunkt")
 
+
+    private fun TestPerson.TestArbeidsgiver.korrigertInntekt(skjæringstidspunkt: LocalDate) =
+        inspektør.vilkårsgrunnlag(skjæringstidspunkt)?.inspektør?.inntektsgrunnlag?.inspektør?.arbeidsgiverInntektsopplysninger?.singleOrNull { it.inspektør.orgnummer == this.orgnummer }?.inspektør?.korrigertInntekt ?: error("Forventet å finne inntektsopplysning for ${this.orgnummer} på $skjæringstidspunkt")
+
     private fun TestPerson.TestArbeidsgiver.skjønnsfastsatt(skjæringstidspunkt: LocalDate) =
         inspektør.vilkårsgrunnlag(skjæringstidspunkt)?.inspektør?.inntektsgrunnlag?.inspektør?.arbeidsgiverInntektsopplysninger?.singleOrNull { it.inspektør.orgnummer == this.orgnummer }?.inspektør?.skjønnsmessigFastsatt ?: error("Forventet å finne inntektsopplysning for ${this.orgnummer} på $skjæringstidspunkt")
 
@@ -1253,6 +1257,6 @@ internal class GjenbrukeTidsnæreOpplysningerTest : AbstractDslTest() {
     private fun TestArbeidsgiverInspektør.skjønnsmessigFastsattOverstyrtHendelseId(skjæringstidspunkt: LocalDate, organisasjonsnummer: String = this.orgnummer): UUID {
         val info = vilkårsgrunnlag(skjæringstidspunkt)!!.inspektør.inntektsgrunnlag.inspektør.arbeidsgiverInntektsopplysningerPerArbeidsgiver.getValue(organisasjonsnummer).inspektør
         assertNotNull(info.skjønnsmessigFastsatt)
-        return info.inntektsopplysning.inspektør.hendelseId
+        return info.korrigertInntekt?.inspektør?.hendelseId ?: info.inntektsopplysning.inspektør.hendelseId
     }
 }
