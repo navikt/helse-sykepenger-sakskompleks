@@ -91,6 +91,7 @@ internal abstract class AbstractEndToEndMediatorTest {
 
     protected val meldingsfabrikk = TestMessageFactory(UNG_PERSON_FNR_2018, ORGNUMMER, INNTEKT, UNG_PERSON_FØDSELSDATO)
     protected lateinit var testRapid: TestRapid
+    protected lateinit var hendelseRepository: HendelseRepository
     private lateinit var hendelseMediator: HendelseMediator
     private lateinit var messageMediator: MessageMediator
     private lateinit var dataSource: TestDataSource
@@ -102,8 +103,9 @@ internal abstract class AbstractEndToEndMediatorTest {
 
         testRapid = TestRapid()
         subsumsjoner = mutableListOf()
+        hendelseRepository = HendelseRepository(dataSource.ds)
         hendelseMediator = HendelseMediator(
-            hendelseRepository = HendelseRepository(dataSource.ds),
+            hendelseRepository = hendelseRepository,
             personDao = PersonDao(dataSource.ds, STØTTER_IDENTBYTTE = true),
             versjonAvKode = "test-versjon",
             støtterIdentbytte = true,
@@ -117,7 +119,7 @@ internal abstract class AbstractEndToEndMediatorTest {
         messageMediator = MessageMediator(
             rapidsConnection = testRapid,
             hendelseMediator = hendelseMediator,
-            hendelseRepository = HendelseRepository(dataSource.ds)
+            hendelseRepository = hendelseRepository
         )
 
         testRapid.observer(InntektsmeldingerReplayObserver(testRapid, dataSource.ds))

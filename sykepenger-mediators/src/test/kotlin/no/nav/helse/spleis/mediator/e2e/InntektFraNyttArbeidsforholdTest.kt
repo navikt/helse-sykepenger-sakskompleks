@@ -7,6 +7,7 @@ import no.nav.helse.januar
 import no.nav.helse.person.aktivitetslogg.Varselkode.RV_SV_5
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 internal class InntektFraNyttArbeidsforholdTest : AbstractEndToEndMediatorTest() {
 
@@ -62,19 +63,21 @@ internal class InntektFraNyttArbeidsforholdTest : AbstractEndToEndMediatorTest()
 
         assertEquals(1, testRapid.inspektør.vedtaksperiodeteller)
 
-        sendSøknad(
-            perioder = listOf(SoknadsperiodeDTO(fom = 1.februar, tom = 28.februar, sykmeldingsgrad = 100)),
-            inntektFraNyttArbeidsforhold = listOf(
-                InntektFraNyttArbeidsforholdDTO(
-                    fom = 1.februar,
-                    tom = 28.februar,
-                    belop = null,
-                    arbeidsstedOrgnummer = "4",
-                    opplysningspliktigOrgnummer = "5",
-                    harJobbet = true
+        assertThrows<IllegalStateException> {
+            sendSøknad(
+                perioder = listOf(SoknadsperiodeDTO(fom = 1.februar, tom = 28.februar, sykmeldingsgrad = 100)),
+                inntektFraNyttArbeidsforhold = listOf(
+                    InntektFraNyttArbeidsforholdDTO(
+                        fom = 1.februar,
+                        tom = 28.februar,
+                        belop = null,
+                        arbeidsstedOrgnummer = "4",
+                        opplysningspliktigOrgnummer = "5",
+                        harJobbet = true
+                    )
                 )
             )
-        )
+        }
 
         // En slik type søknad skal angivelig ikke skje & den tryner på en exception
         assertEquals(1, testRapid.inspektør.vedtaksperiodeteller)

@@ -24,7 +24,10 @@ import no.nav.inntektsmeldingkontrakt.Naturalytelse
 import no.nav.inntektsmeldingkontrakt.OpphoerAvNaturalytelse
 import no.nav.inntektsmeldingkontrakt.Periode
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 internal class KunEnArbeidsgiverMediatorTest : AbstractEndToEndMediatorTest() {
 
@@ -333,26 +336,19 @@ internal class KunEnArbeidsgiverMediatorTest : AbstractEndToEndMediatorTest() {
 
     @Test
     fun `Behandler melding hvis den tidligere har prøvd å behandle melding, men kræsjet`() {
-        val hendelseRepository: HendelseRepository = mockk(relaxed = true)
-        every { hendelseRepository.erBehandlet(any()) } returnsMany (listOf(false, false, true))
+        val (ugyldigSøknadId, ugyldigSøknad) = meldingsfabrikk.lagNySøknad(SoknadsperiodeDTO(fom = 25.januar, tom = 1.januar, sykmeldingsgrad = 100))
+        val meldingId = ugyldigSøknadId.toUUID()
+        assertThrows<IllegalArgumentException> {
+            testRapid.sendTestMessage(ugyldigSøknad)
+        }
 
-        MessageMediator(
-            rapidsConnection = testRapid,
-            hendelseRepository = hendelseRepository,
-            hendelseMediator = TestHendelseMediator()
-        )
-
-        val meldingId = sendNySøknad(SoknadsperiodeDTO(fom = 25.januar, tom = 1.januar, sykmeldingsgrad = 100))
-        verify(exactly = 0) { hendelseRepository.markerSomBehandlet(meldingId) }
+        assertFalse(hendelseRepository.erBehandlet(meldingId))
         val (_, message) = meldingsfabrikk.lagNySøknad(SoknadsperiodeDTO(fom = 1.januar, tom = 25.januar, sykmeldingsgrad = 100))
         val medSammeId = (jacksonObjectMapper().readTree(message) as ObjectNode).also {
             it.put("@id", meldingId.toString())
         }.toString()
         testRapid.sendTestMessage(medSammeId)
-        testRapid.sendTestMessage(medSammeId)
-        verify(exactly = 1) { hendelseRepository.markerSomBehandlet(meldingId) }
-        verify(exactly = 1) { hendelseRepository.markerSomBehandlet(meldingId) }
-        verify(exactly = 3) { hendelseRepository.erBehandlet(any()) }
+        assertTrue(hendelseRepository.erBehandlet(meldingId))
     }
 
     @Test

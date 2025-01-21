@@ -52,7 +52,49 @@ import no.nav.helse.spleis.meldinger.UtbetalingshistorikkForFeriepengerRiver
 import no.nav.helse.spleis.meldinger.UtbetalingshistorikkRiver
 import no.nav.helse.spleis.meldinger.VilkårsgrunnlagRiver
 import no.nav.helse.spleis.meldinger.YtelserRiver
+import no.nav.helse.spleis.meldinger.model.AnmodningOmForkastingMessage
+import no.nav.helse.spleis.meldinger.model.AnnulleringMessage
+import no.nav.helse.spleis.meldinger.model.AvbruttArbeidsledigSøknadMessage
+import no.nav.helse.spleis.meldinger.model.AvbruttSøknadMessage
+import no.nav.helse.spleis.meldinger.model.AvstemmingMessage
+import no.nav.helse.spleis.meldinger.model.DødsmeldingMessage
+import no.nav.helse.spleis.meldinger.model.ForkastSykmeldingsperioderMessage
+import no.nav.helse.spleis.meldinger.model.GrunnbeløpsreguleringMessage
 import no.nav.helse.spleis.meldinger.model.HendelseMessage
+import no.nav.helse.spleis.meldinger.model.IdentOpphørtMessage
+import no.nav.helse.spleis.meldinger.model.InfotrygdendringMessage
+import no.nav.helse.spleis.meldinger.model.InntektsmeldingMessage
+import no.nav.helse.spleis.meldinger.model.InntektsmeldingerReplayMessage
+import no.nav.helse.spleis.meldinger.model.MigrateMessage
+import no.nav.helse.spleis.meldinger.model.MinimumSykdomsgradVurdertMessage
+import no.nav.helse.spleis.meldinger.model.NavNoInntektsmeldingMessage
+import no.nav.helse.spleis.meldinger.model.NavNoKorrigertInntektsmeldingMessage
+import no.nav.helse.spleis.meldinger.model.NavNoSelvbestemtInntektsmeldingMessage
+import no.nav.helse.spleis.meldinger.model.NyArbeidsledigSøknadMessage
+import no.nav.helse.spleis.meldinger.model.NyFrilansSøknadMessage
+import no.nav.helse.spleis.meldinger.model.NySelvstendigSøknadMessage
+import no.nav.helse.spleis.meldinger.model.NySøknadMessage
+import no.nav.helse.spleis.meldinger.model.OverstyrArbeidsforholdMessage
+import no.nav.helse.spleis.meldinger.model.OverstyrArbeidsgiveropplysningerMessage
+import no.nav.helse.spleis.meldinger.model.OverstyrTidslinjeMessage
+import no.nav.helse.spleis.meldinger.model.PersonPåminnelseMessage
+import no.nav.helse.spleis.meldinger.model.PåminnelseMessage
+import no.nav.helse.spleis.meldinger.model.SendtSøknadArbeidsgiverMessage
+import no.nav.helse.spleis.meldinger.model.SendtSøknadArbeidsledigMessage
+import no.nav.helse.spleis.meldinger.model.SendtSøknadFrilansMessage
+import no.nav.helse.spleis.meldinger.model.SendtSøknadNavMessage
+import no.nav.helse.spleis.meldinger.model.SendtSøknadSelvstendigMessage
+import no.nav.helse.spleis.meldinger.model.SimuleringMessage
+import no.nav.helse.spleis.meldinger.model.SkjønnsmessigFastsettelseMessage
+import no.nav.helse.spleis.meldinger.model.SykepengegrunnlagForArbeidsgiverMessage
+import no.nav.helse.spleis.meldinger.model.UtbetalingMessage
+import no.nav.helse.spleis.meldinger.model.UtbetalingpåminnelseMessage
+import no.nav.helse.spleis.meldinger.model.UtbetalingsgodkjenningMessage
+import no.nav.helse.spleis.meldinger.model.UtbetalingshistorikkEtterInfotrygdendringMessage
+import no.nav.helse.spleis.meldinger.model.UtbetalingshistorikkForFeriepengerMessage
+import no.nav.helse.spleis.meldinger.model.UtbetalingshistorikkMessage
+import no.nav.helse.spleis.meldinger.model.VilkårsgrunnlagMessage
+import no.nav.helse.spleis.meldinger.model.YtelserMessage
 import org.slf4j.LoggerFactory
 
 internal class MessageMediator(
@@ -140,15 +182,71 @@ internal class MessageMediator(
                 }
                 sikkerLogg.info("brukte $label ($antallSekunder s) på å prosessere meldingen")
             }
-        } catch (err: DeserializationException) {
-            severeErrorHandler(err, message)
-        } catch (err: JsonMigrationException) {
-            severeErrorHandler(err, message)
-        } catch (err: SQLException) {
-            severeErrorHandler(err, message)
         } catch (err: Exception) {
-            errorHandler(err, message)
+            if (kritiskFeilSomSkalMedføreAtPoddenDør(err, message)) severeErrorHandler(err, message)
+            else errorHandler(err, message)
         }
+    }
+
+    private fun kritiskFeilSomSkalMedføreAtPoddenDør(err: Exception, message: HendelseMessage): Boolean {
+        return err.kritiskFeil || message.måMeldingResendesVedFeil
+    }
+
+    private val Exception.kritiskFeil get() = when (this) {
+        is DeserializationException,
+        is JsonMigrationException,
+        is SQLException -> true
+        else -> false
+    }
+
+    private val HendelseMessage.måMeldingResendesVedFeil get() = when (this) {
+        // meldinger som fint kan ignoreres/blir sendt på nytt får en
+        // avslappet feilhåndtering
+        is AnmodningOmForkastingMessage,
+        is AnnulleringMessage,
+        is AvstemmingMessage,
+        is SimuleringMessage,
+        is SykepengegrunnlagForArbeidsgiverMessage,
+        is UtbetalingMessage,
+        is UtbetalingsgodkjenningMessage,
+        is UtbetalingshistorikkForFeriepengerMessage,
+        is UtbetalingshistorikkMessage,
+        is VilkårsgrunnlagMessage,
+        is YtelserMessage,
+        is ForkastSykmeldingsperioderMessage,
+        is GrunnbeløpsreguleringMessage,
+        is InntektsmeldingerReplayMessage,
+        is MigrateMessage,
+        is MinimumSykdomsgradVurdertMessage,
+        is OverstyrArbeidsforholdMessage,
+        is OverstyrArbeidsgiveropplysningerMessage,
+        is OverstyrTidslinjeMessage,
+        is PersonPåminnelseMessage,
+        is PåminnelseMessage,
+        is SkjønnsmessigFastsettelseMessage,
+        is UtbetalingpåminnelseMessage -> false
+
+        // meldinger som må replayes/sendes på nytt ved feil får
+        // en feilhåndtering som medfører at podden går ned
+        is UtbetalingshistorikkEtterInfotrygdendringMessage,
+        is AvbruttArbeidsledigSøknadMessage,
+        is AvbruttSøknadMessage,
+        is DødsmeldingMessage,
+        is IdentOpphørtMessage,
+        is InfotrygdendringMessage,
+        is InntektsmeldingMessage,
+        is NavNoInntektsmeldingMessage,
+        is NavNoKorrigertInntektsmeldingMessage,
+        is NavNoSelvbestemtInntektsmeldingMessage,
+        is NyArbeidsledigSøknadMessage,
+        is NyFrilansSøknadMessage,
+        is NySelvstendigSøknadMessage,
+        is NySøknadMessage,
+        is SendtSøknadArbeidsgiverMessage,
+        is SendtSøknadArbeidsledigMessage,
+        is SendtSøknadFrilansMessage,
+        is SendtSøknadNavMessage,
+        is SendtSøknadSelvstendigMessage -> true
     }
 
     override fun onRiverError(riverName: String, problems: MessageProblems, context: MessageContext, metadata: MessageMetadata) {
@@ -161,17 +259,17 @@ internal class MessageMediator(
     }
 
     private fun severeErrorHandler(err: Exception, message: HendelseMessage) {
-        errorHandler(err, message)
+        errorHandler("kritisk feil", err, message.toJson(), message.secureDiagnosticinfo())
         throw err
     }
 
     private fun errorHandler(err: Exception, message: HendelseMessage) {
-        errorHandler(err, message.toJson(), message.secureDiagnosticinfo())
+        errorHandler("alvorlig feil", err, message.toJson(), message.secureDiagnosticinfo())
     }
 
-    private fun errorHandler(err: Exception, message: String, context: Map<String, String> = emptyMap()) {
-        log.error("alvorlig feil: ${err.message} (se sikkerlogg for melding)", err)
-        withMDC(context) { sikkerLogg.error("alvorlig feil: ${err.message}\n\t$message", err) }
+    private fun errorHandler(prefix: String, err: Exception, message: String, context: Map<String, String> = emptyMap()) {
+        log.error("$prefix: ${err.message} (se sikkerlogg for melding)", err)
+        withMDC(context) { sikkerLogg.error("$prefix: ${err.message}\n\t$message", err) }
     }
 
     private inner class DelegatedRapid(
