@@ -1,7 +1,6 @@
 package no.nav.helse.dto.deserialisering
 
 import java.util.*
-import no.nav.helse.dto.SkatteopplysningDto
 
 sealed class InntektsopplysningInnDto {
     abstract val id: UUID
@@ -25,7 +24,6 @@ sealed class InntektsopplysningInnDto {
 
     data class SkattSykepengegrunnlagDto(
         override val id: UUID,
-        override val inntektsdata: InntektsdataInnDto,
-        val inntektsopplysninger: List<SkatteopplysningDto>
+        override val inntektsdata: InntektsdataInnDto
     ) : InntektsopplysningInnDto()
 }

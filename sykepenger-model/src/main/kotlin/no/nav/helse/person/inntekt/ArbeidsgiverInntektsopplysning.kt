@@ -18,7 +18,6 @@ import no.nav.helse.person.aktivitetslogg.Varselkode
 import no.nav.helse.person.builders.UtkastTilVedtakBuilder
 import no.nav.helse.person.inntekt.Arbeidsgiverinntekt.Kilde
 import no.nav.helse.person.inntekt.Inntektsopplysning.Companion.markerFlereArbeidsgivere
-import no.nav.helse.person.inntekt.Skatteopplysning.Companion.subsumsjonsformat
 import no.nav.helse.utbetalingstidslinje.VilkårsprøvdSkjæringstidspunkt
 import no.nav.helse.yearMonth
 import no.nav.helse.økonomi.Inntekt
@@ -106,10 +105,7 @@ internal data class ArbeidsgiverInntektsopplysning(
             `§ 8-15`(
                 skjæringstidspunkt = omregnetÅrsinntekt.dato,
                 organisasjonsnummer = orgnummer,
-                inntekterSisteTreMåneder = if (korrigertInntekt == null && inntektsopplysning is SkattSykepengegrunnlag)
-                    inntektsopplysning.inntektsopplysninger.subsumsjonsformat()
-                else
-                    emptyList(),
+                inntekterSisteTreMåneder = emptyList(),
                 forklaring = forklaring,
                 oppfylt = oppfylt
             )

@@ -7,29 +7,24 @@ import no.nav.helse.dto.serialisering.InntektsopplysningUtDto
 
 internal class SkattSykepengegrunnlag(
     id: UUID,
-    inntektsdata: Inntektsdata,
-    val inntektsopplysninger: List<Skatteopplysning>
+    inntektsdata: Inntektsdata
 ) : Inntektsopplysning(id, inntektsdata) {
     internal companion object {
         internal fun ikkeRapportert(dato: LocalDate, meldingsreferanseId: UUID) =
             SkattSykepengegrunnlag(
                 id = UUID.randomUUID(),
-                inntektsdata = Inntektsdata.ingen(meldingsreferanseId, dato),
-                inntektsopplysninger = emptyList()
+                inntektsdata = Inntektsdata.ingen(meldingsreferanseId, dato)
             )
-        internal fun fraSkatt(inntektsdata: Inntektsdata, inntektsopplysningerTreMånederFørSkjæringstidspunkt: List<Skatteopplysning>) =
+        internal fun fraSkatt(inntektsdata: Inntektsdata) =
             SkattSykepengegrunnlag(
                 id = UUID.randomUUID(),
-                inntektsdata = inntektsdata,
-                inntektsopplysninger = inntektsopplysningerTreMånederFørSkjæringstidspunkt
+                inntektsdata = inntektsdata
             )
 
         internal fun gjenopprett(dto: InntektsopplysningInnDto.SkattSykepengegrunnlagDto): SkattSykepengegrunnlag {
-            val skatteopplysninger = dto.inntektsopplysninger.map { Skatteopplysning.gjenopprett(it) }
             return SkattSykepengegrunnlag(
                 id = dto.id,
-                inntektsdata = Inntektsdata.gjenopprett(dto.inntektsdata),
-                inntektsopplysninger = skatteopplysninger
+                inntektsdata = Inntektsdata.gjenopprett(dto.inntektsdata)
             )
         }
     }
@@ -37,7 +32,6 @@ internal class SkattSykepengegrunnlag(
     override fun dto() =
         InntektsopplysningUtDto.SkattSykepengegrunnlagDto(
             id = id,
-            inntektsdata = inntektsdata.dto(),
-            inntektsopplysninger = inntektsopplysninger.map { it.dto() }
+            inntektsdata = inntektsdata.dto()
         )
 }

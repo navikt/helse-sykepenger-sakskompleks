@@ -1,11 +1,9 @@
 package no.nav.helse.spleis.speil.builders
 
 import java.time.LocalDate
-import java.time.YearMonth
 import no.nav.helse.spleis.speil.dto.Arbeidsgiverinntekt
 import no.nav.helse.spleis.speil.dto.Arbeidsgiverrefusjon
 import no.nav.helse.spleis.speil.dto.Inntekt
-import no.nav.helse.spleis.speil.dto.InntekterFraAOrdningen
 import no.nav.helse.spleis.speil.dto.Inntektkilde
 import no.nav.helse.spleis.speil.dto.Refusjonselement
 import no.nav.helse.spleis.speil.dto.SkjønnsmessigFastsattDTO
@@ -56,15 +54,13 @@ internal data class IArbeidsgiverrefusjon(
 internal data class IOmregnetÅrsinntekt(
     val kilde: IInntektkilde,
     val beløp: Double,
-    val månedsbeløp: Double,
-    val inntekterFraAOrdningen: List<IInntekterFraAOrdningen>? = null //kun gyldig for A-ordningen
+    val månedsbeløp: Double
 ) {
     internal fun toDTO(): Inntekt {
         return Inntekt(
             kilde = kilde.toDTO(),
             beløp = beløp,
-            månedsbeløp = månedsbeløp,
-            inntekterFraAOrdningen = inntekterFraAOrdningen?.sortedBy { it.måned }?.map { it.toDTO() }
+            månedsbeløp = månedsbeløp
         )
     }
 }
@@ -78,15 +74,6 @@ internal enum class IInntektkilde {
         Infotrygd -> Inntektkilde.Infotrygd
         AOrdningen -> Inntektkilde.AOrdningen
         IkkeRapportert -> Inntektkilde.IkkeRapportert
-    }
-}
-
-internal data class IInntekterFraAOrdningen(
-    val måned: YearMonth,
-    val sum: Double
-) {
-    internal fun toDTO(): InntekterFraAOrdningen {
-        return InntekterFraAOrdningen(måned, sum)
     }
 }
 

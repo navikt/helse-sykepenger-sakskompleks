@@ -14,7 +14,6 @@ import no.nav.helse.spleis.graphql.dto.GraphQLDag
 import no.nav.helse.spleis.graphql.dto.GraphQLHendelse
 import no.nav.helse.spleis.graphql.dto.GraphQLInfotrygdVilkarsgrunnlag
 import no.nav.helse.spleis.graphql.dto.GraphQLInntektFraAOrdningen
-import no.nav.helse.spleis.graphql.dto.GraphQLInntekterFraAOrdningen
 import no.nav.helse.spleis.graphql.dto.GraphQLInntektskilde
 import no.nav.helse.spleis.graphql.dto.GraphQLInntektsmelding
 import no.nav.helse.spleis.graphql.dto.GraphQLInntektstype
@@ -471,12 +470,7 @@ private fun Inntekt.tilGraphQLOmregnetArsinntekt() = GraphQLOmregnetArsinntekt(
     },
     belop = this.beløp,
     manedsbelop = this.månedsbeløp,
-    inntekterFraAOrdningen = this.inntekterFraAOrdningen?.map {
-        GraphQLInntekterFraAOrdningen(
-            maned = it.måned,
-            sum = it.sum
-        )
-    }
+    inntekterFraAOrdningen = null
 )
 
 internal fun mapVilkårsgrunnlag(id: UUID, vilkårsgrunnlag: Vilkårsgrunnlag) =

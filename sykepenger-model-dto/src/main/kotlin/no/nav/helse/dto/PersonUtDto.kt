@@ -3,7 +3,6 @@ package no.nav.helse.dto
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Year
-import java.time.YearMonth
 import java.util.*
 
 data class AlderDto(val fødselsdato: LocalDate, val dødsdato: LocalDate?)
@@ -130,28 +129,6 @@ sealed class MedlemskapsvurderingDto {
     data object Nei : MedlemskapsvurderingDto()
     data object VetIkke : MedlemskapsvurderingDto()
     data object UavklartMedBrukerspørsmål : MedlemskapsvurderingDto()
-}
-
-data class ArbeidsgiverInntektsopplysningForSammenligningsgrunnlagDto(
-    val orgnummer: String,
-    val inntektsopplysninger: List<SkatteopplysningDto>
-)
-
-data class SkatteopplysningDto(
-    val hendelseId: UUID,
-    val beløp: InntektbeløpDto.MånedligDouble,
-    val måned: YearMonth,
-    val type: InntekttypeDto,
-    val fordel: String,
-    val beskrivelse: String,
-    val tidsstempel: LocalDateTime
-)
-
-sealed class InntekttypeDto {
-    data object LØNNSINNTEKT : InntekttypeDto()
-    data object NÆRINGSINNTEKT : InntekttypeDto()
-    data object PENSJON_ELLER_TRYGD : InntekttypeDto()
-    data object YTELSE_FRA_OFFENTLIGE : InntekttypeDto()
 }
 
 data class ArbeidsgiverOpptjeningsgrunnlagDto(

@@ -1,8 +1,6 @@
 package no.nav.helse.spleis.graphql
 
 import java.time.LocalDate.EPOCH
-import java.time.Month
-import java.time.YearMonth
 import no.nav.helse.desember
 import no.nav.helse.februar
 import no.nav.helse.hendelser.OverstyrArbeidsforhold
@@ -16,7 +14,6 @@ import no.nav.helse.spleis.speil.dto.Arbeidsgiverinntekt
 import no.nav.helse.spleis.speil.dto.BeregnetPeriode
 import no.nav.helse.spleis.speil.dto.GhostPeriodeDTO
 import no.nav.helse.spleis.speil.dto.Inntekt
-import no.nav.helse.spleis.speil.dto.InntekterFraAOrdningen
 import no.nav.helse.spleis.speil.dto.Inntektkilde
 import no.nav.helse.spleis.speil.dto.SpleisVilkårsgrunnlag
 import no.nav.helse.spleis.testhelpers.OverstyrtArbeidsgiveropplysning
@@ -307,12 +304,7 @@ internal class SpeilBuilderFlereAGTest : AbstractE2ETest() {
                 omregnetÅrsinntekt = Inntekt(
                     kilde = Inntektkilde.AOrdningen,
                     beløp = 12000.0,
-                    månedsbeløp = 1000.0,
-                    inntekterFraAOrdningen = listOf(
-                        InntekterFraAOrdningen(YearMonth.of(2017, Month.OCTOBER), 1000.0),
-                        InntekterFraAOrdningen(YearMonth.of(2017, Month.NOVEMBER), 1000.0),
-                        InntekterFraAOrdningen(YearMonth.of(2017, Month.DECEMBER), 1000.0)
-                    )
+                    månedsbeløp = 1000.0
                 ),
                 fom = 1.januar,
                 tom = null,
@@ -365,8 +357,7 @@ internal class SpeilBuilderFlereAGTest : AbstractE2ETest() {
                 omregnetÅrsinntekt = Inntekt(
                     kilde = Inntektkilde.Inntektsmelding,
                     beløp = 576000.0,
-                    månedsbeløp = 48000.0,
-                    inntekterFraAOrdningen = null
+                    månedsbeløp = 48000.0
                 ),
                 fom = 1.januar,
                 tom = null,
@@ -377,8 +368,7 @@ internal class SpeilBuilderFlereAGTest : AbstractE2ETest() {
                 omregnetÅrsinntekt = Inntekt(
                     kilde = Inntektkilde.IkkeRapportert,
                     beløp = 0.0,
-                    månedsbeløp = 0.0,
-                    inntekterFraAOrdningen = emptyList()
+                    månedsbeløp = 0.0
                 ),
                 fom = 1.januar,
                 tom = null,

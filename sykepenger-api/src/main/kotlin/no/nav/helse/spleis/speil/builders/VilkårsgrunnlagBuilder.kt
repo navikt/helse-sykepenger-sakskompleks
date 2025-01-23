@@ -275,39 +275,27 @@ internal class VilkårsgrunnlagBuilder(vilkårsgrunnlagHistorikk: Vilkårsgrunnl
         if (korrigertInntekt != null) return IOmregnetÅrsinntekt(
             kilde = IInntektkilde.Saksbehandler,
             beløp = korrigertInntekt.inntektsdata.beløp.årlig.beløp,
-            månedsbeløp = korrigertInntekt.inntektsdata.beløp.månedligDouble.beløp,
-            inntekterFraAOrdningen = null
+            månedsbeløp = korrigertInntekt.inntektsdata.beløp.månedligDouble.beløp
         )
 
         return when (io) {
             is InntektsopplysningUtDto.InfotrygdDto -> IOmregnetÅrsinntekt(
                 kilde = IInntektkilde.Infotrygd,
                 beløp = io.inntektsdata.beløp.årlig.beløp,
-                månedsbeløp = io.inntektsdata.beløp.månedligDouble.beløp,
-                inntekterFraAOrdningen = null
+                månedsbeløp = io.inntektsdata.beløp.månedligDouble.beløp
             )
             is InntektsopplysningUtDto.ArbeidsgiverinntektDto -> {
                 IOmregnetÅrsinntekt(
                     kilde = if (io.kilde == InntektsopplysningUtDto.ArbeidsgiverinntektDto.KildeDto.AOrdningen) IInntektkilde.AOrdningen else IInntektkilde.Inntektsmelding,
                     beløp = io.inntektsdata.beløp.årlig.beløp,
-                    månedsbeløp = io.inntektsdata.beløp.månedligDouble.beløp,
-                    inntekterFraAOrdningen = null
+                    månedsbeløp = io.inntektsdata.beløp.månedligDouble.beløp
                 )
             }
 
             is InntektsopplysningUtDto.SkattSykepengegrunnlagDto -> IOmregnetÅrsinntekt(
-                kilde = if (io.inntektsopplysninger.isEmpty()) IInntektkilde.IkkeRapportert else IInntektkilde.AOrdningen,
+                kilde = if (io.inntektsdata.beløp.årlig.beløp == 0.0) IInntektkilde.IkkeRapportert else IInntektkilde.AOrdningen,
                 beløp = io.inntektsdata.beløp.årlig.beløp,
-                månedsbeløp = io.inntektsdata.beløp.månedligDouble.beløp,
-                inntekterFraAOrdningen = io.inntektsopplysninger
-                    .groupBy { it.måned }
-                    .mapValues { (_, verdier) -> verdier.sumOf { it.beløp.beløp } }
-                    .map { (måned, månedligSum) ->
-                        IInntekterFraAOrdningen(
-                            måned = måned,
-                            sum = månedligSum
-                        )
-                    }
+                månedsbeløp = io.inntektsdata.beløp.månedligDouble.beløp
             )
         }
     }

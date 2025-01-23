@@ -1,7 +1,6 @@
 package no.nav.helse.person.inntekt
 
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.*
 import kotlin.properties.Delegates
 import no.nav.helse.Alder.Companion.alder
@@ -37,7 +36,6 @@ import no.nav.helse.person.aktivitetslogg.Aktivitetslogg
 import no.nav.helse.person.aktivitetslogg.Varselkode.RV_VV_1
 import no.nav.helse.person.aktivitetslogg.Varselkode.RV_VV_2
 import no.nav.helse.person.aktivitetslogg.Varselkode.RV_VV_8
-import no.nav.helse.person.inntekt.Skatteopplysning.Inntekttype.LØNNSINNTEKT
 import no.nav.helse.spleis.e2e.assertVarsel
 import no.nav.helse.spleis.e2e.assertVarsler
 import no.nav.helse.sykepengegrunnlag
@@ -46,7 +44,6 @@ import no.nav.helse.testhelpers.NAVDAGER
 import no.nav.helse.testhelpers.assertNotNull
 import no.nav.helse.testhelpers.tidslinjeOf
 import no.nav.helse.utbetalingstidslinje.Begrunnelse
-import no.nav.helse.yearMonth
 import no.nav.helse.økonomi.Inntekt.Companion.daglig
 import no.nav.helse.økonomi.Inntekt.Companion.månedlig
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -391,17 +388,7 @@ internal class InntektsgrunnlagTest {
                     inntektsopplysning = skattSykepengegrunnlag(
                         hendelseId = UUID.randomUUID(),
                         dato = skjæringstidspunkt,
-                        inntektsopplysninger = listOf(
-                            Skatteopplysning(
-                                hendelseId = UUID.randomUUID(),
-                                beløp = 25000.månedlig,
-                                måned = 1.januar.yearMonth,
-                                type = LØNNSINNTEKT,
-                                fordel = "",
-                                beskrivelse = "",
-                                tidsstempel = LocalDateTime.now()
-                            )
-                        )
+                        beløp = 25000.månedlig
                     ),
                     korrigertInntekt = null,
                     skjønnsmessigFastsatt = null
@@ -469,17 +456,7 @@ internal class InntektsgrunnlagTest {
                     inntektsopplysning = skattSykepengegrunnlag(
                         hendelseId = UUID.randomUUID(),
                         dato = skjæringstidspunkt,
-                        inntektsopplysninger = listOf(
-                            Skatteopplysning(
-                                hendelseId = UUID.randomUUID(),
-                                beløp = 25000.månedlig,
-                                måned = 1.januar.yearMonth,
-                                type = LØNNSINNTEKT,
-                                fordel = "",
-                                beskrivelse = "",
-                                tidsstempel = LocalDateTime.now()
-                            )
-                        )
+                        beløp = 25000.månedlig
                     ),
                     korrigertInntekt = null,
                     skjønnsmessigFastsatt = null

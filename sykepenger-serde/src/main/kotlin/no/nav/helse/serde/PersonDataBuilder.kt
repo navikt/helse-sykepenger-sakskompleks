@@ -13,7 +13,6 @@ import no.nav.helse.dto.EndringskodeDto
 import no.nav.helse.dto.FagområdeDto
 import no.nav.helse.dto.HendelseskildeDto
 import no.nav.helse.dto.InfotrygdFerieperiodeDto
-import no.nav.helse.dto.InntekttypeDto
 import no.nav.helse.dto.KlassekodeDto
 import no.nav.helse.dto.MaksdatobestemmelseDto
 import no.nav.helse.dto.MedlemskapsvurderingDto
@@ -22,7 +21,6 @@ import no.nav.helse.dto.OppdragstatusDto
 import no.nav.helse.dto.RefusjonsservitørDto
 import no.nav.helse.dto.SatstypeDto
 import no.nav.helse.dto.SimuleringResultatDto
-import no.nav.helse.dto.SkatteopplysningDto
 import no.nav.helse.dto.SykdomshistorikkElementDto
 import no.nav.helse.dto.SykdomstidslinjeDagDto
 import no.nav.helse.dto.SykdomstidslinjeDto
@@ -63,7 +61,6 @@ import no.nav.helse.serde.PersonData.ArbeidsgiverData.SykdomstidslinjeData.DagDa
 import no.nav.helse.serde.PersonData.ArbeidsgiverData.VedtaksperiodeData.TilstandTypeData
 import no.nav.helse.serde.PersonData.UtbetalingstidslinjeData.UtbetalingsdagData
 import no.nav.helse.serde.PersonData.VilkårsgrunnlagElementData.ArbeidsgiverInntektsopplysningData.InntektsopplysningData.InntektsopplysningskildeData
-import no.nav.helse.serde.PersonData.VilkårsgrunnlagElementData.ArbeidsgiverInntektsopplysningData.SkatteopplysningData
 import no.nav.helse.serde.mapping.JsonMedlemskapstatus
 
 fun PersonData.tilSerialisertPerson(pretty: Boolean = false): SerialisertPerson {
@@ -821,10 +818,6 @@ private fun InntektsopplysningUtDto.tilPersonData() = PersonData.Vilkårsgrunnla
         is InntektsopplysningUtDto.ArbeidsgiverinntektDto -> InntektsopplysningskildeData.INNTEKTSMELDING
         is InntektsopplysningUtDto.SkattSykepengegrunnlagDto -> InntektsopplysningskildeData.SKATT_SYKEPENGEGRUNNLAG
     },
-    skatteopplysninger = when (this) {
-        is InntektsopplysningUtDto.SkattSykepengegrunnlagDto -> this.inntektsopplysninger.map { it.tilPersonDataSkattopplysning() }
-        else -> null
-    },
     inntektsmeldingkilde = when (this) {
         is InntektsopplysningUtDto.ArbeidsgiverinntektDto -> when (this.kilde) {
             InntektsopplysningUtDto.ArbeidsgiverinntektDto.KildeDto.Arbeidsgiver -> PersonData.VilkårsgrunnlagElementData.ArbeidsgiverInntektsopplysningData.InntektsopplysningData.InntektsmeldingKildeDto.Arbeidsgiver
@@ -848,21 +841,6 @@ private fun SkjønnsmessigFastsattUtDto.tilPersonData() = PersonData.Vilkårsgru
     hendelseId = this.inntektsdata.hendelseId,
     beløp = this.inntektsdata.beløp.månedligDouble.beløp,
     tidsstempel = this.inntektsdata.tidsstempel
-)
-
-private fun SkatteopplysningDto.tilPersonDataSkattopplysning() = SkatteopplysningData(
-    hendelseId = this.hendelseId,
-    beløp = this.beløp.beløp,
-    måned = this.måned,
-    type = when (this.type) {
-        InntekttypeDto.LØNNSINNTEKT -> SkatteopplysningData.InntekttypeData.LØNNSINNTEKT
-        InntekttypeDto.NÆRINGSINNTEKT -> SkatteopplysningData.InntekttypeData.NÆRINGSINNTEKT
-        InntekttypeDto.PENSJON_ELLER_TRYGD -> SkatteopplysningData.InntekttypeData.PENSJON_ELLER_TRYGD
-        InntekttypeDto.YTELSE_FRA_OFFENTLIGE -> SkatteopplysningData.InntekttypeData.YTELSE_FRA_OFFENTLIGE
-    },
-    fordel = fordel,
-    beskrivelse = beskrivelse,
-    tidsstempel = tidsstempel
 )
 
 private fun BeløpstidslinjeDto.tilPersonData() = PersonData.BeløpstidslinjeData(

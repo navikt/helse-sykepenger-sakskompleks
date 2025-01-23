@@ -4,7 +4,6 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Year
-import java.time.YearMonth
 import java.util.*
 import kotlin.streams.asSequence
 import no.nav.helse.dto.AlderDto
@@ -23,7 +22,6 @@ import no.nav.helse.dto.FeriepengeberegnerDto
 import no.nav.helse.dto.HendelseskildeDto
 import no.nav.helse.dto.InfotrygdFerieperiodeDto
 import no.nav.helse.dto.InntektbeløpDto
-import no.nav.helse.dto.InntekttypeDto
 import no.nav.helse.dto.KlassekodeDto
 import no.nav.helse.dto.MaksdatobestemmelseDto
 import no.nav.helse.dto.NyInntektUnderveisDto
@@ -33,7 +31,6 @@ import no.nav.helse.dto.ProsentdelDto
 import no.nav.helse.dto.RefusjonsservitørDto
 import no.nav.helse.dto.SatstypeDto
 import no.nav.helse.dto.SimuleringResultatDto
-import no.nav.helse.dto.SkatteopplysningDto
 import no.nav.helse.dto.SykdomshistorikkDto
 import no.nav.helse.dto.SykdomshistorikkElementDto
 import no.nav.helse.dto.SykdomstidslinjeDagDto
@@ -285,38 +282,6 @@ data class PersonData(
                 skjønnsmessigFastsatt = skjønnsmessigFastsatt?.tilDto()
             )
 
-            data class SkatteopplysningData(
-                val hendelseId: UUID,
-                val beløp: Double,
-                val måned: YearMonth,
-                val type: InntekttypeData,
-                val fordel: String,
-                val beskrivelse: String,
-                val tidsstempel: LocalDateTime
-            ) {
-                enum class InntekttypeData {
-                    LØNNSINNTEKT,
-                    NÆRINGSINNTEKT,
-                    PENSJON_ELLER_TRYGD,
-                    YTELSE_FRA_OFFENTLIGE
-                }
-
-                fun tilDto() = SkatteopplysningDto(
-                    hendelseId = this.hendelseId,
-                    beløp = InntektbeløpDto.MånedligDouble(beløp = beløp),
-                    måned = this.måned,
-                    type = when (type) {
-                        InntekttypeData.LØNNSINNTEKT -> InntekttypeDto.LØNNSINNTEKT
-                        InntekttypeData.NÆRINGSINNTEKT -> InntekttypeDto.NÆRINGSINNTEKT
-                        InntekttypeData.PENSJON_ELLER_TRYGD -> InntekttypeDto.PENSJON_ELLER_TRYGD
-                        InntekttypeData.YTELSE_FRA_OFFENTLIGE -> InntekttypeDto.YTELSE_FRA_OFFENTLIGE
-                    },
-                    fordel = fordel,
-                    beskrivelse = beskrivelse,
-                    tidsstempel = tidsstempel
-                )
-            }
-
             data class InntektsopplysningData(
                 val id: UUID,
                 val dato: LocalDate,
@@ -324,7 +289,6 @@ data class PersonData(
                 val beløp: Double,
                 val tidsstempel: LocalDateTime,
                 val kilde: InntektsopplysningskildeData,
-                val skatteopplysninger: List<SkatteopplysningData>?,
                 val inntektsmeldingkilde: InntektsmeldingKildeDto?
             ) {
                 enum class InntektsmeldingKildeDto {
@@ -370,8 +334,7 @@ data class PersonData(
                             dato = this.dato,
                             beløp = InntektbeløpDto.MånedligDouble(beløp = beløp),
                             tidsstempel = this.tidsstempel
-                        ),
-                        inntektsopplysninger = this.skatteopplysninger?.map { it.tilDto() } ?: emptyList()
+                        )
                     )
                 }
             }

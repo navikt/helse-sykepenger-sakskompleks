@@ -1,8 +1,7 @@
 package no.nav.helse.spleis.speil.dto
 
 import java.time.LocalDate
-import java.time.YearMonth
-import java.util.UUID
+import java.util.*
 import no.nav.helse.spleis.speil.builders.SykepengegrunnlagsgrenseDTO
 
 interface Vilkårsgrunnlag {
@@ -70,11 +69,5 @@ data class SkjønnsmessigFastsattDTO(
 data class Inntekt(
     val kilde: Inntektkilde,
     val beløp: Double,
-    val månedsbeløp: Double,
-    val inntekterFraAOrdningen: List<InntekterFraAOrdningen>? = null //kun gyldig for A-ordningen
-)
-
-data class InntekterFraAOrdningen(
-    val måned: YearMonth,
-    val sum: Double
+    val månedsbeløp: Double
 )

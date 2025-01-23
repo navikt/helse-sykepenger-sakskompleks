@@ -1362,7 +1362,7 @@ internal class Vedtaksperiode private constructor(
             ?.takeUnless { skjæringstidspunkt.yearMonth < it.inntektsdata.dato.yearMonth }
 
         if (inntektForArbeidsgiver != null) return Arbeidsgiverinntekt.fraInntektsmelding(inntektForArbeidsgiver)
-        if (skatteopplysning != null) return SkattSykepengegrunnlag.fraSkatt(skatteopplysning.inntektsdata, skatteopplysning.treMånederFørSkjæringstidspunkt)
+        if (skatteopplysning != null) return SkattSykepengegrunnlag.fraSkatt(skatteopplysning.inntektsdata)
         return SkattSykepengegrunnlag.ikkeRapportert(skjæringstidspunkt, hendelse.metadata.meldingsreferanseId)
     }
 
@@ -1436,7 +1436,7 @@ internal class Vedtaksperiode private constructor(
                 ArbeidsgiverInntektsopplysning(
                     orgnummer = skatteopplysning.arbeidsgiver,
                     gjelder = skjæringstidspunkt til LocalDate.MAX,
-                    inntektsopplysning = SkattSykepengegrunnlag.fraSkatt(skatteopplysning.inntektsdata, skatteopplysning.treMånederFørSkjæringstidspunkt),
+                    inntektsopplysning = SkattSykepengegrunnlag.fraSkatt(skatteopplysning.inntektsdata),
                     korrigertInntekt = null,
                     skjønnsmessigFastsatt = null
                 )

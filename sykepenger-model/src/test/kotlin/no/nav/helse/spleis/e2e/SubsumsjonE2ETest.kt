@@ -1085,31 +1085,7 @@ internal class SubsumsjonE2ETest : AbstractEndToEndTest() {
             input = mapOf(
                 "organisasjonsnummer" to a2,
                 "skjæringstidspunkt" to 1.januar,
-                "inntekterSisteTreMåneder" to
-                    listOf(
-                        mapOf(
-                            "beløp" to 31000.0,
-                            "årMåned" to YearMonth.of(2017, 10),
-                            "type" to "LØNNSINNTEKT",
-                            "fordel" to "kontantytelse",
-                            "beskrivelse" to "fastloenn"
-                        ),
-                        mapOf(
-                            "beløp" to 31000.0,
-                            "årMåned" to YearMonth.of(2017, 11),
-                            "type" to "LØNNSINNTEKT",
-                            "fordel" to "kontantytelse",
-                            "beskrivelse" to "fastloenn"
-                        ),
-                        mapOf(
-                            "beløp" to 31000.0,
-                            "årMåned" to YearMonth.of(2017, 12),
-                            "type" to "LØNNSINNTEKT",
-                            "fordel" to "kontantytelse",
-                            "beskrivelse" to "fastloenn"
-                        )
-                    ),
-
+                "inntekterSisteTreMåneder" to emptyList<Any>(),
                 "forklaring" to "Jeg, en saksbehandler, overstyrte pga 8-15"
             ),
             output = mapOf(
@@ -1150,29 +1126,7 @@ internal class SubsumsjonE2ETest : AbstractEndToEndTest() {
             input = mapOf(
                 "organisasjonsnummer" to a2,
                 "skjæringstidspunkt" to 1.januar,
-                "inntekterSisteTreMåneder" to listOf(
-                    mapOf(
-                        "beløp" to 31000.0,
-                        "årMåned" to YearMonth.of(2017, 10),
-                        "type" to "LØNNSINNTEKT",
-                        "fordel" to "kontantytelse",
-                        "beskrivelse" to "fastloenn"
-                    ),
-                    mapOf(
-                        "beløp" to 31000.0,
-                        "årMåned" to YearMonth.of(2017, 11),
-                        "type" to "LØNNSINNTEKT",
-                        "fordel" to "kontantytelse",
-                        "beskrivelse" to "fastloenn"
-                    ),
-                    mapOf(
-                        "beløp" to 31000.0,
-                        "årMåned" to YearMonth.of(2017, 12),
-                        "type" to "LØNNSINNTEKT",
-                        "fordel" to "kontantytelse",
-                        "beskrivelse" to "fastloenn"
-                    )
-                ),
+                "inntekterSisteTreMåneder" to emptyList<Any>(),
                 "forklaring" to "Jeg, en saksbehandler, overstyrte pga 8-15"
             ),
             output = mapOf(
@@ -1213,29 +1167,7 @@ internal class SubsumsjonE2ETest : AbstractEndToEndTest() {
             input = mapOf(
                 "organisasjonsnummer" to a2,
                 "skjæringstidspunkt" to 1.januar,
-                "inntekterSisteTreMåneder" to listOf(
-                    mapOf(
-                        "beløp" to 31000.0,
-                        "årMåned" to YearMonth.of(2017, 10),
-                        "type" to "LØNNSINNTEKT",
-                        "fordel" to "kontantytelse",
-                        "beskrivelse" to "fastloenn"
-                    ),
-                    mapOf(
-                        "beløp" to 31000.0,
-                        "årMåned" to YearMonth.of(2017, 11),
-                        "type" to "LØNNSINNTEKT",
-                        "fordel" to "kontantytelse",
-                        "beskrivelse" to "fastloenn"
-                    ),
-                    mapOf(
-                        "beløp" to 31000.0,
-                        "årMåned" to YearMonth.of(2017, 12),
-                        "type" to "LØNNSINNTEKT",
-                        "fordel" to "kontantytelse",
-                        "beskrivelse" to "fastloenn"
-                    )
-                ),
+                "inntekterSisteTreMåneder" to emptyList<Any>(),
                 "forklaring" to "Jeg, en saksbehandler, overstyrte pga 8-15"
             ),
             output = mapOf(
@@ -1261,31 +1193,7 @@ internal class SubsumsjonE2ETest : AbstractEndToEndTest() {
             input = mapOf(
                 "organisasjonsnummer" to a2,
                 "skjæringstidspunkt" to 1.januar,
-                "inntekterSisteTreMåneder" to
-                    listOf(
-                        mapOf(
-                            "beløp" to 31000.0,
-                            "årMåned" to YearMonth.of(2017, 10),
-                            "type" to "LØNNSINNTEKT",
-                            "fordel" to "kontantytelse",
-                            "beskrivelse" to "fastloenn"
-                        ),
-                        mapOf(
-                            "beløp" to 31000.0,
-                            "årMåned" to YearMonth.of(2017, 11),
-                            "type" to "LØNNSINNTEKT",
-                            "fordel" to "kontantytelse",
-                            "beskrivelse" to "fastloenn"
-                        ),
-                        mapOf(
-                            "beløp" to 31000.0,
-                            "årMåned" to YearMonth.of(2017, 12),
-                            "type" to "LØNNSINNTEKT",
-                            "fordel" to "kontantytelse",
-                            "beskrivelse" to "fastloenn"
-                        )
-                    ),
-
+                "inntekterSisteTreMåneder" to emptyList<Any>(),
                 "forklaring" to "Jeg, en saksbehandler, aktiverte pga 8-15"
             ),
             output = mapOf(

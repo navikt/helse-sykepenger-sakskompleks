@@ -3,8 +3,7 @@ package no.nav.helse.dto
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Year
-import java.time.YearMonth
-import java.util.UUID
+import java.util.*
 import no.nav.helse.dto.SpannerPersonDto.ArbeidsgiverData.RefusjonservitørData
 import no.nav.helse.dto.SpannerPersonDto.ArbeidsgiverData.SykdomstidslinjeData.DagData
 import no.nav.helse.dto.SpannerPersonDto.ArbeidsgiverData.VedtaksperiodeData.BehandlingData.AvsenderData
@@ -140,23 +139,6 @@ data class SpannerPersonDto(
             val korrigertInntekt: KorrigertInntektsopplysningData?,
             val skjønnsmessigFastsatt: SkjønnsmessigFastsattData?
         ) {
-            data class SkatteopplysningData(
-                val hendelseId: UUID,
-                val beløp: Double,
-                val måned: YearMonth,
-                val type: InntekttypeData,
-                val fordel: String,
-                val beskrivelse: String,
-                val tidsstempel: LocalDateTime
-            ) {
-                enum class InntekttypeData {
-                    LØNNSINNTEKT,
-                    NÆRINGSINNTEKT,
-                    PENSJON_ELLER_TRYGD,
-                    YTELSE_FRA_OFFENTLIGE
-                }
-            }
-
             data class InntektsopplysningData(
                 val id: UUID,
                 val dato: LocalDate,
@@ -164,7 +146,6 @@ data class SpannerPersonDto(
                 val beløp: InntektDto?,
                 val kilde: String,
                 val tidsstempel: LocalDateTime,
-                val skatteopplysninger: List<SkatteopplysningData>?,
                 val inntektsmeldingkilde: ArbeidsgiverData.InntektsmeldingData.KildeData?
             )
             data class KorrigertInntektsopplysningData(
@@ -1555,10 +1536,6 @@ private fun InntektsopplysningUtDto.tilPersonData() =
             is InntektsopplysningUtDto.ArbeidsgiverinntektDto -> "INNTEKTSMELDING"
             is InntektsopplysningUtDto.SkattSykepengegrunnlagDto -> "SKATT_SYKEPENGEGRUNNLAG"
         },
-        skatteopplysninger = when (this) {
-            is InntektsopplysningUtDto.SkattSykepengegrunnlagDto -> this.inntektsopplysninger.map { it.tilPersonDataSkattopplysning() }
-            else -> null
-        },
         inntektsmeldingkilde = when (this) {
             is InntektsopplysningUtDto.ArbeidsgiverinntektDto -> when (this.kilde) {
                 InntektsopplysningUtDto.ArbeidsgiverinntektDto.KildeDto.Arbeidsgiver -> SpannerPersonDto.ArbeidsgiverData.InntektsmeldingData.KildeData.Arbeidsgiver
@@ -1583,22 +1560,6 @@ private fun SkjønnsmessigFastsattUtDto.tilPersonData() =
         hendelseId = this.inntektsdata.hendelseId,
         beløp = this.inntektsdata.beløp.tilPersonData(),
         tidsstempel = this.inntektsdata.tidsstempel
-    )
-
-private fun SkatteopplysningDto.tilPersonDataSkattopplysning() =
-    ArbeidsgiverInntektsopplysningData.SkatteopplysningData(
-        hendelseId = this.hendelseId,
-        beløp = this.beløp.beløp,
-        måned = this.måned,
-        type = when (this.type) {
-            InntekttypeDto.LØNNSINNTEKT -> ArbeidsgiverInntektsopplysningData.SkatteopplysningData.InntekttypeData.LØNNSINNTEKT
-            InntekttypeDto.NÆRINGSINNTEKT -> ArbeidsgiverInntektsopplysningData.SkatteopplysningData.InntekttypeData.NÆRINGSINNTEKT
-            InntekttypeDto.PENSJON_ELLER_TRYGD -> ArbeidsgiverInntektsopplysningData.SkatteopplysningData.InntekttypeData.PENSJON_ELLER_TRYGD
-            InntekttypeDto.YTELSE_FRA_OFFENTLIGE -> ArbeidsgiverInntektsopplysningData.SkatteopplysningData.InntekttypeData.YTELSE_FRA_OFFENTLIGE
-        },
-        fordel = fordel,
-        beskrivelse = beskrivelse,
-        tidsstempel = tidsstempel
     )
 
 private fun BeløpstidslinjeDto.tilPersonData() = SpannerPersonDto.BeløpstidslinjeData(

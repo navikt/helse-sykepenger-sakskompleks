@@ -17,10 +17,8 @@ import no.nav.helse.person.inntekt.ArbeidsgiverInntektsopplysning.Companion.akti
 import no.nav.helse.person.inntekt.ArbeidsgiverInntektsopplysning.Companion.deaktiver
 import no.nav.helse.person.inntekt.ArbeidsgiverInntektsopplysning.Companion.overstyrMedInntektsmelding
 import no.nav.helse.person.inntekt.ArbeidsgiverInntektsopplysning.Companion.overstyrMedSaksbehandler
-import no.nav.helse.person.inntekt.Skatteopplysning.Inntekttype.LØNNSINNTEKT
 import no.nav.helse.testhelpers.assertInstanceOf
 import no.nav.helse.testhelpers.assertNotNull
-import no.nav.helse.yearMonth
 import no.nav.helse.økonomi.Inntekt.Companion.månedlig
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -95,13 +93,7 @@ internal class ArbeidsgiverInntektsopplysningTest {
     @Test
     fun `ny inntektsmelding uten endring i beløp i forhold Skatt endrer kun omregnet årsinntekt for skjønnsmessig fastsatt`() {
         val skjæringstidspunkt = 1.januar
-        val skattA1 = skattSykepengegrunnlag(
-            UUID.randomUUID(), skjæringstidspunkt, listOf(
-            Skatteopplysning(UUID.randomUUID(), 1000.månedlig, skjæringstidspunkt.minusMonths(1).yearMonth, LØNNSINNTEKT, "", ""),
-            Skatteopplysning(UUID.randomUUID(), 1000.månedlig, skjæringstidspunkt.minusMonths(2).yearMonth, LØNNSINNTEKT, "", ""),
-            Skatteopplysning(UUID.randomUUID(), 1000.månedlig, skjæringstidspunkt.minusMonths(3).yearMonth, LØNNSINNTEKT, "", "")
-        )
-        )
+        val skattA1 = skattSykepengegrunnlag(UUID.randomUUID(), skjæringstidspunkt, 1000.månedlig)
         val arbeidsgiverinntektA2 = arbeidsgiverinntekt(skjæringstidspunkt, 2000.månedlig)
         val arbeidsgiverinntektA3 = arbeidsgiverinntekt(skjæringstidspunkt, 3000.månedlig)
 

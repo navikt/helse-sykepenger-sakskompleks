@@ -483,7 +483,7 @@ internal class SpeilBehandlingerBuilderTest : AbstractE2ETest() {
             0.generasjon {
                 val vilkårsgrunnlag = beregnetPeriode(0).vilkårsgrunnlag()
                 val inntektsgrunnlag = vilkårsgrunnlag.inntekter.firstOrNull { it.organisasjonsnummer == a2 }
-                assertEquals(Inntekt(Inntektkilde.IkkeRapportert, 0.0, 0.0, emptyList()), inntektsgrunnlag?.omregnetÅrsinntekt)
+                assertEquals(Inntekt(Inntektkilde.IkkeRapportert, 0.0, 0.0), inntektsgrunnlag?.omregnetÅrsinntekt)
             }
         }
     }
