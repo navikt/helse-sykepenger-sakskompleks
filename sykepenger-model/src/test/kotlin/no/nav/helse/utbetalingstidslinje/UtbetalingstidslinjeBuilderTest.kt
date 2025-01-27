@@ -1,6 +1,5 @@
 package no.nav.helse.utbetalingstidslinje
 
-import java.time.LocalDate
 import no.nav.helse.Grunnbeløp
 import no.nav.helse.februar
 import no.nav.helse.hendelser.Avsender.ARBEIDSGIVER
@@ -1035,8 +1034,7 @@ internal class UtbetalingstidslinjeBuilderTest {
             faktaavklarteInntekter = ArbeidsgiverFaktaavklartInntekt(
                 skjæringstidspunkt = 1.januar,
                 `6G` = Grunnbeløp.`6G`.beløp(1.januar),
-                fastsattÅrsinntekt = 31000.månedlig,
-                gjelder = 1.januar til LocalDate.MAX
+                fastsattÅrsinntekt = 31000.månedlig
             ),
             regler = ArbeidsgiverRegler.Companion.NormalArbeidstaker,
             arbeidsgiverperiode = arbeidsgiverperioder.flatMap { it.arbeidsgiverperiode }.grupperSammenhengendePerioder(),

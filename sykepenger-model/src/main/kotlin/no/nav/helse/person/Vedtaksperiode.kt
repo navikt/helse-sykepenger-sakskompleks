@@ -4,7 +4,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Period
 import java.time.YearMonth
-import java.util.*
+import java.util.UUID
 import no.nav.helse.Grunnbeløp
 import no.nav.helse.Toggle
 import no.nav.helse.dto.LazyVedtaksperiodeVenterDto
@@ -3180,8 +3180,7 @@ internal class Vedtaksperiode private constructor(
             return ArbeidsgiverFaktaavklartInntekt(
                 skjæringstidspunkt = skjæringstidspunkt,
                 `6G` = Grunnbeløp.`6G`.beløp(skjæringstidspunkt),
-                fastsattÅrsinntekt = Inntekt.INGEN,
-                gjelder = skjæringstidspunkt til LocalDate.MAX
+                fastsattÅrsinntekt = Inntekt.INGEN
             )
         }
 

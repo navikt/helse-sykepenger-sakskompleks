@@ -1,13 +1,18 @@
 package no.nav.helse.utbetalingstidslinje
 
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.util.UUID
 import no.nav.helse.erHelg
+import no.nav.helse.hendelser.Avsender
 import no.nav.helse.hendelser.Periode
 import no.nav.helse.hendelser.Periode.Companion.periode
+import no.nav.helse.hendelser.somPeriode
 import no.nav.helse.hendelser.til
 import no.nav.helse.person.beløp.Beløpsdag
 import no.nav.helse.person.beløp.Beløpstidslinje
 import no.nav.helse.person.beløp.Dag as Beløpstidslinjedag
+import no.nav.helse.person.beløp.Kilde
 import no.nav.helse.person.beløp.UkjentDag
 import no.nav.helse.sykdomstidslinje.Dag
 import no.nav.helse.sykdomstidslinje.Sykdomstidslinje
@@ -26,8 +31,7 @@ internal class VilkårsprøvdSkjæringstidspunkt(
         inntekt.organisasjonsnummer to ArbeidsgiverFaktaavklartInntekt(
             skjæringstidspunkt = skjæringstidspunkt,
             `6G` = `6G`,
-            fastsattÅrsinntekt = inntekt.fastsattÅrsinntekt,
-            gjelder = inntekt.gjelder
+            fastsattÅrsinntekt = Beløpstidslinje.fra(inntekt.gjelder.start.somPeriode(), inntekt.fastsattÅrsinntekt, Kilde(UUID.randomUUID(), Avsender.SYSTEM, LocalDateTime.now()))
         )
     }
 
@@ -91,25 +95,28 @@ internal class VilkårsprøvdSkjæringstidspunkt(
 internal class ArbeidsgiverFaktaavklartInntekt(
     private val skjæringstidspunkt: LocalDate,
     private val `6G`: Inntekt,
-    private val fastsattÅrsinntekt: Inntekt,
-    private val gjelder: Periode
+    private val fastsattÅrsinntekt: Beløpstidslinje
 ) {
+    constructor(skjæringstidspunkt: LocalDate, `6G`: Inntekt, fastsattÅrsinntekt: Inntekt): this(skjæringstidspunkt, `6G`, Beløpstidslinje.fra(skjæringstidspunkt.somPeriode(), fastsattÅrsinntekt, Kilde(UUID.randomUUID(), Avsender.SYSTEM, LocalDateTime.now())))
     private val lagDefaultRefusjonsbeløpHvisMangler = { _: LocalDate, aktuellDagsinntekt: Inntekt -> aktuellDagsinntekt }
     private val krevRefusjonsbeløpHvisMangler = { dato: LocalDate, _: Inntekt ->
         error("Har ingen refusjonsopplysninger på vilkårsgrunnlag for utbetalingsdag $dato")
     }
 
-    private fun fastsattÅrsinntekt(dagen: LocalDate): Inntekt {
-        if (dagen !in gjelder) return INGEN
-        return fastsattÅrsinntekt
+    private fun beløp(dato: LocalDate): Inntekt {
+        return when (val dag = fastsattÅrsinntekt[dato]) {
+            is Beløpsdag -> dag.beløp
+            UkjentDag -> {
+                val førsteDag = fastsattÅrsinntekt.firstOrNull() ?: error("Hvordan kan det ha seg at vi har en arbeidsgiver med en tom beløpstidslinje?")
+                if (førsteDag.dato != skjæringstidspunkt) INGEN else fastsattÅrsinntekt.last().beløp
+            }
+        }
     }
 
-    private fun beregningsgrunnlag(skjæringstidspunkt: LocalDate): Inntekt {
-        if (!gjelderPåSkjæringstidspunktet(skjæringstidspunkt)) return INGEN
-        return fastsattÅrsinntekt
-    }
+    private fun fastsattÅrsinntekt(dagen: LocalDate): Inntekt = beløp(dagen)
 
-    private fun gjelderPåSkjæringstidspunktet(skjæringstidspunkt: LocalDate) = skjæringstidspunkt == gjelder.start
+    private fun beregningsgrunnlag(skjæringstidspunkt: LocalDate): Inntekt = beløp(skjæringstidspunkt)
+
     internal fun medInntektHvisFinnes(
         dato: LocalDate,
         økonomi: Økonomi,
@@ -152,7 +159,8 @@ internal class ArbeidsgiverFaktaavklartInntekt(
 
     internal fun ghosttidslinje(beregningsperiode: Periode, skjæringstidspunkt: LocalDate, `6G`: Inntekt, arbeidsgiverlinjer: List<Utbetalingstidslinje>): Utbetalingstidslinje {
         // avdekker hvilken periode det er aktuelt å lage ghost-dager i
-        val aktueltGhostområde = if (gjelder.start <= beregningsperiode.endInclusive) listOf(beregningsperiode.subset(gjelder.start til LocalDate.MAX)) else emptyList()
+        val førsteDag = fastsattÅrsinntekt.first().dato
+        val aktueltGhostområde = if (førsteDag <= beregningsperiode.endInclusive) listOf(beregningsperiode.subset(førsteDag til LocalDate.MAX)) else emptyList()
 
         // fjerner perioder med registrert vedtaksperiode
         val ghostperioder = arbeidsgiverlinjer.fold(aktueltGhostområde) { result, linje ->
