@@ -6,14 +6,18 @@ import no.nav.helse.dto.deserialisering.ArbeidsgiverInntektsopplysningInnDto
 import no.nav.helse.dto.serialisering.ArbeidsgiverInntektsopplysningUtDto
 import no.nav.helse.etterlevelse.Subsumsjonslogg
 import no.nav.helse.etterlevelse.`§ 8-15`
+import no.nav.helse.hendelser.Avsender
 import no.nav.helse.hendelser.OverstyrArbeidsgiveropplysninger.KorrigertArbeidsgiverInntektsopplysning
 import no.nav.helse.hendelser.Periode
 import no.nav.helse.hendelser.SkjønnsmessigFastsettelse
+import no.nav.helse.hendelser.somPeriode
 import no.nav.helse.person.Arbeidsgiver
 import no.nav.helse.person.Opptjening
 import no.nav.helse.person.PersonObserver.UtkastTilVedtakEvent.Inntektskilde
 import no.nav.helse.person.aktivitetslogg.IAktivitetslogg
 import no.nav.helse.person.aktivitetslogg.Varselkode
+import no.nav.helse.person.beløp.Beløpstidslinje
+import no.nav.helse.person.beløp.Kilde
 import no.nav.helse.person.builders.UtkastTilVedtakBuilder
 import no.nav.helse.person.inntekt.Skatteopplysning.Companion.subsumsjonsformat
 import no.nav.helse.utbetalingstidslinje.VilkårsprøvdSkjæringstidspunkt
@@ -115,12 +119,28 @@ internal data class ArbeidsgiverInntektsopplysning(
     }
 
     internal companion object {
-        internal fun List<ArbeidsgiverInntektsopplysning>.faktaavklarteInntekter() = this
+        internal fun List<ArbeidsgiverInntektsopplysning>.faktaavklarteInntekter(skjæringstidspunkt: LocalDate) = this
             .map {
+                val fastsattInntektsdata = (it.skjønnsmessigFastsatt?.inntektsdata ?: it.omregnetÅrsinntekt)
                 VilkårsprøvdSkjæringstidspunkt.FaktaavklartInntekt(
                     organisasjonsnummer = it.orgnummer,
-                    fastsattÅrsinntekt = it.fastsattÅrsinntekt,
-                    gjelder = it.gjelder
+                    inntektstidslinje = Inntektstidslinje(
+                        skjæringstidspunkt = skjæringstidspunkt,
+                        gjelderTilOgMed = it.gjelder.endInclusive,
+                        beløpstidslinje = Beløpstidslinje.fra(
+                            periode = it.gjelder.start.somPeriode(),
+                            beløp = it.fastsattÅrsinntekt,
+                            kilde = Kilde(
+                                meldingsreferanseId = fastsattInntektsdata.hendelseId,
+                                avsender = when {
+                                    it.korrigertInntekt != null || it.skjønnsmessigFastsatt != null -> Avsender.SAKSBEHANDLER
+                                    // TODO: Skal Infotrygd/AOrdningen ha annen kilde? Og burde beløpstidslinje ha egne Avsendere enn de gjenbrukte hendelse-Avsenderne?
+                                    else -> Avsender.ARBEIDSGIVER
+                                },
+                                tidsstempel = fastsattInntektsdata.tidsstempel
+                            )
+                        )
+                    )
                 )
             }
 

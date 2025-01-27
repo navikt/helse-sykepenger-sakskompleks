@@ -16,11 +16,13 @@ import no.nav.helse.etterlevelse.tredjeLedd
 import no.nav.helse.hendelser.Avsender.ARBEIDSGIVER
 import no.nav.helse.hendelser.Periode
 import no.nav.helse.hendelser.Periode.Companion.grupperSammenhengendePerioder
+import no.nav.helse.hendelser.somPeriode
 import no.nav.helse.hendelser.til
 import no.nav.helse.januar
 import no.nav.helse.nesteDag
 import no.nav.helse.person.beløp.Beløpstidslinje
 import no.nav.helse.person.beløp.BeløpstidslinjeTest.Companion.beløpstidslinje
+import no.nav.helse.person.inntekt.Inntektstidslinje
 import no.nav.helse.sykdomstidslinje.Sykdomstidslinje
 import no.nav.helse.testhelpers.A
 import no.nav.helse.testhelpers.S
@@ -204,8 +206,11 @@ internal class ArbeidsgiverperiodesubsumsjonTest {
             faktaavklarteInntekter = ArbeidsgiverFaktaavklartInntekt(
                 skjæringstidspunkt = 1.januar,
                 `6G` = Grunnbeløp.`6G`.beløp(1.januar),
-                fastsattÅrsinntekt = 31000.månedlig,
-                gjelder = 1.januar til LocalDate.MAX
+                inntektstidslinje = Inntektstidslinje(
+                    skjæringstidspunkt = 1.januar,
+                    beløpstidslinje = ARBEIDSGIVER.beløpstidslinje(1.januar.somPeriode(), 31000.månedlig),
+                    gjelderTilOgMed = LocalDate.MAX
+                )
             ),
             regler = ArbeidsgiverRegler.Companion.NormalArbeidstaker,
             arbeidsgiverperiode = arbeidsgiverperioder.flatMap { it.arbeidsgiverperiode }.grupperSammenhengendePerioder(),

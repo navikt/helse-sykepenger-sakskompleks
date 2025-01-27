@@ -164,6 +164,7 @@ import no.nav.helse.person.inntekt.Inntektsgrunnlag
 import no.nav.helse.person.inntekt.Inntektshistorikk
 import no.nav.helse.person.inntekt.Inntektsmeldinginntekt
 import no.nav.helse.person.inntekt.Inntektsopplysning
+import no.nav.helse.person.inntekt.Inntektstidslinje
 import no.nav.helse.person.inntekt.Skatteopplysning
 import no.nav.helse.person.inntekt.Skatteopplysning.Companion.subsumsjonsformat
 import no.nav.helse.person.inntekt.SkatteopplysningerForSykepengegrunnlag
@@ -3180,8 +3181,11 @@ internal class Vedtaksperiode private constructor(
             return ArbeidsgiverFaktaavklartInntekt(
                 skjæringstidspunkt = skjæringstidspunkt,
                 `6G` = Grunnbeløp.`6G`.beløp(skjæringstidspunkt),
-                fastsattÅrsinntekt = Inntekt.INGEN,
-                gjelder = skjæringstidspunkt til LocalDate.MAX
+                inntektstidslinje = Inntektstidslinje(
+                    skjæringstidspunkt = skjæringstidspunkt,
+                    beløpstidslinje = Beløpstidslinje(),
+                    gjelderTilOgMed = LocalDate.MAX
+                )
             )
         }
 
