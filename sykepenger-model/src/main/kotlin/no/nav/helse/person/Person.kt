@@ -33,6 +33,7 @@ import no.nav.helse.hendelser.Periode
 import no.nav.helse.hendelser.PersonPåminnelse
 import no.nav.helse.hendelser.Påminnelse
 import no.nav.helse.hendelser.Revurderingseventyr
+import no.nav.helse.hendelser.Saksbehandleroverstyringer
 import no.nav.helse.hendelser.Simulering
 import no.nav.helse.hendelser.SkjønnsmessigFastsettelse
 import no.nav.helse.hendelser.SykepengegrunnlagForArbeidsgiver
@@ -236,11 +237,11 @@ class Person private constructor(
         håndterGjenoppta(replays, aktivitetslogg)
     }
 
-    fun håndter(melding: MinimumSykdomsgradsvurderingMelding, aktivitetslogg: IAktivitetslogg) {
+    fun håndter(melding: MinimumSykdomsgradsvurderingMelding, aktivitetslogg: IAktivitetslogg, etter: () -> Unit = { håndterGjenoppta(melding, aktivitetslogg)}) {
         registrer(aktivitetslogg, "Behandler minimum sykdomsgradvurdering")
         melding.oppdater(this.minimumSykdomsgradsvurdering)
         this.igangsettOverstyring(Revurderingseventyr.minimumSykdomsgradVurdert(melding, melding.periodeForEndring()), aktivitetslogg)
-        håndterGjenoppta(melding, aktivitetslogg)
+        etter()
     }
 
     private fun tidligereBehandlinger(behandlingsporing: Behandlingsporing.Arbeidsgiver, aktivitetslogg: IAktivitetslogg, periode: Periode) {
@@ -433,10 +434,10 @@ class Person private constructor(
         håndterGjenoppta(påminnelse, aktivitetslogg)
     }
 
-    fun håndter(hendelse: OverstyrTidslinje, aktivitetslogg: IAktivitetslogg) {
+    fun håndter(hendelse: OverstyrTidslinje, aktivitetslogg: IAktivitetslogg, etter: () -> Unit = { håndterGjenoppta(hendelse, aktivitetslogg)} ) {
         registrer(aktivitetslogg, "Behandler Overstyr tidslinje")
         finnArbeidsgiver(hendelse.behandlingsporing, aktivitetslogg).håndter(hendelse, aktivitetslogg)
-        håndterGjenoppta(hendelse, aktivitetslogg)
+        etter()
     }
 
     fun håndter(hendelse: OverstyrArbeidsgiveropplysninger, aktivitetslogg: IAktivitetslogg) {
@@ -475,6 +476,12 @@ class Person private constructor(
         registrer(aktivitetslogg, "Behandler grunnbeløpsendring")
         if (arbeidsgivere.håndter(hendelse, aktivitetslogg)) return håndterGjenoppta(hendelse, aktivitetslogg)
         observers.forEach { hendelse.sykefraværstilfelleIkkeFunnet(it) }
+    }
+
+    fun håndter(hendelse: Saksbehandleroverstyringer, aktivitetslogg: IAktivitetslogg) {
+        registrer(aktivitetslogg, "Behandler saksbehandleroverstyringer")
+        hendelse.håndter(aktivitetslogg, this)
+        håndterGjenoppta(hendelse, aktivitetslogg)
     }
 
     fun addObserver(observer: PersonObserver) {

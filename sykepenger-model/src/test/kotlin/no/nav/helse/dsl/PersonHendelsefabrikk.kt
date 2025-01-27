@@ -11,8 +11,10 @@ import no.nav.helse.hendelser.Avsender.SAKSBEHANDLER
 import no.nav.helse.hendelser.Dødsmelding
 import no.nav.helse.hendelser.OverstyrArbeidsforhold
 import no.nav.helse.hendelser.OverstyrArbeidsgiveropplysninger
+import no.nav.helse.hendelser.Overstyringsdata
 import no.nav.helse.hendelser.Periode
 import no.nav.helse.hendelser.PersonPåminnelse
+import no.nav.helse.hendelser.Saksbehandleroverstyringer
 import no.nav.helse.hendelser.SkjønnsmessigFastsettelse
 import no.nav.helse.hendelser.UtbetalingshistorikkForFeriepenger
 import no.nav.helse.hendelser.til
@@ -22,6 +24,16 @@ import no.nav.helse.person.inntekt.Inntektsdata
 import no.nav.helse.økonomi.Inntekt
 
 internal class PersonHendelsefabrikk {
+    internal fun lagSaksbehsandleroverstyringer(
+        meldingsreferanseId: UUID = UUID.randomUUID(),
+        innsendt: LocalDateTime = LocalDateTime.now(),
+        vararg overstyringer: Overstyringsdata
+    ) = Saksbehandleroverstyringer(
+        meldingsreferanseId = meldingsreferanseId,
+        innsendt = innsendt,
+        overstyringer = overstyringer.toList()
+    )
+
     internal fun lagDødsmelding(dødsdato: LocalDate) =
         Dødsmelding(
             meldingsreferanseId = UUID.randomUUID(),

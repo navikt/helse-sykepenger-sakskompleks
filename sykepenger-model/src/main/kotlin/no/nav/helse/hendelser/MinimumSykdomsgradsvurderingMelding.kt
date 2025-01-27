@@ -2,33 +2,34 @@ package no.nav.helse.hendelser
 
 import java.time.LocalDateTime
 import java.util.UUID
-import no.nav.helse.hendelser.Avsender.SYSTEM
+import no.nav.helse.hendelser.Avsender.SAKSBEHANDLER
 import no.nav.helse.person.MinimumSykdomsgradsvurdering
 
 /**
  * Melding om perioder saksbehandler har vurdert dithet at bruker har tapt nok arbeidstid til å ha rett på sykepenger,
  * tross < 20% tapt inntekt
  */
+class MinimumSykdomsgradsvurderingMeldingData(
+    internal val perioderMedMinimumSykdomsgradVurdertOK: Set<Periode>,
+    internal val perioderMedMinimumSykdomsgradVurdertIkkeOK: Set<Periode>
+): Overstyringsdata
+
 class MinimumSykdomsgradsvurderingMelding(
-    private val perioderMedMinimumSykdomsgradVurdertOK: Set<Periode>,
-    private val perioderMedMinimumSykdomsgradVurdertIkkeOK: Set<Periode>,
-    meldingsreferanseId: UUID
+    data: MinimumSykdomsgradsvurderingMeldingData,
+    override val metadata: HendelseMetadata
 ) : Hendelse {
+    private val perioderMedMinimumSykdomsgradVurdertOK = data.perioderMedMinimumSykdomsgradVurdertOK
+    private val perioderMedMinimumSykdomsgradVurdertIkkeOK = data.perioderMedMinimumSykdomsgradVurdertIkkeOK
+
+    constructor(perioderMedMinimumSykdomsgradVurdertOK: Set<Periode>, perioderMedMinimumSykdomsgradVurdertIkkeOK: Set<Periode>, meldingsreferanseId: UUID): this(
+        MinimumSykdomsgradsvurderingMeldingData(perioderMedMinimumSykdomsgradVurdertOK, perioderMedMinimumSykdomsgradVurdertIkkeOK), LocalDateTime.now().let { HendelseMetadata(meldingsreferanseId, SAKSBEHANDLER, it, it, false) }
+    )
 
     init {
         sjekkForOverlapp()
     }
 
     override val behandlingsporing = Behandlingsporing.IngenArbeidsgiver
-    override val metadata = LocalDateTime.now().let { nå ->
-        HendelseMetadata(
-            meldingsreferanseId = meldingsreferanseId,
-            avsender = SYSTEM,
-            innsendt = nå,
-            registrert = nå,
-            automatiskBehandling = true
-        )
-    }
 
     internal fun oppdater(vurdering: MinimumSykdomsgradsvurdering) {
         vurdering.leggTil(perioderMedMinimumSykdomsgradVurdertOK)

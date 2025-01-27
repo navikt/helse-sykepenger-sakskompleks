@@ -37,21 +37,24 @@ enum class Dagtype {
     }
 }
 
-class OverstyrTidslinje(
-    meldingsreferanseId: UUID,
-    organisasjonsnummer: String,
-    dager: List<ManuellOverskrivingDag>,
-    opprettet: LocalDateTime,
+data class OverstyrTidslinjeData(
+    internal val organisasjonsnummer: String,
+    internal val dager: List<ManuellOverskrivingDag>
+): Overstyringsdata
+
+class OverstyrTidslinje internal constructor(
+    data: OverstyrTidslinjeData,
+    override val metadata: HendelseMetadata
 ) : Hendelse {
+    private val organisasjonsnummer = data.organisasjonsnummer
+    private val dager = data.dager
+
+    constructor(meldingsreferanseId: UUID, organisasjonsnummer: String, dager: List<ManuellOverskrivingDag>, opprettet: LocalDateTime): this(
+        OverstyrTidslinjeData(organisasjonsnummer, dager), HendelseMetadata(meldingsreferanseId, Avsender.SAKSBEHANDLER, opprettet, LocalDateTime.now(), false)
+    )
+
     override val behandlingsporing = Behandlingsporing.Arbeidsgiver(
         organisasjonsnummer = organisasjonsnummer
-    )
-    override val metadata = HendelseMetadata(
-        meldingsreferanseId = meldingsreferanseId,
-        avsender = Avsender.SAKSBEHANDLER,
-        innsendt = opprettet,
-        registrert = LocalDateTime.now(),
-        automatiskBehandling = false
     )
     private val kilde = Hendelseskilde(this::class, metadata.meldingsreferanseId, metadata.innsendt)
     private var nesteFraOgMed: LocalDate = LocalDate.MIN

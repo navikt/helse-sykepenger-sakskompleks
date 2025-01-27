@@ -22,6 +22,7 @@ import no.nav.helse.hendelser.Inntektsmelding
 import no.nav.helse.hendelser.ManuellOverskrivingDag
 import no.nav.helse.hendelser.Medlemskapsvurdering
 import no.nav.helse.hendelser.OverstyrArbeidsforhold.ArbeidsforholdOverstyrt
+import no.nav.helse.hendelser.Overstyringsdata
 import no.nav.helse.hendelser.Periode
 import no.nav.helse.hendelser.Sykmeldingsperiode
 import no.nav.helse.hendelser.Søknad
@@ -174,6 +175,12 @@ internal class TestPerson(
 
         internal fun håndterKorrigerteArbeidsgiveropplysninger(vedtaksperiodeId: UUID, vararg opplysninger: Arbeidsgiveropplysning): UUID {
             val hendelse = arbeidsgiverHendelsefabrikk.lagKorrigerteArbeidsgiveropplysninger(vedtaksperiodeId = vedtaksperiodeId, opplysninger = opplysninger)
+            hendelse.håndter(Person::håndter)
+            return hendelse.metadata.meldingsreferanseId
+        }
+
+        internal fun håndterSaksbehandleroverstyringer(vararg overstyringer: Overstyringsdata): UUID {
+            val hendelse = personHendelsefabrikk.lagSaksbehsandleroverstyringer(overstyringer = overstyringer)
             hendelse.håndter(Person::håndter)
             return hendelse.metadata.meldingsreferanseId
         }
