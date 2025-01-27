@@ -237,11 +237,11 @@ class Person private constructor(
         håndterGjenoppta(replays, aktivitetslogg)
     }
 
-    fun håndter(melding: MinimumSykdomsgradsvurderingMelding, aktivitetslogg: IAktivitetslogg, etter: () -> Unit = { håndterGjenoppta(melding, aktivitetslogg)}) {
+    fun håndter(melding: MinimumSykdomsgradsvurderingMelding, aktivitetslogg: IAktivitetslogg) {
         registrer(aktivitetslogg, "Behandler minimum sykdomsgradvurdering")
         melding.oppdater(this.minimumSykdomsgradsvurdering)
-        this.igangsettOverstyring(Revurderingseventyr.minimumSykdomsgradVurdert(melding, melding.periodeForEndring()), aktivitetslogg)
-        etter()
+        melding.overstyring(Revurderingseventyr.minimumSykdomsgradVurdert(melding, melding.periodeForEndring()), aktivitetslogg, this)
+        melding.ferdighåndtert(melding, aktivitetslogg, this)
     }
 
     private fun tidligereBehandlinger(behandlingsporing: Behandlingsporing.Arbeidsgiver, aktivitetslogg: IAktivitetslogg, periode: Periode) {
@@ -434,10 +434,10 @@ class Person private constructor(
         håndterGjenoppta(påminnelse, aktivitetslogg)
     }
 
-    fun håndter(hendelse: OverstyrTidslinje, aktivitetslogg: IAktivitetslogg, etter: () -> Unit = { håndterGjenoppta(hendelse, aktivitetslogg)} ) {
+    fun håndter(hendelse: OverstyrTidslinje, aktivitetslogg: IAktivitetslogg ) {
         registrer(aktivitetslogg, "Behandler Overstyr tidslinje")
         finnArbeidsgiver(hendelse.behandlingsporing, aktivitetslogg).håndter(hendelse, aktivitetslogg)
-        etter()
+        hendelse.ferdighåndtert(hendelse, aktivitetslogg, this)
     }
 
     fun håndter(hendelse: OverstyrArbeidsgiveropplysninger, aktivitetslogg: IAktivitetslogg) {
@@ -828,7 +828,7 @@ class Person private constructor(
         gjenopptaBehandlingNy = true
     }
 
-    private fun håndterGjenoppta(hendelse: Hendelse, aktivitetslogg: IAktivitetslogg) {
+    internal fun håndterGjenoppta(hendelse: Hendelse, aktivitetslogg: IAktivitetslogg) {
         while (gjenopptaBehandlingNy) {
             gjenopptaBehandlingNy = false
             arbeidsgivere.gjenopptaBehandling(hendelse, aktivitetslogg)

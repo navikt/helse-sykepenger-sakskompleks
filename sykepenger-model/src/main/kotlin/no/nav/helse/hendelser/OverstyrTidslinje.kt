@@ -44,13 +44,16 @@ data class OverstyrTidslinjeData(
 
 class OverstyrTidslinje internal constructor(
     data: OverstyrTidslinjeData,
-    override val metadata: HendelseMetadata
-) : Hendelse {
+    override val metadata: HendelseMetadata,
+    overstyring: Overstyring
+) : Hendelse, Overstyring by overstyring {
     private val organisasjonsnummer = data.organisasjonsnummer
     private val dager = data.dager
 
     constructor(meldingsreferanseId: UUID, organisasjonsnummer: String, dager: List<ManuellOverskrivingDag>, opprettet: LocalDateTime): this(
-        OverstyrTidslinjeData(organisasjonsnummer, dager), HendelseMetadata(meldingsreferanseId, Avsender.SAKSBEHANDLER, opprettet, LocalDateTime.now(), false)
+        data = OverstyrTidslinjeData(organisasjonsnummer, dager),
+        metadata = HendelseMetadata(meldingsreferanseId, Avsender.SAKSBEHANDLER, opprettet, LocalDateTime.now(), false),
+        overstyring = Overstyring.Enkeltoverstyring
     )
 
     override val behandlingsporing = Behandlingsporing.Arbeidsgiver(

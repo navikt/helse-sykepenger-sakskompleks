@@ -16,13 +16,16 @@ class MinimumSykdomsgradsvurderingMeldingData(
 
 class MinimumSykdomsgradsvurderingMelding(
     data: MinimumSykdomsgradsvurderingMeldingData,
-    override val metadata: HendelseMetadata
-) : Hendelse {
+    override val metadata: HendelseMetadata,
+    overstyring: Overstyring
+) : Hendelse, Overstyring by overstyring {
     private val perioderMedMinimumSykdomsgradVurdertOK = data.perioderMedMinimumSykdomsgradVurdertOK
     private val perioderMedMinimumSykdomsgradVurdertIkkeOK = data.perioderMedMinimumSykdomsgradVurdertIkkeOK
 
     constructor(perioderMedMinimumSykdomsgradVurdertOK: Set<Periode>, perioderMedMinimumSykdomsgradVurdertIkkeOK: Set<Periode>, meldingsreferanseId: UUID): this(
-        MinimumSykdomsgradsvurderingMeldingData(perioderMedMinimumSykdomsgradVurdertOK, perioderMedMinimumSykdomsgradVurdertIkkeOK), LocalDateTime.now().let { HendelseMetadata(meldingsreferanseId, SAKSBEHANDLER, it, it, false) }
+        data = MinimumSykdomsgradsvurderingMeldingData(perioderMedMinimumSykdomsgradVurdertOK, perioderMedMinimumSykdomsgradVurdertIkkeOK),
+        metadata = LocalDateTime.now().let { HendelseMetadata(meldingsreferanseId, SAKSBEHANDLER, it, it, false) },
+        overstyring = Overstyring.Enkeltoverstyring
     )
 
     init {

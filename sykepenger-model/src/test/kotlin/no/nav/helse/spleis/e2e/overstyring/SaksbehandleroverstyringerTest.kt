@@ -35,10 +35,12 @@ internal class SaksbehandleroverstyringerTest: AbstractDslTest() {
                 assertTrue(tags.contains("IngenUtbetaling"))
             }
 
-            håndterSaksbehandleroverstyringer(
-                OverstyrTidslinjeData(a1, listOf(ManuellOverskrivingDag(1.januar, Arbeidsdag))),
-                MinimumSykdomsgradsvurderingMeldingData(perioderMedMinimumSykdomsgradVurdertOK = setOf(januar), emptySet())
-            )
+            assertÈnOverstyringIgangsatt("SYKDOMSTIDSLINJE") {
+                håndterSaksbehandleroverstyringer(
+                    OverstyrTidslinjeData(a1, listOf(ManuellOverskrivingDag(1.januar, Arbeidsdag))),
+                    MinimumSykdomsgradsvurderingMeldingData(perioderMedMinimumSykdomsgradVurdertOK = setOf(januar), emptySet())
+                )
+            }
             assertSisteTilstand(1.vedtaksperiode, AVVENTER_VILKÅRSPRØVING_REVURDERING)
             assertEquals(2.januar, inspektør.vedtaksperioder(1.vedtaksperiode).skjæringstidspunkt)
             håndterVilkårsgrunnlag(1.vedtaksperiode)
@@ -55,5 +57,14 @@ internal class SaksbehandleroverstyringerTest: AbstractDslTest() {
 
             assertVarsler(1.vedtaksperiode, RV_VV_4, RV_IV_7, RV_VV_17)
         }
+    }
+
+    private fun assertÈnOverstyringIgangsatt(forventetÅrsak: String, block: () -> Unit) {
+        val før = observatør.overstyringIgangsatt.toList()
+        block()
+        val etter= observatør.overstyringIgangsatt.toList()
+        assertEquals(før.size + 1, etter.size)
+        assertEquals(forventetÅrsak, etter.last().årsak)
+
     }
 }

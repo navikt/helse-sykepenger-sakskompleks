@@ -385,12 +385,14 @@ internal class Vedtaksperiode private constructor(
                 val vedtaksperiodeTilRevurdering = arbeidsgiver.finnVedtaksperiodeFør(this)?.takeIf {
                     nyArbeidsgiverperiodeEtterEndring(it)
                 } ?: this
-                person.igangsettOverstyring(
-                    Revurderingseventyr.sykdomstidslinje(
+                hendelse.overstyring(
+                    eventyr = Revurderingseventyr.sykdomstidslinje(
                         hendelse = hendelse,
                         skjæringstidspunkt = vedtaksperiodeTilRevurdering.skjæringstidspunkt,
                         periodeForEndring = vedtaksperiodeTilRevurdering.periode
-                    ), aktivitetslogg
+                    ),
+                    aktivitetslogg = aktivitetslogg,
+                    person = person
                 )
             }
 
