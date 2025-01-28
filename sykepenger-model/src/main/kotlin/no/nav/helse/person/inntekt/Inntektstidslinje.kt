@@ -11,7 +11,7 @@ class Inntektstidslinje(
     beløpstidslinje: Beløpstidslinje,
     private val gjelderTilOgMed: LocalDate
 ) {
-    private val beløpstidslinje = beløpstidslinje.fraOgMed(skjæringstidspunkt)
+    private val beløpstidslinje = beløpstidslinje.fraOgMed(skjæringstidspunkt.plusDays(1))
 
     internal operator fun get(dato: LocalDate): Inntekt? {
         if (dato > gjelderTilOgMed) return null // Arbeidsgiveren har opphørt/deaktivert
