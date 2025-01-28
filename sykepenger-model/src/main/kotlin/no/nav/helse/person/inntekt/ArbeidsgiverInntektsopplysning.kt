@@ -30,7 +30,8 @@ internal data class ArbeidsgiverInntektsopplysning(
     val gjelder: Periode,
     val faktaavklartInntekt: FaktaavklartInntekt,
     val korrigertInntekt: Saksbehandler?,
-    val skjønnsmessigFastsatt: SkjønnsmessigFastsatt?
+    val skjønnsmessigFastsatt: SkjønnsmessigFastsatt?,
+    val beløpstidslinje: Beløpstidslinje = Beløpstidslinje()
 ) {
     val omregnetÅrsinntekt = korrigertInntekt?.inntektsdata ?: faktaavklartInntekt.inntektsdata
     val fastsattÅrsinntekt = skjønnsmessigFastsatt?.inntektsdata?.beløp ?: omregnetÅrsinntekt.beløp
@@ -117,28 +118,36 @@ internal data class ArbeidsgiverInntektsopplysning(
         return this
     }
 
+    private fun beløpstidslinjeForSkjæringstidspuntet(skjæringstidspunkt: LocalDate): Beløpstidslinje {
+        // HMM, dette føles ut som et rart hack 🐄
+        if (faktaavklartInntekt.inntektsdata.beløp == INGEN) return Beløpstidslinje()
+
+        val fastsattInntektsdata = (skjønnsmessigFastsatt?.inntektsdata ?: omregnetÅrsinntekt)
+        return Beløpstidslinje.fra(
+            periode = skjæringstidspunkt.somPeriode(),
+            beløp = fastsattÅrsinntekt,
+            kilde = Kilde(
+                meldingsreferanseId = fastsattInntektsdata.hendelseId,
+                avsender = when {
+                    korrigertInntekt != null || skjønnsmessigFastsatt != null -> Avsender.SAKSBEHANDLER
+                    // TODO: Skal Infotrygd/AOrdningen ha annen kilde? Og burde beløpstidslinje ha egne Avsendere enn de gjenbrukte hendelse-Avsenderne?
+                    else -> Avsender.ARBEIDSGIVER
+                },
+                tidsstempel = fastsattInntektsdata.tidsstempel
+            )
+        )
+    }
+
     internal companion object {
+
         internal fun List<ArbeidsgiverInntektsopplysning>.faktaavklarteInntekter(skjæringstidspunkt: LocalDate) = this
             .map {
-                val fastsattInntektsdata = (it.skjønnsmessigFastsatt?.inntektsdata ?: it.omregnetÅrsinntekt)
                 VilkårsprøvdSkjæringstidspunkt.FaktaavklartInntekt(
                     organisasjonsnummer = it.orgnummer,
                     inntektstidslinje = Inntektstidslinje(
                         skjæringstidspunkt = skjæringstidspunkt,
-                        gjelderTilOgMed = it.gjelder.endInclusive,
-                        beløpstidslinje = Beløpstidslinje.fra(
-                            periode = it.gjelder.start.somPeriode(),
-                            beløp = it.fastsattÅrsinntekt,
-                            kilde = Kilde(
-                                meldingsreferanseId = fastsattInntektsdata.hendelseId,
-                                avsender = when {
-                                    it.korrigertInntekt != null || it.skjønnsmessigFastsatt != null -> Avsender.SAKSBEHANDLER
-                                    // TODO: Skal Infotrygd/AOrdningen ha annen kilde? Og burde beløpstidslinje ha egne Avsendere enn de gjenbrukte hendelse-Avsenderne?
-                                    else -> Avsender.ARBEIDSGIVER
-                                },
-                                tidsstempel = fastsattInntektsdata.tidsstempel
-                            )
-                        )
+                        gjelderTilOgMed = LocalDate.MAX,
+                        beløpstidslinje = it.beløpstidslinjeForSkjæringstidspuntet(skjæringstidspunkt) + it.beløpstidslinje.fraOgMed(skjæringstidspunkt.plusDays(1))
                     )
                 )
             }
