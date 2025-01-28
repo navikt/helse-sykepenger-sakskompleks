@@ -191,6 +191,7 @@ import no.nav.helse.utbetalingstidslinje.Utbetalingstidslinjesubsumsjon
 import no.nav.helse.utbetalingstidslinje.VilkårsprøvdSkjæringstidspunkt
 import no.nav.helse.yearMonth
 import no.nav.helse.økonomi.Inntekt
+import no.nav.helse.økonomi.Inntekt.Companion.INGEN
 import no.nav.helse.økonomi.Prosentdel.Companion.prosent
 import no.nav.helse.økonomi.Økonomi
 
@@ -2618,7 +2619,7 @@ internal class Vedtaksperiode private constructor(
             )
             val ingenRefusjon = Beløpstidslinje.fra(
                 periode = vedtaksperiode.periode,
-                beløp = Inntekt.INGEN,
+                beløp = INGEN,
                 kilde = Kilde(
                     sykepengegrunnlagForArbeidsgiver.metadata.meldingsreferanseId,
                     sykepengegrunnlagForArbeidsgiver.metadata.avsender,
@@ -3184,7 +3185,8 @@ internal class Vedtaksperiode private constructor(
                 inntektstidslinje = Inntektstidslinje(
                     skjæringstidspunkt = skjæringstidspunkt,
                     beløpstidslinje = Beløpstidslinje(),
-                    gjelderTilOgMed = LocalDate.MAX
+                    gjelderTilOgMed = LocalDate.MAX,
+                    fastsattÅrsinntekt = INGEN
                 )
             )
         }

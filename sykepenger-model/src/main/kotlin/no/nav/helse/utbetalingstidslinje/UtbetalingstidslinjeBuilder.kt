@@ -96,8 +96,8 @@ internal class ArbeidsgiverFaktaavklartInntekt(
         error("Har ingen refusjonsopplysninger på vilkårsgrunnlag for utbetalingsdag $dato")
     }
 
-    private fun fastsattÅrsinntekt(dagen: LocalDate) = inntektstidslinje[dagen].takeIf { it is Beløpsdag }?.beløp ?: INGEN
-    private fun beregningsgrunnlag(skjæringstidspunkt: LocalDate) = inntektstidslinje[skjæringstidspunkt].takeIf { it is Beløpsdag }?.beløp ?: INGEN
+    private fun fastsattÅrsinntekt(dagen: LocalDate) = inntektstidslinje[dagen] ?: INGEN
+    private fun beregningsgrunnlag(skjæringstidspunkt: LocalDate) = inntektstidslinje[skjæringstidspunkt] ?: INGEN
 
     internal fun medInntektHvisFinnes(
         dato: LocalDate,
@@ -142,23 +142,22 @@ internal class ArbeidsgiverFaktaavklartInntekt(
     internal fun ghosttidslinje(beregningsperiode: Periode, skjæringstidspunkt: LocalDate, `6G`: Inntekt, arbeidsgiverlinjer: List<Utbetalingstidslinje>): Utbetalingstidslinje {
         val vedtaksperioder = arbeidsgiverlinjer.map { it.periode() }
         // Dette er dager man er ghost/ tilkommen
-        val beløpsdager = beregningsperiode.mapNotNull { dato ->
-            if (vedtaksperioder.any { vedtaksperiode -> dato in vedtaksperiode }) null
-            else when (val dag = inntektstidslinje[dato]) {
-                is Beløpsdag -> dag
-                UkjentDag -> null
-            }
-        }
+        val beløpsdager = beregningsperiode
+            .associateWith { dato ->
+                if (vedtaksperioder.any { vedtaksperiode -> dato in vedtaksperiode }) null
+                else inntektstidslinje[dato]
+            }.filterValues { it != null }
+            .mapValues { (_, inntekt) -> inntekt!! }
 
         // lager faktiske ghost/tilkommen-tidslinjer fra brudd-periodene
         val utbetalingstidslinje = with(Utbetalingstidslinje.Builder()) {
             val beregningsgrunnlag = beregningsgrunnlag(skjæringstidspunkt)
-            beløpsdager.forEach { beløpsdag ->
-                if (beløpsdag.dato.erHelg()) addFridag(beløpsdag.dato, Økonomi.ikkeBetalt())
+            beløpsdager.forEach { (dato, inntekt) ->
+                if (dato.erHelg()) addFridag(dato, Økonomi.ikkeBetalt())
                 else addArbeidsdag(
-                    dato = beløpsdag.dato,
+                    dato = dato,
                     økonomi = Økonomi.ikkeBetalt().inntekt(
-                        aktuellDagsinntekt = beløpsdag.beløp,
+                        aktuellDagsinntekt = inntekt,
                         beregningsgrunnlag = beregningsgrunnlag,
                         dekningsgrunnlag = INGEN,
                         `6G` = `6G`,

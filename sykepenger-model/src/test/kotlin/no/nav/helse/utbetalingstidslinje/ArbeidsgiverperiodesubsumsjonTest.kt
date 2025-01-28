@@ -16,7 +16,6 @@ import no.nav.helse.etterlevelse.tredjeLedd
 import no.nav.helse.hendelser.Avsender.ARBEIDSGIVER
 import no.nav.helse.hendelser.Periode
 import no.nav.helse.hendelser.Periode.Companion.grupperSammenhengendePerioder
-import no.nav.helse.hendelser.somPeriode
 import no.nav.helse.hendelser.til
 import no.nav.helse.januar
 import no.nav.helse.nesteDag
@@ -208,8 +207,9 @@ internal class ArbeidsgiverperiodesubsumsjonTest {
                 `6G` = Grunnbeløp.`6G`.beløp(1.januar),
                 inntektstidslinje = Inntektstidslinje(
                     skjæringstidspunkt = 1.januar,
-                    beløpstidslinje = ARBEIDSGIVER.beløpstidslinje(1.januar.somPeriode(), 31000.månedlig),
-                    gjelderTilOgMed = LocalDate.MAX
+                    beløpstidslinje = Beløpstidslinje(),
+                    gjelderTilOgMed = LocalDate.MAX,
+                    fastsattÅrsinntekt = 31000.månedlig
                 )
             ),
             regler = ArbeidsgiverRegler.Companion.NormalArbeidstaker,

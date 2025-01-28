@@ -1038,8 +1038,9 @@ internal class UtbetalingstidslinjeBuilderTest {
                 `6G` = Grunnbeløp.`6G`.beløp(1.januar),
                 inntektstidslinje = Inntektstidslinje(
                     skjæringstidspunkt = 1.januar,
-                    beløpstidslinje = ARBEIDSGIVER.beløpstidslinje(1.januar.somPeriode(), 31000.månedlig),
-                    gjelderTilOgMed = LocalDate.MAX
+                    beløpstidslinje = Beløpstidslinje(),
+                    gjelderTilOgMed = LocalDate.MAX,
+                    fastsattÅrsinntekt = 31000.månedlig
                 )
             ),
             regler = ArbeidsgiverRegler.Companion.NormalArbeidstaker,

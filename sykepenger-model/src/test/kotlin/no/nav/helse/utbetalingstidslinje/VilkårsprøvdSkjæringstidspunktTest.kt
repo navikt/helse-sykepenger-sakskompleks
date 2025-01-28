@@ -9,6 +9,7 @@ import no.nav.helse.februar
 import no.nav.helse.hendelser.Avsender
 import no.nav.helse.hendelser.til
 import no.nav.helse.januar
+import no.nav.helse.person.beløp.Beløpstidslinje
 import no.nav.helse.person.beløp.BeløpstidslinjeTest.Companion.beløpstidslinje
 import no.nav.helse.person.inntekt.Inntektstidslinje
 import no.nav.helse.testhelpers.AP
@@ -29,13 +30,15 @@ internal class VilkårsprøvdSkjæringstidspunktTest {
             inntekter = listOf(
                 VilkårsprøvdSkjæringstidspunkt.FaktaavklartInntekt("a1", Inntektstidslinje(
                     skjæringstidspunkt = 1.januar,
-                    beløpstidslinje = Avsender.ARBEIDSGIVER.beløpstidslinje(1.januar til 31.januar, 1000.daglig),
-                    gjelderTilOgMed = LocalDate.MAX
+                    beløpstidslinje = Beløpstidslinje(),
+                    gjelderTilOgMed = LocalDate.MAX,
+                    fastsattÅrsinntekt = 1000.daglig
                 )),
                 VilkårsprøvdSkjæringstidspunkt.FaktaavklartInntekt("a2", Inntektstidslinje(
                     skjæringstidspunkt = 1.januar,
                     beløpstidslinje = Avsender.ARBEIDSGIVER.beløpstidslinje(25.januar til 31.januar, 500.daglig),
-                    gjelderTilOgMed = LocalDate.MAX
+                    gjelderTilOgMed = LocalDate.MAX,
+                    fastsattÅrsinntekt = null
                 )),
             ),
             tilkommendeInntekter = emptyList(),
@@ -83,8 +86,9 @@ internal class VilkårsprøvdSkjæringstidspunktTest {
             inntekter = listOf(
                 VilkårsprøvdSkjæringstidspunkt.FaktaavklartInntekt("a1", Inntektstidslinje(
                     skjæringstidspunkt = 1.januar,
-                    beløpstidslinje = Avsender.ARBEIDSGIVER.beløpstidslinje(1.januar til 31.januar, 1000.daglig),
-                    gjelderTilOgMed = 31.januar
+                    beløpstidslinje = Beløpstidslinje(),
+                    gjelderTilOgMed = 31.januar,
+                    fastsattÅrsinntekt = 1000.daglig
                 ))
             ),
             tilkommendeInntekter = listOf(
