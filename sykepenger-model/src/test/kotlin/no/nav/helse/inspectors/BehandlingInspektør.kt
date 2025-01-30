@@ -29,7 +29,7 @@ internal class BehandlingInspektør(view: BehandlingView) {
                 refusjonstidslinje = it.refusjonstidslinje,
                 skjæringstidspunkt = it.skjæringstidspunkt,
                 sykdomstidslinje = it.sykdomstidslinje,
-                arbeidsgiverperiode = it.arbeidsgiverperiode,
+                arbeidsgiverperiode = it.arbeidsgiverperiode.arbeidsgiverperioder.map { it.periode },
                 sykmeldingsperiode = it.sykmeldingsperiode,
             )
         },

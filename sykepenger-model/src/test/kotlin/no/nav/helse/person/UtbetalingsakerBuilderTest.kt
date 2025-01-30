@@ -2,6 +2,7 @@ package no.nav.helse.person
 
 import no.nav.helse.august
 import no.nav.helse.februar
+import no.nav.helse.hendelser.Periode
 import no.nav.helse.hendelser.til
 import no.nav.helse.januar
 import no.nav.helse.mai
@@ -69,4 +70,15 @@ class UtbetalingsakerBuilderTest {
         )
         assertEquals(forventet, builder.lagUtbetalingsaker())
     }
+
+    private fun ArbeidsgiverperiodeForVedtaksperiode(vedtaksperiode: Periode, agp: List<Periode>) =
+        ArbeidsgiverperiodeForVedtaksperiode(
+            vedtaksperiode = vedtaksperiode,
+            arbeidsgiverperiode = BeregnetArbeidsgiverperiode(
+                status = BeregnetArbeidsgiverperiode.Status.TELLING_FERDIG,
+                arbeidsgiverperioder = agp.map {
+                    BeregnetArbeidsgiverperiode.Venteperiode(it, false)
+                }
+            )
+        )
 }

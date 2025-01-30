@@ -21,6 +21,6 @@ data class BehandlingendringInnDto(
     val refusjonstidslinje: BeløpstidslinjeDto,
     val skjæringstidspunkt: LocalDate,
     val skjæringstidspunkter: List<LocalDate>,
-    val arbeidsgiverperiode: List<PeriodeDto>,
+    val arbeidsgiverperiode: BeregnetArbeidsgiverperiodeInnDto,
     val maksdatoresultat: MaksdatoresultatInnDto
 )

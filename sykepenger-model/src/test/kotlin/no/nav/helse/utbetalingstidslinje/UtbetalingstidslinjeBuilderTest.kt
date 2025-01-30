@@ -11,9 +11,11 @@ import no.nav.helse.inspectors.UtbetalingstidslinjeInspektør
 import no.nav.helse.inspectors.inspektør
 import no.nav.helse.januar
 import no.nav.helse.mars
+import no.nav.helse.person.BeregnetArbeidsgiverperiode
 import no.nav.helse.person.beløp.Beløpstidslinje
 import no.nav.helse.person.beløp.BeløpstidslinjeTest.Companion.beløpstidslinje
 import no.nav.helse.person.inntekt.Inntektstidslinje
+import no.nav.helse.sykdomstidslinje.Dag
 import no.nav.helse.sykdomstidslinje.Sykdomstidslinje
 import no.nav.helse.testhelpers.A
 import no.nav.helse.testhelpers.AIG
@@ -1042,7 +1044,20 @@ internal class UtbetalingstidslinjeBuilderTest {
                 )
             ),
             regler = ArbeidsgiverRegler.Companion.NormalArbeidstaker,
-            arbeidsgiverperiode = arbeidsgiverperioder.flatMap { it.arbeidsgiverperiode }.grupperSammenhengendePerioder(),
+            arbeidsgiverperiode = BeregnetArbeidsgiverperiode(
+                status = BeregnetArbeidsgiverperiode.Status.TELLING_FERDIG,
+                arbeidsgiverperioder = arbeidsgiverperioder
+                    .flatMap { it.arbeidsgiverperiode }
+                    .flatten()
+                    .map {
+                        BeregnetArbeidsgiverperiode.Venteperiode(
+                            periode = it.somPeriode(),
+                            navOvertarAnsvar = tidslinje.any { sykedag ->
+                                sykedag is Dag.SykedagNav && sykedag.dato == it
+                            }
+                        )
+                    }
+            ),
             refusjonstidslinje = tidslinje.periode()?.let { ARBEIDSGIVER.beløpstidslinje(it, 31000.månedlig) } ?: Beløpstidslinje()
         )
 

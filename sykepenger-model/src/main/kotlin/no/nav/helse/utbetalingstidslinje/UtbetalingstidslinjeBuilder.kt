@@ -4,6 +4,7 @@ import java.time.LocalDate
 import no.nav.helse.erHelg
 import no.nav.helse.hendelser.Periode
 import no.nav.helse.hendelser.Periode.Companion.periode
+import no.nav.helse.person.BeregnetArbeidsgiverperiode
 import no.nav.helse.person.beløp.Beløpsdag
 import no.nav.helse.person.beløp.Beløpstidslinje
 import no.nav.helse.person.beløp.Dag as Beløpstidslinjedag
@@ -171,13 +172,13 @@ internal class ArbeidsgiverFaktaavklartInntekt(
 
 internal data class ArbeidsgiverperiodeForVedtaksperiode(
     val vedtaksperiode: Periode,
-    val arbeidsgiverperioder: List<Periode>
+    val arbeidsgiverperiode: BeregnetArbeidsgiverperiode
 )
 
 internal class UtbetalingstidslinjeBuilderVedtaksperiode(
     private val faktaavklarteInntekter: ArbeidsgiverFaktaavklartInntekt,
     private val regler: ArbeidsgiverRegler,
-    private val arbeidsgiverperiode: List<Periode>,
+    private val arbeidsgiverperiode: BeregnetArbeidsgiverperiode,
     private val refusjonstidslinje: Beløpstidslinje
 ) {
     internal fun result(sykdomstidslinje: Sykdomstidslinje): Utbetalingstidslinje {
@@ -206,7 +207,7 @@ internal class UtbetalingstidslinjeBuilderVedtaksperiode(
                 }
 
                 is Dag.SykedagNav -> {
-                    if (erAGP(dag.dato)) builder.addArbeidsgiverperiodedagNav(dag.dato, faktaavklarteInntekter.medInntektOrThrow(dag.dato, dag.økonomi, regler, refusjonstidslinje[dag.dato]))
+                    if (erAGP(dag.dato)) arbeidsgiverperiodedag(builder, dag.dato, dag.økonomi)
                     else when (dag.dato.erHelg()) {
                         true -> helg(builder, dag.dato, dag.økonomi)
                         false -> navDag(builder, dag.dato, dag.økonomi)
@@ -216,7 +217,7 @@ internal class UtbetalingstidslinjeBuilderVedtaksperiode(
                 is Dag.AndreYtelser -> {
                     // andreytelse-dagen er fridag hvis den overlapper med en agp-dag, eller om vedtaksperioden ikke har noen agp -- fordi andre ytelsen spiser opp alt
                     if (erAGP(dag.dato)) arbeidsgiverperiodedag(builder, dag.dato, Økonomi.ikkeBetalt())
-                    else if (arbeidsgiverperiode.isEmpty() || dag.dato < arbeidsgiverperiode.first().start) fridag(builder, dag.dato)
+                    else if (arbeidsgiverperiode.omsluttendePeriode == null || dag.dato < arbeidsgiverperiode.omsluttendePeriode.start) fridag(builder, dag.dato)
                     else {
                         val begrunnelse = when (dag.ytelse) {
                             Dag.AndreYtelser.AnnenYtelse.AAP -> Begrunnelse.AndreYtelserAap
@@ -272,9 +273,15 @@ internal class UtbetalingstidslinjeBuilderVedtaksperiode(
         return builder.build()
     }
 
-    private fun erAGP(dato: LocalDate) = arbeidsgiverperiode.any { dato in it }
+    private fun erAGP(dato: LocalDate) = arbeidsgiverperiode.arbeidsgiverperioder.any { dato in it.periode }
+    private fun erSykNav(dato: LocalDate) = arbeidsgiverperiode.arbeidsgiverperioder.any { it.navOvertarAnsvar && dato in it.periode }
+
     private fun arbeidsgiverperiodedag(builder: Utbetalingstidslinje.Builder, dato: LocalDate, økonomi: Økonomi) {
-        builder.addArbeidsgiverperiodedag(dato, faktaavklarteInntekter.medInntektHvisFinnes(dato, økonomi.ikkeBetalt(), regler, refusjonstidslinje[dato]))
+        if (erSykNav(dato)) {
+            builder.addArbeidsgiverperiodedagNav(dato, faktaavklarteInntekter.medInntektOrThrow(dato, økonomi, regler, refusjonstidslinje[dato]))
+        } else {
+            builder.addArbeidsgiverperiodedag(dato, faktaavklarteInntekter.medInntektHvisFinnes(dato, økonomi.ikkeBetalt(), regler, refusjonstidslinje[dato]))
+        }
     }
 
     private fun avvistDag(builder: Utbetalingstidslinje.Builder, dato: LocalDate, økonomi: Økonomi, begrunnelse: Begrunnelse) {

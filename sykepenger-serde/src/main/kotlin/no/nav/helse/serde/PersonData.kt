@@ -50,6 +50,7 @@ import no.nav.helse.dto.deserialisering.ArbeidstakerinntektskildeInnDto
 import no.nav.helse.dto.deserialisering.BehandlingInnDto
 import no.nav.helse.dto.deserialisering.BehandlingendringInnDto
 import no.nav.helse.dto.deserialisering.BehandlingerInnDto
+import no.nav.helse.dto.deserialisering.BeregnetArbeidsgiverperiodeInnDto
 import no.nav.helse.dto.deserialisering.FaktaavklartInntektInnDto
 import no.nav.helse.dto.deserialisering.FeriepengeInnDto
 import no.nav.helse.dto.deserialisering.ForkastetVedtaksperiodeInnDto
@@ -494,11 +495,17 @@ data class PersonData(
             val periode: PeriodeData?,
             val låstePerioder: List<PeriodeData>?
         ) {
-            fun tilDto() = SykdomstidslinjeDto(
-                dager = this.dager.flatMap { it.tilDto() },
-                periode = this.periode?.tilDto(),
-                låstePerioder = this.låstePerioder?.map { it.tilDto() } ?: emptyList()
-            )
+            fun tilDto(): SykdomstidslinjeDto {
+                try {
+                    return SykdomstidslinjeDto(
+                        dager = this.dager.flatMap { it.tilDto() },
+                        periode = this.periode?.tilDto(),
+                        låstePerioder = this.låstePerioder?.map { it.tilDto() } ?: emptyList()
+                    )
+                } catch (err: Exception) {
+                    error(err)
+                }
+            }
 
             data class DagData(
                 val type: JsonDagType,
@@ -829,7 +836,7 @@ data class PersonData(
                     vedtakFattet = this.vedtakFattet,
                     avsluttet = this.avsluttet,
                     kilde = this.kilde.tilDto(),
-                    endringer = this.endringer.map { it.tilDto() },
+                    endringer = this.endringer.map { it.tilDto(vedtakFattet != null) },
                 )
 
                 enum class TilstandData {
@@ -878,9 +885,15 @@ data class PersonData(
                     val refusjonstidslinje: BeløpstidslinjeData,
                     val dokumentsporing: DokumentsporingData,
                     val arbeidsgiverperioder: List<PeriodeData>,
+                    val beregnetArbeidsgiverperiode: BeregnetArbeidsgiverperiodeData?,
                     val maksdatoresultat: MaksdatoresultatData
                 ) {
-                    fun tilDto() = BehandlingendringInnDto(
+                    val antallAGPdager = arbeidsgiverperioder.sumOf {
+                        it.fom.datesUntil(it.tom.plusDays(1)).count()
+                    }
+                    val arbeidsgiverperiodeFerdig = antallAGPdager == 16L
+
+                    fun tilDto(harFattetVedtak: Boolean) = BehandlingendringInnDto(
                         id = this.id,
                         tidsstempel = this.tidsstempel,
                         sykmeldingsperiode = PeriodeDto(fom = sykmeldingsperiodeFom, tom = sykmeldingsperiodeTom),
@@ -893,9 +906,80 @@ data class PersonData(
                         refusjonstidslinje = this.refusjonstidslinje.tilDto(),
                         skjæringstidspunkt = skjæringstidspunkt,
                         skjæringstidspunkter = skjæringstidspunkter,
-                        arbeidsgiverperiode = arbeidsgiverperioder.map { it.tilDto() },
+                        arbeidsgiverperiode = beregnetArbeidsgiverperiode?.tilDto() ?: BeregnetArbeidsgiverperiodeInnDto(
+                            status = when {
+                                arbeidsgiverperioder.isEmpty() -> when {
+                                    // infotrygdperioder ligger inne med en tom agp-liste
+                                    harFattetVedtak -> BeregnetArbeidsgiverperiodeInnDto.StatusInnDto.TELLING_FERDIG
+                                    else -> BeregnetArbeidsgiverperiodeInnDto.StatusInnDto.TELLING_IKKE_BEGYNT
+                                }
+                                arbeidsgiverperiodeFerdig -> BeregnetArbeidsgiverperiodeInnDto.StatusInnDto.TELLING_FERDIG
+                                else -> BeregnetArbeidsgiverperiodeInnDto.StatusInnDto.TELLING_STARTET
+                            },
+                            arbeidsgiverperioder = arbeidsgiverperioder
+                                .flatMap { venteperiode ->
+                                    venteperiode.fom.datesUntil(venteperiode.tom.plusDays(1)).map { agpdato ->
+                                        // todo: vi må såklart sjekke sykdomstidslinjen til vedtaksperioden som AGP overlapper med! det holder ikke å sjekke *denne*
+                                        val navOvertarAnsvar = this.sykdomstidslinje.dager.any { sykdomstidslinjedag ->
+                                            val overlapp = when (sykdomstidslinjedag.dato) {
+                                                null -> agpdato in (sykdomstidslinjedag.fom!!..sykdomstidslinjedag.tom!!)
+                                                else -> agpdato == sykdomstidslinjedag.dato
+                                            }
+                                            sykdomstidslinjedag.type == SykdomstidslinjeData.JsonDagType.SYKEDAG_NAV && overlapp
+                                        }
+                                        Pair(agpdato..agpdato, navOvertarAnsvar)
+                                    }.toList()
+                                }
+                                .fold(emptyList<Pair<ClosedRange<LocalDate>, Boolean>>()) { resultat, dag ->
+                                    val last = resultat.lastOrNull()
+                                    when {
+                                        last == null -> listOf(dag)
+                                        last.first.endInclusive.plusDays(1) == dag.first.start && last.second == dag.second ->
+                                            resultat.dropLast(1).plusElement(last.copy(
+                                            first = last.first.start..dag.first.endInclusive
+                                        ))
+                                        else -> resultat.plusElement(dag)
+                                    }
+                                }
+                                .map { (venteperiode, navOvertarAnsvar) ->
+                                    BeregnetArbeidsgiverperiodeInnDto.VenteperiodeInnDto(
+                                        periode = PeriodeDto(venteperiode.start, venteperiode.endInclusive),
+                                        navOvertarAnsvar = navOvertarAnsvar
+                                    )
+                                }
+                        ),
                         maksdatoresultat = maksdatoresultat.tilDto()
                     )
+
+                    data class BeregnetArbeidsgiverperiodeData(
+                        val status: StatusData,
+                        val perioder: List<VenteperiodeData>
+                    ) {
+                        enum class StatusData {
+                            TELLING_IKKE_BEGYNT,
+                            TELLING_STARTET,
+                            TELLING_FERDIG
+                        }
+                        data class VenteperiodeData(
+                            val fom: LocalDate,
+                            val tom: LocalDate,
+                            val navOvertarAnsvar: Boolean
+                        )
+
+                        fun tilDto() = BeregnetArbeidsgiverperiodeInnDto(
+                            status = when (status) {
+                                StatusData.TELLING_IKKE_BEGYNT -> BeregnetArbeidsgiverperiodeInnDto.StatusInnDto.TELLING_IKKE_BEGYNT
+                                StatusData.TELLING_STARTET -> BeregnetArbeidsgiverperiodeInnDto.StatusInnDto.TELLING_STARTET
+                                StatusData.TELLING_FERDIG -> BeregnetArbeidsgiverperiodeInnDto.StatusInnDto.TELLING_FERDIG
+                            },
+                            arbeidsgiverperioder = perioder.map { venteperiode ->
+                                BeregnetArbeidsgiverperiodeInnDto.VenteperiodeInnDto(
+                                    periode = PeriodeDto(fom = venteperiode.fom, tom = venteperiode.tom),
+                                    navOvertarAnsvar = venteperiode.navOvertarAnsvar
+                                )
+                            }
+                        )
+                    }
                 }
             }
 
