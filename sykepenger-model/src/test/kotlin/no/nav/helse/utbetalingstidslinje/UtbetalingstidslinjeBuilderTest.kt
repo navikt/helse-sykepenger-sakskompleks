@@ -11,7 +11,6 @@ import no.nav.helse.inspectors.UtbetalingstidslinjeInspektør
 import no.nav.helse.inspectors.inspektør
 import no.nav.helse.januar
 import no.nav.helse.mars
-import no.nav.helse.person.BeregnetArbeidsgiverperiode
 import no.nav.helse.person.beløp.Beløpstidslinje
 import no.nav.helse.person.beløp.BeløpstidslinjeTest.Companion.beløpstidslinje
 import no.nav.helse.person.inntekt.Inntektstidslinje
@@ -1033,6 +1032,7 @@ internal class UtbetalingstidslinjeBuilderTest {
         val arbeidsgiverperioder = arbeidsgiverperiodeberegner.resultat(tidslinje, infotrygdBetalteDager)
         perioder.addAll(arbeidsgiverperioder)
 
+        val agpdager = arbeidsgiverperioder.flatMap { it.arbeidsgiverperiode }
         val builder = UtbetalingstidslinjeBuilderVedtaksperiode(
             faktaavklarteInntekter = ArbeidsgiverFaktaavklartInntekt(
                 skjæringstidspunkt = 1.januar,
@@ -1044,20 +1044,13 @@ internal class UtbetalingstidslinjeBuilderTest {
                 )
             ),
             regler = ArbeidsgiverRegler.Companion.NormalArbeidstaker,
-            arbeidsgiverperiode = BeregnetArbeidsgiverperiode(
-                status = BeregnetArbeidsgiverperiode.Status.TELLING_FERDIG,
-                arbeidsgiverperioder = arbeidsgiverperioder
-                    .flatMap { it.arbeidsgiverperiode }
-                    .flatten()
-                    .map {
-                        BeregnetArbeidsgiverperiode.Venteperiode(
-                            periode = it.somPeriode(),
-                            navOvertarAnsvar = tidslinje.any { sykedag ->
-                                sykedag is Dag.SykedagNav && sykedag.dato == it
-                            }
-                        )
-                    }
-            ),
+            arbeidsgiverperiode = agpdager.grupperSammenhengendePerioder(),
+            dagerNavOvertarAnsvar = agpdager
+                .flatten()
+                .filter { agpdag ->
+                    tidslinje.any { sykedag -> sykedag is Dag.SykedagNav && sykedag.dato == agpdag }
+                }
+                .grupperSammenhengendePerioder(),
             refusjonstidslinje = tidslinje.periode()?.let { ARBEIDSGIVER.beløpstidslinje(it, 31000.månedlig) } ?: Beløpstidslinje()
         )
 

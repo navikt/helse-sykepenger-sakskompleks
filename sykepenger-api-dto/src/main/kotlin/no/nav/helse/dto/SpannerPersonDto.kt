@@ -28,7 +28,6 @@ import no.nav.helse.dto.serialisering.InfotrygdhistorikkelementUtDto
 import no.nav.helse.dto.serialisering.InntektsgrunnlagUtDto
 import no.nav.helse.dto.serialisering.InntektsmeldingUtDto
 import no.nav.helse.dto.serialisering.ArbeidstakerinntektskildeUtDto
-import no.nav.helse.dto.serialisering.BeregnetArbeidsgiverperiodeUtDto
 import no.nav.helse.dto.serialisering.InntektsopplysningUtDto
 import no.nav.helse.dto.serialisering.MaksdatoresultatUtDto
 import no.nav.helse.dto.serialisering.OppdragUtDto
@@ -331,7 +330,7 @@ data class SpannerPersonDto(
             val refusjonstidslinje: List<BeløpstidslinjeperiodeData>,
             val refusjonstidslinjeHensyntattUbrukteRefusjonsopplysninger: List<BeløpstidslinjeperiodeData>,
             val utbetalingstidslinje: List<Any>,
-            val arbeidsgiverperiode: VedtaksperiodeData.BehandlingData.EndringData.BeregnetArbeidsgiverperiodeData,
+            val arbeidsgiverperiode: List<PeriodeData>?,
             val arbeidsgiverInntektsopplysninger: List<ArbeidsgiverInntektsopplysningData>,
             val forbrukteDager: Long,
             val gjenståendeDager: Int,
@@ -496,24 +495,10 @@ data class SpannerPersonDto(
                     val utbetalingstidslinje: UtbetalingstidslinjeData,
                     val refusjonstidslinje: BeløpstidslinjeData,
                     val dokumentsporing: DokumentsporingData,
-                    val arbeidsgiverperiode: BeregnetArbeidsgiverperiodeData,
+                    val arbeidsgiverperiode: List<PeriodeData>?,
+                    val dagerNavOvertarAnsvar: List<PeriodeData>,
                     val maksdatoresultat: MaksdatoresultatData
-                ) {
-                    data class BeregnetArbeidsgiverperiodeData(
-                        val status: Status,
-                        val perioder: List<VenteperiodeData>
-                    ) {
-                        enum class Status {
-                            TELLING_IKKE_BEGYNT,
-                            TELLING_STARTET,
-                            TELLING_FERDIG
-                        }
-                        data class VenteperiodeData(
-                            val periode: PeriodeData,
-                            val navOvertarAnsvar: Boolean
-                        )
-                    }
-                }
+                )
             }
 
             data class DataForSimuleringData(
@@ -1127,23 +1112,10 @@ private fun BehandlingendringUtDto.tilPersonData() =
         utbetalingstidslinje = utbetalingstidslinje.tilPersonData(),
         refusjonstidslinje = refusjonstidslinje.tilPersonData(),
         dokumentsporing = dokumentsporing.tilPersonData(),
-        arbeidsgiverperiode = arbeidsgiverperioder.tilPersonData(),
+        arbeidsgiverperiode = arbeidsgiverperioder?.map { SpannerPersonDto.ArbeidsgiverData.PeriodeData(it.fom, it.tom) },
+        dagerNavOvertarAnsvar = dagerNavOvertarAnsvar.map { SpannerPersonDto.ArbeidsgiverData.PeriodeData(it.fom, it.tom) },
         maksdatoresultat = maksdatoresultat.tilPersonData()
     )
-
-private fun BeregnetArbeidsgiverperiodeUtDto.tilPersonData() = SpannerPersonDto.ArbeidsgiverData.VedtaksperiodeData.BehandlingData.EndringData.BeregnetArbeidsgiverperiodeData(
-    status = when (status) {
-        BeregnetArbeidsgiverperiodeUtDto.StatusUtDto.TELLING_IKKE_BEGYNT -> SpannerPersonDto.ArbeidsgiverData.VedtaksperiodeData.BehandlingData.EndringData.BeregnetArbeidsgiverperiodeData.Status.TELLING_IKKE_BEGYNT
-        BeregnetArbeidsgiverperiodeUtDto.StatusUtDto.TELLING_STARTET -> SpannerPersonDto.ArbeidsgiverData.VedtaksperiodeData.BehandlingData.EndringData.BeregnetArbeidsgiverperiodeData.Status.TELLING_STARTET
-        BeregnetArbeidsgiverperiodeUtDto.StatusUtDto.TELLING_FERDIG -> SpannerPersonDto.ArbeidsgiverData.VedtaksperiodeData.BehandlingData.EndringData.BeregnetArbeidsgiverperiodeData.Status.TELLING_FERDIG
-    },
-    perioder = arbeidsgiverperioder.map {
-        SpannerPersonDto.ArbeidsgiverData.VedtaksperiodeData.BehandlingData.EndringData.BeregnetArbeidsgiverperiodeData.VenteperiodeData(
-            periode = SpannerPersonDto.ArbeidsgiverData.PeriodeData(fom = it.periode.fom, tom = it.periode.tom),
-            navOvertarAnsvar = it.navOvertarAnsvar
-        )
-    }
-)
 
 private fun MaksdatoresultatUtDto.tilPersonData() = SpannerPersonDto.ArbeidsgiverData.VedtaksperiodeData.MaksdatoresultatData(
     vurdertTilOgMed = vurdertTilOgMed,

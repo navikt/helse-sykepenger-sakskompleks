@@ -8,10 +8,8 @@ import no.nav.helse.etterlevelse.`§ 8-19 fjerde ledd`
 import no.nav.helse.etterlevelse.`§ 8-19 første ledd`
 import no.nav.helse.etterlevelse.`§ 8-19 tredje ledd`
 import no.nav.helse.hendelser.Periode
-import no.nav.helse.hendelser.Periode.Companion.grupperSammenhengendePerioder
 import no.nav.helse.hendelser.somPeriode
 import no.nav.helse.nesteDag
-import no.nav.helse.person.BeregnetArbeidsgiverperiode
 import no.nav.helse.sykdomstidslinje.Sykdomstidslinje
 
 data class Arbeidsgiverperioderesultat(
@@ -45,34 +43,6 @@ data class Arbeidsgiverperioderesultat(
             oppholdsperioder = this.oppholdsperioder.leggTil(oppholdsperiode),
             fullstendig = fullstendig ?: this.fullstendig,
             sisteDag = sisteDag ?: this.sisteDag
-        )
-    }
-
-    internal fun somBeregnetArbeidsgiverperiode(): BeregnetArbeidsgiverperiode {
-        return BeregnetArbeidsgiverperiode(
-            status = when {
-                fullstendig || arbeidsgiverperiode.isEmpty() -> BeregnetArbeidsgiverperiode.Status.TELLING_FERDIG
-                else -> BeregnetArbeidsgiverperiode.Status.TELLING_STARTET
-            },
-            arbeidsgiverperioder = arbeidsgiverperiode
-                .flatten()
-                .map { agpDag ->
-                    BeregnetArbeidsgiverperiode.Venteperiode(
-                        periode = agpDag.somPeriode(),
-                        navOvertarAnsvar = utbetalingsperioder.any { agpDag in it }
-                    )
-                }
-                .fold(emptyList<BeregnetArbeidsgiverperiode.Venteperiode>()) { resultat, dag ->
-                    val last = resultat.lastOrNull()
-                    when {
-                        last == null -> listOf(dag)
-                        last.navOvertarAnsvar == dag.navOvertarAnsvar && last.periode.endInclusive.nesteDag == dag.periode.start -> {
-                            resultat.dropLast(1) + last.copy(periode = last.periode.oppdaterTom(dag.periode))
-                        }
-
-                        else -> resultat.plusElement(dag)
-                    }
-                }
         )
     }
 

@@ -369,7 +369,7 @@ internal class KorrigerendeInntektsmeldingTest : AbstractEndToEndTest() {
             listOf(1.januar til 8.januar, 13.januar til 21.januar)
         )
         assertEquals("SSSSSHH SAAAAGG SSSSSHH SSSSSHH SSS", inspektør.sykdomshistorikk.sykdomstidslinje().toShortString())
-        assertVarsler(emptyList(), 1.vedtaksperiode.filter())
+        assertVarsler(listOf(RV_IM_24), 1.vedtaksperiode.filter())
     }
 
     @Test

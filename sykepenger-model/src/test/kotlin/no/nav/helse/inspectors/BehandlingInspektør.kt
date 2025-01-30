@@ -29,7 +29,7 @@ internal class BehandlingInspektør(view: BehandlingView) {
                 refusjonstidslinje = it.refusjonstidslinje,
                 skjæringstidspunkt = it.skjæringstidspunkt,
                 sykdomstidslinje = it.sykdomstidslinje,
-                arbeidsgiverperiode = it.arbeidsgiverperiode.arbeidsgiverperioder.map { it.periode },
+                arbeidsgiverperiode = it.arbeidsgiverperiode,
                 sykmeldingsperiode = it.sykmeldingsperiode,
             )
         },
@@ -63,7 +63,7 @@ internal class BehandlingInspektør(view: BehandlingView) {
             val refusjonstidslinje: Beløpstidslinje,
             val skjæringstidspunkt: LocalDate,
             val sykdomstidslinje: Sykdomstidslinje,
-            val arbeidsgiverperiode: List<Periode>,
+            val arbeidsgiverperiode: List<Periode>?,
             val sykmeldingsperiode: Periode
         )
 

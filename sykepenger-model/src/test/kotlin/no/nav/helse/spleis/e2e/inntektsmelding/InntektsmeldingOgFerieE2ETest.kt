@@ -40,6 +40,7 @@ import no.nav.helse.spleis.e2e.nyPeriode
 import no.nav.helse.spleis.e2e.nyttVedtak
 import no.nav.helse.økonomi.Prosentdel.Companion.prosent
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 
 internal class InntektsmeldingOgFerieE2ETest : AbstractEndToEndTest() {
@@ -143,7 +144,7 @@ internal class InntektsmeldingOgFerieE2ETest : AbstractEndToEndTest() {
 
         assertEquals(24.februar, inspektør.skjæringstidspunkt(3.vedtaksperiode))
         assertEquals(24.februar til 28.februar, inspektør.periode(3.vedtaksperiode))
-        assertEquals(emptyList<Any>(), inspektør.arbeidsgiverperiode(3.vedtaksperiode))
+        assertNull(inspektør.arbeidsgiverperiode(3.vedtaksperiode))
         assertTilstander(3.vedtaksperiode, START, AVVENTER_INNTEKTSMELDING, AVSLUTTET_UTEN_UTBETALING)
     }
 

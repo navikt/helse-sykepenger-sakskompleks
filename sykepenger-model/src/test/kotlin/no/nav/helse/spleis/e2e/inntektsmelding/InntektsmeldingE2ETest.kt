@@ -2303,7 +2303,7 @@ internal class InntektsmeldingE2ETest : AbstractEndToEndTest() {
             arbeidsgiverperioder = listOf(førsteDagIArbeidsgiverperioden til 15.mars)
         )
         assertEquals("R AAAAARR AAAAARR AAAAARR AAAAARR AASSSHH SSSSSHH SSSSSHH SSSSSHH SSSSSH", inspektør.sykdomshistorikk.sykdomstidslinje().toShortString())
-        assertEquals(emptyList<Any>(), inspektør.arbeidsgiverperiode(1.vedtaksperiode))
+        assertNull(inspektør.arbeidsgiverperiode(1.vedtaksperiode))
         assertEquals(listOf(28.februar til 15.mars), inspektør.arbeidsgiverperiode(2.vedtaksperiode))
         assertEquals(listOf(28.februar til 15.mars), inspektør.arbeidsgiverperiode(2.vedtaksperiode))
         assertSisteTilstand(1.vedtaksperiode, AVSLUTTET_UTEN_UTBETALING)

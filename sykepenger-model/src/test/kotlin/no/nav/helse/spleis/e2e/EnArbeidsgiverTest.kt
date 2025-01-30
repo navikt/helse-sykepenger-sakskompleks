@@ -69,7 +69,7 @@ internal class EnArbeidsgiverTest : AbstractEndToEndTest() {
 
         assertVarsler(listOf(Varselkode.RV_IM_3, Varselkode.RV_IM_4, RV_IM_24, Varselkode.RV_IM_25), 2.vedtaksperiode.filter())
         assertEquals("ARR AAAAARR AAAAARR AAAAARR AAAAARR ANSSSHH SSSSSH", inspektør.vedtaksperioder(2.vedtaksperiode).sykdomstidslinje.toShortString())
-        assertEquals(listOf(7.august.somPeriode(), 8.august til 18.august), inspektør.arbeidsgiverperioden(2.vedtaksperiode))
+        assertEquals(listOf(7.august til 18.august), inspektør.arbeidsgiverperioden(2.vedtaksperiode))
         assertEquals(7.august, inspektør.skjæringstidspunkt(2.vedtaksperiode))
 
         håndterVilkårsgrunnlag(2.vedtaksperiode)

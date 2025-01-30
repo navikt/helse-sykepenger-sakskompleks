@@ -19,7 +19,6 @@ import no.nav.helse.hendelser.Periode.Companion.grupperSammenhengendePerioder
 import no.nav.helse.hendelser.til
 import no.nav.helse.januar
 import no.nav.helse.nesteDag
-import no.nav.helse.person.BeregnetArbeidsgiverperiode
 import no.nav.helse.person.beløp.Beløpstidslinje
 import no.nav.helse.person.beløp.BeløpstidslinjeTest.Companion.beløpstidslinje
 import no.nav.helse.person.inntekt.Inntektstidslinje
@@ -213,13 +212,8 @@ internal class ArbeidsgiverperiodesubsumsjonTest {
                 )
             ),
             regler = ArbeidsgiverRegler.Companion.NormalArbeidstaker,
-            arbeidsgiverperiode = BeregnetArbeidsgiverperiode(
-                status = BeregnetArbeidsgiverperiode.Status.TELLING_FERDIG,
-                arbeidsgiverperioder = arbeidsgiverperioder
-                    .flatMap { it.arbeidsgiverperiode }
-                    .grupperSammenhengendePerioder()
-                    .map { BeregnetArbeidsgiverperiode.Venteperiode(it, false) }
-            ),
+            arbeidsgiverperiode = arbeidsgiverperioder.flatMap { it.arbeidsgiverperiode }.grupperSammenhengendePerioder(),
+            dagerNavOvertarAnsvar = emptyList(),
             refusjonstidslinje = tidslinje.periode()?.let { ARBEIDSGIVER.beløpstidslinje(it, 31000.månedlig) } ?: Beløpstidslinje()
         )
 

@@ -48,11 +48,11 @@ internal class UtkastTilVedtakBuilder(
     private lateinit var behandlingId: UUID
     internal fun behandlingId(behandlingId: UUID) = apply { this.behandlingId = behandlingId }
     private lateinit var periode: Periode
-    internal fun periode(arbeidsgiverperiode: List<Periode>, periode: Periode) = apply {
+    internal fun periode(arbeidsgiverperiode: List<Periode>?, periode: Periode) = apply {
         this.periode = periode
 
-        val gjennomført = NormalArbeidstaker.arbeidsgiverperiodenGjennomført(arbeidsgiverperiode.periode()?.count() ?: 0)
-        val arbeidsgiverperiodePåstartetITidligerePeriode = arbeidsgiverperiode.isNotEmpty() && periode.start >= arbeidsgiverperiode.last().endInclusive
+        val gjennomført = NormalArbeidstaker.arbeidsgiverperiodenGjennomført(arbeidsgiverperiode?.periode()?.count() ?: 0)
+        val arbeidsgiverperiodePåstartetITidligerePeriode = arbeidsgiverperiode != null && arbeidsgiverperiode.isNotEmpty() && periode.start >= arbeidsgiverperiode.last().endInclusive
 
         // flex viser denne teksten hvis vi har tagget med 'IngenNyArbeidsgiverperiode':
         //      Det er tidligere utbetalt en hel arbeidsgiverperiode.
@@ -62,7 +62,7 @@ internal class UtkastTilVedtakBuilder(
         if (utbetalingFraFørsteDagEtterAGP) {
             tags.add(Tag.IngenNyArbeidsgiverperiode)
         }
-        if (arbeidsgiverperiode.periode()?.contains(periode) == true) {
+        if (arbeidsgiverperiode?.periode()?.contains(periode) == true) {
             tags.add(Tag.InnenforArbeidsgiverperioden)
         }
     }

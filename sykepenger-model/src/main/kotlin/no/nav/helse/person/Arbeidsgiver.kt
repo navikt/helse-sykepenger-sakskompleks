@@ -934,11 +934,8 @@ internal class Arbeidsgiver private constructor(
     internal fun beregnArbeidsgiverperiode() = { vedtaksperiode: Periode ->
         arbeidsgiverperiodeFor(sykdomstidslinje())
             .finn(vedtaksperiode)
-            ?.somBeregnetArbeidsgiverperiode()
-            ?: BeregnetArbeidsgiverperiode(
-                status = BeregnetArbeidsgiverperiode.Status.TELLING_IKKE_BEGYNT,
-                arbeidsgiverperioder = emptyList()
-            )
+            ?.arbeidsgiverperiode
+            ?.grupperSammenhengendePerioder()
     }
 
     private fun arbeidsgiverperiode(periode: Periode, sykdomstidslinje: Sykdomstidslinje): Arbeidsgiverperiode? {

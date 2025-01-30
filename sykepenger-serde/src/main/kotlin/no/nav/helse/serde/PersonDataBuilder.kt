@@ -46,7 +46,6 @@ import no.nav.helse.dto.serialisering.InfotrygdhistorikkelementUtDto
 import no.nav.helse.dto.serialisering.InntektsgrunnlagUtDto
 import no.nav.helse.dto.serialisering.InntektsmeldingUtDto
 import no.nav.helse.dto.serialisering.ArbeidstakerinntektskildeUtDto
-import no.nav.helse.dto.serialisering.BeregnetArbeidsgiverperiodeUtDto
 import no.nav.helse.dto.serialisering.InntektsopplysningUtDto
 import no.nav.helse.dto.serialisering.MaksdatoresultatUtDto
 import no.nav.helse.dto.serialisering.OppdragUtDto
@@ -63,7 +62,6 @@ import no.nav.helse.dto.serialisering.VilkårsgrunnlagInnslagUtDto
 import no.nav.helse.dto.serialisering.VilkårsgrunnlagUtDto
 import no.nav.helse.serde.PersonData.ArbeidsgiverData.InntektsmeldingData.InntektsmeldingKildeDto
 import no.nav.helse.serde.PersonData.ArbeidsgiverData.SykdomstidslinjeData.DagData
-import no.nav.helse.serde.PersonData.ArbeidsgiverData.VedtaksperiodeData.BehandlingData.EndringData.BeregnetArbeidsgiverperiodeData.StatusData
 import no.nav.helse.serde.PersonData.ArbeidsgiverData.VedtaksperiodeData.TilstandTypeData
 import no.nav.helse.serde.PersonData.UtbetalingstidslinjeData.UtbetalingsdagData
 import no.nav.helse.serde.PersonData.VilkårsgrunnlagElementData.ArbeidsgiverInntektsopplysningData.InntektsopplysningData.InntektsopplysningskildeData
@@ -407,26 +405,9 @@ private fun BehandlingendringUtDto.tilPersonData() = PersonData.ArbeidsgiverData
     utbetalingstidslinje = utbetalingstidslinje.tilPersonData(),
     refusjonstidslinje = refusjonstidslinje.tilPersonData(),
     dokumentsporing = dokumentsporing.tilPersonData(),
-    beregnetArbeidsgiverperiode = arbeidsgiverperioder.tilPersonData(),
-    arbeidsgiverperioder = arbeidsgiverperioder.arbeidsgiverperioder.map {
-        PersonData.ArbeidsgiverData.PeriodeData(it.periode.fom, it.periode.tom)
-    },
+    arbeidsgiverperioder = arbeidsgiverperioder?.map { PersonData.ArbeidsgiverData.PeriodeData(it.fom, it.tom) },
+    dagerNavOvertarAnsvar = dagerNavOvertarAnsvar.map { PersonData.ArbeidsgiverData.PeriodeData(it.fom, it.tom) },
     maksdatoresultat = maksdatoresultat.tilPersonData()
-)
-
-private fun BeregnetArbeidsgiverperiodeUtDto.tilPersonData() = PersonData.ArbeidsgiverData.VedtaksperiodeData.BehandlingData.EndringData.BeregnetArbeidsgiverperiodeData(
-    status = when (status) {
-        BeregnetArbeidsgiverperiodeUtDto.StatusUtDto.TELLING_IKKE_BEGYNT -> StatusData.TELLING_IKKE_BEGYNT
-        BeregnetArbeidsgiverperiodeUtDto.StatusUtDto.TELLING_STARTET -> StatusData.TELLING_STARTET
-        BeregnetArbeidsgiverperiodeUtDto.StatusUtDto.TELLING_FERDIG -> StatusData.TELLING_FERDIG
-    },
-    perioder = arbeidsgiverperioder.map {
-        PersonData.ArbeidsgiverData.VedtaksperiodeData.BehandlingData.EndringData.BeregnetArbeidsgiverperiodeData.VenteperiodeData(
-            fom = it.periode.fom,
-            tom = it.periode.tom,
-            navOvertarAnsvar = it.navOvertarAnsvar
-        )
-    }
 )
 
 private fun MaksdatoresultatUtDto.tilPersonData() = PersonData.ArbeidsgiverData.VedtaksperiodeData.MaksdatoresultatData(
