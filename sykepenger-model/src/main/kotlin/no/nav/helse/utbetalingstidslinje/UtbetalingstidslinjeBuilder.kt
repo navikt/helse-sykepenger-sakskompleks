@@ -171,8 +171,15 @@ internal class ArbeidsgiverFaktaavklartInntekt(
 
 internal data class ArbeidsgiverperiodeForVedtaksperiode(
     val vedtaksperiode: Periode,
-    val arbeidsgiverperioder: List<Periode>
-)
+    val arbeidsgiverperioder: List<Periode>,
+    val sykedagNav: List<LocalDate> = emptyList()
+) {
+    val arbeidsgiverperiode = arbeidsgiverperioder.periode()
+    val erUtenforAGP = arbeidsgiverperiode != null && arbeidsgiverperiode.endInclusive < vedtaksperiode.endInclusive
+    val navSkalOvertaAGP = arbeidsgiverperiode != null && sykedagNav.any { it in arbeidsgiverperiode }
+
+    val skalFatteVedtak = navSkalOvertaAGP || erUtenforAGP
+}
 
 internal class UtbetalingstidslinjeBuilderVedtaksperiode(
     private val faktaavklarteInntekter: ArbeidsgiverFaktaavklartInntekt,

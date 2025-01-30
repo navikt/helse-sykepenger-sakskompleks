@@ -1776,14 +1776,14 @@ internal class Vedtaksperiode private constructor(
         arbeidsgiver.arbeidsgiverperiodeInkludertForkastet(periode, sykdomstidslinje)
 
     private fun skalBehandlesISpeil(): Boolean {
-        return behandlinger.harVærtBeregnet() || forventerInntekt()
+        // sender perioden til speil så lenge en tidligere behandling har vært beregnet
+        if (behandlinger.harVærtBeregnet()) return true
+        // fatter vedtak så lenge perioden er utenfor agp eller at nav skal overta ansvaret for agp
+        // todo: støtte saker med agp i infotrygd
+        return behandlinger.arbeidsgiverperiode().skalFatteVedtak
     }
 
     private fun skalOmgjøres(): Boolean {
-        return forventerInntekt()
-    }
-
-    private fun forventerInntekt(): Boolean {
         return finnArbeidsgiverperiode()?.forventerInntekt(periode) == true
     }
 

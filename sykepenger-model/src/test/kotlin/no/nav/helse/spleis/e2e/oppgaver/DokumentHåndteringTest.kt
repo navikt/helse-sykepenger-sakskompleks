@@ -202,10 +202,10 @@ internal class DokumentHåndteringTest : AbstractEndToEndTest() {
         håndterSøknad(Sykdom(1.januar, 31.januar, 100.prosent), Søknad.Søknadsperiode.Ferie(17.januar, 31.januar))
         håndterSykmelding(Sykmeldingsperiode(1.februar, 28.februar))
         val id = håndterInntektsmelding(listOf(1.januar til 16.januar), førsteFraværsdag = 1.januar)
-        val inntektsmeldingFørSøknadEvent = observatør.inntektsmeldingFørSøknad.single()
-        inntektsmeldingFørSøknadEvent.let {
-            assertEquals(id, it.inntektsmeldingId)
-            assertEquals(listOf(februar), it.relevanteSykmeldingsperioder)
+        val inntektsmeldingFørSøknadEvent = observatør.inntektsmeldingHåndtert.single()
+        inntektsmeldingFørSøknadEvent.let { (inntektsmeldingId, vedtaksperiode) ->
+            assertEquals(id, inntektsmeldingId)
+            assertEquals(1.vedtaksperiode.id(a1), vedtaksperiode)
         }
     }
 

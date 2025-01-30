@@ -94,7 +94,11 @@ internal class Behandlinger private constructor(behandlinger: List<Behandling>) 
         hendelser = hendelseIder()
     )
 
-    internal fun arbeidsgiverperiode() = ArbeidsgiverperiodeForVedtaksperiode(periode(), behandlinger.last().arbeidsgiverperiode)
+    internal fun arbeidsgiverperiode() = ArbeidsgiverperiodeForVedtaksperiode(
+        vedtaksperiode = periode(),
+        arbeidsgiverperioder = behandlinger.last().arbeidsgiverperiode,
+        sykedagNav = behandlinger.last().sykdomstidslinje.filterIsInstance<SykedagNav>().map { it.dato }
+    )
     internal fun lagUtbetalingstidslinje(faktaavklarteInntekter: ArbeidsgiverFaktaavklartInntekt) = behandlinger.last().lagUtbetalingstidslinje(faktaavklarteInntekter)
 
     internal val maksdato get() = behandlinger.last().maksdato
@@ -133,7 +137,7 @@ internal class Behandlinger private constructor(behandlinger: List<Behandling>) 
         siste!!.valider(simulering, aktivitetslogg)
     }
 
-    internal fun erKlarForGodkjenning() = siste?.erKlarForGodkjenning() ?: false
+    internal fun erKlarForGodkjenning() = siste?.erKlarForGodkjenning() == true
     internal fun simuler(aktivitetslogg: IAktivitetslogg) = siste!!.simuler(aktivitetslogg)
     internal fun godkjenning(aktivitetslogg: IAktivitetslogg, builder: UtkastTilVedtakBuilder) {
         if (behandlinger.grunnbeløpsregulert()) builder.grunnbeløpsregulert()
