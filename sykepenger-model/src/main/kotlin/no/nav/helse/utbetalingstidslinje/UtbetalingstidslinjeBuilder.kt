@@ -171,7 +171,7 @@ internal class ArbeidsgiverFaktaavklartInntekt(
 
 internal data class ArbeidsgiverperiodeForVedtaksperiode(
     val vedtaksperiode: Periode,
-    val arbeidsgiverperioder: List<Periode>?,
+    val arbeidsgiverperioder: List<Periode>,
     val dagerNavOvertarAnsvar: List<Periode> = emptyList()
 )
 

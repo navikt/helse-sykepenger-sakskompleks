@@ -46,13 +46,13 @@ internal class UtbetalingsakerBuilder(
             c) første dag i vedtaksperioden hvis arbeidsgiverperioden er tom og det ikke foreligger noen IT-utbetalinger
          */
         return infotrygdutbetalingsakStartdato
-            ?: vedtaksperiode.arbeidsgiverperioder?.firstOrNull()?.start
+            ?: vedtaksperiode.arbeidsgiverperioder.firstOrNull()?.start
             ?: vedtaksperiode.vedtaksperiode.start
     }
 
     private fun infotrygdutbetalingEtterArbeidsgiverperiodenOgFørVedtaksperioden(infotrygdbetalinger: List<Periode>, vedtaksperiode: ArbeidsgiverperiodeForVedtaksperiode) =
         infotrygdbetalinger.lastOrNull { infotrygdperiode ->
-            (vedtaksperiode.arbeidsgiverperioder != null && (vedtaksperiode.arbeidsgiverperioder.isEmpty() || infotrygdperiode.start > vedtaksperiode.arbeidsgiverperioder.last().endInclusive))
+            (vedtaksperiode.arbeidsgiverperioder.isEmpty() || infotrygdperiode.start > vedtaksperiode.arbeidsgiverperioder.last().endInclusive)
                 && infotrygdperiode.endInclusive < vedtaksperiode.vedtaksperiode.start
         }
 

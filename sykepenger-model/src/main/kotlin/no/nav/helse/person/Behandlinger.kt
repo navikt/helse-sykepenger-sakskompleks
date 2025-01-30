@@ -357,7 +357,7 @@ internal class Behandlinger private constructor(behandlinger: List<Behandling>) 
         fun arbeidsgiverperiode() =
             ArbeidsgiverperiodeForVedtaksperiode(
                 vedtaksperiode = periode,
-                arbeidsgiverperioder = arbeidsgiverperiode,
+                arbeidsgiverperioder = arbeidsgiverperiode ?: emptyList(),
                 dagerNavOvertarAnsvar = gjeldende.dagerNavOvertarAnsvar
             )
 
